@@ -2,8 +2,7 @@ package book.service;
 
 import java.util.List;
 
-import book.entity.Admin;
-
+import com.xjh.dao.dataobject.Admin;
 
 public interface AdminService {
     /**

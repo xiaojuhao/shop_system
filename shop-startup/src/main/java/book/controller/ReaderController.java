@@ -14,7 +14,8 @@ import java.util.ResourceBundle;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import book.entity.Reader;
+import com.xjh.dao.dataobject.Reader;
+
 import book.service.ReaderService;
 import book.utils.ServiceFactory;
 import javafx.beans.value.ChangeListener;

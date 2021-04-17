@@ -5,11 +5,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import book.entity.Type;
-import book.service.TypeService;
+import com.xjh.dao.dataobject.Type;
+
 import book.utils.ColorUtil;
 import book.utils.ComponentUtil;
-import book.utils.ServiceFactory;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -35,9 +34,6 @@ public class TypeController implements Initializable {
 
     //定义ObservableList数据集合
     private ObservableList<Type> typeData = FXCollections.observableArrayList();
-
-    //通过工厂类获得TypeService的实例
-    private TypeService typeService = ServiceFactory.getTypeServiceInstance();
 
     //定义Type类型集合，用来存放数据库查询结果
     private List<Type> typeList;
@@ -75,7 +71,6 @@ public class TypeController implements Initializable {
                     if (result.get() == ButtonType.OK) {
                         typeData.remove(type);
                         //调用typeService的删除类别方法
-                        typeService.deleteType(type.getId());
                         showTypePane();
                     }
                 });
@@ -83,7 +78,6 @@ public class TypeController implements Initializable {
         });
         //删除列加入表格
         typeTable.getColumns().add(delCol);
-        typeList = typeService.getAllTypes();
         //显示类别的表格数据
         showTypeData(typeList);
         //显示类别的卡片展示
@@ -106,7 +100,6 @@ public class TypeController implements Initializable {
             Type type = new Type();
             type.setTypeName(typeName);
             long id = 0;
-            id = typeService.addType(type);
             type.setId(id);
             //加入ObservableList，刷新模型视图，不用重新查询数据库也可以立刻看到结果
             typeData.add(type);
@@ -121,7 +114,6 @@ public class TypeController implements Initializable {
 
     private void showTypePane() {
         typePane.getChildren().clear();
-        typeList = typeService.getAllTypes();
         //遍历类别集合数据
         for (Type type : typeList) {
             //给每个类别创建一个面板

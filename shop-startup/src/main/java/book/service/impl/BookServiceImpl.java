@@ -4,8 +4,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import book.dao.BookDAO;
-import book.entity.Book;
+import com.xjh.dao.BookDAO;
+import com.xjh.dao.dataobject.Book;
+
 import book.service.BookService;
 import book.utils.DAOFactory;
 

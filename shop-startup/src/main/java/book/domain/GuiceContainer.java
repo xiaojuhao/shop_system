@@ -2,8 +2,8 @@ package book.domain;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.xjh.dao.DaoModule;
 
-import book.dao.DaoModule;
 import book.datasource.DataSourceModule;
 import book.service.ServiceModule;
 import book.utils.Holder;

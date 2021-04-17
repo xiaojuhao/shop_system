@@ -7,7 +7,8 @@ import java.util.ResourceBundle;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import book.entity.Admin;
+import com.xjh.dao.dataobject.Admin;
+
 import book.service.AdminService;
 import book.utils.ServiceFactory;
 import javafx.collections.FXCollections;

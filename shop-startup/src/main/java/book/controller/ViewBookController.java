@@ -7,7 +7,8 @@ import java.util.ResourceBundle;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import book.entity.Book;
+import com.xjh.dao.dataobject.Book;
+
 import book.service.BookService;
 import book.utils.ServiceFactory;
 import javafx.collections.ObservableList;

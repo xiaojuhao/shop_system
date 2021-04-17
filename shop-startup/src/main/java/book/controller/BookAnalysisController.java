@@ -1,12 +1,13 @@
 package book.controller;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import book.entity.Type;
+import com.xjh.dao.dataobject.Type;
+
 import book.service.BookService;
-import book.service.TypeService;
 import book.utils.ServiceFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,7 +24,6 @@ public class BookAnalysisController implements Initializable {
     @FXML
     private StackPane pieChartPane, barChartPane;
 
-    private TypeService typeService = ServiceFactory.getTypeServiceInstance();
     private BookService bookService = ServiceFactory.getBookServiceInstance();
     private ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
 
@@ -36,7 +36,7 @@ public class BookAnalysisController implements Initializable {
     }
 
     private void initPieChart() {
-        List<Type> typeList = typeService.getAllTypes();
+        List<Type> typeList = new ArrayList<>();
         for (Type type : typeList) {
             int count = bookService.countByType(type.getId());
             pieChartData.add(new PieChart.Data(type.getTypeName(), count));
@@ -56,7 +56,7 @@ public class BookAnalysisController implements Initializable {
         yAxis.setLabel("图书数量");
         XYChart.Series series1 = new XYChart.Series();
         series1.setName("2018年统计数据");
-        List<Type> typeList = typeService.getAllTypes();
+        List<Type> typeList = new ArrayList<>();
         for (Type type : typeList) {
             int count = bookService.countByType(type.getId());
             series1.getData().add(new XYChart.Data(type.getTypeName(), count));

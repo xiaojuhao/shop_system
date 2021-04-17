@@ -6,7 +6,6 @@ import book.service.impl.AdminServiceImpl;
 import book.service.impl.AnalysisServiceImpl;
 import book.service.impl.BookServiceImpl;
 import book.service.impl.ReaderServiceImpl;
-import book.service.impl.TypeServiceImpl;
 
 public class ServiceModule extends AbstractModule {
     @Override
@@ -15,6 +14,5 @@ public class ServiceModule extends AbstractModule {
         bind(AnalysisService.class).to(AnalysisServiceImpl.class);
         bind(BookService.class).to(BookServiceImpl.class);
         bind(ReaderService.class).to(ReaderServiceImpl.class);
-        bind(TypeService.class).to(TypeServiceImpl.class);
     }
 }

@@ -3,7 +3,8 @@ package book.controller;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import book.entity.Admin;
+import com.xjh.dao.dataobject.Admin;
+
 import book.service.AdminService;
 import book.utils.ServiceFactory;
 import javafx.application.Platform;

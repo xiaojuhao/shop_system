@@ -4,10 +4,10 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import book.entity.Book;
-import book.entity.Type;
+import com.xjh.dao.dataobject.Book;
+import com.xjh.dao.dataobject.Type;
+
 import book.service.BookService;
-import book.service.TypeService;
 import book.utils.ServiceFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -42,15 +42,12 @@ public class AddBookController implements Initializable {
 
     private BookService bookService = ServiceFactory.getBookServiceInstance();
 
-    private TypeService typeService = ServiceFactory.getTypeServiceInstance();
-
     private List<Type> typeList = null;
 
     private Long typeId;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        typeList = typeService.getAllTypes();
         typeData.addAll(typeList);
         bookType.setItems(typeData);
         bookType.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {

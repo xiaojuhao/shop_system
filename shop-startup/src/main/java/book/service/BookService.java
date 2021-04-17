@@ -2,7 +2,7 @@ package book.service;
 
 import java.util.List;
 
-import book.entity.Book;
+import com.xjh.dao.dataobject.Book;
 
 public interface BookService {
     /**

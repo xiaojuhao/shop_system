@@ -2,7 +2,8 @@ package book.utils;
 
 import java.util.List;
 
-import book.entity.Book;
+import com.xjh.dao.dataobject.Book;
+
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 

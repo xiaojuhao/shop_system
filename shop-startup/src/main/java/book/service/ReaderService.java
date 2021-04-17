@@ -2,7 +2,7 @@ package book.service;
 
 import java.util.List;
 
-import book.entity.Reader;
+import com.xjh.dao.dataobject.Reader;
 
 /**
  * 读者业务逻辑接口

@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import book.entity.Book;
-import book.entity.Type;
+import com.xjh.dao.dataobject.Book;
+import com.xjh.dao.dataobject.Type;
+
 import book.service.BookService;
-import book.service.TypeService;
 import book.utils.ComponentUtil;
 import book.utils.ExcelExport;
 import book.utils.ServiceFactory;
@@ -59,9 +59,6 @@ public class BookController implements Initializable {
 
     //图书Service对象，从DAO工厂通过静态方法获得
     private BookService bookService = ServiceFactory.getBookServiceInstance();
-
-    //类别TypeService对象
-    private TypeService typeService = ServiceFactory.getTypeServiceInstance();
 
     //图书集合，存放数据库图书表各种查询的结果
     private List<Book> bookList = null;
@@ -205,8 +202,6 @@ public class BookController implements Initializable {
 
     //下拉框初始化方法
     private void initComBox() {
-        //1.到数据库查询所有的类别
-        typeList = typeService.getAllTypes();
         //2.将typeList集合加入typeData模型数据集合
         typeData.addAll(typeList);
         //3.将数据模型设置给下拉框

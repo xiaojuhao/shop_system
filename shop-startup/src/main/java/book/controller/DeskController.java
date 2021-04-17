@@ -9,9 +9,10 @@ import java.util.Map;
 import java.util.Random;
 import java.util.ResourceBundle;
 
-import book.dao.DeskDAO;
+import com.xjh.dao.DeskDAO;
+import com.xjh.dao.dataobject.Desk;
+
 import book.domain.GuiceContainer;
-import book.entity.Desk;
 import book.enumeration.EnumDesKStatus;
 import book.utils.CommonUtils;
 import book.utils.DateBuilder;

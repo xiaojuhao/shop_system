@@ -1,16 +1,15 @@
 package book.utils;
 
-
-import book.dao.AdminDAO;
-import book.dao.BookDAO;
-import book.dao.DeskDAO;
-import book.dao.ReaderDAO;
-import book.dao.TypeDAO;
-import book.dao.impl.AdminDAOImpl;
-import book.dao.impl.BookDAOImpl;
-import book.dao.impl.DeskDAOImpl;
-import book.dao.impl.ReaderDAOImpl;
-import book.dao.impl.TypeDAOImpl;
+import com.xjh.dao.AdminDAO;
+import com.xjh.dao.BookDAO;
+import com.xjh.dao.DeskDAO;
+import com.xjh.dao.ReaderDAO;
+import com.xjh.dao.TypeDAO;
+import com.xjh.dao.impl.AdminDAOImpl;
+import com.xjh.dao.impl.BookDAOImpl;
+import com.xjh.dao.impl.DeskDAOImpl;
+import com.xjh.dao.impl.ReaderDAOImpl;
+import com.xjh.dao.impl.TypeDAOImpl;
 
 /**
  * 工厂类，用静态方法来生成各个DAO实例
