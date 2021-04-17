@@ -16,8 +16,8 @@ import java.util.concurrent.Executors;
 
 import com.xjh.dao.dataobject.Reader;
 
+import book.domain.GuiceContainer;
 import book.service.ReaderService;
-import book.utils.ServiceFactory;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -51,7 +51,7 @@ import javafx.stage.Stage;
 public class ReaderController implements Initializable {
     @FXML
     private FlowPane readerPane;
-    private ReaderService readerService = ServiceFactory.getReaderServiceInstance();
+    ReaderService readerService = GuiceContainer.getInstance(ReaderService.class);
     private List<Reader> readerList = new ArrayList<>();
 
 

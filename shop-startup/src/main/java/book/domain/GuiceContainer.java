@@ -2,11 +2,11 @@ package book.domain;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.xjh.common.utils.Holder;
 import com.xjh.dao.DaoModule;
 
 import book.datasource.DataSourceModule;
 import book.service.ServiceModule;
-import book.utils.Holder;
 
 public class GuiceContainer {
     static Holder<Injector> injector = new Holder<>();

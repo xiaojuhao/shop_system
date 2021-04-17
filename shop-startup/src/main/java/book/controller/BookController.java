@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+import com.xjh.common.utils.ComponentUtil;
+import com.xjh.common.utils.ExcelExport;
 import com.xjh.dao.dataobject.Book;
 import com.xjh.dao.dataobject.Type;
 
+import book.domain.GuiceContainer;
 import book.service.BookService;
-import book.utils.ComponentUtil;
-import book.utils.ExcelExport;
-import book.utils.ServiceFactory;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -58,7 +58,7 @@ public class BookController implements Initializable {
     private ObservableList<Type> typeData = FXCollections.observableArrayList();
 
     //图书Service对象，从DAO工厂通过静态方法获得
-    private BookService bookService = ServiceFactory.getBookServiceInstance();
+    private BookService bookService = GuiceContainer.getInstance(BookService.class);
 
     //图书集合，存放数据库图书表各种查询的结果
     private List<Book> bookList = null;

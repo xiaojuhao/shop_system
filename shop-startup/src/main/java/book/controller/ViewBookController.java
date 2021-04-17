@@ -9,8 +9,8 @@ import java.util.concurrent.Executors;
 
 import com.xjh.dao.dataobject.Book;
 
+import book.domain.GuiceContainer;
 import book.service.BookService;
-import book.utils.ServiceFactory;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -30,7 +30,7 @@ public class ViewBookController implements Initializable {
 
     private List<Book> bookList;
 
-    private BookService bookService = ServiceFactory.getBookServiceInstance();
+    BookService bookService = GuiceContainer.getInstance(BookService.class);
 
     private static final int MAX_THREADS = 4;
     //线程池配置

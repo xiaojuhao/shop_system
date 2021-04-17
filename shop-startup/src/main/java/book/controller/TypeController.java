@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+import com.xjh.common.utils.ColorUtil;
+import com.xjh.common.utils.ComponentUtil;
 import com.xjh.dao.dataobject.Type;
 
-import book.utils.ColorUtil;
-import book.utils.ComponentUtil;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

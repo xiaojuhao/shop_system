@@ -3,8 +3,8 @@ package book.controller;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import book.domain.GuiceContainer;
 import book.service.ReaderService;
-import book.utils.ServiceFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -19,7 +19,7 @@ public class ReaderAnalysisController implements Initializable {
     private String[] departments = {"机械工程学院", "电气工程学院", "航空工程学院", "交通工程学院",
             "计算机与软件学院", "经济管理学院", "商务贸易学院", "艺术设计学院"};
     private String[] roles = {"教师", "学生"};
-    private ReaderService readerService = ServiceFactory.getReaderServiceInstance();
+    ReaderService readerService = GuiceContainer.getInstance(ReaderService.class);
 
     private ObservableList<PieChart.Data> pieChartData1 = FXCollections.observableArrayList();
 

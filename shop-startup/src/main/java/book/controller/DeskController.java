@@ -9,14 +9,14 @@ import java.util.Map;
 import java.util.Random;
 import java.util.ResourceBundle;
 
+import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.utils.ThreadUtils;
 import com.xjh.dao.DeskDAO;
 import com.xjh.dao.dataobject.Desk;
 
 import book.domain.GuiceContainer;
 import book.enumeration.EnumDesKStatus;
-import book.utils.CommonUtils;
-import book.utils.DateBuilder;
-import book.utils.ThreadUtils;
 import cn.hutool.core.lang.Holder;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;

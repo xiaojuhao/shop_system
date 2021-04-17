@@ -4,14 +4,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.inject.Inject;
 import com.xjh.dao.BookDAO;
 import com.xjh.dao.dataobject.Book;
 
 import book.service.BookService;
-import book.utils.DAOFactory;
 
 public class BookServiceImpl implements BookService {
-    private BookDAO bookDAO = DAOFactory.getBookDAOInstance();
+    @Inject
+    BookDAO bookDAO;
 
     @Override
     public Long addBook(Book book) {

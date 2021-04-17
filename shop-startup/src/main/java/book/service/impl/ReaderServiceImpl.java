@@ -4,14 +4,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.inject.Inject;
 import com.xjh.dao.ReaderDAO;
 import com.xjh.dao.dataobject.Reader;
 
 import book.service.ReaderService;
-import book.utils.DAOFactory;
 
 public class ReaderServiceImpl implements ReaderService {
-    private ReaderDAO readerDAO = DAOFactory.getReaderDAOInstance();
+    @Inject
+    private ReaderDAO readerDAO;
 
     @Override
     public List<Reader> getAllReaders() {

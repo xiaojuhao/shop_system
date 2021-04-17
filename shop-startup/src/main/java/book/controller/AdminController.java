@@ -9,8 +9,8 @@ import java.util.concurrent.Executors;
 
 import com.xjh.dao.dataobject.Admin;
 
+import book.domain.GuiceContainer;
 import book.service.AdminService;
-import book.utils.ServiceFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -27,7 +27,7 @@ public class AdminController implements Initializable {
     @FXML
     private ListView<Admin> adminListView;
 
-    private AdminService adminService = ServiceFactory.getAdminServiceInstance();
+    private AdminService adminService = GuiceContainer.getInstance(AdminService.class);
 
     private ObservableList<Admin> observableList = FXCollections.observableArrayList();
 

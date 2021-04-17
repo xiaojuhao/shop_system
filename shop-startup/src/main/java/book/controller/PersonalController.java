@@ -5,8 +5,8 @@ import java.util.ResourceBundle;
 
 import com.xjh.dao.dataobject.Admin;
 
+import book.domain.GuiceContainer;
 import book.service.AdminService;
-import book.utils.ServiceFactory;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -25,7 +25,7 @@ public class PersonalController implements Initializable {
     @FXML
     private ImageView adminImg;
 
-    private AdminService adminService = ServiceFactory.getAdminServiceInstance();
+    private AdminService adminService = GuiceContainer.getInstance(AdminService.class);
 
     private Admin admin;
 

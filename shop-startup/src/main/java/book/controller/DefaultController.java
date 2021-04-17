@@ -3,8 +3,6 @@ package book.controller;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import book.service.AnalysisService;
-import book.utils.ServiceFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -15,7 +13,6 @@ public class DefaultController implements Initializable {
     private ImageView bookImg;
     @FXML
     private Label typeCount, bookCount, readerCount, adminCount;
-    private AnalysisService analysisService = ServiceFactory.getAnalysisServiceInstance();
 
     //轮播图资源数组
     String[] imgPath = {"book1.jpg", "book2.jpg", "book3.jpg", "book4.jpg", "book5.jpg"};

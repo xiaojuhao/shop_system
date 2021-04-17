@@ -4,15 +4,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.inject.Inject;
 import com.xjh.dao.AdminDAO;
 import com.xjh.dao.dataobject.Admin;
 
 import book.service.AdminService;
-import book.utils.DAOFactory;
 
 
 public class AdminServiceImpl implements AdminService {
-    private AdminDAO adminDAO = DAOFactory.getAdminDAOInstance();
+    @Inject
+    AdminDAO adminDAO;
 
     @Override
     public List<Admin> getAllAdmins() {

@@ -7,8 +7,8 @@ import java.util.ResourceBundle;
 import com.xjh.dao.dataobject.Book;
 import com.xjh.dao.dataobject.Type;
 
+import book.domain.GuiceContainer;
 import book.service.BookService;
-import book.utils.ServiceFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -40,7 +40,7 @@ public class AddBookController implements Initializable {
 
     private ObservableList<Type> typeData = FXCollections.observableArrayList();
 
-    private BookService bookService = ServiceFactory.getBookServiceInstance();
+    private BookService bookService = GuiceContainer.getInstance(BookService.class);
 
     private List<Type> typeList = null;
 

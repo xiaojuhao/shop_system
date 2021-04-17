@@ -2,20 +2,24 @@ package book.service.impl;
 
 import java.sql.SQLException;
 
+import com.google.inject.Inject;
 import com.xjh.dao.AdminDAO;
 import com.xjh.dao.BookDAO;
 import com.xjh.dao.ReaderDAO;
 import com.xjh.dao.TypeDAO;
 
 import book.service.AnalysisService;
-import book.utils.DAOFactory;
 
 
 public class AnalysisServiceImpl implements AnalysisService {
-    private TypeDAO typeDAO = DAOFactory.getTypeDAOInstance();
-    private BookDAO bookDAO = DAOFactory.getBookDAOInstance();
-    private ReaderDAO readerDAO = DAOFactory.getReaderDAOInstance();
-    private AdminDAO adminDAO = DAOFactory.getAdminDAOInstance();
+    @Inject
+    TypeDAO typeDAO;
+    @Inject
+    BookDAO bookDAO;
+    @Inject
+    ReaderDAO readerDAO;
+    @Inject
+    AdminDAO adminDAO;
 
     @Override
     public int getTypesCount() {
