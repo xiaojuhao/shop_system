@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="book.controller.PersonalController"
+            fx:controller="com.xjh.startup.controller.PersonalController"
             prefHeight="400.0" prefWidth="600.0" styleClass="box">
     <ImageView fx:id="adminImg" AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20"
                fitWidth="120" fitHeight="120">

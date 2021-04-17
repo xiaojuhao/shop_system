@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="book.controller.BookController">
+            fx:controller="com.xjh.startup.controller.BookController">
     <HBox alignment="BOTTOM_CENTER" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10" spacing="10">
         <Button styleClass="green-theme,btn-radius" text="添加图书" onAction="#newBookStage"/>
         <Button styleClass="blue-theme,btn-radius" text="导出数据" onAction="#export"/>

@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="book.controller.LoginController" styleClass="login-bg">
+            fx:controller="com.xjh.startup.controller.LoginController" styleClass="login-bg">
     <AnchorPane AnchorPane.topAnchor="120" AnchorPane.leftAnchor="400" styleClass="login-card">
         <Label text="小句号点餐收银系统" styleClass="login-title" AnchorPane.topAnchor="25" AnchorPane.leftAnchor="160"/>
         <!--        <Label text="图书管理系统后台" styleClass="font-gray" AnchorPane.topAnchor="65" AnchorPane.leftAnchor="190"/>-->

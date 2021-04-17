@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="book.controller.DefaultController">
+            fx:controller="com.xjh.startup.controller.DefaultController">
     <HBox AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0"
           AnchorPane.rightAnchor="0" prefHeight="300" spacing="20">
         <StackPane styleClass="box">

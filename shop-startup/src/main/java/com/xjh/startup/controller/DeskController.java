@@ -1,4 +1,4 @@
-package book.controller;
+package com.xjh.startup.controller;
 
 import java.net.URL;
 import java.sql.SQLException;
@@ -14,8 +14,8 @@ import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.ThreadUtils;
 import com.xjh.dao.DeskDAO;
 import com.xjh.dao.dataobject.Desk;
+import com.xjh.startup.foundation.guice.GuiceContainer;
 
-import book.domain.GuiceContainer;
 import book.enumeration.EnumDesKStatus;
 import cn.hutool.core.lang.Holder;
 import javafx.application.Platform;

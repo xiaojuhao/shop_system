@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="book.controller.TypeController">
+            fx:controller="com.xjh.startup.controller.TypeController">
     <HBox AnchorPane.topAnchor="10" AnchorPane.leftAnchor="20" spacing="20">
         <Button text="添加图书类别" styleClass="green-theme" onAction="#addType"/>
     </HBox>

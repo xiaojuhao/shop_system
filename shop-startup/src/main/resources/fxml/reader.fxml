@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.FlowPane?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="book.controller.ReaderController">
+            fx:controller="com.xjh.startup.controller.ReaderController">
     <Button text="新增读者" styleClass="green-theme" onAction="#addReader"
             AnchorPane.topAnchor="5" AnchorPane.leftAnchor="10"/>
     <FlowPane fx:id="readerPane" hgap="10" vgap="10"

@@ -1,4 +1,4 @@
-package book.controller;
+package com.xjh.startup.controller;
 
 import javafx.application.Application;
 import javafx.stage.Modality;

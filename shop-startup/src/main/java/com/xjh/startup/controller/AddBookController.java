@@ -1,4 +1,4 @@
-package book.controller;
+package com.xjh.startup.controller;
 
 import java.net.URL;
 import java.util.List;
@@ -7,8 +7,8 @@ import java.util.ResourceBundle;
 import com.xjh.dao.dataobject.Book;
 import com.xjh.dao.dataobject.Type;
 import com.xjh.service.BookService;
+import com.xjh.startup.foundation.guice.GuiceContainer;
 
-import book.domain.GuiceContainer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;

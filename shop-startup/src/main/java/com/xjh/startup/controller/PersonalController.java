@@ -1,12 +1,12 @@
-package book.controller;
+package com.xjh.startup.controller;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
 import com.xjh.dao.dataobject.Admin;
 import com.xjh.service.AdminService;
+import com.xjh.startup.foundation.guice.GuiceContainer;
 
-import book.domain.GuiceContainer;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

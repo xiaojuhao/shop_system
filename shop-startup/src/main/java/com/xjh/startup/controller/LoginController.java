@@ -1,8 +1,8 @@
-package book.controller;
+package com.xjh.startup.controller;
 
 import com.xjh.service.AdminService;
+import com.xjh.startup.foundation.guice.GuiceContainer;
 
-import book.domain.GuiceContainer;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

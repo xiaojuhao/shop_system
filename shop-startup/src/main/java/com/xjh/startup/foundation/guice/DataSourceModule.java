@@ -1,4 +1,4 @@
-package book.datasource;
+package com.xjh.startup.foundation.guice;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

@@ -1,11 +1,11 @@
-package book.controller;
+package com.xjh.startup.controller;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
 import com.xjh.service.ReaderService;
+import com.xjh.startup.foundation.guice.GuiceContainer;
 
-import book.domain.GuiceContainer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;

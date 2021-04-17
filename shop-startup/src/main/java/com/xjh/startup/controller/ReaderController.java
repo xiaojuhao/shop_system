@@ -1,4 +1,4 @@
-package book.controller;
+package com.xjh.startup.controller;
 
 import java.net.URL;
 import java.text.DateFormat;
@@ -16,8 +16,8 @@ import java.util.concurrent.Executors;
 
 import com.xjh.dao.dataobject.Reader;
 import com.xjh.service.ReaderService;
+import com.xjh.startup.foundation.guice.GuiceContainer;
 
-import book.domain.GuiceContainer;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;

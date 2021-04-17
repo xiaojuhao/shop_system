@@ -1,4 +1,4 @@
-package book.controller;
+package com.xjh.startup.controller;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

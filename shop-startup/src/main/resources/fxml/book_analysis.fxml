@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.StackPane?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="book.controller.BookAnalysisController">
+            fx:controller="com.xjh.startup.controller.BookAnalysisController">
     <GridPane>
         <StackPane fx:id="pieChartPane" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
         <StackPane fx:id="barChartPane" GridPane.columnIndex="1" GridPane.rowIndex="0"/>

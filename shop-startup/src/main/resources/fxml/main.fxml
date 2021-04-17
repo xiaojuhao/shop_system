@@ -2,7 +2,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <BorderPane styleClass="green-theme"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="book.controller.MainController">
+            fx:controller="com.xjh.startup.controller.MainController">
     <top>
         <!--        <AnchorPane prefHeight="80.0">-->
         <!--            <Label text="小句号点餐系统" onMouseClicked="#listDefault"-->
