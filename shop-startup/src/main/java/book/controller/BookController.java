@@ -9,9 +9,9 @@ import com.xjh.common.utils.ComponentUtil;
 import com.xjh.common.utils.ExcelExport;
 import com.xjh.dao.dataobject.Book;
 import com.xjh.dao.dataobject.Type;
+import com.xjh.service.BookService;
 
 import book.domain.GuiceContainer;
-import book.service.BookService;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

@@ -13,6 +13,7 @@
         <module>shop-startup</module>
         <module>shop-dao</module>
         <module>shop-common</module>
+        <module>shop-service</module>
     </modules>
 
     <build>
@@ -150,6 +151,16 @@
             <dependency>
                 <groupId>com.xjh</groupId>
                 <artifactId>shop-dao</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.xjh</groupId>
+                <artifactId>shop-service</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.xjh</groupId>
+                <artifactId>shop-common</artifactId>
                 <version>0.0.1-SNAPSHOT</version>
             </dependency>
             <!--Java工具集合的依赖-->

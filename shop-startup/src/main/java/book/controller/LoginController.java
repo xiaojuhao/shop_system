@@ -1,7 +1,8 @@
 package book.controller;
 
+import com.xjh.service.AdminService;
+
 import book.domain.GuiceContainer;
-import book.service.AdminService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

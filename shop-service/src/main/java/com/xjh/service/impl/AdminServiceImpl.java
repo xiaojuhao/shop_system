@@ -1,4 +1,4 @@
-package book.service.impl;
+package com.xjh.service.impl;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -7,9 +7,7 @@ import java.util.List;
 import com.google.inject.Inject;
 import com.xjh.dao.AdminDAO;
 import com.xjh.dao.dataobject.Admin;
-
-import book.service.AdminService;
-
+import com.xjh.service.AdminService;
 
 public class AdminServiceImpl implements AdminService {
     @Inject

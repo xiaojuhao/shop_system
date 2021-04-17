@@ -1,4 +1,4 @@
-package book.service;
+package com.xjh.service;
 
 /**
  * 数据统计分析服务接口

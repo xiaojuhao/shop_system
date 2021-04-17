@@ -1,4 +1,4 @@
-package book.service.impl;
+package com.xjh.service.impl;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -7,8 +7,7 @@ import java.util.List;
 import com.google.inject.Inject;
 import com.xjh.dao.BookDAO;
 import com.xjh.dao.dataobject.Book;
-
-import book.service.BookService;
+import com.xjh.service.BookService;
 
 public class BookServiceImpl implements BookService {
     @Inject

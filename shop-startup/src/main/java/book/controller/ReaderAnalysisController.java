@@ -3,8 +3,9 @@ package book.controller;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import com.xjh.service.ReaderService;
+
 import book.domain.GuiceContainer;
-import book.service.ReaderService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;

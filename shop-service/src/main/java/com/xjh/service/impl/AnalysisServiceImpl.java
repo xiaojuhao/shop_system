@@ -1,4 +1,4 @@
-package book.service.impl;
+package com.xjh.service.impl;
 
 import java.sql.SQLException;
 
@@ -7,9 +7,7 @@ import com.xjh.dao.AdminDAO;
 import com.xjh.dao.BookDAO;
 import com.xjh.dao.ReaderDAO;
 import com.xjh.dao.TypeDAO;
-
-import book.service.AnalysisService;
-
+import com.xjh.service.AnalysisService;
 
 public class AnalysisServiceImpl implements AnalysisService {
     @Inject

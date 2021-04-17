@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import com.xjh.dao.dataobject.Type;
+import com.xjh.service.BookService;
 
 import book.domain.GuiceContainer;
-import book.service.BookService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;

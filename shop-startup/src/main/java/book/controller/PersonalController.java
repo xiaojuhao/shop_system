@@ -4,9 +4,9 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import com.xjh.dao.dataobject.Admin;
+import com.xjh.service.AdminService;
 
 import book.domain.GuiceContainer;
-import book.service.AdminService;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

@@ -1,6 +1,5 @@
 package book.datasource;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.net.URL;
@@ -31,7 +30,6 @@ public class DataSourceModule extends AbstractModule {
         Map<String, String> map = new HashMap<>();
         URL url = this.getClass().getResource("/config/db.setting");
         try {
-            BufferedInputStream stream = (BufferedInputStream) url.getContent();
             BufferedReader reader = new BufferedReader(new FileReader(url.getFile()));
             String line = null;
             while ((line = reader.readLine()) != null) {

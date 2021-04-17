@@ -8,9 +8,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import com.xjh.dao.dataobject.Admin;
+import com.xjh.service.AdminService;
 
 import book.domain.GuiceContainer;
-import book.service.AdminService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
