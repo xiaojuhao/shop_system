@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="book.controller.DefaultController">
+    <HBox AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0"
+          AnchorPane.rightAnchor="0" prefHeight="300" spacing="20">
+        <StackPane styleClass="box">
+            <ImageView fx:id="bookImg" fitWidth="600" fitHeight="300">
+            </ImageView>
+        </StackPane>
+        <GridPane hgap="40" vgap="30" prefHeight="300" prefWidth="380" styleClass="box">
+            <StackPane GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="box,green-theme,hover-change" prefWidth="160"
+                       prefHeight="130">
+                <Label text="类别" fx:id="typeCount" styleClass="font-title"/>
+            </StackPane>
+            <StackPane GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="box,blue-theme,hover-change" prefWidth="160"
+                       prefHeight="130">
+                <Label text="图书" fx:id="bookCount" styleClass="font-title"/>
+            </StackPane>
+            <StackPane GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="box,warm-theme,hover-change" prefWidth="160"
+                       prefHeight="130">
+                <Label text="读者" fx:id="readerCount" styleClass="font-title"/>
+            </StackPane>
+            <StackPane GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="box,warning-theme,hover-change" prefWidth="160"
+                       prefHeight="130">
+                <Label text="管理员" fx:id="adminCount" styleClass="font-title"/>
+            </StackPane>
+        </GridPane>
+    </HBox>
+    <AnchorPane AnchorPane.topAnchor="320" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="30" styleClass="box"
+                maxWidth="850">
+        <fx:include source="book_analysis.fxml"/>
+    </AnchorPane>
+</AnchorPane>

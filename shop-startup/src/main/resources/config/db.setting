@@ -1,0 +1,14 @@
+## db.setting文件
+
+url = jdbc:mysql://localhost:3306/book?useUnicode=true&characterEncoding=utf-8
+driver = com.mysql.cj.jdbc.Driver
+user = root
+pass = 12345678
+
+## 可选配置
+# 是否在日志中显示执行的SQL
+showSql = false
+# 是否格式化显示的SQL
+formatSql = false
+# 是否显示SQL参数
+showParams = false

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="book.controller.AddBookController"
+            prefHeight="500.0" prefWidth="600.0">
+    <HBox AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
+          minHeight="50" alignment="CENTER" styleClass="green-theme">
+        <Label text="新增书籍信息" styleClass="font-title,green-theme,font-white"/>
+    </HBox>
+    <VBox styleClass="default-theme" spacing="20" minHeight="400"
+          AnchorPane.topAnchor="55" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+        <ComboBox promptText="选择类别" fx:id="bookType" prefWidth="120"/>
+        <TextField promptText="书名" fx:id="bookName"/>
+        <TextField promptText="作者" fx:id="bookAuthor"/>
+        <HBox spacing="10">
+            <TextField promptText="价格" fx:id="bookPrice" prefWidth="290"/>
+            <TextField promptText="库存" fx:id="bookStock" prefWidth="290"/>
+        </HBox>
+        <TextField promptText="封面图" fx:id="bookCover"/>
+        <TextArea promptText="图书摘要" fx:id="bookSummary" prefHeight="140"/>
+        <padding>
+            <Insets top="10" left="50" bottom="10" right="50"/>
+        </padding>
+    </VBox>
+    <Button text="确认" onAction="#addBook" styleClass="green-theme,btn-radius"
+            AnchorPane.bottomAnchor="10" AnchorPane.leftAnchor="180" AnchorPane.rightAnchor="180"/>
+</AnchorPane>

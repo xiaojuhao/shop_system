@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.StackPane?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml" fx:controller="book.controller.IndexController">
+    <FlowPane hgap="20" alignment="CENTER" prefHeight="100" styleClass="default-theme"
+              AnchorPane.leftAnchor="20" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20">
+        <Button styleClass="btn-basic,btn-radius-normal,default-theme" text="原始按钮"/>
+        <Button styleClass="btn-basic,btn-radius-normal,green-theme" text="默认按钮"/>
+        <Button styleClass="btn-basic,btn-radius-normal,blue-theme" text="百搭按钮"/>
+        <Button styleClass="btn-basic,btn-radius-normal,warm-theme" text="暖色按钮"/>
+        <Button styleClass="btn-basic,btn-radius-normal,warning-theme" text="警告按钮"/>
+        <Button styleClass="btn-basic,btn-radius-large,default-theme" text="原始按钮"/>
+        <Button styleClass="btn-basic,btn-radius-large,green-theme" text="默认按钮"/>
+        <Button styleClass="btn-basic,btn-radius-large,blue-theme" text="百搭按钮"/>
+        <Button styleClass="btn-basic,btn-radius-large,warm-theme" text="暖色按钮"/>
+        <Button styleClass="btn-basic,btn-radius-large,warning-theme" text="警告按钮"/>
+    </FlowPane>
+
+    <FlowPane hgap="20" alignment="CENTER" prefHeight="100" styleClass="default-theme"
+              AnchorPane.leftAnchor="20" AnchorPane.topAnchor="150" AnchorPane.rightAnchor="20">
+        <CheckBox text="阅读"/>
+        <CheckBox text="游戏"/>
+        <RadioButton selected="true" text="男">
+            <toggleGroup>
+                <ToggleGroup fx:id="toggleGroup"/>
+            </toggleGroup>
+        </RadioButton>
+        <RadioButton text="女" toggleGroup="$toggleGroup"/>
+        <ComboBox promptText="请选择">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="Java"/>
+                    <String fx:value="C++"/>
+                    <String fx:value="JavaScript"/>
+                    <String fx:value="Python"/>
+                </FXCollections>
+            </items>
+        </ComboBox>
+        <TextField promptText="请输入标题" styleClass="input-group" disable="true"/>
+        <TextField promptText="用户名" styleClass="input-group"/>
+        <PasswordField promptText="密码" styleClass="input-group"/>
+        <Label text="标题字体" styleClass="font-title,font-gray"/>
+        <Label text="正文字体" styleClass="font-gray"/>
+    </FlowPane>
+
+    <FlowPane hgap="20" alignment="CENTER" prefHeight="120" styleClass="default-theme"
+              AnchorPane.leftAnchor="20" AnchorPane.topAnchor="280" AnchorPane.rightAnchor="20">
+        <StackPane styleClass="box,default-theme" prefHeight="100" prefWidth="100">
+            <!--wrapText="true"为可换行显示-->
+            <Label text="内容内容内容内容内容内容内容内容内容内容内容" styleClass="font-gray" wrapText="true"/>
+        </StackPane>
+        <StackPane styleClass="box,green-theme" prefHeight="100" prefWidth="100">
+            <Label text="内容内容内容内容内容内容内容内容内容内容内容" styleClass="font-white" wrapText="true"/>
+        </StackPane>
+        <StackPane styleClass="box,blue-theme" prefHeight="100" prefWidth="100">
+            <Label text="内容内容内容内容内容内容内容内容内容内容内容" styleClass="font-white" wrapText="true"/>
+        </StackPane>
+        <StackPane styleClass="box,warm-theme" prefHeight="100" prefWidth="100">
+            <Label text="内容内容内容内容内容内容内容内容内容内容内容" styleClass="font-white" wrapText="true"/>
+        </StackPane>
+        <StackPane styleClass="box,warning-theme" prefHeight="100" prefWidth="100">
+            <Label text="内容内容内容内容内容内容内容内容内容内容内容" styleClass="font-white" wrapText="true"/>
+        </StackPane>
+        <DatePicker/>
+        <ColorPicker/>
+    </FlowPane>
+
+    <FlowPane hgap="20" alignment="CENTER" prefHeight="230" styleClass="default-theme"
+              AnchorPane.leftAnchor="20" AnchorPane.topAnchor="420" AnchorPane.rightAnchor="20"
+              AnchorPane.bottomAnchor="20">
+        <ListView prefHeight="150" prefWidth="200">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="One"/>
+                    <String fx:value="Two"/>
+                    <String fx:value="Three"/>
+                    <String fx:value="Four"/>
+                    <String fx:value="Five"/>
+                    <String fx:value="Six"/>
+                </FXCollections>
+            </items>
+        </ListView>
+
+        <TableView fx:id="personTable" prefHeight="200" prefWidth="320">
+            <columns>
+                <TableColumn text="姓名" prefWidth="90">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="name"/>
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn text="邮箱" prefWidth="230">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="email"/>
+                    </cellValueFactory>
+                </TableColumn>
+            </columns>
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <Person name="张无忌" email="zhang.wuji@example.com"/>
+                    <Person name="张三丰" email="zhang.sanfeng@example.com"/>
+                    <Person name="令狐冲" email="linghu.chong@example.com"/>
+                    <Person name="韦小宝" email="wei.xiaobao@example.com"/>
+                </FXCollections>
+            </items>
+        </TableView>
+        <Button text="增加一行" onAction="#addRow"/>
+        <Button text="删除一行" onAction="#removeRow"/>
+
+    </FlowPane>
+</AnchorPane>
