@@ -53,6 +53,7 @@ public class MenuBarController {
         label.setOnMouseClicked(evt -> {
             System.out.println("主页点击。。。。。。");
             root.setCenter(new DeskController().view());
+            root.getCenter();
         });
         menu.setGraphic(label);
         return menu;

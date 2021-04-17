@@ -13,5 +13,6 @@ public class ServiceModule extends AbstractModule {
         bind(AnalysisService.class).to(AnalysisServiceImpl.class);
         bind(BookService.class).to(BookServiceImpl.class);
         bind(ReaderService.class).to(ReaderServiceImpl.class);
+        bind(DeskService.class);
     }
 }

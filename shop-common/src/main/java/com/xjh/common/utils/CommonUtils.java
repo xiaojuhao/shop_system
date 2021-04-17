@@ -1,5 +1,11 @@
 package com.xjh.common.utils;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +49,28 @@ public class CommonUtils {
             return ((LocalDateTime) a).isEqual((LocalDateTime) b);
         }
         return a.equals(b);
+    }
+
+    public static String readAsString(InputStream stream) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int t;
+        while ((t = stream.read()) != -1) {
+            sb.append((char) t);
+        }
+        return sb.toString();
+    }
+
+    public static String readFile(String file) throws Exception {
+        InputStreamReader ipr = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
+        BufferedReader br = new BufferedReader(ipr);
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = br.readLine()) != null) {
+            sb.append(line).append(" ");
+        }
+        br.close();
+        ipr.close();
+        return sb.toString();
     }
 
     public static boolean isBlank(String str) {

@@ -35,6 +35,7 @@ public class DataSourceModule extends AbstractModule {
             while ((line = reader.readLine()) != null) {
                 map.putAll(asKV(line));
             }
+            reader.close();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
