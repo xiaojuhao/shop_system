@@ -1,4 +1,4 @@
-package book.enumeration;
+package com.xjh.common.enumeration;
 
 public enum EnumDesKStatus {
     FREE(1, "空闲中"),
