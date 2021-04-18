@@ -54,20 +54,13 @@ public class DeskController implements Initializable {
             // 加载所有的tables
             deskService.getAllDesks().forEach(desk -> tables.add(new SimpleObjectProperty<>(desk)));
             // 渲染tables
-            tables.forEach(desk -> {
-                Desk running = deskService.getRunningData(desk.get().getId());
-                if (running != null) {
-                    desk.set(running);
-                }
-                Platform.runLater(() -> render(desk, pane));
-            });
+            tables.forEach(desk -> Platform.runLater(() -> render(desk, pane)));
             // 监测变化
             while (instance.get() == s) {
-                CommonUtils.sleep(1000);
                 tables.forEach(this::detectChange);
+                CommonUtils.sleep(1000);
             }
-            System.out.println("************** DeskController 循环退出......."
-                    + this + "\t\t" + Thread.currentThread().getName());
+            System.out.println("******* DeskController 循环退出." + Thread.currentThread().getName());
             System.gc();
         });
         return s;
@@ -98,12 +91,12 @@ public class DeskController implements Initializable {
         tableName.setFont(new javafx.scene.text.Font("微软雅黑", 15));
         vBox.getChildren().addAll(tableName, statusLabel, timeLabel);
 
-        desk.addListener((cc, old, newV) -> {
-            LocalDateTime orderTime = newV.getOrderCreateTime();
-            EnumDesKStatus s = EnumDesKStatus.of(newV.getStatus());
+        desk.addListener((cc, _old, _new) -> {
+            LocalDateTime ot = _new.getOrderCreateTime();
+            EnumDesKStatus s = EnumDesKStatus.of(_new.getStatus());
             setBackground(vBox, s);
             statusLabel.setText(s.remark());
-            timeLabel.setText(DateBuilder.base(orderTime).format(TIME_FORMAT));
+            timeLabel.setText(DateBuilder.base(ot).format(TIME_FORMAT));
         });
         vBox.setOnMouseClicked(evt -> {
             Dialog<Pair<String, String>> dialog = new Dialog<>();

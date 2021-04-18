@@ -23,7 +23,6 @@ import com.sleepycat.je.TransactionConfig;
 import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.store.DeskKvDatabase;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.HessianUtils;
 import com.xjh.common.utils.ThreadUtils;
 import com.xjh.dao.dataobject.Desk;
 
@@ -39,29 +38,25 @@ public class DeskService {
         int toalSize = getAllDesks().size();
         ThreadUtils.runInDaemon(() -> {
             while (true) {
-                try {
-                    Thread.sleep(1000);
-                    long deskId = random.nextInt(toalSize);
-                    Desk desk = this.getRunningData(deskId);
-                    if (desk != null) {
-                        desk.setVerNo(desk.getVerNo() != null ? desk.getVerNo() + 1 : 1);
-                        if (EnumDesKStatus.of(desk.getStatus()) == EnumDesKStatus.USED) {
-                            desk.setStatus(EnumDesKStatus.FREE.status());
-                            desk.setOrderCreateTime(null);
-                        } else {
-                            desk.setOrderCreateTime(LocalDateTime.now());
-                            desk.setStatus(EnumDesKStatus.USED.status());
-                        }
-                        this.saveRunningData(desk);
-                    } else {
-                        desk = new Desk();
-                        desk.setId(deskId);
-                        desk.setDeskName(deskId + "");
+                CommonUtils.sleep(3000);
+                long deskId = random.nextInt(toalSize);
+                Desk desk = this.getRunningData(deskId);
+                if (desk != null) {
+                    desk.setVerNo(desk.getVerNo() != null ? desk.getVerNo() + 1 : 1);
+                    if (EnumDesKStatus.of(desk.getStatus()) == EnumDesKStatus.USED) {
                         desk.setStatus(EnumDesKStatus.FREE.status());
-                        this.saveRunningData(desk);
+                        desk.setOrderCreateTime(null);
+                    } else {
+                        desk.setOrderCreateTime(LocalDateTime.now());
+                        desk.setStatus(EnumDesKStatus.USED.status());
                     }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                    this.saveRunningData(desk);
+                } else {
+                    desk = new Desk();
+                    desk.setId(deskId);
+                    desk.setDeskName(deskId + "");
+                    desk.setStatus(EnumDesKStatus.FREE.status());
+                    this.saveRunningData(desk);
                 }
             }
         });
@@ -88,8 +83,6 @@ public class DeskService {
     }
 
     public void saveRunningData(Desk desk) {
-        System.out.println(Thread.currentThread().getName() + ":" +
-                desk.getId() + " 变化....");
         String key = desk.getId() + "_running_data";
         DatabaseEntry theKey = new DatabaseEntry(key.getBytes(StandardCharsets.UTF_8));
         // DatabaseEntry theData = new DatabaseEntry(HessianUtils.serialize(desk));
@@ -127,7 +120,6 @@ public class DeskService {
         OperationStatus status = db.get(txn, theKey, theData, LockMode.DEFAULT);
         Desk desk = null;
         if (status == OperationStatus.SUCCESS) {
-            // desk = HessianUtils.deserialize(theData.getData());
             try {
                 desk = JSON.parseObject(new String(theData.getData()), Desk.class);
             } catch (Exception ex) {
@@ -138,7 +130,7 @@ public class DeskService {
         return desk;
     }
 
-    public List<Desk> getDesksRunningStatus() {
+    public List<Desk> listAllRunningData() {
         List<Desk> desks = new ArrayList<>();
         try {
             Database db = DeskKvDatabase.getDB();
@@ -151,12 +143,9 @@ public class DeskService {
             DatabaseEntry theKey = new DatabaseEntry();
             DatabaseEntry theData = new DatabaseEntry();
             while (cursor.getNext(theKey, theData, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-                CommonUtils.safeRun(() -> {
-                    if (theData.getData() != null) {
-                        Desk d = HessianUtils.deserialize(theData.getData());
-                        desks.add(d);
-                    }
-                });
+                if (theData.getData() != null) {
+                    desks.add(JSON.parseObject(new String(theData.getData()), Desk.class));
+                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
