@@ -33,14 +33,15 @@ import javafx.scene.layout.VBox;
 import javafx.util.Pair;
 
 public class DeskController implements Initializable {
+    static final String TIME_FORMAT = "HH:mm:ss";
     DeskService deskService = GuiceContainer.getInstance(DeskService.class);
-    static Holder<ScrollPane> holder = new Holder<>();
+    static Holder<ScrollPane> instance = new Holder<>();
 
     public ScrollPane view() {
+        ScrollPane s = new ScrollPane();
+        instance.set(s);
         ObservableList<SimpleObjectProperty<Desk>> tables = FXCollections.observableArrayList();
 
-        ScrollPane s = new ScrollPane();
-        holder.set(s);
         FlowPane pane = new FlowPane();
         pane.setPadding(new Insets(10));
         pane.setHgap(5);
@@ -53,20 +54,17 @@ public class DeskController implements Initializable {
             // 加载所有的tables
             deskService.getAllDesks().forEach(desk -> tables.add(new SimpleObjectProperty<>(desk)));
             // 渲染tables
-            tables.forEach(desk -> Platform.runLater(() -> render(desk, pane)));
-            // 监测变化
-            while (holder.get() == s) {
-                try {
-                    Thread.sleep(1000);
-                    tables.forEach(t -> {
-                        Desk dd = deskService.getRunningData(t.get().getId());
-                        if (dd != null && CommonUtils.ne(dd.getVerNo(), t.get().getVerNo())) {
-                            Platform.runLater(() -> t.set(dd));
-                        }
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
+            tables.forEach(desk -> {
+                Desk running = deskService.getRunningData(desk.get().getId());
+                if (running != null) {
+                    desk.set(running);
                 }
+                Platform.runLater(() -> render(desk, pane));
+            });
+            // 监测变化
+            while (instance.get() == s) {
+                CommonUtils.sleep(1000);
+                tables.forEach(this::detectChange);
             }
             System.out.println("************** DeskController 循环退出......."
                     + this + "\t\t" + Thread.currentThread().getName());
@@ -75,13 +73,15 @@ public class DeskController implements Initializable {
         return s;
     }
 
+    void detectChange(SimpleObjectProperty<Desk> desk) {
+        Desk dd = deskService.getRunningData(desk.get().getId());
+        if (dd != null && CommonUtils.ne(dd.getVerNo(), desk.get().getVerNo())) {
+            Platform.runLater(() -> desk.set(dd));
+        }
+    }
+
     void render(SimpleObjectProperty<Desk> desk, FlowPane pane) {
         Desk table = desk.get();
-        Desk running = deskService.getRunningData(table.getId());
-        if (running != null) {
-            System.out.println("desk " + table.getId() + " valid。。。。" + running.getStatus());
-            table = running;
-        }
         double boxWidth = Math.max(pane.getWidth() / 6 - 15, 200);
         VBox vBox = new VBox();
         vBox.setPrefSize(boxWidth, boxWidth / 2);
@@ -90,32 +90,21 @@ public class DeskController implements Initializable {
         vBox.setAlignment(Pos.CENTER);
 
         EnumDesKStatus status = EnumDesKStatus.of(table.getStatus());
-        if (status == EnumDesKStatus.USED || status == EnumDesKStatus.PAID) {
-            vBox.setStyle("-fx-background-color: #ed6871;");
-        } else {
-            vBox.setStyle("-fx-background-color: #228B22;");
-        }
+        setBackground(vBox, status);
         Label statusLabel = new Label(status.remark());
         Label timeLabel = new Label();
-        timeLabel.setText(DateBuilder.base(table.getOrderCreateTime()).format("HH:mm:ss"));
+        timeLabel.setText(DateBuilder.base(table.getOrderCreateTime()).format(TIME_FORMAT));
+        Label tableName = new Label(table.getDeskName());
+        tableName.setFont(new javafx.scene.text.Font("微软雅黑", 15));
+        vBox.getChildren().addAll(tableName, statusLabel, timeLabel);
+
         desk.addListener((cc, old, newV) -> {
             LocalDateTime orderTime = newV.getOrderCreateTime();
             EnumDesKStatus s = EnumDesKStatus.of(newV.getStatus());
-            Platform.runLater(() -> statusLabel.setText(s.remark()));
-            if (s == EnumDesKStatus.USED || s == EnumDesKStatus.PAID) {
-                vBox.setStyle("-fx-background-color: #ed6871;");
-            } else {
-                vBox.setStyle("-fx-background-color: #228B22;");
-            }
-            if (CommonUtils.ne(old.getOrderCreateTime(), orderTime)) {
-                Platform.runLater(() ->
-                        timeLabel.setText(DateBuilder.base(orderTime).format("HH:mm:ss")));
-            }
+            setBackground(vBox, s);
+            statusLabel.setText(s.remark());
+            timeLabel.setText(DateBuilder.base(orderTime).format(TIME_FORMAT));
         });
-
-        Label tableNameLabel = new Label(table.getDeskName());
-        tableNameLabel.setFont(new javafx.scene.text.Font("微软雅黑", 15));
-        vBox.getChildren().addAll(tableNameLabel, statusLabel, timeLabel);
         vBox.setOnMouseClicked(evt -> {
             Dialog<Pair<String, String>> dialog = new Dialog<>();
             dialog.setTitle("Login Dialog");
@@ -127,7 +116,7 @@ public class DeskController implements Initializable {
 
             TextField username = new TextField();
             username.setPromptText("Username");
-            // username.setText("作者：" + table.getDeskName());
+            username.setText("作者：" + table.getDeskName());
             PasswordField password = new PasswordField();
             password.setPromptText("Password");
 
@@ -139,9 +128,16 @@ public class DeskController implements Initializable {
             ButtonType loginButtonType = new ButtonType("Login", ButtonData.OK_DONE);
             dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
             dialog.showAndWait();
-
         });
         pane.getChildren().add(vBox);
+    }
+
+    private void setBackground(VBox vbox, EnumDesKStatus status) {
+        if (status == EnumDesKStatus.USED || status == EnumDesKStatus.PAID) {
+            vbox.setStyle("-fx-background-color: #ed6871;");
+        } else {
+            vbox.setStyle("-fx-background-color: #228B22;");
+        }
     }
 
     @Override

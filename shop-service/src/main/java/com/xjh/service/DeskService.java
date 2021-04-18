@@ -39,7 +39,8 @@ public class DeskService {
             while (true) {
                 try {
                     Thread.sleep(1000);
-                    Desk desk = this.getRunningData((long) random.nextInt(toalSize));
+                    long deskId = random.nextInt(toalSize);
+                    Desk desk = this.getRunningData(deskId);
                     if (desk != null) {
                         desk.setVerNo(desk.getVerNo() != null ? desk.getVerNo() + 1 : 1);
                         if (EnumDesKStatus.of(desk.getStatus()) == EnumDesKStatus.USED) {
@@ -49,6 +50,12 @@ public class DeskService {
                             desk.setOrderCreateTime(LocalDateTime.now());
                             desk.setStatus(EnumDesKStatus.USED.status());
                         }
+                        this.saveRunningData(desk);
+                    } else {
+                        desk = new Desk();
+                        desk.setId(deskId);
+                        desk.setDeskName(deskId + "");
+                        desk.setStatus(EnumDesKStatus.FREE.status());
                         this.saveRunningData(desk);
                     }
                 } catch (Exception ex) {
