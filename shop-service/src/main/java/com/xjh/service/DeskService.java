@@ -19,12 +19,16 @@ import com.sleepycat.je.TransactionConfig;
 import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.store.DeskKvDatabase;
 import com.xjh.dao.DeskDAO;
+import com.xjh.dao.InfoDAO;
 import com.xjh.dao.dataobject.Desk;
+import com.xjh.dao.dataobject.Info;
 
 @Singleton
 public class DeskService {
     @Inject
     DeskDAO deskDAO;
+    @Inject
+    InfoDAO infoDAO;
 
     public void openDesk(Long id) {
         Desk desk = this.getRunningData(id);
@@ -52,6 +56,9 @@ public class DeskService {
 
         List<Desk> desks = new ArrayList<>();
         try {
+            infoDAO.select(new Info()).forEach(info -> {
+                System.out.println("读取INFO信息:" + JSON.toJSONString(info));
+            });
             return deskDAO.select(new Desk());
         } catch (Exception ex) {
             ex.printStackTrace();
