@@ -3,12 +3,14 @@ package com.xjh.service.impl;
 import java.sql.SQLException;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.xjh.dao.AdminDAO;
 import com.xjh.dao.BookDAO;
 import com.xjh.dao.ReaderDAO;
 import com.xjh.dao.TypeDAO;
 import com.xjh.service.AnalysisService;
 
+@Singleton
 public class AnalysisServiceImpl implements AnalysisService {
     @Inject
     TypeDAO typeDAO;

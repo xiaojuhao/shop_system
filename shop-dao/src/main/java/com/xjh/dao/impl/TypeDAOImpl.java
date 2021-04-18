@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import com.google.inject.Singleton;
 import com.xjh.dao.TypeDAO;
 import com.xjh.dao.dataobject.Type;
 import com.zaxxer.hikari.HikariDataSource;
@@ -13,6 +14,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
 
+@Singleton
 public class TypeDAOImpl implements TypeDAO {
     @Inject
     HikariDataSource ds;

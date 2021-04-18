@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.xjh.dao.ReaderDAO;
 import com.xjh.dao.dataobject.Reader;
 import com.xjh.service.ReaderService;
 
+@Singleton
 public class ReaderServiceImpl implements ReaderService {
     @Inject
     private ReaderDAO readerDAO;

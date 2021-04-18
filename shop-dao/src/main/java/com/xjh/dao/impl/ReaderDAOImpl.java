@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import com.google.inject.Singleton;
 import com.xjh.dao.ReaderDAO;
 import com.xjh.dao.dataobject.Reader;
 import com.zaxxer.hikari.HikariDataSource;
@@ -16,6 +17,7 @@ import cn.hutool.db.Entity;
 /**
  * 读者DAO的实现类
  */
+@Singleton
 public class ReaderDAOImpl implements ReaderDAO {
     @Inject
     HikariDataSource ds;

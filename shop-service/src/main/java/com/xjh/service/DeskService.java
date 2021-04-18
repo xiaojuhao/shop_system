@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.inject.Singleton;
 import com.sleepycat.je.Cursor;
 import com.sleepycat.je.CursorConfig;
 import com.sleepycat.je.Database;
@@ -26,6 +27,7 @@ import com.xjh.common.utils.HessianUtils;
 import com.xjh.common.utils.ThreadUtils;
 import com.xjh.dao.dataobject.Desk;
 
+@Singleton
 public class DeskService {
     AtomicBoolean randomUpdateStarted = new AtomicBoolean();
 
@@ -86,6 +88,8 @@ public class DeskService {
     }
 
     public void saveRunningData(Desk desk) {
+        System.out.println(Thread.currentThread().getName() + ":" +
+                desk.getId() + " 变化....");
         String key = desk.getId() + "_running_data";
         DatabaseEntry theKey = new DatabaseEntry(key.getBytes(StandardCharsets.UTF_8));
         // DatabaseEntry theData = new DatabaseEntry(HessianUtils.serialize(desk));

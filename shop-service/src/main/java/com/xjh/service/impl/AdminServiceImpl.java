@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.xjh.dao.AdminDAO;
 import com.xjh.dao.dataobject.Admin;
 import com.xjh.service.AdminService;
 
+@Singleton
 public class AdminServiceImpl implements AdminService {
     @Inject
     AdminDAO adminDAO;

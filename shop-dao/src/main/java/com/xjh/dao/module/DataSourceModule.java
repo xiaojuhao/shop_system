@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -19,6 +20,7 @@ public class DataSourceModule extends AbstractModule {
         System.out.println("DataSourceModule 耗时: " + (System.currentTimeMillis() - start));
     }
 
+    @Singleton
     public static class DatabaseProvider implements Provider<HikariDataSource> {
         @Override
         public HikariDataSource get() {

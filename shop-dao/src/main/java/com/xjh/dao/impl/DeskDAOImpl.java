@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.dao.DeskDAO;
@@ -13,7 +14,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
 
-
+@Singleton
 public class DeskDAOImpl implements DeskDAO {
     @Inject
     HikariDataSource ds;
