@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.dao.TypeDAO;
 import com.xjh.dao.dataobject.Type;
-import com.zaxxer.hikari.HikariDataSource;
+import com.xjh.dao.datasource.MysqlDataSource;
 
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
@@ -17,7 +17,7 @@ import cn.hutool.db.Entity;
 @Singleton
 public class TypeDAOImpl implements TypeDAO {
     @Inject
-    HikariDataSource ds;
+    MysqlDataSource ds;
 
     @Override
     public Long insertType(Type type) throws SQLException {

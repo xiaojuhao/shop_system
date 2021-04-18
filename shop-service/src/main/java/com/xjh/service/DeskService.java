@@ -9,6 +9,7 @@ import java.util.List;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.sleepycat.je.Cursor;
 import com.sleepycat.je.CursorConfig;
@@ -21,10 +22,14 @@ import com.sleepycat.je.TransactionConfig;
 import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.store.DeskKvDatabase;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.dao.DeskDAO;
 import com.xjh.dao.dataobject.Desk;
 
 @Singleton
 public class DeskService {
+    @Inject
+    DeskDAO deskDAO;
+
     public void openDesk(Long id) {
         Desk desk = this.getRunningData(id);
         if (desk == null) {
@@ -48,8 +53,14 @@ public class DeskService {
     }
 
     public List<Desk> getAllDesks() {
+
         List<Desk> desks = new ArrayList<>();
         try {
+            List<Desk> list = deskDAO.select(new Desk());
+            list.forEach(d -> {
+                System.out.println("从数据库中加载desk信息:" +
+                        JSON.toJSONString(d));
+            });
             URL url = DeskService.class.getResource("/config/desks.json");
             String data = CommonUtils.readFile(url.getFile());
             JSONArray json = JSON.parseArray(data);

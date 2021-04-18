@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.dao.ReaderDAO;
 import com.xjh.dao.dataobject.Reader;
-import com.zaxxer.hikari.HikariDataSource;
+import com.xjh.dao.datasource.MysqlDataSource;
 
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
@@ -20,7 +20,7 @@ import cn.hutool.db.Entity;
 @Singleton
 public class ReaderDAOImpl implements ReaderDAO {
     @Inject
-    HikariDataSource ds;
+    MysqlDataSource ds;
 
     @Override
     public List<Reader> selectReaders() throws SQLException {
