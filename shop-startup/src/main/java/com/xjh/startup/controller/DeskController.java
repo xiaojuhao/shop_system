@@ -2,7 +2,6 @@ package com.xjh.startup.controller;
 
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.Random;
 import java.util.ResourceBundle;
 
 import com.xjh.common.enumeration.EnumDesKStatus;
@@ -35,8 +34,6 @@ import javafx.util.Pair;
 
 public class DeskController implements Initializable {
     DeskService deskService = GuiceContainer.getInstance(DeskService.class);
-    static Random random = new Random();
-
     static Holder<ScrollPane> holder = new Holder<>();
 
     public ScrollPane view() {
@@ -53,7 +50,6 @@ public class DeskController implements Initializable {
         s.setContent(pane);
 
         ThreadUtils.runInDaemon(() -> {
-            deskService.getAllDesks().forEach(desk -> deskService.saveRunningData(desk));
             // 加载所有的tables
             deskService.getAllDesks().forEach(desk -> tables.add(new SimpleObjectProperty<>(desk)));
             // 渲染tables
@@ -76,33 +72,16 @@ public class DeskController implements Initializable {
                     + this + "\t\t" + Thread.currentThread().getName());
             System.gc();
         });
-        // 随机更新table
-        ThreadUtils.runInDaemon(() -> {
-            while (holder.get() == s) {
-                try {
-                    Thread.sleep(1000);
-                    Desk desk = deskService.getRunningData((long) random.nextInt(20));
-                    if (desk != null) {
-                        desk.setVerNo(desk.getVerNo() != null ? desk.getVerNo() + 1 : 1);
-                        if (EnumDesKStatus.of(desk.getStatus()) == EnumDesKStatus.USED) {
-                            desk.setStatus(EnumDesKStatus.FREE.status());
-                            desk.setOrderCreateTime(null);
-                        } else {
-                            desk.setOrderCreateTime(LocalDateTime.now());
-                            desk.setStatus(EnumDesKStatus.USED.status());
-                        }
-                        deskService.saveRunningData(desk);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
         return s;
     }
 
     void render(SimpleObjectProperty<Desk> desk, FlowPane pane) {
         Desk table = desk.get();
+        Desk running = deskService.getRunningData(table.getId());
+        if (running != null) {
+            System.out.println("desk " + table.getId() + " valid。。。。" + running.getStatus());
+            table = running;
+        }
         double boxWidth = Math.max(pane.getWidth() / 6 - 15, 200);
         VBox vBox = new VBox();
         vBox.setPrefSize(boxWidth, boxWidth / 2);
@@ -148,7 +127,7 @@ public class DeskController implements Initializable {
 
             TextField username = new TextField();
             username.setPromptText("Username");
-            username.setText("作者：" + table.getDeskName());
+            // username.setText("作者：" + table.getDeskName());
             PasswordField password = new PasswordField();
             password.setPromptText("Password");
 

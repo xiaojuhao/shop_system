@@ -37,6 +37,8 @@ public class LoginController {
             Scene scene = new Scene(root);
             scene.getStylesheets().add("/css/style.css");
             mainStage.setTitle("小句号点餐系统");
+            mainStage.setWidth(800);
+            mainStage.setHeight(600);
             mainStage.setMaximized(true);
             mainStage.setScene(scene);
             //            mainStage.getIcons().add(new Image("/img/logo.png"));

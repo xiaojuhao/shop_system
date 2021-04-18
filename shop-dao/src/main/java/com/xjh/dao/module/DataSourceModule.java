@@ -7,28 +7,37 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Provider;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 public class DataSourceModule extends AbstractModule {
     @Override
     protected void configure() {
-        Map<String, String> config = configMap();
-        HikariConfig hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl(config.get("url"));
-        hikariConfig.setDriverClassName(config.get("driver"));
-        hikariConfig.setUsername(config.get("user"));
-        hikariConfig.setPassword(config.get("pass"));
-        hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
-        hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
-        hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-        HikariDataSource ds = new HikariDataSource(hikariConfig);
-        bind(HikariDataSource.class).toInstance(ds);
+        long start = System.currentTimeMillis();
+        bind(HikariDataSource.class).toProvider(DatabaseProvider.class);
+        System.out.println("DataSourceModule 耗时: " + (System.currentTimeMillis() - start));
     }
 
-    private Map<String, String> configMap() {
+    public static class DatabaseProvider implements Provider<HikariDataSource> {
+        @Override
+        public HikariDataSource get() {
+            Map<String, String> config = configMap();
+            HikariConfig hikariConfig = new HikariConfig();
+            hikariConfig.setJdbcUrl(config.get("url"));
+            hikariConfig.setDriverClassName(config.get("driver"));
+            hikariConfig.setUsername(config.get("user"));
+            hikariConfig.setPassword(config.get("pass"));
+            hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
+            hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
+            hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+            return new HikariDataSource(hikariConfig);
+        }
+    }
+
+    private static Map<String, String> configMap() {
         Map<String, String> map = new HashMap<>();
-        URL url = this.getClass().getResource("/config/db.setting");
+        URL url = DataSourceModule.class.getResource("/config/db.setting");
         try {
             BufferedReader reader = new BufferedReader(new FileReader(url.getFile()));
             String line = null;
@@ -42,7 +51,7 @@ public class DataSourceModule extends AbstractModule {
         return map;
     }
 
-    private Map<String, String> asKV(String str) {
+    private static Map<String, String> asKV(String str) {
         Map<String, String> map = new HashMap<>();
         if (str == null || str.trim().isEmpty()) {
             return map;

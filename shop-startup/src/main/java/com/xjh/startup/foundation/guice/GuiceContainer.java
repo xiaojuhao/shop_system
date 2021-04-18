@@ -18,11 +18,14 @@ public class GuiceContainer {
             if (injector.get() != null) {
                 return injector.get();
             }
+            long start = System.currentTimeMillis();
             Injector ij = Guice.createInjector(
                     new DaoModule(),
                     new ServiceModule(),
-                    new DataSourceModule());
+                    new DataSourceModule()
+            );
             injector.set(ij);
+            System.out.println("初始化Guice, 耗时:" + (System.currentTimeMillis() - start));
             return ij;
         }
     }

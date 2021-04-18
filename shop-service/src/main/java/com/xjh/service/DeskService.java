@@ -5,6 +5,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -17,13 +19,47 @@ import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
 import com.sleepycat.je.Transaction;
 import com.sleepycat.je.TransactionConfig;
+import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.store.DeskKvDatabase;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.HessianUtils;
+import com.xjh.common.utils.ThreadUtils;
 import com.xjh.dao.dataobject.Desk;
 
 public class DeskService {
+    AtomicBoolean randomUpdateStarted = new AtomicBoolean();
+
+    public void randomUpdate() {
+        if (!randomUpdateStarted.compareAndSet(false, true)) {
+            return;
+        }
+        Random random = new Random();
+        int toalSize = getAllDesks().size();
+        ThreadUtils.runInDaemon(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(1000);
+                    Desk desk = this.getRunningData((long) random.nextInt(toalSize));
+                    if (desk != null) {
+                        desk.setVerNo(desk.getVerNo() != null ? desk.getVerNo() + 1 : 1);
+                        if (EnumDesKStatus.of(desk.getStatus()) == EnumDesKStatus.USED) {
+                            desk.setStatus(EnumDesKStatus.FREE.status());
+                            desk.setOrderCreateTime(null);
+                        } else {
+                            desk.setOrderCreateTime(LocalDateTime.now());
+                            desk.setStatus(EnumDesKStatus.USED.status());
+                        }
+                        this.saveRunningData(desk);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+    }
+
     public List<Desk> getAllDesks() {
+        randomUpdate();
         List<Desk> desks = new ArrayList<>();
         try {
             URL url = DeskService.class.getResource("/config/desks.json");
