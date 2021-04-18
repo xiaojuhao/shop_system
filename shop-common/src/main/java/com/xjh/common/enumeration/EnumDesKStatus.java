@@ -13,6 +13,10 @@ public enum EnumDesKStatus {
         return remark;
     }
 
+    public int status() {
+        return status;
+    }
+
     EnumDesKStatus(int status, String remark) {
         this.status = status;
         this.remark = remark;

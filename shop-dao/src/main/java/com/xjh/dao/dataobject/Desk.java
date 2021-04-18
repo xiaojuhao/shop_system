@@ -1,8 +1,10 @@
 package com.xjh.dao.dataobject;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class Desk {
+public class Desk implements Serializable {
+    private static final long serialVersionUID = -2784348482896858640L;
     Long id;
     String deskName;
     Integer status;

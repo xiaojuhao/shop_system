@@ -1,12 +1,12 @@
 package com.xjh.startup.controller;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalDateTime;
 import java.util.Random;
 import java.util.ResourceBundle;
 
 import com.xjh.common.enumeration.EnumDesKStatus;
+import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.ThreadUtils;
 import com.xjh.dao.dataobject.Desk;
@@ -41,7 +41,6 @@ public class DeskController implements Initializable {
 
     public ScrollPane view() {
         ObservableList<SimpleObjectProperty<Desk>> tables = FXCollections.observableArrayList();
-        Map<Long, SimpleObjectProperty<Desk>> tableMap = new HashMap<>();
 
         ScrollPane s = new ScrollPane();
         holder.set(s);
@@ -53,49 +52,57 @@ public class DeskController implements Initializable {
         s.setFitToWidth(true);
         s.setContent(pane);
 
-        ThreadUtils.runInDaemon(() ->
-                deskService.getAllDesks().forEach(desk ->
-                        Platform.runLater(() -> pane.getChildren().add(render(desk, pane)))));
-
-        //            while (holder.get() == s) {
-        //                try {
-        //                    synchronized (DeskController.class) {
-        //                        List<Desk> desks = deskService.getAllDesks();
-        //                        desks.forEach(d -> {
-        //                            ObjectProperty<Desk> t = tableMap.get(d.getId());
-        //                            if (t == null || t.get() == null) {
-        //                                SimpleObjectProperty<Desk> desk = new SimpleObjectProperty<>(d);
-        //                                tables.add(desk);
-        //                                tableMap.put(d.getId(), desk);
-        //                            } else {
-        //                                Desk dd = t.get();
-        //                                if (CommonUtils.ne(dd.getVerNo(), d.getVerNo())) {
-        //                                    Platform.runLater(() -> t.set(d));
-        //                                }
-        //                            }
-        //                        });
-        //                    }
-        //                } catch (Exception e) {
-        //                    e.printStackTrace();
-        //                }
-        //            }
-        //            System.out.println("************** DeskController Destroyed......."
-        //                    + this + "\t\t" + Thread.currentThread().getName());
-        //            System.gc();
-
-        //        tables.addListener((ListChangeListener<SimpleObjectProperty<Desk>>) c -> Platform.runLater(() -> {
-        //            while (c.next()) {
-        //                Platform.runLater(() -> {
-        //                    //                    pane.getChildren().addAll(CommonUtils.collect(c.getAddedSubList(),
-        //                    //                            desk -> this.render(desk, pane)));
-        //                });
-        //            }
-        //        }));
-
+        ThreadUtils.runInDaemon(() -> {
+            deskService.getAllDesks().forEach(desk -> deskService.saveRunningData(desk));
+            // 加载所有的tables
+            deskService.getAllDesks().forEach(desk -> tables.add(new SimpleObjectProperty<>(desk)));
+            // 渲染tables
+            tables.forEach(desk -> Platform.runLater(() -> render(desk, pane)));
+            // 监测变化
+            while (holder.get() == s) {
+                try {
+                    Thread.sleep(1000);
+                    tables.forEach(t -> {
+                        Desk dd = deskService.getRunningData(t.get().getId());
+                        if (dd != null && CommonUtils.ne(dd.getVerNo(), t.get().getVerNo())) {
+                            Platform.runLater(() -> t.set(dd));
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            System.out.println("************** DeskController 循环退出......."
+                    + this + "\t\t" + Thread.currentThread().getName());
+            System.gc();
+        });
+        // 随机更新table
+        ThreadUtils.runInDaemon(() -> {
+            while (holder.get() == s) {
+                try {
+                    Thread.sleep(1000);
+                    Desk desk = deskService.getRunningData((long) random.nextInt(20));
+                    if (desk != null) {
+                        desk.setVerNo(desk.getVerNo() != null ? desk.getVerNo() + 1 : 1);
+                        if (EnumDesKStatus.of(desk.getStatus()) == EnumDesKStatus.USED) {
+                            desk.setStatus(EnumDesKStatus.FREE.status());
+                            desk.setOrderCreateTime(null);
+                        } else {
+                            desk.setOrderCreateTime(LocalDateTime.now());
+                            desk.setStatus(EnumDesKStatus.USED.status());
+                        }
+                        deskService.saveRunningData(desk);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
         return s;
     }
 
-    VBox render(Desk table, FlowPane pane) {
+    void render(SimpleObjectProperty<Desk> desk, FlowPane pane) {
+        Desk table = desk.get();
         double boxWidth = Math.max(pane.getWidth() / 6 - 15, 200);
         VBox vBox = new VBox();
         vBox.setPrefSize(boxWidth, boxWidth / 2);
@@ -111,22 +118,21 @@ public class DeskController implements Initializable {
         }
         Label statusLabel = new Label(status.remark());
         Label timeLabel = new Label();
-        timeLabel.setText(DateBuilder.base(
-                table.getOrderCreateTime()).format("HH:mm:ss"));
-        //        tableProperty.addListener((cc, old, newV) -> {
-        //            LocalDateTime orderTime = newV.getOrderCreateTime();
-        //            EnumDesKStatus s = EnumDesKStatus.of(newV.getStatus());
-        //            Platform.runLater(() -> statusLabel.setText(s.remark()));
-        //            if (s == EnumDesKStatus.USED || s == EnumDesKStatus.PAID) {
-        //                vBox.setStyle("-fx-background-color: #ed6871;");
-        //            } else {
-        //                vBox.setStyle("-fx-background-color: #228B22;");
-        //            }
-        //            if (CommonUtils.ne(old.getOrderCreateTime(), orderTime)) {
-        //                Platform.runLater(() ->
-        //                        timeLabel.setText(DateBuilder.base(orderTime).format("HH:mm:ss")));
-        //            }
-        //        });
+        timeLabel.setText(DateBuilder.base(table.getOrderCreateTime()).format("HH:mm:ss"));
+        desk.addListener((cc, old, newV) -> {
+            LocalDateTime orderTime = newV.getOrderCreateTime();
+            EnumDesKStatus s = EnumDesKStatus.of(newV.getStatus());
+            Platform.runLater(() -> statusLabel.setText(s.remark()));
+            if (s == EnumDesKStatus.USED || s == EnumDesKStatus.PAID) {
+                vBox.setStyle("-fx-background-color: #ed6871;");
+            } else {
+                vBox.setStyle("-fx-background-color: #228B22;");
+            }
+            if (CommonUtils.ne(old.getOrderCreateTime(), orderTime)) {
+                Platform.runLater(() ->
+                        timeLabel.setText(DateBuilder.base(orderTime).format("HH:mm:ss")));
+            }
+        });
 
         Label tableNameLabel = new Label(table.getDeskName());
         tableNameLabel.setFont(new javafx.scene.text.Font("微软雅黑", 15));
@@ -156,7 +162,7 @@ public class DeskController implements Initializable {
             dialog.showAndWait();
 
         });
-        return vBox;
+        pane.getChildren().add(vBox);
     }
 
     @Override

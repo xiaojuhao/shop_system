@@ -21,6 +21,14 @@ public class CommonUtils {
         return list.stream().map(fun).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
+    public static void safeRun(Runnable run) {
+        try {
+            run.run();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
     public static void sleep(long millis) {
         try {
             Thread.sleep(millis);
