@@ -9,7 +9,7 @@ import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.dao.DeskDAO;
 import com.xjh.dao.dataobject.Desk;
-import com.xjh.dao.datasource.MysqlDataSource;
+import com.xjh.dao.datasource.LocalSqliteDataSource;
 
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
@@ -17,7 +17,7 @@ import cn.hutool.db.Entity;
 @Singleton
 public class DeskDAOImpl implements DeskDAO {
     @Inject
-    MysqlDataSource ds;
+    LocalSqliteDataSource ds;
 
     @Override
     public int insert(Desk desk) throws SQLException {

@@ -1,14 +1,11 @@
 package com.xjh.service;
 
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.sleepycat.je.Cursor;
@@ -21,7 +18,6 @@ import com.sleepycat.je.Transaction;
 import com.sleepycat.je.TransactionConfig;
 import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.store.DeskKvDatabase;
-import com.xjh.common.utils.CommonUtils;
 import com.xjh.dao.DeskDAO;
 import com.xjh.dao.dataobject.Desk;
 
@@ -56,21 +52,7 @@ public class DeskService {
 
         List<Desk> desks = new ArrayList<>();
         try {
-            List<Desk> list = deskDAO.select(new Desk());
-            list.forEach(d -> {
-                System.out.println("从数据库中加载desk信息:" +
-                        JSON.toJSONString(d));
-            });
-            URL url = DeskService.class.getResource("/config/desks.json");
-            String data = CommonUtils.readFile(url.getFile());
-            JSONArray json = JSON.parseArray(data);
-            for (int i = 0; i < json.size(); i++) {
-                JSONObject v = json.getJSONObject(i);
-                Desk desk = new Desk();
-                desk.setId(v.getLong("id"));
-                desk.setDeskName(v.getString("name"));
-                desks.add(desk);
-            }
+            return deskDAO.select(new Desk());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
