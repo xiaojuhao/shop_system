@@ -2,6 +2,7 @@ package com.xjh.startup.controller;
 
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import com.xjh.common.enumeration.EnumDesKStatus;
@@ -30,7 +31,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.util.Pair;
 
 public class DeskController implements Initializable {
     static final String TIME_FORMAT = "HH:mm:ss";
@@ -68,7 +68,11 @@ public class DeskController implements Initializable {
 
     void detectChange(SimpleObjectProperty<Desk> desk) {
         Desk dd = deskService.getRunningData(desk.get().getId());
-        if (dd != null && CommonUtils.ne(dd.getVerNo(), desk.get().getVerNo())) {
+        if (dd == null) {
+            return;
+        }
+        if (CommonUtils.ne(dd.getVerNo(), desk.get().getVerNo())
+                || EnumDesKStatus.of(dd.getStatus()) == EnumDesKStatus.USED) {
             Platform.runLater(() -> desk.set(dd));
         }
     }
@@ -96,10 +100,13 @@ public class DeskController implements Initializable {
             EnumDesKStatus s = EnumDesKStatus.of(_new.getStatus());
             setBackground(vBox, s);
             statusLabel.setText(s.remark());
-            timeLabel.setText(DateBuilder.base(ot).format(TIME_FORMAT));
+            long usedSeconds = DateBuilder.intervalSeconds(ot, LocalDateTime.now());
+            if (s != EnumDesKStatus.FREE) {
+                timeLabel.setText("已用" + showSeconds(usedSeconds));
+            }
         });
         vBox.setOnMouseClicked(evt -> {
-            Dialog<Pair<String, String>> dialog = new Dialog<>();
+            Dialog<Integer> dialog = new Dialog<>();
             dialog.setTitle("Login Dialog");
             dialog.setHeaderText("Look, a Custom Login Dialog");
             GridPane grid = new GridPane();
@@ -118,11 +125,57 @@ public class DeskController implements Initializable {
             grid.add(new Label("Password:"), 0, 1);
             grid.add(password, 1, 1);
             dialog.getDialogPane().setContent(grid);
-            ButtonType loginButtonType = new ButtonType("Login", ButtonData.OK_DONE);
-            dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
-            dialog.showAndWait();
+            Desk runningData = deskService.getRunningData(table.getId());
+            EnumDesKStatus runStatus = EnumDesKStatus.FREE;
+            if (runningData != null) {
+                runStatus = EnumDesKStatus.of(runningData.getStatus());
+            }
+            ButtonType openDesk = new ButtonType("开台", ButtonData.OK_DONE);
+            ButtonType closeDesk = new ButtonType("关台", ButtonData.OK_DONE);
+            if (runStatus == EnumDesKStatus.USED) {
+                dialog.getDialogPane().getButtonTypes().addAll(closeDesk, ButtonType.CANCEL);
+            } else {
+                dialog.getDialogPane().getButtonTypes().addAll(openDesk, ButtonType.CANCEL);
+            }
+            dialog.setResultConverter(btn -> {
+                if (openDesk == btn) {
+                    return 1;
+                } else if (closeDesk == btn) {
+                    return 2;
+                } else {
+                    return 0;
+                }
+            });
+            Optional<Integer> result = dialog.showAndWait();
+            if (result.isPresent() && result.get() == 1) {
+                deskService.openDesk(table.getId());
+            } else if (result.isPresent() && result.get() == 2) {
+                deskService.closeDesk(table.getId());
+            }
+
         });
         pane.getChildren().add(vBox);
+    }
+
+    private String showSeconds(long seconds) {
+        if (seconds <= 60) {
+            return padding(seconds) + "秒";
+        }
+        if (seconds < 3600) {
+            return padding((seconds / 60))
+                    + "分" + padding((seconds % 60)) + "秒";
+        }
+        return padding((seconds / 3600)) + "时"
+                + padding((seconds / 60)) + "分"
+                + padding((seconds % 60)) + "秒";
+    }
+
+    private String padding(long time) {
+        if (time < 10) {
+            return "0" + time;
+        } else {
+            return "" + time;
+        }
     }
 
     private void setBackground(VBox vbox, EnumDesKStatus status) {

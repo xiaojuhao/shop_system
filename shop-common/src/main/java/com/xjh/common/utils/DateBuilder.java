@@ -39,10 +39,14 @@ public class DateBuilder {
     }
 
     public static long leftSeconds(LocalDateTime toDate) {
-        if (toDate == null) {
+        return intervalSeconds(LocalDateTime.now(), toDate);
+    }
+
+    public static long intervalSeconds(LocalDateTime start, LocalDateTime end) {
+        if (start == null || end == null) {
             return 0;
         }
-        long leftSeconds = ChronoUnit.SECONDS.between(LocalDateTime.now(), toDate);
+        long leftSeconds = ChronoUnit.SECONDS.between(start, end);
         if (leftSeconds < 0) {
             return 0;
         }

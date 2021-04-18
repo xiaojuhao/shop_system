@@ -5,8 +5,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -23,47 +21,33 @@ import com.sleepycat.je.TransactionConfig;
 import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.store.DeskKvDatabase;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.ThreadUtils;
 import com.xjh.dao.dataobject.Desk;
 
 @Singleton
 public class DeskService {
-    AtomicBoolean randomUpdateStarted = new AtomicBoolean();
+    public void openDesk(Long id) {
+        Desk desk = this.getRunningData(id);
+        if (desk == null) {
+            desk = new Desk();
+            desk.setId(id);
+            desk.setDeskName(id.toString());
+        }
+        desk.setStatus(EnumDesKStatus.USED.status());
+        desk.setOrderCreateTime(LocalDateTime.now());
+        this.saveRunningData(desk);
+    }
 
-    public void randomUpdate() {
-        if (!randomUpdateStarted.compareAndSet(false, true)) {
+    public void closeDesk(Long id) {
+        Desk desk = this.getRunningData(id);
+        if (desk == null) {
             return;
         }
-        Random random = new Random();
-        int toalSize = getAllDesks().size();
-        ThreadUtils.runInDaemon(() -> {
-            while (true) {
-                CommonUtils.sleep(3000);
-                long deskId = random.nextInt(toalSize);
-                Desk desk = this.getRunningData(deskId);
-                if (desk != null) {
-                    desk.setVerNo(desk.getVerNo() != null ? desk.getVerNo() + 1 : 1);
-                    if (EnumDesKStatus.of(desk.getStatus()) == EnumDesKStatus.USED) {
-                        desk.setStatus(EnumDesKStatus.FREE.status());
-                        desk.setOrderCreateTime(null);
-                    } else {
-                        desk.setOrderCreateTime(LocalDateTime.now());
-                        desk.setStatus(EnumDesKStatus.USED.status());
-                    }
-                    this.saveRunningData(desk);
-                } else {
-                    desk = new Desk();
-                    desk.setId(deskId);
-                    desk.setDeskName(deskId + "");
-                    desk.setStatus(EnumDesKStatus.FREE.status());
-                    this.saveRunningData(desk);
-                }
-            }
-        });
+        desk.setStatus(EnumDesKStatus.FREE.status());
+        desk.setOrderCreateTime(null);
+        this.saveRunningData(desk);
     }
 
     public List<Desk> getAllDesks() {
-        randomUpdate();
         List<Desk> desks = new ArrayList<>();
         try {
             URL url = DeskService.class.getResource("/config/desks.json");
@@ -84,6 +68,7 @@ public class DeskService {
 
     public void saveRunningData(Desk desk) {
         String key = desk.getId() + "_running_data";
+        desk.setVerNo(desk.getVerNo() != null ? desk.getVerNo() + 1 : 1);
         DatabaseEntry theKey = new DatabaseEntry(key.getBytes(StandardCharsets.UTF_8));
         // DatabaseEntry theData = new DatabaseEntry(HessianUtils.serialize(desk));
         DatabaseEntry theData = new DatabaseEntry(JSON.toJSONString(desk).getBytes(StandardCharsets.UTF_8));
