@@ -165,13 +165,8 @@ public class DeskController implements Initializable {
             return padding((seconds / 60))
                     + "分" + padding((seconds % 60)) + "秒";
         }
-        if (seconds < 3600 * 24) {
-            return padding((seconds / 3600)) + "时"
-                    + padding(((seconds % 3600) / 60)) + "分"
-                    + padding((seconds % 60)) + "秒";
-        }
-        return padding(((seconds % (3600 * 24 * 30)) / (3600 * 24))) + "天"
-                + padding(((seconds % (3600 * 24)) / 3600)) + "时"
+        seconds = seconds % (3600 * 24);
+        return padding((seconds / 3600)) + "时"
                 + padding(((seconds % 3600) / 60)) + "分"
                 + padding((seconds % 60)) + "秒";
     }
