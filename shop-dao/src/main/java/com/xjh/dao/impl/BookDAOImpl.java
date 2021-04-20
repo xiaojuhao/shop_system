@@ -6,18 +6,18 @@ import java.util.List;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import com.xjh.dao.BookDAO;
 import com.xjh.dao.dataobject.Book;
+import com.zaxxer.hikari.HikariDataSource;
 
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
-import com.zaxxer.hikari.HikariDataSource;
-import jdk.jfr.Name;
 
 @Singleton
 public class BookDAOImpl implements BookDAO {
     @Inject
-    @Name(value = "mysql")
+    @Named("mysql")
     HikariDataSource ds;
 
     @Override

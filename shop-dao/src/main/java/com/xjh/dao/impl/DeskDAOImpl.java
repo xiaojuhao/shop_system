@@ -5,21 +5,21 @@ import java.util.List;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.dao.DeskDAO;
 import com.xjh.dao.dataobject.Desk;
+import com.zaxxer.hikari.HikariDataSource;
 
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
-import com.zaxxer.hikari.HikariDataSource;
 
-import javax.inject.Named;
 
 @Singleton
 public class DeskDAOImpl implements DeskDAO {
     @Inject
-    @Named(value = "sqlite")
+    @Named("sqlite")
     HikariDataSource ds;
 
     @Override

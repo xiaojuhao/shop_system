@@ -5,19 +5,19 @@ import java.util.List;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.dao.InfoDAO;
 import com.xjh.dao.dataobject.Info;
+import com.zaxxer.hikari.HikariDataSource;
 
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
-import com.zaxxer.hikari.HikariDataSource;
-import jdk.jfr.Name;
 
 @Singleton
 public class InfoDAOImpl implements InfoDAO {
     @Inject
-    @Name(value = "sqlite")
+    @Named("sqlite")
     HikariDataSource ds;
 
     @Override

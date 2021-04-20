@@ -5,15 +5,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import com.xjh.dao.ReaderDAO;
 import com.xjh.dao.dataobject.Reader;
+import com.zaxxer.hikari.HikariDataSource;
 
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
-import com.zaxxer.hikari.HikariDataSource;
 
 /**
  * 读者DAO的实现类
