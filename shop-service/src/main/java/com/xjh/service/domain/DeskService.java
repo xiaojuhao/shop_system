@@ -7,6 +7,7 @@ import java.util.List;
 import com.alibaba.fastjson.JSON;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.xjh.common.utils.CommonUtils;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Info;
 import com.xjh.dao.mapper.DeskDAO;
@@ -34,7 +35,7 @@ public class DeskService {
             if (desk == null) {
                 return;
             }
-            desk.setOrderId("ORD" + System.currentTimeMillis());
+            desk.setOrderId(CommonUtils.randomNumber(1, 100000) + "");
             desk.setOrderCreateTime(LocalDateTime.now());
             deskDAO.placeOrder(desk);
         } catch (Exception ex) {
