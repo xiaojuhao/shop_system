@@ -8,17 +8,16 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.dao.BookDAO;
 import com.xjh.dao.dataobject.Book;
-import com.xjh.dao.datasource.LocalSqliteDS;
 
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
-import com.xjh.dao.datasource.MysqlDS;
 import com.zaxxer.hikari.HikariDataSource;
+import jdk.jfr.Name;
 
 @Singleton
 public class BookDAOImpl implements BookDAO {
     @Inject
-    @MysqlDS
+    @Name(value = "mysql")
     HikariDataSource ds;
 
     @Override

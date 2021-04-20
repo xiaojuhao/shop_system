@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import com.google.inject.Singleton;
 import com.xjh.dao.AdminDAO;
@@ -12,14 +13,13 @@ import com.xjh.dao.dataobject.Admin;
 
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
-import com.xjh.dao.datasource.LocalSqliteDS;
 import com.zaxxer.hikari.HikariDataSource;
 
 
 @Singleton
 public class AdminDAOImpl implements AdminDAO {
     @Inject
-    @LocalSqliteDS
+    @Named(value = "mysql")
     HikariDataSource ds;
 
     @Override
