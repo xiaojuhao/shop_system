@@ -67,7 +67,7 @@ public class DeskController implements Initializable {
     }
 
     void detectChange(SimpleObjectProperty<Desk> desk) {
-        Desk dd = deskService.getRunningData(desk.get().getId());
+        Desk dd = deskService.getById(desk.get().getId());
         if (dd == null) {
             return;
         }
@@ -125,7 +125,7 @@ public class DeskController implements Initializable {
             grid.add(new Label("Password:"), 0, 1);
             grid.add(password, 1, 1);
             dialog.getDialogPane().setContent(grid);
-            Desk runningData = deskService.getRunningData(table.getId());
+            Desk runningData = deskService.getById(desk.get().getId());
             EnumDesKStatus runStatus = EnumDesKStatus.FREE;
             if (runningData != null) {
                 runStatus = EnumDesKStatus.of(runningData.getStatus());

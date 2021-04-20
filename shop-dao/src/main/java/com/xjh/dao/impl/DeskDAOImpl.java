@@ -40,25 +40,36 @@ public class DeskDAOImpl implements DeskDAO {
     public List<Desk> select(Desk desk) throws SQLException {
         StringBuilder sql = new StringBuilder("select * from t_desk where 1 = 1 ");
         if (desk.getId() != null) {
-            sql.append(" id = ").append(desk.getId());
+            sql.append(" and id = ").append(desk.getId());
         }
         if (CommonUtils.isNotBlank(desk.getDeskName())) {
-            sql.append(" desk_name like '%").append(desk.getDeskName()).append("%' ");
+            sql.append(" and desk_name like '%").append(desk.getDeskName()).append("%' ");
         }
         if (desk.getStatus() != null) {
-            sql.append(" status = ").append(desk.getStatus());
+            sql.append(" and status = ").append(desk.getStatus());
         }
         if (desk.getDeskType() != null) {
-            sql.append(" desk_type = ").append(desk.getDeskType());
+            sql.append(" and desk_type = ").append(desk.getDeskType());
         }
         if (desk.getIsDelete() != null) {
-            sql.append(" is_delete = ").append(desk.getIsDelete());
+            sql.append(" and is_delete = ").append(desk.getIsDelete());
         }
         if (CommonUtils.isNotBlank(desk.getOrderId())) {
-            sql.append(" order_id = '").append(desk.getOrderId()).append("'");
+            sql.append(" and order_id = '").append(desk.getOrderId()).append("'");
         }
         List<Entity> list = Db.use(ds).query(sql.toString());
         return CommonUtils.collect(list, this::convert);
+    }
+
+    @Override
+    public Desk getById(Long id) throws SQLException {
+        if (id == null) {
+            return null;
+        }
+        Desk cond = new Desk();
+        cond.setId(id);
+        List<Desk> desks = select(cond);
+        return desks.stream().findFirst().orElse(null);
     }
 
     @Override
@@ -91,7 +102,7 @@ public class DeskDAOImpl implements DeskDAO {
         desk.setStatus(entity.getInt("status"));
         desk.setOrderId(entity.getStr("order_id"));
         desk.setVerNo(entity.getInt("ver_no"));
-        desk.setOrderCreateTime(DateBuilder.base(entity.getTimestamp("order_create_time")).dateTime());
+        desk.setOrderCreateTime(DateBuilder.base(entity.getStr("order_create_time")).dateTime());
         return desk;
     }
 }

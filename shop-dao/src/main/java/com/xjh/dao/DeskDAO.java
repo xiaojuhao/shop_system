@@ -10,6 +10,8 @@ public interface DeskDAO {
 
     List<Desk> select(Desk desk) throws SQLException;
 
+    Desk getById(Long id) throws SQLException;
+
     int placeOrder(Desk desk) throws SQLException;
 
     int clearOrder(Long id) throws SQLException;
