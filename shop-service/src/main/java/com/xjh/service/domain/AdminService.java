@@ -1,4 +1,4 @@
-package com.xjh.service;
+package com.xjh.service.domain;
 
 import java.util.List;
 

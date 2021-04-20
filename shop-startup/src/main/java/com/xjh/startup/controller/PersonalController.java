@@ -4,7 +4,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import com.xjh.dao.dataobject.Admin;
-import com.xjh.service.AdminService;
+import com.xjh.service.domain.AdminService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 
 import javafx.application.Platform;

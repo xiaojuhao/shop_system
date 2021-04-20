@@ -1,4 +1,4 @@
-package com.xjh.service.impl;
+package com.xjh.service.domain.impl;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -8,7 +8,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.dao.dataobject.Reader;
 import com.xjh.dao.mapper.ReaderDAO;
-import com.xjh.service.ReaderService;
+import com.xjh.service.domain.ReaderService;
 
 @Singleton
 public class ReaderServiceImpl implements ReaderService {

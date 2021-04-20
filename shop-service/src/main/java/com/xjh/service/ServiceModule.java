@@ -1,10 +1,11 @@
 package com.xjh.service;
 
 import com.google.inject.AbstractModule;
-import com.xjh.service.impl.AdminServiceImpl;
-import com.xjh.service.impl.AnalysisServiceImpl;
-import com.xjh.service.impl.BookServiceImpl;
-import com.xjh.service.impl.ReaderServiceImpl;
+import com.xjh.service.domain.*;
+import com.xjh.service.domain.impl.AdminServiceImpl;
+import com.xjh.service.domain.impl.AnalysisServiceImpl;
+import com.xjh.service.domain.impl.BookServiceImpl;
+import com.xjh.service.domain.impl.ReaderServiceImpl;
 
 public class ServiceModule extends AbstractModule {
     @Override

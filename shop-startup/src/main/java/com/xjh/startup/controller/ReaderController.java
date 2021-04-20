@@ -15,7 +15,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import com.xjh.dao.dataobject.Reader;
-import com.xjh.service.ReaderService;
+import com.xjh.service.domain.ReaderService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 
 import javafx.beans.value.ChangeListener;

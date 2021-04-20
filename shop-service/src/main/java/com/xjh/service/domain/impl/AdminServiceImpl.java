@@ -1,4 +1,4 @@
-package com.xjh.service.impl;
+package com.xjh.service.domain.impl;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -8,7 +8,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.dao.dataobject.Admin;
 import com.xjh.dao.mapper.AdminDAO;
-import com.xjh.service.AdminService;
+import com.xjh.service.domain.AdminService;
 
 @Singleton
 public class AdminServiceImpl implements AdminService {

@@ -6,7 +6,7 @@ import java.util.ResourceBundle;
 
 import com.xjh.dao.dataobject.Book;
 import com.xjh.dao.dataobject.Type;
-import com.xjh.service.BookService;
+import com.xjh.service.domain.BookService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 
 import javafx.collections.FXCollections;

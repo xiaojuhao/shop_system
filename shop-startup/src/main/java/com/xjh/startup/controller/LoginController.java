@@ -1,6 +1,6 @@
 package com.xjh.startup.controller;
 
-import com.xjh.service.AdminService;
+import com.xjh.service.domain.AdminService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 
 import javafx.fxml.FXML;

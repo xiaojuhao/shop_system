@@ -1,4 +1,4 @@
-package com.xjh.service.impl;
+package com.xjh.service.domain.impl;
 
 import java.sql.SQLException;
 
@@ -8,7 +8,7 @@ import com.xjh.dao.mapper.AdminDAO;
 import com.xjh.dao.mapper.BookDAO;
 import com.xjh.dao.mapper.ReaderDAO;
 import com.xjh.dao.mapper.TypeDAO;
-import com.xjh.service.AnalysisService;
+import com.xjh.service.domain.AnalysisService;
 
 @Singleton
 public class AnalysisServiceImpl implements AnalysisService {

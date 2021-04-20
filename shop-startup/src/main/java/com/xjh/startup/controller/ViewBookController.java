@@ -8,7 +8,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import com.xjh.dao.dataobject.Book;
-import com.xjh.service.BookService;
+import com.xjh.service.domain.BookService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 
 import javafx.collections.ObservableList;

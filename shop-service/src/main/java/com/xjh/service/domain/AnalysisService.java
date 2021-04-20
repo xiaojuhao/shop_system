@@ -1,4 +1,4 @@
-package com.xjh.service;
+package com.xjh.service.domain;
 
 /**
  * 数据统计分析服务接口

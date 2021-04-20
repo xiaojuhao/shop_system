@@ -8,7 +8,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import com.xjh.dao.dataobject.Admin;
-import com.xjh.service.AdminService;
+import com.xjh.service.domain.AdminService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 
 import javafx.collections.FXCollections;

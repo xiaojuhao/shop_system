@@ -3,7 +3,7 @@ package com.xjh.startup.controller;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import com.xjh.service.ReaderService;
+import com.xjh.service.domain.ReaderService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 
 import javafx.collections.FXCollections;

@@ -1,4 +1,4 @@
-package com.xjh.service;
+package com.xjh.service.domain;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -7,10 +7,10 @@ import java.util.List;
 import com.alibaba.fastjson.JSON;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.xjh.dao.DeskDAO;
-import com.xjh.dao.InfoDAO;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Info;
+import com.xjh.dao.mapper.DeskDAO;
+import com.xjh.dao.mapper.InfoDAO;
 
 @Singleton
 public class DeskService {

@@ -10,7 +10,7 @@ import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.ThreadUtils;
 import com.xjh.dao.dataobject.Desk;
-import com.xjh.service.DeskService;
+import com.xjh.service.domain.DeskService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 
 import cn.hutool.core.lang.Holder;
