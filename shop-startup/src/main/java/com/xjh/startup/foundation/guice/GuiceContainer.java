@@ -4,7 +4,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.xjh.common.utils.Holder;
 import com.xjh.dao.datasource.DataSourceModule;
-import com.xjh.dao.module.DaoModule;
+import com.xjh.dao.DaoModule;
 import com.xjh.service.ServiceModule;
 
 public class GuiceContainer {

@@ -1,19 +1,17 @@
-package com.xjh.dao.impl;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
-import com.xjh.dao.AdminDAO;
-import com.xjh.dao.dataobject.Admin;
-import com.zaxxer.hikari.HikariDataSource;
+package com.xjh.dao.mapper.impl;
 
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import com.xjh.dao.dataobject.Admin;
+import com.xjh.dao.mapper.AdminDAO;
+import com.zaxxer.hikari.HikariDataSource;
+
+import javax.inject.Inject;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Singleton

@@ -6,8 +6,8 @@ import java.util.List;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.xjh.dao.ReaderDAO;
 import com.xjh.dao.dataobject.Reader;
+import com.xjh.dao.mapper.ReaderDAO;
 import com.xjh.service.ReaderService;
 
 @Singleton

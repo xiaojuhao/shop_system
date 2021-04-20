@@ -1,14 +1,14 @@
 package com.xjh.dao.datasource;
 
+import com.google.inject.Provider;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.google.inject.Provider;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 
 public class MysqlDataSourceProvider implements Provider<HikariDataSource> {
     @Override

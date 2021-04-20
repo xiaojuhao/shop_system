@@ -4,10 +4,10 @@ import java.sql.SQLException;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.xjh.dao.AdminDAO;
-import com.xjh.dao.BookDAO;
-import com.xjh.dao.ReaderDAO;
-import com.xjh.dao.TypeDAO;
+import com.xjh.dao.mapper.AdminDAO;
+import com.xjh.dao.mapper.BookDAO;
+import com.xjh.dao.mapper.ReaderDAO;
+import com.xjh.dao.mapper.TypeDAO;
 import com.xjh.service.AnalysisService;
 
 @Singleton

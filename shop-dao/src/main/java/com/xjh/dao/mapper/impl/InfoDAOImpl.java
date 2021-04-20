@@ -1,18 +1,17 @@
-package com.xjh.dao.impl;
+package com.xjh.dao.mapper.impl;
 
-import java.sql.SQLException;
-import java.util.List;
-
+import cn.hutool.db.Db;
+import cn.hutool.db.Entity;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.dao.InfoDAO;
 import com.xjh.dao.dataobject.Info;
+import com.xjh.dao.mapper.InfoDAO;
 import com.zaxxer.hikari.HikariDataSource;
 
-import cn.hutool.db.Db;
-import cn.hutool.db.Entity;
+import java.sql.SQLException;
+import java.util.List;
 
 @Singleton
 public class InfoDAOImpl implements InfoDAO {

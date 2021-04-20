@@ -6,8 +6,8 @@ import java.util.List;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.xjh.dao.AdminDAO;
 import com.xjh.dao.dataobject.Admin;
+import com.xjh.dao.mapper.AdminDAO;
 import com.xjh.service.AdminService;
 
 @Singleton

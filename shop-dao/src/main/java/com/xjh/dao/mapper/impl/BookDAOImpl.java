@@ -1,18 +1,17 @@
-package com.xjh.dao.impl;
+package com.xjh.dao.mapper.impl;
+
+import cn.hutool.db.Db;
+import cn.hutool.db.Entity;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import com.xjh.dao.dataobject.Book;
+import com.xjh.dao.mapper.BookDAO;
+import com.zaxxer.hikari.HikariDataSource;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
-import com.xjh.dao.BookDAO;
-import com.xjh.dao.dataobject.Book;
-import com.zaxxer.hikari.HikariDataSource;
-
-import cn.hutool.db.Db;
-import cn.hutool.db.Entity;
 
 @Singleton
 public class BookDAOImpl implements BookDAO {

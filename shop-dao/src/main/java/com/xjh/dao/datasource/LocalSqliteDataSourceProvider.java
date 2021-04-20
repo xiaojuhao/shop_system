@@ -1,10 +1,10 @@
 package com.xjh.dao.datasource;
 
-import java.io.File;
-
 import com.google.inject.Provider;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+
+import java.io.File;
 
 public class LocalSqliteDataSourceProvider implements Provider<HikariDataSource> {
     @Override

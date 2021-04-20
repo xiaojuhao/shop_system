@@ -1,19 +1,17 @@
-package com.xjh.dao.impl;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
-import com.xjh.dao.TypeDAO;
-import com.xjh.dao.dataobject.Type;
-import com.zaxxer.hikari.HikariDataSource;
+package com.xjh.dao.mapper.impl;
 
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import com.xjh.dao.dataobject.Type;
+import com.xjh.dao.mapper.TypeDAO;
+import com.zaxxer.hikari.HikariDataSource;
+
+import javax.inject.Inject;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Singleton
 public class TypeDAOImpl implements TypeDAO {

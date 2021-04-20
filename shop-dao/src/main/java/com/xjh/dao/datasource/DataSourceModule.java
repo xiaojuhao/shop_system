@@ -5,8 +5,6 @@ import com.google.inject.name.Names;
 import com.xjh.common.utils.TimeRecord;
 import com.zaxxer.hikari.HikariDataSource;
 
-import javax.inject.Named;
-
 public class DataSourceModule extends AbstractModule {
     @Override
     protected void configure() {

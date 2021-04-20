@@ -1,10 +1,10 @@
-package com.xjh.dao;
+package com.xjh.dao.mapper;
 
+
+import com.xjh.dao.dataobject.Book;
 
 import java.sql.SQLException;
 import java.util.List;
-
-import com.xjh.dao.dataobject.Book;
 
 /**
  * 图书DAO

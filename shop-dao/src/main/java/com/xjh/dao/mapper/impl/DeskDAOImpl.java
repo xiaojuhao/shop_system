@@ -1,19 +1,18 @@
-package com.xjh.dao.impl;
+package com.xjh.dao.mapper.impl;
 
-import java.sql.SQLException;
-import java.util.List;
-
+import cn.hutool.db.Db;
+import cn.hutool.db.Entity;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
-import com.xjh.dao.DeskDAO;
 import com.xjh.dao.dataobject.Desk;
+import com.xjh.dao.mapper.DeskDAO;
 import com.zaxxer.hikari.HikariDataSource;
 
-import cn.hutool.db.Db;
-import cn.hutool.db.Entity;
+import java.sql.SQLException;
+import java.util.List;
 
 
 @Singleton
