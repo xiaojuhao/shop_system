@@ -9,10 +9,11 @@ import javax.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.dao.ReaderDAO;
 import com.xjh.dao.dataobject.Reader;
-import com.xjh.dao.datasource.MysqlDataSource;
+import com.xjh.dao.datasource.MysqlDS;
 
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
+import com.zaxxer.hikari.HikariDataSource;
 
 /**
  * 读者DAO的实现类
@@ -20,7 +21,8 @@ import cn.hutool.db.Entity;
 @Singleton
 public class ReaderDAOImpl implements ReaderDAO {
     @Inject
-    MysqlDataSource ds;
+    @MysqlDS
+    HikariDataSource ds;
 
     @Override
     public List<Reader> selectReaders() throws SQLException {

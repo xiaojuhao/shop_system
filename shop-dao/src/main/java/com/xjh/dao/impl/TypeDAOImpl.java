@@ -9,15 +9,17 @@ import javax.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.dao.TypeDAO;
 import com.xjh.dao.dataobject.Type;
-import com.xjh.dao.datasource.MysqlDataSource;
+import com.xjh.dao.datasource.MysqlDS;
 
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
+import com.zaxxer.hikari.HikariDataSource;
 
 @Singleton
 public class TypeDAOImpl implements TypeDAO {
     @Inject
-    MysqlDataSource ds;
+    @MysqlDS
+    HikariDataSource ds;
 
     @Override
     public Long insertType(Type type) throws SQLException {

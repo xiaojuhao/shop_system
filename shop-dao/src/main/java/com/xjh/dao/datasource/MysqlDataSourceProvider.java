@@ -8,10 +8,11 @@ import java.util.Map;
 
 import com.google.inject.Provider;
 import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
-public class MysqlDataSourceProvider implements Provider<MysqlDataSource> {
+public class MysqlDataSourceProvider implements Provider<HikariDataSource> {
     @Override
-    public MysqlDataSource get() {
+    public HikariDataSource get() {
         Map<String, String> config = configMap();
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(config.get("url"));
@@ -21,7 +22,7 @@ public class MysqlDataSourceProvider implements Provider<MysqlDataSource> {
         hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
         hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
         hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-        return new MysqlDataSource(hikariConfig);
+        return new HikariDataSource(hikariConfig);
     }
 
     private static Map<String, String> configMap() {

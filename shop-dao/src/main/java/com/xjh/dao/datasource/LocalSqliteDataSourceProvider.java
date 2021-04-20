@@ -4,10 +4,11 @@ import java.io.File;
 
 import com.google.inject.Provider;
 import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
-public class LocalSqliteDataSourceProvider implements Provider<LocalSqliteDataSource> {
+public class LocalSqliteDataSourceProvider implements Provider<HikariDataSource> {
     @Override
-    public LocalSqliteDataSource get() {
+    public HikariDataSource get() {
         File home = new File(".rundata/sqlite");
         System.out.println("Home path: " + home.getAbsolutePath());
         if (!home.exists()) {
@@ -27,7 +28,6 @@ public class LocalSqliteDataSourceProvider implements Provider<LocalSqliteDataSo
         hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
         hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
         hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-        LocalSqliteDataSource ds = new LocalSqliteDataSource(hikariConfig);
-        return ds;
+        return new HikariDataSource(hikariConfig);
     }
 }

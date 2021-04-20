@@ -9,15 +9,17 @@ import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.dao.DeskDAO;
 import com.xjh.dao.dataobject.Desk;
-import com.xjh.dao.datasource.LocalSqliteDataSource;
+import com.xjh.dao.datasource.LocalSqliteDS;
 
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
+import com.zaxxer.hikari.HikariDataSource;
 
 @Singleton
 public class DeskDAOImpl implements DeskDAO {
     @Inject
-    LocalSqliteDataSource ds;
+    @LocalSqliteDS
+    HikariDataSource ds;
 
     @Override
     public int insert(Desk desk) throws SQLException {

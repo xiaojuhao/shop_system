@@ -9,16 +9,18 @@ import javax.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.dao.AdminDAO;
 import com.xjh.dao.dataobject.Admin;
-import com.xjh.dao.datasource.MysqlDataSource;
 
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
+import com.xjh.dao.datasource.LocalSqliteDS;
+import com.zaxxer.hikari.HikariDataSource;
 
 
 @Singleton
 public class AdminDAOImpl implements AdminDAO {
     @Inject
-    MysqlDataSource ds;
+    @LocalSqliteDS
+    HikariDataSource ds;
 
     @Override
     public List<Admin> selectAdmins() throws SQLException {

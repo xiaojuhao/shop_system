@@ -8,15 +8,17 @@ import com.google.inject.Singleton;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.dao.InfoDAO;
 import com.xjh.dao.dataobject.Info;
-import com.xjh.dao.datasource.LocalSqliteDataSource;
+import com.xjh.dao.datasource.LocalSqliteDS;
 
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
+import com.zaxxer.hikari.HikariDataSource;
 
 @Singleton
 public class InfoDAOImpl implements InfoDAO {
     @Inject
-    LocalSqliteDataSource ds;
+    @LocalSqliteDS
+    HikariDataSource ds;
 
     @Override
     public int insert(Info info) throws SQLException {
