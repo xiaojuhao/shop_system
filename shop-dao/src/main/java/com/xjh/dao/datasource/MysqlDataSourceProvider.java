@@ -1,6 +1,7 @@
 package com.xjh.dao.datasource;
 
 import com.google.inject.Provider;
+import com.xjh.dao.DataSourceModule;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
