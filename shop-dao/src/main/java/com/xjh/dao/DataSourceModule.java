@@ -11,6 +11,7 @@ public class DataSourceModule extends AbstractModule {
     @Override
     protected void configure() {
         TimeRecord.start();
+        // test
         bind(HikariDataSource.class).annotatedWith(Names.named("mysql")).toProvider(MysqlDataSourceProvider.class);
         System.out.println("MysqlDS 耗时: " + TimeRecord.getCostAndRestart());
         bind(HikariDataSource.class).annotatedWith(Names.named("sqlite")).toProvider(LocalSqliteDataSourceProvider.class);
