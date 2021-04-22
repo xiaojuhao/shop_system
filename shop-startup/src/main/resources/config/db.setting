@@ -1,6 +1,6 @@
 ## db.settingÎÄ¼þ
 
-url = jdbc:mysql://localhost:3306/book?useUnicode=true&characterEncoding=utf-8
+url = jdbc:mysql://localhost:3306/xjh?useUnicode=true&characterEncoding=utf-8
 driver = com.mysql.cj.jdbc.Driver
 user = root
 pass = 12345678

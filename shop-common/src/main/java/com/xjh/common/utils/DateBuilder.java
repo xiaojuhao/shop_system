@@ -22,6 +22,14 @@ public class DateBuilder {
         return today().plusDays(1);
     }
 
+    public static DateBuilder base(Long milliSeconds) {
+        DateBuilder builder = new DateBuilder();
+        if (milliSeconds != null && milliSeconds > 0) {
+            builder.localDateTime = base(new Date(milliSeconds)).dateTime();
+        }
+        return builder;
+    }
+
     public static DateBuilder base(LocalDateTime dateTime) {
         DateBuilder builder = new DateBuilder();
         if (dateTime != null) {
