@@ -73,7 +73,7 @@ public class DeskDAOImpl implements DeskDAO {
                         " createTime = ?, " +
                         " useStatus = 2 " +
                         " where deskId = ? ",
-                desk.getOrderId(), desk.getOrderCreateTime().getSecond(), desk.getId());
+                desk.getOrderId(), DateBuilder.base(desk.getOrderCreateTime()).mills(), desk.getId());
     }
 
     @Override

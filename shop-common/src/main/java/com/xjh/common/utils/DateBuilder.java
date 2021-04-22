@@ -174,6 +174,10 @@ public class DateBuilder {
         return this;
     }
 
+    public long mills() {
+        return base(this.localDateTime).date().getTime();
+    }
+
     public boolean expired() {
         return expiredAt(LocalDateTime.now());
     }

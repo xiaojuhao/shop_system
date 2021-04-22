@@ -46,6 +46,33 @@ public class CommonUtils {
         }
     }
 
+    public static String formatSeconds(long seconds) {
+        if (seconds <= 60) {
+            return padding(seconds) + "秒";
+        }
+        if (seconds <= 3600) {
+            return padding((seconds / 60))
+                    + "分" + padding((seconds % 60)) + "秒";
+        }
+        if (seconds <= 3600 * 24) {
+            return padding((seconds / 3600)) + "时"
+                    + padding(((seconds % 3600) / 60)) + "分"
+                    + padding((seconds % 60)) + "秒";
+        }
+        return padding((seconds / (3600 * 24))) + "天" +
+                padding((seconds % (3600 * 24) / 3600)) + "时"
+                + padding(((seconds % 3600) / 60)) + "分"
+                + padding((seconds % 60)) + "秒";
+    }
+
+    private static String padding(long time) {
+        if (time < 10) {
+            return "0" + time;
+        } else {
+            return "" + time;
+        }
+    }
+
     public static boolean ne(Object a, Object b) {
         return !eq(a, b);
     }

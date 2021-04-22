@@ -102,7 +102,7 @@ public class DeskController implements Initializable {
             statusLabel.setText(s.remark());
             long usedSeconds = DateBuilder.intervalSeconds(ot, LocalDateTime.now());
             if (s != EnumDesKStatus.FREE) {
-                timeLabel.setText("已用" + showSeconds(usedSeconds));
+                timeLabel.setText("已用" + CommonUtils.formatSeconds(usedSeconds));
             }
         });
         vBox.setOnMouseClicked(evt -> {
@@ -155,28 +155,6 @@ public class DeskController implements Initializable {
 
         });
         pane.getChildren().add(vBox);
-    }
-
-    private String showSeconds(long seconds) {
-        if (seconds <= 60) {
-            return padding(seconds) + "秒";
-        }
-        if (seconds < 3600) {
-            return padding((seconds / 60))
-                    + "分" + padding((seconds % 60)) + "秒";
-        }
-        seconds = seconds % (3600 * 24);
-        return padding((seconds / 3600)) + "时"
-                + padding(((seconds % 3600) / 60)) + "分"
-                + padding((seconds % 60)) + "秒";
-    }
-
-    private String padding(long time) {
-        if (time < 10) {
-            return "0" + time;
-        } else {
-            return "" + time;
-        }
     }
 
     private void setBackground(VBox vbox, EnumDesKStatus status) {
