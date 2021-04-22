@@ -6,20 +6,24 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.xjh.startup.controller.LoginController" styleClass="login-bg">
-    <VBox styleClass="login-card" prefWidth="500" minWidth="450" alignment="CENTER">
-        <Label text="小句号点餐收银系统" styleClass="login-title"/>
+<VBox styleClass="login-bg" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.xjh.startup.controller.LoginController">
+    <VBox alignment="CENTER" minWidth="450" prefWidth="500" styleClass="login-card">
+        <Label styleClass="login-title" text="小句号点餐收银系统"/>
         <!--        <Label text="图书管理系统后台" styleClass="font-gray" AnchorPane.topAnchor="65" AnchorPane.leftAnchor="190"/>-->
-        <VBox prefWidth="330" alignment="CENTER" spacing="15">
-            <TextField promptText="账号" focusTraversable="false" fx:id="accountField" text="1"/>
-            <PasswordField promptText="密码" focusTraversable="false" fx:id="passwordField" text="1"/>
+        <VBox alignment="CENTER" prefWidth="330" spacing="15">
+            <HBox prefWidth="300">
+                <Label prefHeight="18.0" prefWidth="44.0" text="账号:"/>
+                <TextField fx:id="accountField" focusTraversable="false" prefHeight="26.0" prefWidth="289.0" promptText="账号"/>
+            </HBox>
+            <HBox prefWidth="300">
+                <Label prefHeight="18.0" prefWidth="44.0" text="密码:"/>
+                <PasswordField fx:id="passwordField" focusTraversable="false" prefHeight="26.0" prefWidth="288.0" promptText="密码"/>
+            </HBox>
+
             <!--            <HBox spacing="20">-->
             <!--                <TextField promptText="验证码" focusTraversable="false" prefWidth="180"/>-->
             <!--                <ImageView fitWidth="80" fitHeight="30">-->
@@ -27,28 +31,22 @@
             <!--                </ImageView>-->
             <!--            </HBox>-->
             <AnchorPane>
-                <CheckBox text="记住密码" AnchorPane.leftAnchor="0"/>
-                <Label text="忘记密码" AnchorPane.rightAnchor="0" styleClass="font-green"/>
+                <CheckBox layoutX="14.0" text="记住密码" AnchorPane.leftAnchor="14.0"/>
+                <Label layoutX="259.0" styleClass="font-green" text="忘记密码" AnchorPane.rightAnchor="29.0"/>
             </AnchorPane>
-            <Button text="登入" styleClass="login-btn" onAction="#login"/>
-            <HBox spacing="12" alignment="BOTTOM_LEFT">
-                <Label text="社交账号注册" styleClass="font-gray"/>
-                <ImageView fitWidth="20" fitHeight="20">
-                    <Image url="/img/zhifubao.png"/>
-                </ImageView>
-                <ImageView fitWidth="20" fitHeight="20">
-                    <Image url="/img/weixin.png"/>
-                </ImageView>
-                <ImageView fitWidth="20" fitHeight="20">
-                    <Image url="/img/dingding.jpeg"/>
-                </ImageView>
-                <Label text="注册账号" styleClass="font-green"/>
+            <Button onAction="#login" styleClass="login-btn" text="登入"/>
+            <HBox alignment="BOTTOM_LEFT" spacing="12">
+                <Label styleClass="font-gray" text="社交账号注册"/>
+                <ImageView fx:id="wxImg" fitHeight="20" fitWidth="20"/>
+                <ImageView fx:id="zfbImg" fitHeight="20" fitWidth="20"/>
+                <ImageView fx:id="dingdingImg" fitHeight="20" fitWidth="20"/>
+                <Label styleClass="font-green" text="注册账号"/>
                 <padding>
                     <Insets left="30" right="30"/>
                 </padding>
             </HBox>
             <padding>
-                <Insets top="60" left="80" right="80" bottom="20"/>
+                <Insets bottom="20" left="80" right="80" top="60"/>
             </padding>
         </VBox>
     </VBox>
