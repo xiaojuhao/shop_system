@@ -14,7 +14,7 @@
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.xjh.startup.controller.LoginController" styleClass="login-bg">
-    <VBox styleClass="login-card" prefWidth="500" alignment="CENTER">
+    <VBox styleClass="login-card" prefWidth="500" minWidth="450" alignment="CENTER">
         <Label text="小句号点餐收银系统" styleClass="login-title"/>
         <!--        <Label text="图书管理系统后台" styleClass="font-gray" AnchorPane.topAnchor="65" AnchorPane.leftAnchor="190"/>-->
         <VBox prefWidth="330" alignment="CENTER" spacing="15">
