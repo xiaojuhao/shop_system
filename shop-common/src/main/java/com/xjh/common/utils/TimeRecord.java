@@ -9,19 +9,13 @@ public class TimeRecord {
         return r;
     }
 
-    public long getCostAndClear() {
-        long cost = getCost();
-        startTime = 0;
-        return cost;
-    }
-
     public long getCost() {
         return System.currentTimeMillis() - startTime;
     }
 
-    public long getCostAndRestart() {
+    public long getCostAndReset() {
         long cost = getCost();
-        startTime = 0;
+        startTime = System.currentTimeMillis();
         return cost;
     }
 
