@@ -1,34 +1,27 @@
 package com.xjh.common.utils;
 
 public class TimeRecord {
-    static ThreadLocal<Long> startTime = new ThreadLocal<>();
+    long startTime = 0;
 
-    public static void clear() {
-        startTime.remove();
+    public static TimeRecord start() {
+        TimeRecord r = new TimeRecord();
+        r.startTime = System.currentTimeMillis();
+        return r;
     }
 
-    public static void start() {
-        clear();
-        startTime.set(System.currentTimeMillis());
-    }
-
-    public static long getCostAndClear() {
+    public long getCostAndClear() {
         long cost = getCost();
-        clear();
+        startTime = 0;
         return cost;
     }
 
-    public static long getCost() {
-        if (startTime.get() == null) {
-            start();
-            return 0;
-        }
-        return System.currentTimeMillis() - startTime.get();
+    public long getCost() {
+        return System.currentTimeMillis() - startTime;
     }
 
-    public static long getCostAndRestart() {
+    public long getCostAndRestart() {
         long cost = getCost();
-        start();
+        startTime = 0;
         return cost;
     }
 
