@@ -70,10 +70,7 @@ public class DeskController implements Initializable {
         if (dd == null) {
             return;
         }
-        if (CommonUtils.ne(dd.getVerNo(), desk.get().getVerNo())
-                || EnumDesKStatus.of(dd.getStatus()) == EnumDesKStatus.USED) {
-            Platform.runLater(() -> desk.set(dd));
-        }
+        Platform.runLater(() -> desk.set(dd));
     }
 
     void render(SimpleObjectProperty<Desk> desk, FlowPane pane) {

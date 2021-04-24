@@ -9,6 +9,7 @@ import com.google.inject.name.Named;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.dao.dataobject.Desk;
+import com.xjh.dao.foundation.EntityUtils;
 import com.xjh.dao.mapper.DeskDAO;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -29,9 +30,7 @@ public class DeskDAOImpl implements DeskDAO {
                 .set("desk_name", desk.getDeskName())
                 .set("status", desk.getStatus())
                 .set("max_person", desk.getMaxPerson())
-                .set("desk_type", desk.getDeskType())
-                .set("is_delete", desk.getIsDelete())
-                .set("ver_no", CommonUtils.orElse(desk.getVerNo(), 1));
+                .set("desk_type", desk.getDeskType());
         return Db.use(ds).insert(t);
     }
 
@@ -87,12 +86,7 @@ public class DeskDAOImpl implements DeskDAO {
 
     private Desk convert(Entity entity) {
         Desk desk = new Desk();
-        desk.setId(entity.getLong("deskId"));
-        desk.setDeskName(entity.getStr("deskName"));
-        desk.setMaxPerson(entity.getInt("maxPersonNum"));
-        desk.setStatus(entity.getInt("useStatus"));
-        desk.setOrderId(entity.getStr("orderId"));
-        desk.setOrderCreateTime(DateBuilder.base(entity.getLong("createTime")).dateTime());
+        EntityUtils.convert(entity, desk);
         return desk;
     }
 }

@@ -3,17 +3,23 @@ package com.xjh.dao.dataobject;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import com.xjh.dao.foundation.Column;
+
 public class Desk implements Serializable {
     private static final long serialVersionUID = -2784348482896858640L;
+    @Column("deskId")
     Long id;
+    @Column("deskName")
     String deskName;
+    @Column("useStatus")
     Integer status;
+    @Column("maxPersonNum")
     Integer maxPerson;
     Integer deskType;
+    @Column("orderId")
     String orderId;
+    @Column("createTime")
     LocalDateTime orderCreateTime;
-    Integer isDelete;
-    Integer verNo;
 
     public Long getId() {
         return id;
@@ -71,19 +77,4 @@ public class Desk implements Serializable {
         this.orderCreateTime = orderCreateTime;
     }
 
-    public Integer getIsDelete() {
-        return isDelete;
-    }
-
-    public void setIsDelete(Integer isDelete) {
-        this.isDelete = isDelete;
-    }
-
-    public Integer getVerNo() {
-        return verNo;
-    }
-
-    public void setVerNo(Integer verNo) {
-        this.verNo = verNo;
-    }
 }
