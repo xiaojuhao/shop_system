@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+    <GridPane>
+        <HBox GridPane.columnIndex="0">
+            <Label prefHeight="17.0" prefWidth="67.0" text="就餐人数"/>
+            <TextField/>
+        </HBox>
+        <HBox GridPane.columnIndex="1">
+            <Label prefHeight="17.0" prefWidth="67.0" text="订单号"/>
+            <TextField/>
+        </HBox>
+        <HBox GridPane.columnIndex="2">
+            <Label prefHeight="17.0" prefWidth="91.0" text="订单号"/>
+            <TextField/>
+        </HBox>
+        <HBox GridPane.rowIndex="1">
+            <Label prefHeight="17.0" prefWidth="98.0" text="订单号"/>
+            <TextField/>
+        </HBox>
+        <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <Label prefHeight="17.0" prefWidth="68.0" text="订单号"/>
+            <TextField/>
+        </HBox>
+        <HBox GridPane.columnIndex="2" GridPane.rowIndex="1">
+            <Label prefHeight="17.0" prefWidth="93.0" text="订单号"/>
+            <TextField/>
+        </HBox>
+    </GridPane>
+</VBox>

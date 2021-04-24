@@ -13,6 +13,7 @@ import com.xjh.dao.dataobject.Desk;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
+import com.xjh.startup.foundation.utils.FxmlUtils;
 
 import cn.hutool.core.lang.Holder;
 import javafx.application.Platform;
@@ -22,6 +23,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -121,6 +123,9 @@ public class DeskController implements Initializable {
                 orderInfo.setWidth(pane.getScene().getWindow().getWidth() / 10 * 9);
                 orderInfo.setHeight(pane.getScene().getWindow().getHeight() / 10 * 9);
                 orderInfo.setTitle("订单详情");
+                VBox detail = new VBox();
+                orderInfo.setScene(new Scene(detail));
+                detail.getChildren().add(FxmlUtils.load("orderDetail"));
                 orderInfo.show();
             } else {
                 Dialog<Integer> dialog = new Dialog<>();
