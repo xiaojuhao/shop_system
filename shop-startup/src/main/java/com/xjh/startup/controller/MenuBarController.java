@@ -50,11 +50,7 @@ public class MenuBarController {
     private Menu createIndexMenu() {
         Menu menu = new Menu();
         Label label = new Label("主页");
-        label.setOnMouseClicked(evt -> {
-            System.out.println("主页点击。。。。。。");
-            root.setCenter(new DeskController().view());
-            root.getCenter();
-        });
+        label.setOnMouseClicked(evt -> root.setCenter(new DeskController().view()));
         menu.setGraphic(label);
         return menu;
     }

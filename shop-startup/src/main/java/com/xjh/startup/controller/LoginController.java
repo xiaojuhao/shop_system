@@ -7,7 +7,6 @@ import com.xjh.service.domain.AdminService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -40,13 +39,12 @@ public class LoginController implements Initializable {
             //创建主界面舞台
             Stage mainStage = new Stage();
             //读入布局
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
-            BorderPane root = fxmlLoader.load();
-            // 菜单
-            root.setTop(new MenuBarController(root).renderMenuBar());
+            // FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
+            BorderPane main = new BorderPane();
+            main.setTop(new MenuBarController(main).renderMenuBar());
             // 主体内容
-            root.setCenter(new DeskController().view());
-            Scene scene = new Scene(root);
+            main.setCenter(new DeskController().view());
+            Scene scene = new Scene(main);
             scene.getStylesheets().add("/css/style.css");
             mainStage.setTitle("小句号点餐系统");
             mainStage.setWidth(1000);

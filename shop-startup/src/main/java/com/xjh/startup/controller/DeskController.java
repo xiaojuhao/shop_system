@@ -25,7 +25,6 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
@@ -107,23 +106,20 @@ public class DeskController implements Initializable {
         });
         vBox.setOnMouseClicked(evt -> {
             Dialog<Integer> dialog = new Dialog<>();
-            dialog.setTitle("Login Dialog");
-            dialog.setHeaderText("Look, a Custom Login Dialog");
+            dialog.setTitle("开台");
+            dialog.setWidth(300);
+            // dialog.setHeaderText("Look, a Custom Login Dialog");
             GridPane grid = new GridPane();
             grid.setHgap(10);
             grid.setVgap(10);
-            grid.setPadding(new Insets(20, 150, 10, 10));
+            grid.setPadding(new Insets(20, 100, 10, 10));
 
-            TextField username = new TextField();
-            username.setPromptText("Username");
-            username.setText("作者：" + table.getDeskName());
-            PasswordField password = new PasswordField();
-            password.setPromptText("Password");
-
-            grid.add(new Label("Username:"), 0, 0);
-            grid.add(username, 1, 0);
-            grid.add(new Label("Password:"), 0, 1);
-            grid.add(password, 1, 1);
+            TextField custNum = new TextField();
+            custNum.setPromptText("就餐人数");
+            grid.add(new Label("桌号:"), 0, 0);
+            grid.add(new Label(table.getDeskName()), 1, 0);
+            grid.add(new Label("人数:"), 0, 1);
+            grid.add(custNum, 1, 1);
             dialog.getDialogPane().setContent(grid);
             Desk runningData = deskService.getById(desk.get().getId());
             EnumDesKStatus runStatus = EnumDesKStatus.FREE;
