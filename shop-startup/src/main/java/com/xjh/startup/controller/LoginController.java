@@ -51,12 +51,7 @@ public class LoginController implements Initializable {
             mainStage.setHeight(600);
             mainStage.setMaximized(true);
             mainStage.setScene(scene);
-            //            mainStage.getIcons().add(new Image("/img/logo.png"));
             mainStage.show();
-            //将这个管理员信息传给主控制器
-            //            Admin admin = adminService.getAdminByAccount(account);
-            //            MainController mainController = fxmlLoader.getController();
-            //            mainController.setAdmin(admin);
             Stage loginStage = (Stage) accountField.getScene().getWindow();
             loginStage.close();
         } else {

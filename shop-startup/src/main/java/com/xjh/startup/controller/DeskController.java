@@ -11,6 +11,7 @@ import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.ThreadUtils;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.service.domain.DeskService;
+import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 
 import cn.hutool.core.lang.Holder;
@@ -30,10 +31,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class DeskController implements Initializable {
     static final String TIME_FORMAT = "HH:mm:ss";
     DeskService deskService = GuiceContainer.getInstance(DeskService.class);
+    OrderService orderService = GuiceContainer.getInstance(OrderService.class);
     static Holder<ScrollPane> instance = new Holder<>();
 
     public ScrollPane view() {
@@ -90,7 +95,6 @@ public class DeskController implements Initializable {
         Label tableName = new Label(table.getDeskName());
         tableName.setFont(new javafx.scene.text.Font("微软雅黑", 15));
         vBox.getChildren().addAll(tableName, statusLabel, timeLabel);
-
         desk.addListener((cc, _old, _new) -> {
             LocalDateTime ot = DateBuilder.base(_new.getOrderCreateTime()).dateTime();
             EnumDesKStatus s = EnumDesKStatus.of(_new.getStatus());
@@ -102,50 +106,58 @@ public class DeskController implements Initializable {
             }
         });
         vBox.setOnMouseClicked(evt -> {
-            Dialog<Integer> dialog = new Dialog<>();
-            dialog.setTitle("开台");
-            dialog.setWidth(300);
-            // dialog.setHeaderText("Look, a Custom Login Dialog");
-            GridPane grid = new GridPane();
-            grid.setHgap(10);
-            grid.setVgap(10);
-            grid.setPadding(new Insets(20, 100, 10, 10));
-
-            TextField custNum = new TextField();
-            custNum.setPromptText("就餐人数");
-            grid.add(new Label("桌号:"), 0, 0);
-            grid.add(new Label(table.getDeskName()), 1, 0);
-            grid.add(new Label("人数:"), 0, 1);
-            grid.add(custNum, 1, 1);
-            dialog.getDialogPane().setContent(grid);
             Desk runningData = deskService.getById(desk.get().getId());
             EnumDesKStatus runStatus = EnumDesKStatus.FREE;
             if (runningData != null) {
                 runStatus = EnumDesKStatus.of(runningData.getStatus());
             }
-            ButtonType openDesk = new ButtonType("开台", ButtonData.OK_DONE);
-            ButtonType closeDesk = new ButtonType("关台", ButtonData.OK_DONE);
             if (runStatus == EnumDesKStatus.USED) {
-                dialog.getDialogPane().getButtonTypes().addAll(closeDesk, ButtonType.CANCEL);
+                // dialog.getDialogPane().getButtonTypes().addAll(closeDesk, ButtonType.CANCEL);
+                Stage orderInfo = new Stage();
+                orderInfo.initOwner(pane.getScene().getWindow());
+                orderInfo.initModality(Modality.WINDOW_MODAL);
+                orderInfo.initStyle(StageStyle.DECORATED);
+                orderInfo.centerOnScreen();
+                orderInfo.setWidth(pane.getScene().getWindow().getWidth() / 10 * 9);
+                orderInfo.setHeight(pane.getScene().getWindow().getHeight() / 10 * 9);
+                orderInfo.setTitle("订单详情");
+                orderInfo.show();
             } else {
-                dialog.getDialogPane().getButtonTypes().addAll(openDesk, ButtonType.CANCEL);
-            }
-            dialog.setResultConverter(btn -> {
-                if (openDesk == btn) {
-                    return 1;
-                } else if (closeDesk == btn) {
-                    return 2;
-                } else {
-                    return 0;
-                }
-            });
-            Optional<Integer> result = dialog.showAndWait();
-            if (result.isPresent() && result.get() == 1) {
-                deskService.openDesk(table.getId());
-            } else if (result.isPresent() && result.get() == 2) {
-                deskService.closeDesk(table.getId());
-            }
+                Dialog<Integer> dialog = new Dialog<>();
+                dialog.setTitle("开台");
+                dialog.setWidth(300);
+                // dialog.setHeaderText("Look, a Custom Login Dialog");
+                GridPane grid = new GridPane();
+                grid.setHgap(10);
+                grid.setVgap(10);
+                grid.setPadding(new Insets(20, 100, 10, 10));
 
+                TextField custNum = new TextField();
+                custNum.setPromptText("就餐人数");
+                grid.add(new Label("桌号:"), 0, 0);
+                grid.add(new Label(table.getDeskName()), 1, 0);
+                grid.add(new Label("人数:"), 0, 1);
+                grid.add(custNum, 1, 1);
+                dialog.getDialogPane().setContent(grid);
+                ButtonType openDesk = new ButtonType("开台", ButtonData.OK_DONE);
+                ButtonType closeDesk = new ButtonType("关台", ButtonData.OK_DONE);
+                dialog.getDialogPane().getButtonTypes().addAll(openDesk, ButtonType.CANCEL);
+                dialog.setResultConverter(btn -> {
+                    if (openDesk == btn) {
+                        return 1;
+                    } else if (closeDesk == btn) {
+                        return 2;
+                    } else {
+                        return 0;
+                    }
+                });
+                Optional<Integer> result = dialog.showAndWait();
+                if (result.isPresent() && result.get() == 1) {
+                    deskService.openDesk(table.getId());
+                } else if (result.isPresent() && result.get() == 2) {
+                    deskService.closeDesk(table.getId());
+                }
+            }
         });
         pane.getChildren().add(vBox);
     }
