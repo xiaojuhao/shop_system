@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSON;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.DateBuilder;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Info;
 import com.xjh.dao.mapper.DeskDAO;
@@ -36,7 +37,7 @@ public class DeskService {
                 return;
             }
             desk.setOrderId(CommonUtils.randomNumber(1, 100000) + "");
-            desk.setOrderCreateTime(LocalDateTime.now());
+            desk.setOrderCreateTime(DateBuilder.base(LocalDateTime.now()).mills());
             deskDAO.placeOrder(desk);
         } catch (Exception ex) {
             ex.printStackTrace();

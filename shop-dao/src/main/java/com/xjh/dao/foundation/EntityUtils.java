@@ -12,21 +12,39 @@ import com.xjh.common.utils.ReflectionUtils;
 import cn.hutool.db.Entity;
 
 public class EntityUtils {
+    public static Entity create(Object dd) {
+        Class<?> clz = dd.getClass();
+        Table table = clz.getAnnotation(Table.class);
+        String tableName = table.value();
+        Entity entity = Entity.create(tableName);
+        ReflectionUtils.resolvePD(dd.getClass()).values().forEach(pd -> {
+            try {
+                entity.set(getColumnName(pd.getField()), pd.readValue(dd));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        return entity;
+    }
 
     public static void convert(Entity entity, Object target) {
         ReflectionUtils.resolvePD(target.getClass()).values().forEach(pd -> {
             try {
-                Field field = pd.getField();
-                String columnName = field.getName();
-                Column column = field.getAnnotation(Column.class);
-                if (column != null && !CommonUtils.isBlank(column.value())) {
-                    columnName = column.value();
-                }
-                pd.writeValue(target, getValue(entity, columnName, field.getType()));
+                pd.writeValue(target, getValue(entity,
+                        getColumnName(pd.getField()), pd.getField().getType()));
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         });
+    }
+
+    private static String getColumnName(Field field) {
+        String columnName = field.getName();
+        Column column = field.getAnnotation(Column.class);
+        if (column != null && !CommonUtils.isBlank(column.value())) {
+            columnName = column.value();
+        }
+        return columnName;
     }
 
     private static Object getValue(Entity entity, String columnName, Class<?> targetClass) {

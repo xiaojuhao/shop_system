@@ -1,10 +1,11 @@
 package com.xjh.dao.dataobject;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 import com.xjh.dao.foundation.Column;
+import com.xjh.dao.foundation.Table;
 
+@Table("desks")
 public class Desk implements Serializable {
     private static final long serialVersionUID = -2784348482896858640L;
     @Column("deskId")
@@ -19,7 +20,7 @@ public class Desk implements Serializable {
     @Column("orderId")
     String orderId;
     @Column("createTime")
-    LocalDateTime orderCreateTime;
+    Long orderCreateTime;
 
     public Long getId() {
         return id;
@@ -69,11 +70,11 @@ public class Desk implements Serializable {
         this.orderId = orderId;
     }
 
-    public LocalDateTime getOrderCreateTime() {
+    public Long getOrderCreateTime() {
         return orderCreateTime;
     }
 
-    public void setOrderCreateTime(LocalDateTime orderCreateTime) {
+    public void setOrderCreateTime(Long orderCreateTime) {
         this.orderCreateTime = orderCreateTime;
     }
 

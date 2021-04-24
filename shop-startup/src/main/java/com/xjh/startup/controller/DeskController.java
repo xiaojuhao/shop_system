@@ -92,7 +92,7 @@ public class DeskController implements Initializable {
         vBox.getChildren().addAll(tableName, statusLabel, timeLabel);
 
         desk.addListener((cc, _old, _new) -> {
-            LocalDateTime ot = _new.getOrderCreateTime();
+            LocalDateTime ot = DateBuilder.base(_new.getOrderCreateTime()).dateTime();
             EnumDesKStatus s = EnumDesKStatus.of(_new.getStatus());
             setBackground(vBox, s);
             statusLabel.setText(s.remark());
