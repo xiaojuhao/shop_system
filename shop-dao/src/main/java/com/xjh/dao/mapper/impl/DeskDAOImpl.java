@@ -25,15 +25,8 @@ public class DeskDAOImpl implements DeskDAO {
 
     @Override
     public int insert(Desk desk) throws SQLException {
-        Entity t = Entity.create("t_desk")
-                .set("id", desk.getId())
-                .set("desk_name", desk.getDeskName())
-                .set("status", desk.getStatus())
-                .set("max_person", desk.getMaxPerson())
-                .set("desk_type", desk.getDeskType());
-        return Db.use(ds).insert(t);
+        return Db.use(ds).insert(EntityUtils.create(desk));
     }
-
 
     @Override
     public List<Desk> select(Desk desk) throws SQLException {
@@ -63,6 +56,14 @@ public class DeskDAOImpl implements DeskDAO {
         cond.setId(id);
         List<Desk> desks = select(cond);
         return desks.stream().findFirst().orElse(null);
+    }
+
+    @Override
+    public int updateById(Desk desk) throws SQLException {
+        return Db.use(ds).update(
+                EntityUtils.create(desk),
+                EntityUtils.idCond(desk)
+        );
     }
 
     @Override

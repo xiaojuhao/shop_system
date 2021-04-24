@@ -27,6 +27,23 @@ public class EntityUtils {
         return entity;
     }
 
+    public static Entity idCond(Object dd) {
+        Class<?> clz = dd.getClass();
+        Table table = clz.getAnnotation(Table.class);
+        String tableName = table.value();
+        Entity entity = Entity.create(tableName);
+        ReflectionUtils.resolvePD(dd.getClass()).values().forEach(pd -> {
+            try {
+                if (pd.getField().getAnnotation(Id.class) != null) {
+                    entity.set(getColumnName(pd.getField()), pd.readValue(dd));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        return entity;
+    }
+
     public static void convert(Entity entity, Object target) {
         ReflectionUtils.resolvePD(target.getClass()).values().forEach(pd -> {
             try {

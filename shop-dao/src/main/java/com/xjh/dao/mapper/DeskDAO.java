@@ -1,9 +1,9 @@
 package com.xjh.dao.mapper;
 
-import com.xjh.dao.dataobject.Desk;
-
 import java.sql.SQLException;
 import java.util.List;
+
+import com.xjh.dao.dataobject.Desk;
 
 public interface DeskDAO {
     int insert(Desk desk) throws SQLException;
@@ -11,6 +11,8 @@ public interface DeskDAO {
     List<Desk> select(Desk desk) throws SQLException;
 
     Desk getById(Long id) throws SQLException;
+
+    int updateById(Desk desk) throws SQLException;
 
     int placeOrder(Desk desk) throws SQLException;
 
