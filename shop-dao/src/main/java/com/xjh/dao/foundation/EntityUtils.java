@@ -47,6 +47,9 @@ public class EntityUtils {
         }
         if (targetClass == LocalDateTime.class) {
             Object val = entity.get(columnName);
+            if (val == null) {
+                return null;
+            }
             if (val instanceof Long) {
                 return DateBuilder.base((Long) val).dateTime();
             }
@@ -57,6 +60,7 @@ public class EntityUtils {
                 return val;
             }
         }
+        System.out.println("不支持的类型：" + columnName + ", " + targetClass);
         return null;
     }
 }
