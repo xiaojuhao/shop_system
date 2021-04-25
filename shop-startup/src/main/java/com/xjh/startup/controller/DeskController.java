@@ -13,7 +13,6 @@ import com.xjh.dao.dataobject.Desk;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
-import com.xjh.startup.foundation.utils.FxmlUtils;
 
 import cn.hutool.core.lang.Holder;
 import javafx.application.Platform;
@@ -24,6 +23,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -33,6 +33,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -114,7 +115,6 @@ public class DeskController implements Initializable {
                 runStatus = EnumDesKStatus.of(runningData.getStatus());
             }
             if (runStatus == EnumDesKStatus.USED) {
-                // dialog.getDialogPane().getButtonTypes().addAll(closeDesk, ButtonType.CANCEL);
                 Stage orderInfo = new Stage();
                 orderInfo.initOwner(pane.getScene().getWindow());
                 orderInfo.initModality(Modality.WINDOW_MODAL);
@@ -125,7 +125,39 @@ public class DeskController implements Initializable {
                 orderInfo.setTitle("订单详情");
                 VBox detail = new VBox();
                 orderInfo.setScene(new Scene(detail));
-                detail.getChildren().add(FxmlUtils.load("orderDetail"));
+                GridPane gridPane = new GridPane();
+                gridPane.setVgap(10);
+                gridPane.setHgap(10);
+                gridPane.setStyle("-fx-border-width: 1 1 1 1;-fx-border-style: solid;-fx-border-color: red");
+                Label l = new Label("桌号：" + runningData.getDeskName());
+                l.setMinWidth(800);
+                l.setMinHeight(50);
+                l.setFont(new Font(18));
+                l.setAlignment(Pos.CENTER);
+                gridPane.add(l, 0, 0, 4, 1);
+                // 第二行
+                Label labelCustNum = new Label("就餐人数: 2");
+                labelCustNum.setMinWidth(200);
+                gridPane.add(labelCustNum, 0, 1);
+
+                Label labelOrder = new Label("订单号: 8888888");
+                labelOrder.setMinWidth(200);
+                gridPane.add(labelOrder, 1, 1);
+
+                Label labelOrderTime = new Label("就餐时间: 2021-04-25 20:01");
+                labelOrderTime.setMinWidth(200);
+                gridPane.add(labelOrderTime, 2, 1);
+
+                Label labelPayStatus = new Label("支付状态: 待支付");
+                labelPayStatus.setMinWidth(200);
+                gridPane.add(labelPayStatus, 3, 1);
+
+                // 关台按钮
+                Button button = new Button("关台");
+                button.setMinWidth(100);
+                gridPane.add(button, 4, 0, 1, 2);
+
+                detail.getChildren().add(gridPane);
                 orderInfo.show();
             } else {
                 Dialog<Integer> dialog = new Dialog<>();
