@@ -21,6 +21,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -29,6 +30,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
@@ -125,39 +127,87 @@ public class DeskController implements Initializable {
                 orderInfo.setTitle("订单详情");
                 VBox detail = new VBox();
                 orderInfo.setScene(new Scene(detail));
-                GridPane gridPane = new GridPane();
-                gridPane.setVgap(10);
-                gridPane.setHgap(10);
-                gridPane.setStyle("-fx-border-width: 1 1 1 1;-fx-border-style: solid;-fx-border-color: red");
-                Label l = new Label("桌号：" + runningData.getDeskName());
-                l.setMinWidth(800);
-                l.setMinHeight(50);
-                l.setFont(new Font(18));
-                l.setAlignment(Pos.CENTER);
-                gridPane.add(l, 0, 0, 4, 1);
-                // 第二行
-                Label labelCustNum = new Label("就餐人数: 2");
-                labelCustNum.setMinWidth(200);
-                gridPane.add(labelCustNum, 0, 1);
+                {
+                    GridPane gridPane = new GridPane();
+                    gridPane.setVgap(10);
+                    gridPane.setHgap(10);
+                    // gridPane.setStyle("-fx-border-width: 1 1 1 1;-fx-border-style: solid;-fx-border-color: red");
+                    Label l = new Label("桌号：" + runningData.getDeskName());
+                    l.setMinWidth(800);
+                    l.setMinHeight(50);
+                    l.setFont(new Font(18));
+                    l.setAlignment(Pos.CENTER);
+                    gridPane.add(l, 0, 0, 4, 1);
+                    // 第二行
+                    Label labelCustNum = new Label("就餐人数: 2");
+                    labelCustNum.setMinWidth(200);
+                    gridPane.add(labelCustNum, 0, 1);
 
-                Label labelOrder = new Label("订单号: 8888888");
-                labelOrder.setMinWidth(200);
-                gridPane.add(labelOrder, 1, 1);
+                    Label labelOrder = new Label("订单号: 8888888");
+                    labelOrder.setMinWidth(200);
+                    gridPane.add(labelOrder, 1, 1);
 
-                Label labelOrderTime = new Label("就餐时间: 2021-04-25 20:01");
-                labelOrderTime.setMinWidth(200);
-                gridPane.add(labelOrderTime, 2, 1);
+                    Label labelOrderTime = new Label("就餐时间: 2021-04-25 20:01");
+                    labelOrderTime.setMinWidth(200);
+                    gridPane.add(labelOrderTime, 2, 1);
 
-                Label labelPayStatus = new Label("支付状态: 待支付");
-                labelPayStatus.setMinWidth(200);
-                gridPane.add(labelPayStatus, 3, 1);
+                    Label labelPayStatus = new Label("支付状态: 待支付");
+                    labelPayStatus.setMinWidth(200);
+                    gridPane.add(labelPayStatus, 3, 1);
 
-                // 关台按钮
-                Button button = new Button("关台");
-                button.setMinWidth(100);
-                gridPane.add(button, 4, 0, 1, 2);
+                    // 关台按钮
+                    Button button = new Button("关台");
+                    button.setMinWidth(100);
+                    gridPane.add(button, 4, 0, 1, 2);
 
-                detail.getChildren().add(gridPane);
+                    detail.getChildren().add(gridPane);
+                }
+                {
+                    Separator separator2 = new Separator();
+                    separator2.setOrientation(Orientation.HORIZONTAL);
+                    detail.getChildren().add(separator2);
+                }
+                {
+                    GridPane gridPane = new GridPane();
+                    gridPane.setVgap(10);
+                    gridPane.setHgap(10);
+                    // gridPane.setStyle("-fx-border-width: 1 1 1 1;-fx-border-style: solid;-fx-border-color: red");
+                    Label l = new Label("桌号：" + runningData.getDeskName());
+                    l.setMinWidth(800);
+                    l.setMinHeight(50);
+                    l.setFont(new Font(18));
+                    l.setAlignment(Pos.CENTER);
+                    gridPane.add(l, 0, 0, 4, 1);
+                    // 第二行
+                    Label labelCustNum = new Label("就餐人数: 2");
+                    labelCustNum.setMinWidth(200);
+                    gridPane.add(labelCustNum, 0, 1);
+
+                    Label labelOrder = new Label("订单号: 8888888");
+                    labelOrder.setMinWidth(200);
+                    gridPane.add(labelOrder, 1, 1);
+
+                    Label labelOrderTime = new Label("就餐时间: 2021-04-25 20:01");
+                    labelOrderTime.setMinWidth(200);
+                    gridPane.add(labelOrderTime, 2, 1);
+
+                    Label labelPayStatus = new Label("支付状态: 待支付");
+                    labelPayStatus.setMinWidth(200);
+                    gridPane.add(labelPayStatus, 3, 1);
+
+                    // 关台按钮
+                    Button button = new Button("关台");
+                    button.setMinWidth(100);
+                    gridPane.add(button, 4, 0, 1, 2);
+
+                    detail.getChildren().add(gridPane);
+                }
+                {
+                    Separator separator2 = new Separator();
+                    separator2.setOrientation(Orientation.HORIZONTAL);
+                    detail.getChildren().add(separator2);
+                }
+
                 orderInfo.show();
             } else {
                 Dialog<Integer> dialog = new Dialog<>();
