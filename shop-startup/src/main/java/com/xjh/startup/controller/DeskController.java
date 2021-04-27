@@ -1,51 +1,31 @@
 package com.xjh.startup.controller;
-
-import java.net.URL;
-import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.ResourceBundle;
-
+import cn.hutool.core.lang.Holder;
 import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.ThreadUtils;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.service.domain.DeskService;
-import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
-
-import cn.hutool.core.lang.Holder;
 import com.xjh.startup.view.DeskView;
 import com.xjh.startup.view.OpenDeskDialog;
 import com.xjh.startup.view.OrderDetail;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Separator;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+
+import java.net.URL;
+import java.util.Optional;
+import java.util.ResourceBundle;
 
 public class DeskController implements Initializable {
 
