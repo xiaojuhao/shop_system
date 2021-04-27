@@ -1,11 +1,11 @@
-package com.xjh.startup.foundation.utils;
+package com.xjh.startup.view;
 
 import javafx.fxml.FXMLLoader;
 
-public class FxmlUtils {
+public class FxmlView {
     public static <T> T load(String fxml) {
         try {
-            return new FXMLLoader(FxmlUtils.class.getResource("/fxml/" + fxml + ".fxml")).load();
+            return new FXMLLoader(FxmlView.class.getResource("/fxml/" + fxml + ".fxml")).load();
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;

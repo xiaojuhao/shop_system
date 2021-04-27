@@ -1,8 +1,8 @@
 package com.xjh.startup;
 
 import com.xjh.common.utils.TimeRecord;
-import com.xjh.startup.foundation.utils.FxmlUtils;
 
+import com.xjh.startup.view.FxmlView;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -16,7 +16,7 @@ public class LoginApp extends Application {
         TimeRecord timeRecord = TimeRecord.start();
         // main
         primaryStage.setTitle("登录系统");
-        VBox root = FxmlUtils.load("login");
+        VBox root = FxmlView.load("login");
         root.setAlignment(Pos.CENTER);
         root.setPadding(new Insets(0, 400, 0, 400));
         System.out.println("加载登录界面:" + timeRecord.getCostAndReset());

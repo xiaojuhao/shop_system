@@ -15,6 +15,8 @@ import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 
 import cn.hutool.core.lang.Holder;
+import com.xjh.startup.view.OpenDeskDialog;
+import com.xjh.startup.view.OrderDetail;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -129,174 +131,10 @@ public class DeskController implements Initializable {
                 orderInfo.setWidth(pane.getScene().getWindow().getWidth() / 10 * 9);
                 orderInfo.setHeight(pane.getScene().getWindow().getHeight() / 10 * 9);
                 orderInfo.setTitle("订单详情");
-                VBox detail = new VBox();
-                orderInfo.setScene(new Scene(detail));
-                {
-                    GridPane gridPane = new GridPane();
-                    gridPane.setVgap(10);
-                    gridPane.setHgap(10);
-                    // gridPane.setStyle("-fx-border-width: 1 1 1 1;-fx-border-style: solid;-fx-border-color: red");
-                    Label l = new Label("桌号：" + runningData.getDeskName());
-                    l.setMinWidth(800);
-                    l.setMinHeight(50);
-                    l.setFont(new Font(18));
-                    l.setAlignment(Pos.CENTER);
-                    gridPane.add(l, 0, 0, 4, 1);
-                    // 第二行
-                    Label labelCustNum = new Label("就餐人数: 2");
-                    labelCustNum.setMinWidth(200);
-                    gridPane.add(labelCustNum, 0, 1);
-
-                    Label labelOrder = new Label("订单号: 8888888");
-                    labelOrder.setMinWidth(200);
-                    gridPane.add(labelOrder, 1, 1);
-
-                    Label labelOrderTime = new Label("就餐时间: 2021-04-25 20:01");
-                    labelOrderTime.setMinWidth(200);
-                    gridPane.add(labelOrderTime, 2, 1);
-
-                    Label labelPayStatus = new Label("支付状态: 待支付");
-                    labelPayStatus.setMinWidth(200);
-                    gridPane.add(labelPayStatus, 3, 1);
-
-                    // 关台按钮
-                    Button button = new Button("关台");
-                    button.setMinWidth(100);
-                    gridPane.add(button, 4, 0, 1, 2);
-
-                    detail.getChildren().add(gridPane);
-                }
-                {
-                    Separator separator2 = new Separator();
-                    separator2.setOrientation(Orientation.HORIZONTAL);
-                    detail.getChildren().add(separator2);
-                }
-                {
-                    GridPane gridPane = new GridPane();
-                    gridPane.setVgap(10);
-                    gridPane.setHgap(10);
-                    // gridPane.setStyle("-fx-border-width: 1 1 1 1;-fx-border-style: solid;-fx-border-color: red");
-                    Label l = new Label("桌号：" + runningData.getDeskName());
-                    l.setMinWidth(800);
-                    l.setMinHeight(50);
-                    l.setFont(new Font(18));
-                    l.setAlignment(Pos.CENTER);
-                    gridPane.add(l, 0, 0, 4, 1);
-                    // 第二行
-                    Label labelCustNum = new Label("就餐人数: 2");
-                    labelCustNum.setMinWidth(200);
-                    gridPane.add(labelCustNum, 0, 1);
-
-                    Label labelOrder = new Label("订单号: 8888888");
-                    labelOrder.setMinWidth(200);
-                    gridPane.add(labelOrder, 1, 1);
-
-                    Label labelOrderTime = new Label("就餐时间: 2021-04-25 20:01");
-                    labelOrderTime.setMinWidth(200);
-                    gridPane.add(labelOrderTime, 2, 1);
-
-                    Label labelPayStatus = new Label("支付状态: 待支付");
-                    labelPayStatus.setMinWidth(200);
-                    gridPane.add(labelPayStatus, 3, 1);
-
-                    // 关台按钮
-                    Button button = new Button("关台");
-                    button.setMinWidth(100);
-                    gridPane.add(button, 4, 0, 1, 2);
-
-                    detail.getChildren().add(gridPane);
-                }
-                {
-                    Separator separator2 = new Separator();
-                    separator2.setOrientation(Orientation.HORIZONTAL);
-                    detail.getChildren().add(separator2);
-                }
-
-                {
-                    TableView<TableItem> tv = new TableView<>();
-                    tv.setMaxHeight(300);
-                    TableColumn<TableItem, SimpleStringProperty> col1 = new TableColumn<>("列1");
-                    col1.setMinWidth(100);
-                    col1.setCellValueFactory(new PropertyValueFactory<>("col1"));
-
-                    TableColumn<TableItem, SimpleStringProperty> col2 = new TableColumn<>("列2");
-                    col2.setMinWidth(200);
-                    col2.setCellValueFactory(new PropertyValueFactory<>("col2"));
-
-                    TableColumn<TableItem, SimpleStringProperty> col3 = new TableColumn<>("列3");
-                    col3.setMinWidth(300);
-                    col3.setCellValueFactory(new PropertyValueFactory<>("col3"));
-
-                    TableColumn<TableItem, SimpleStringProperty> col4 = new TableColumn<>("列4");
-                    col4.setMinWidth(100);
-                    col4.setCellValueFactory(new PropertyValueFactory<>("col4"));
-
-                    tv.getColumns().addAll(col1, col2, col3, col4);
-                    detail.getChildren().add(tv);
-
-                    ObservableList<TableItem> data =
-                            FXCollections.observableArrayList(
-                                    new TableItem("Jacob", "Smith", "jacob.smith@example.com", "1111"),
-                                    new TableItem("Jacob", "Smith", "jacob.smith@example.com", "1111"),
-                                    new TableItem("Jacob", "Smith", "jacob.smith@example.com", "1111"),
-                                    new TableItem("Jacob", "Smith", "jacob.smith@example.com", "1111"),
-                                    new TableItem("Jacob", "Smith", "jacob.smith@example.com", "1111"),
-                                    new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
-                                    new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
-                                    new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
-                                    new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
-                                    new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
-                                    new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
-                                    new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
-                                    new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
-                                    new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
-                                    new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
-                                    new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
-                                    new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
-                                    new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                                    new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                                    new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                                    new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                                    new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                                    new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                                    new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                                    new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                                    new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                                    new TableItem("Michael", "Brown", "michael.brown@example.com", "1111")
-                            );
-                    tv.setItems(data);
-                }
-
+                orderInfo.setScene(new Scene(new OrderDetail(runningData)));
                 orderInfo.show();
             } else {
-                Dialog<Integer> dialog = new Dialog<>();
-                dialog.setTitle("开台");
-                dialog.setWidth(300);
-                // dialog.setHeaderText("Look, a Custom Login Dialog");
-                GridPane grid = new GridPane();
-                grid.setHgap(10);
-                grid.setVgap(10);
-                grid.setPadding(new Insets(20, 100, 10, 10));
-
-                TextField custNum = new TextField();
-                custNum.setPromptText("就餐人数");
-                grid.add(new Label("桌号:"), 0, 0);
-                grid.add(new Label(table.getDeskName()), 1, 0);
-                grid.add(new Label("人数:"), 0, 1);
-                grid.add(custNum, 1, 1);
-                dialog.getDialogPane().setContent(grid);
-                ButtonType openDesk = new ButtonType("开台", ButtonData.OK_DONE);
-                ButtonType closeDesk = new ButtonType("关台", ButtonData.OK_DONE);
-                dialog.getDialogPane().getButtonTypes().addAll(openDesk, ButtonType.CANCEL);
-                dialog.setResultConverter(btn -> {
-                    if (openDesk == btn) {
-                        return 1;
-                    } else if (closeDesk == btn) {
-                        return 2;
-                    } else {
-                        return 0;
-                    }
-                });
+                Dialog<Integer> dialog = new OpenDeskDialog<>(desk.get());
                 Optional<Integer> result = dialog.showAndWait();
                 if (result.isPresent() && result.get() == 1) {
                     deskService.openDesk(table.getId());
@@ -327,65 +165,5 @@ public class DeskController implements Initializable {
         System.out.println("****** " + this.getClass().getName() + " initialize.......");
     }
 
-    public static class TableItem {
-        SimpleStringProperty col1;
-        SimpleStringProperty col2;
-        SimpleStringProperty col3;
-        SimpleStringProperty col4;
 
-        public TableItem(String col1, String col2, String col3, String col4) {
-            this.col1 = new SimpleStringProperty(col1);
-            this.col2 = new SimpleStringProperty(col2);
-            this.col3 = new SimpleStringProperty(col3);
-            this.col4 = new SimpleStringProperty(col4);
-        }
-
-        public String getCol1() {
-            return col1.get();
-        }
-
-        public SimpleStringProperty col1Property() {
-            return col1;
-        }
-
-        public void setCol1(String col1) {
-            this.col1.set(col1);
-        }
-
-        public String getCol2() {
-            return col2.get();
-        }
-
-        public SimpleStringProperty col2Property() {
-            return col2;
-        }
-
-        public void setCol2(String col2) {
-            this.col2.set(col2);
-        }
-
-        public String getCol3() {
-            return col3.get();
-        }
-
-        public SimpleStringProperty col3Property() {
-            return col3;
-        }
-
-        public void setCol3(String col3) {
-            this.col3.set(col3);
-        }
-
-        public String getCol4() {
-            return col4.get();
-        }
-
-        public SimpleStringProperty col4Property() {
-            return col4;
-        }
-
-        public void setCol4(String col4) {
-            this.col4.set(col4);
-        }
-    }
 }
