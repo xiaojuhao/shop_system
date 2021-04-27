@@ -15,6 +15,7 @@ import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 
 import cn.hutool.core.lang.Holder;
+import com.xjh.startup.view.DeskView;
 import com.xjh.startup.view.OpenDeskDialog;
 import com.xjh.startup.view.OrderDetail;
 import javafx.application.Platform;
@@ -47,9 +48,8 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 public class DeskController implements Initializable {
-    static final String TIME_FORMAT = "HH:mm:ss";
+
     DeskService deskService = GuiceContainer.getInstance(DeskService.class);
-    OrderService orderService = GuiceContainer.getInstance(OrderService.class);
     static Holder<ScrollPane> instance = new Holder<>();
 
     public ScrollPane view() {
@@ -90,32 +90,8 @@ public class DeskController implements Initializable {
     }
 
     void render(SimpleObjectProperty<Desk> desk, FlowPane pane) {
-        Desk table = desk.get();
         double boxWidth = Math.max(pane.getWidth() / 6 - 15, 200);
-        VBox vBox = new VBox();
-        vBox.setPrefSize(boxWidth, boxWidth / 2);
-        vBox.getStyleClass().add("desk");
-        vBox.setSpacing(10);
-        vBox.setAlignment(Pos.CENTER);
-
-        EnumDesKStatus status = EnumDesKStatus.of(table.getStatus());
-        setBackground(vBox, status);
-        Label statusLabel = new Label(status.remark());
-        Label timeLabel = new Label();
-        timeLabel.setText(DateBuilder.base(table.getOrderCreateTime()).format(TIME_FORMAT));
-        Label tableName = new Label(table.getDeskName());
-        tableName.setFont(new javafx.scene.text.Font("微软雅黑", 15));
-        vBox.getChildren().addAll(tableName, statusLabel, timeLabel);
-        desk.addListener((cc, _old, _new) -> {
-            LocalDateTime ot = DateBuilder.base(_new.getOrderCreateTime()).dateTime();
-            EnumDesKStatus s = EnumDesKStatus.of(_new.getStatus());
-            setBackground(vBox, s);
-            statusLabel.setText(s.remark());
-            long usedSeconds = DateBuilder.intervalSeconds(ot, LocalDateTime.now());
-            if (s != EnumDesKStatus.FREE) {
-                timeLabel.setText("已用" + CommonUtils.formatSeconds(usedSeconds));
-            }
-        });
+        DeskView vBox = new DeskView(desk, boxWidth);
         vBox.setOnMouseClicked(evt -> {
             Desk runningData = deskService.getById(desk.get().getId());
             EnumDesKStatus runStatus = EnumDesKStatus.FREE;
@@ -137,22 +113,15 @@ public class DeskController implements Initializable {
                 Dialog<Integer> dialog = new OpenDeskDialog<>(desk.get());
                 Optional<Integer> result = dialog.showAndWait();
                 if (result.isPresent() && result.get() == 1) {
-                    deskService.openDesk(table.getId());
+                    deskService.openDesk(desk.get().getId());
                 } else if (result.isPresent() && result.get() == 2) {
-                    deskService.closeDesk(table.getId());
+                    deskService.closeDesk(desk.get().getId());
                 }
             }
         });
         pane.getChildren().add(vBox);
     }
 
-    private void setBackground(VBox vbox, EnumDesKStatus status) {
-        if (status == EnumDesKStatus.USED || status == EnumDesKStatus.PAID) {
-            vbox.setStyle("-fx-background-color: #ed6871;");
-        } else {
-            vbox.setStyle("-fx-background-color: #228B22;");
-        }
-    }
 
     @Override
     protected void finalize() throws Throwable {
