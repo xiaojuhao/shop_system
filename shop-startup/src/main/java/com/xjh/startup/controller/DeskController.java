@@ -1,5 +1,7 @@
 package com.xjh.startup.controller;
 
+import java.util.List;
+
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.ThreadUtils;
 import com.xjh.dao.dataobject.Desk;
@@ -24,7 +26,7 @@ public class DeskController {
     public ScrollPane view() {
         ScrollPane s = new ScrollPane();
         instance.set(s);
-        ObservableList<SimpleObjectProperty<Desk>> tables = FXCollections.observableArrayList();
+        ObservableList<SimpleObjectProperty<Desk>> desks = FXCollections.observableArrayList();
 
         FlowPane pane = new FlowPane();
         pane.setPadding(new Insets(10));
@@ -36,12 +38,15 @@ public class DeskController {
 
         ThreadUtils.runInDaemon(() -> {
             // 加载所有的tables
-            deskService.getAllDesks().forEach(desk -> tables.add(new SimpleObjectProperty<>(desk)));
+            allDesks().forEach(desk -> desks.add(new SimpleObjectProperty<>(desk)));
             // 渲染tables
-            tables.forEach(desk -> Platform.runLater(() -> render(desk, pane)));
+            desks.forEach(desk -> Platform.runLater(() -> {
+                double prefWidth = Math.max(pane.getWidth() / 6 - 15, 200);
+                pane.getChildren().add(new DeskView(desk, prefWidth));
+            }));
             // 监测变化
             while (instance.get() == s) {
-                tables.forEach(this::detectChange);
+                desks.forEach(this::detectChange);
                 CommonUtils.sleep(1000);
             }
             System.out.println("******* DeskController 循环退出." + Thread.currentThread().getName());
@@ -57,11 +62,9 @@ public class DeskController {
         }
     }
 
-    void render(SimpleObjectProperty<Desk> desk, FlowPane pane) {
-        double prefWidth = Math.max(pane.getWidth() / 6 - 15, 200);
-        pane.getChildren().add(new DeskView(desk, prefWidth));
+    List<Desk> allDesks() {
+        return deskService.getAllDesks();
     }
-
 
     @Override
     protected void finalize() throws Throwable {
