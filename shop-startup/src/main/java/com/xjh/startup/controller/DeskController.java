@@ -1,8 +1,5 @@
 package com.xjh.startup.controller;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.ThreadUtils;
 import com.xjh.dao.dataobject.Desk;
@@ -15,12 +12,11 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
 
-public class DeskController implements Initializable {
+public class DeskController {
 
     DeskService deskService = GuiceContainer.getInstance(DeskService.class);
     static Holder<ScrollPane> instance = new Holder<>();
@@ -56,10 +52,9 @@ public class DeskController implements Initializable {
 
     void detectChange(SimpleObjectProperty<Desk> desk) {
         Desk dd = deskService.getById(desk.get().getId());
-        if (dd == null) {
-            return;
+        if (dd != null) {
+            Platform.runLater(() -> desk.set(dd));
         }
-        Platform.runLater(() -> desk.set(dd));
     }
 
     void render(SimpleObjectProperty<Desk> desk, FlowPane pane) {
@@ -73,11 +68,4 @@ public class DeskController implements Initializable {
         super.finalize();
         System.out.println("DeskController被销毁了。。。。。。。。");
     }
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        System.out.println("****** " + this.getClass().getName() + " initialize.......");
-    }
-
-
 }
