@@ -8,6 +8,7 @@ import com.xjh.startup.foundation.guice.GuiceContainer;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
@@ -15,6 +16,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 public class LoginController implements Initializable {
@@ -47,9 +49,12 @@ public class LoginController implements Initializable {
             Scene scene = new Scene(main);
             scene.getStylesheets().add("/css/style.css");
             mainStage.setTitle("小句号点餐系统");
-            mainStage.setWidth(1000);
-            mainStage.setHeight(600);
-            mainStage.setMaximized(true);
+            Rectangle2D screenRectangle = Screen.getPrimary().getBounds();
+            double width = screenRectangle.getWidth();
+            double height = screenRectangle.getHeight();
+            mainStage.setWidth(width - 10);
+            mainStage.setHeight(height - 10);
+            //mainStage.setMaximized(true);
             mainStage.setScene(scene);
             mainStage.show();
             Stage loginStage = (Stage) accountField.getScene().getWindow();

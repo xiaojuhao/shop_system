@@ -63,9 +63,6 @@ public class DeskService {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        desks.forEach(d -> {
-            System.out.println("读取desk:" + JSON.toJSONString(d));
-        });
         return desks;
     }
 

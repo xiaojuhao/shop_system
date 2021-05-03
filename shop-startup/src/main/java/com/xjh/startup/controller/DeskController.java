@@ -15,8 +15,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
+import javafx.stage.Screen;
 
 public class DeskController {
 
@@ -27,13 +29,17 @@ public class DeskController {
         ScrollPane s = new ScrollPane();
         instance.set(s);
         ObservableList<SimpleObjectProperty<Desk>> desks = FXCollections.observableArrayList();
-
+        Rectangle2D screenRectangle = Screen.getPrimary().getBounds();
+        double width = screenRectangle.getWidth();
+        double height = screenRectangle.getHeight();
         FlowPane pane = new FlowPane();
         pane.setPadding(new Insets(10));
         pane.setHgap(5);
         pane.setVgap(5);
-        pane.setPrefWidth(600);
-        s.setFitToWidth(true);
+        pane.setPrefWidth(width);
+        pane.setPrefHeight(height);
+        System.out.println("screen width:" + width + ",height:" + height);
+        //s.setFitToWidth(true);
         s.setContent(pane);
 
         ThreadUtils.runInDaemon(() -> {

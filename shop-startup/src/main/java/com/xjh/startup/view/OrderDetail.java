@@ -18,13 +18,13 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 
 public class OrderDetail extends VBox {
-    public OrderDetail(Desk runningData) {
+    public OrderDetail(Desk orderDesk) {
         {
             GridPane gridPane = new GridPane();
             gridPane.setVgap(10);
             gridPane.setHgap(10);
             // gridPane.setStyle("-fx-border-width: 1 1 1 1;-fx-border-style: solid;-fx-border-color: red");
-            Label l = new Label("桌号：" + runningData.getDeskName());
+            Label l = new Label("桌号：" + orderDesk.getDeskName());
             l.setMinWidth(800);
             l.setMinHeight(50);
             l.setFont(new Font(18));
@@ -64,7 +64,7 @@ public class OrderDetail extends VBox {
             gridPane.setVgap(10);
             gridPane.setHgap(10);
             // gridPane.setStyle("-fx-border-width: 1 1 1 1;-fx-border-style: solid;-fx-border-color: red");
-            Label l = new Label("桌号：" + runningData.getDeskName());
+            Label l = new Label("桌号：" + orderDesk.getDeskName());
             l.setMinWidth(800);
             l.setMinHeight(50);
             l.setFont(new Font(18));
