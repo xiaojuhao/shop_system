@@ -59,10 +59,13 @@ public class DeskService {
             infoDAO.select(new Info()).forEach(info -> {
                 System.out.println("读取INFO信息:" + JSON.toJSONString(info));
             });
-            return deskDAO.select(new Desk());
+            desks.addAll(deskDAO.select(new Desk()));
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        desks.forEach(d -> {
+            System.out.println("读取desk:" + JSON.toJSONString(d));
+        });
         return desks;
     }
 

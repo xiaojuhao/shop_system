@@ -1,5 +1,9 @@
 package com.xjh.startup.controller;
-import cn.hutool.core.lang.Holder;
+
+import java.net.URL;
+import java.util.Optional;
+import java.util.ResourceBundle;
+
 import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.ThreadUtils;
@@ -9,6 +13,8 @@ import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.DeskView;
 import com.xjh.startup.view.OpenDeskDialog;
 import com.xjh.startup.view.OrderDetail;
+
+import cn.hutool.core.lang.Holder;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -16,16 +22,11 @@ import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-
-import java.net.URL;
-import java.util.Optional;
-import java.util.ResourceBundle;
 
 public class DeskController implements Initializable {
 
@@ -90,7 +91,7 @@ public class DeskController implements Initializable {
                 orderInfo.setScene(new Scene(new OrderDetail(runningData)));
                 orderInfo.show();
             } else {
-                Dialog<Integer> dialog = new OpenDeskDialog<>(desk.get());
+                OpenDeskDialog dialog = new OpenDeskDialog(desk.get());
                 Optional<Integer> result = dialog.showAndWait();
                 if (result.isPresent() && result.get() == 1) {
                     deskService.openDesk(desk.get().getId());

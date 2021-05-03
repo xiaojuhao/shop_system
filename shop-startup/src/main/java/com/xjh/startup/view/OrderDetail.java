@@ -1,13 +1,17 @@
 package com.xjh.startup.view;
 
 import com.xjh.dao.dataobject.Desk;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -15,7 +19,6 @@ import javafx.scene.text.Font;
 
 public class OrderDetail extends VBox {
     public OrderDetail(Desk runningData) {
-        VBox detail = this;
         {
             GridPane gridPane = new GridPane();
             gridPane.setVgap(10);
@@ -49,12 +52,12 @@ public class OrderDetail extends VBox {
             button.setMinWidth(100);
             gridPane.add(button, 4, 0, 1, 2);
 
-            detail.getChildren().add(gridPane);
+            this.getChildren().add(gridPane);
         }
         {
             Separator separator2 = new Separator();
             separator2.setOrientation(Orientation.HORIZONTAL);
-            detail.getChildren().add(separator2);
+            this.getChildren().add(separator2);
         }
         {
             GridPane gridPane = new GridPane();
@@ -89,12 +92,12 @@ public class OrderDetail extends VBox {
             button.setMinWidth(100);
             gridPane.add(button, 4, 0, 1, 2);
 
-            detail.getChildren().add(gridPane);
+            this.getChildren().add(gridPane);
         }
         {
             Separator separator2 = new Separator();
             separator2.setOrientation(Orientation.HORIZONTAL);
-            detail.getChildren().add(separator2);
+            this.getChildren().add(separator2);
         }
 
         {
@@ -117,7 +120,7 @@ public class OrderDetail extends VBox {
             col4.setCellValueFactory(new PropertyValueFactory<>("col4"));
 
             tv.getColumns().addAll(col1, col2, col3, col4);
-            detail.getChildren().add(tv);
+            this.getChildren().add(tv);
 
             ObservableList<TableItem> data =
                     FXCollections.observableArrayList(

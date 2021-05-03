@@ -1,15 +1,19 @@
 package com.xjh.startup.view;
 
 import com.xjh.dao.dataobject.Desk;
+
 import javafx.geometry.Insets;
-import javafx.scene.control.*;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
-public class OpenDeskDialog<T> extends Dialog<T> {
-    public OpenDeskDialog(Desk table){
-        Dialog<Integer> dialog = new Dialog<>();
-        dialog.setTitle("开台");
-        dialog.setWidth(300);
+public class OpenDeskDialog extends Dialog<Integer> {
+    public OpenDeskDialog(Desk table) {
+        this.setTitle("开台");
+        this.setWidth(300);
         // dialog.setHeaderText("Look, a Custom Login Dialog");
         GridPane grid = new GridPane();
         grid.setHgap(10);
@@ -22,11 +26,11 @@ public class OpenDeskDialog<T> extends Dialog<T> {
         grid.add(new Label(table.getDeskName()), 1, 0);
         grid.add(new Label("人数:"), 0, 1);
         grid.add(custNum, 1, 1);
-        dialog.getDialogPane().setContent(grid);
+        this.getDialogPane().setContent(grid);
         ButtonType openDesk = new ButtonType("开台", ButtonBar.ButtonData.OK_DONE);
         ButtonType closeDesk = new ButtonType("关台", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(openDesk, ButtonType.CANCEL);
-        dialog.setResultConverter(btn -> {
+        this.getDialogPane().getButtonTypes().addAll(openDesk, ButtonType.CANCEL);
+        this.setResultConverter(btn -> {
             if (openDesk == btn) {
                 return 1;
             } else if (closeDesk == btn) {
