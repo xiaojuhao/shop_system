@@ -1,16 +1,24 @@
 package com.xjh.startup.view;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.utils.TimeRecord;
 import com.xjh.dao.dataobject.Desk;
+import com.xjh.service.domain.DeskService;
+import com.xjh.startup.foundation.guice.GuiceContainer;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class DeskView extends VBox {
     static final String TIME_FORMAT = "HH:mm:ss";
@@ -39,6 +47,37 @@ public class DeskView extends VBox {
             long usedSeconds = DateBuilder.intervalSeconds(ot, LocalDateTime.now());
             if (s != EnumDesKStatus.FREE) {
                 timeLabel.setText("已用" + CommonUtils.formatSeconds(usedSeconds));
+            }
+        });
+
+        this.setOnMouseClicked(evt -> {
+            TimeRecord time = TimeRecord.start();
+            DeskService deskService = GuiceContainer.getInstance(DeskService.class);
+            System.out.println("获取deskService >> cost " + time.getCost());
+            Desk runningData = deskService.getById(desk.get().getId());
+            EnumDesKStatus runStatus = EnumDesKStatus.FREE;
+            if (runningData != null) {
+                runStatus = EnumDesKStatus.of(runningData.getStatus());
+            }
+            if (runStatus == EnumDesKStatus.USED) {
+                Stage orderInfo = new Stage();
+                orderInfo.initOwner(this.getScene().getWindow());
+                orderInfo.initModality(Modality.WINDOW_MODAL);
+                orderInfo.initStyle(StageStyle.DECORATED);
+                orderInfo.centerOnScreen();
+                orderInfo.setWidth(this.getScene().getWindow().getWidth() / 10 * 9);
+                orderInfo.setHeight(this.getScene().getWindow().getHeight() / 10 * 9);
+                orderInfo.setTitle("订单详情");
+                orderInfo.setScene(new Scene(new OrderDetail(runningData)));
+                orderInfo.show();
+            } else {
+                OpenDeskDialog dialog = new OpenDeskDialog(desk.get());
+                Optional<Integer> result = dialog.showAndWait();
+                if (result.isPresent() && result.get() == 1) {
+                    deskService.openDesk(desk.get().getId());
+                } else if (result.isPresent() && result.get() == 2) {
+                    deskService.closeDesk(desk.get().getId());
+                }
             }
         });
     }

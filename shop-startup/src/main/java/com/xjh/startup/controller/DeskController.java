@@ -1,18 +1,14 @@
 package com.xjh.startup.controller;
 
 import java.net.URL;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
-import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.ThreadUtils;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.service.domain.DeskService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.DeskView;
-import com.xjh.startup.view.OpenDeskDialog;
-import com.xjh.startup.view.OrderDetail;
 
 import cn.hutool.core.lang.Holder;
 import javafx.application.Platform;
@@ -21,12 +17,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 public class DeskController implements Initializable {
 
@@ -71,36 +63,8 @@ public class DeskController implements Initializable {
     }
 
     void render(SimpleObjectProperty<Desk> desk, FlowPane pane) {
-        double boxWidth = Math.max(pane.getWidth() / 6 - 15, 200);
-        DeskView vBox = new DeskView(desk, boxWidth);
-        vBox.setOnMouseClicked(evt -> {
-            Desk runningData = deskService.getById(desk.get().getId());
-            EnumDesKStatus runStatus = EnumDesKStatus.FREE;
-            if (runningData != null) {
-                runStatus = EnumDesKStatus.of(runningData.getStatus());
-            }
-            if (runStatus == EnumDesKStatus.USED) {
-                Stage orderInfo = new Stage();
-                orderInfo.initOwner(pane.getScene().getWindow());
-                orderInfo.initModality(Modality.WINDOW_MODAL);
-                orderInfo.initStyle(StageStyle.DECORATED);
-                orderInfo.centerOnScreen();
-                orderInfo.setWidth(pane.getScene().getWindow().getWidth() / 10 * 9);
-                orderInfo.setHeight(pane.getScene().getWindow().getHeight() / 10 * 9);
-                orderInfo.setTitle("订单详情");
-                orderInfo.setScene(new Scene(new OrderDetail(runningData)));
-                orderInfo.show();
-            } else {
-                OpenDeskDialog dialog = new OpenDeskDialog(desk.get());
-                Optional<Integer> result = dialog.showAndWait();
-                if (result.isPresent() && result.get() == 1) {
-                    deskService.openDesk(desk.get().getId());
-                } else if (result.isPresent() && result.get() == 2) {
-                    deskService.closeDesk(desk.get().getId());
-                }
-            }
-        });
-        pane.getChildren().add(vBox);
+        double prefWidth = Math.max(pane.getWidth() / 6 - 15, 200);
+        pane.getChildren().add(new DeskView(desk, prefWidth));
     }
 
 
