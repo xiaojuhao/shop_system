@@ -6,7 +6,7 @@ import com.xjh.dao.foundation.Table;
 @Table("order_list")
 public class Order {
     @Column("orderId")
-    Long orderId;
+    String orderId;
     @Column("orderStatus")
     Integer orderStatus;
     @Column("deskId")
@@ -29,7 +29,7 @@ public class Order {
     Double orderErase;
     @Column("orderRefund")
     Double orderRefund;
-    @Column("createTime")
+    @Column("createtime")
     Long createTime;
     @Column("status")
     Integer status;
@@ -44,11 +44,11 @@ public class Order {
     @Column("orderType")
     Integer orderType;
 
-    public Long getOrderId() {
+    public String getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(Long orderId) {
+    public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
 

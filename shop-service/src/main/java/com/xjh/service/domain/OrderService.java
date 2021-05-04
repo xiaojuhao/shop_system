@@ -11,6 +11,11 @@ public class OrderService {
     OrderDAO orderDAO;
 
     public Order getOrder(String orderId) {
-        return orderDAO.selectByOrderId(orderId);
+        try {
+            return orderDAO.selectByOrderId(orderId);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 }

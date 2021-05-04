@@ -19,7 +19,10 @@ public class EntityUtils {
         Entity entity = Entity.create(tableName);
         ReflectionUtils.resolvePD(dd.getClass()).values().forEach(pd -> {
             try {
-                entity.set(getColumnName(pd.getField()), pd.readValue(dd));
+                Object value = pd.readValue(dd);
+                if (notNone(value)) {
+                    entity.set(getColumnName(pd.getField()), value);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -97,5 +100,12 @@ public class EntityUtils {
         }
         System.out.println("不支持的类型：" + columnName + ", " + targetClass);
         return null;
+    }
+
+    private static boolean notNone(Object val) {
+        if (val == null) {
+            return false;
+        }
+        return !(val instanceof String) || !((String) val).trim().isEmpty();
     }
 }
