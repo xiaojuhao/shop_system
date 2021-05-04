@@ -6,7 +6,6 @@ import java.util.Optional;
 import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
-import com.xjh.common.utils.TimeRecord;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.service.domain.DeskService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
@@ -51,9 +50,7 @@ public class DeskView extends VBox {
         });
 
         this.setOnMouseClicked(evt -> {
-            TimeRecord time = TimeRecord.start();
             DeskService deskService = GuiceContainer.getInstance(DeskService.class);
-            System.out.println("获取deskService >> cost " + time.getCost());
             Desk runningData = deskService.getById(desk.get().getId());
             EnumDesKStatus runStatus = EnumDesKStatus.FREE;
             if (runningData != null) {
