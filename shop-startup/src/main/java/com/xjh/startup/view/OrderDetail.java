@@ -176,56 +176,14 @@ public class OrderDetail extends VBox {
         {
             TableView<TableItem> tv = new TableView<>();
             tv.setMaxHeight(300);
-            TableColumn<TableItem, SimpleStringProperty> col1 = new TableColumn<>("列1");
-            col1.setMinWidth(100);
-            col1.setCellValueFactory(new PropertyValueFactory<>("col1"));
-
-            TableColumn<TableItem, SimpleStringProperty> col2 = new TableColumn<>("列2");
-            col2.setMinWidth(200);
-            col2.setCellValueFactory(new PropertyValueFactory<>("col2"));
-
-            TableColumn<TableItem, SimpleStringProperty> col3 = new TableColumn<>("列3");
-            col3.setMinWidth(300);
-            col3.setCellValueFactory(new PropertyValueFactory<>("col3"));
-
-            TableColumn<TableItem, SimpleStringProperty> col4 = new TableColumn<>("列4");
-            col4.setMinWidth(100);
-            col4.setCellValueFactory(new PropertyValueFactory<>("col4"));
-
+            tv.setPadding(new Insets(5, 0, 0, 5));
+            TableColumn<TableItem, SimpleStringProperty> col1 = newCol("列1", "col1", 200);
+            TableColumn<TableItem, SimpleStringProperty> col2 = newCol("列2", "col2", 200);
+            TableColumn<TableItem, SimpleStringProperty> col3 = newCol("列3", "col3", 200);
+            TableColumn<TableItem, SimpleStringProperty> col4 = newCol("列4", "col4", 100);
             tv.getColumns().addAll(col1, col2, col3, col4);
             this.getChildren().add(tv);
-
-            ObservableList<TableItem> data =
-                    FXCollections.observableArrayList(
-                            new TableItem("Jacob", "Smith", "jacob.smith@example.com", "1111"),
-                            new TableItem("Jacob", "Smith", "jacob.smith@example.com", "1111"),
-                            new TableItem("Jacob", "Smith", "jacob.smith@example.com", "1111"),
-                            new TableItem("Jacob", "Smith", "jacob.smith@example.com", "1111"),
-                            new TableItem("Jacob", "Smith", "jacob.smith@example.com", "1111"),
-                            new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
-                            new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
-                            new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
-                            new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
-                            new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
-                            new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
-                            new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
-                            new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
-                            new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
-                            new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
-                            new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
-                            new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
-                            new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                            new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                            new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                            new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                            new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                            new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                            new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                            new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                            new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                            new TableItem("Michael", "Brown", "michael.brown@example.com", "1111")
-                    );
-            tv.setItems(data);
+            tv.setItems(mockData());
         }
     }
 
@@ -289,5 +247,45 @@ public class OrderDetail extends VBox {
         public void setCol4(String col4) {
             this.col4.set(col4);
         }
+    }
+
+    private TableColumn newCol(String name, String filed, double width) {
+        TableColumn<TableItem, SimpleStringProperty> col1 = new TableColumn<>(name);
+        col1.setMinWidth(width);
+        col1.setCellValueFactory(new PropertyValueFactory<>(filed));
+        return col1;
+    }
+
+    private ObservableList<TableItem> mockData() {
+        return FXCollections.observableArrayList(
+                new TableItem("Jacob", "Smith", "jacob.smith@example.com", "1111"),
+                new TableItem("Jacob", "Smith", "jacob.smith@example.com", "1111"),
+                new TableItem("Jacob", "Smith", "jacob.smith@example.com", "1111"),
+                new TableItem("Jacob", "Smith", "jacob.smith@example.com", "1111"),
+                new TableItem("Jacob", "Smith", "jacob.smith@example.com", "1111"),
+                new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
+                new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
+                new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
+                new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
+                new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
+                new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
+                new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
+                new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
+                new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
+                new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
+                new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
+                new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
+                new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
+                new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
+                new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
+                new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
+                new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
+                new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
+                new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
+                new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
+                new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
+                new TableItem("Michael", "Brown", "michael.brown@example.com", "1111")
+        );
+
     }
 }
