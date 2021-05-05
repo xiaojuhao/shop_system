@@ -47,6 +47,17 @@ public class EntityUtils {
         return entity;
     }
 
+    public static <T> T convert(Entity entity, Class<T> clz) {
+        try {
+            T obj = clz.newInstance();
+            convert(entity, obj);
+            return obj;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
     public static void convert(Entity entity, Object target) {
         ReflectionUtils.resolvePD(target.getClass()).values().forEach(pd -> {
             try {

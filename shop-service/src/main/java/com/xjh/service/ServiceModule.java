@@ -5,6 +5,7 @@ import com.xjh.service.domain.AdminService;
 import com.xjh.service.domain.AnalysisService;
 import com.xjh.service.domain.BookService;
 import com.xjh.service.domain.DeskService;
+import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.ReaderService;
 import com.xjh.service.domain.impl.AdminServiceImpl;
@@ -22,6 +23,7 @@ public class ServiceModule extends AbstractModule {
         bind(ReaderService.class).to(ReaderServiceImpl.class);
         bind(DeskService.class);
         bind(OrderService.class);
+        bind(OrderDishesService.class);
         System.out.println("ServiceModule 耗时:" + (System.currentTimeMillis() - start));
     }
 }

@@ -43,9 +43,6 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     private Order convert(Entity entity) {
-        Order order = new Order();
-        EntityUtils.convert(entity, order);
-        return order;
+        return EntityUtils.convert(entity, Order.class);
     }
-
 }

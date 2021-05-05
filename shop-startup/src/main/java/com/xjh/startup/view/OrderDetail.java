@@ -1,15 +1,21 @@
 package com.xjh.startup.view;
 
+import java.util.List;
+import java.util.Objects;
+
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Order;
+import com.xjh.dao.dataobject.OrderDishes;
+import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -28,6 +34,7 @@ public class OrderDetail extends VBox {
         String orderId = "";
         String orderTime = "";
         String payStatusName = "";
+        Double paid = 0D;
         Order order = null;
         if (CommonUtils.isNotBlank(orderDesk.getOrderId())) {
             orderId = orderDesk.getOrderId();
@@ -50,12 +57,24 @@ public class OrderDetail extends VBox {
                 } else if (orderStatus == 6) {
                     payStatusName = "免单";
                 }
+
+                paid = order.getOrderHadpaid();
             }
         }
+
+        OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
+        double totalPrice = 0;
+        if (CommonUtils.isNotBlank(orderId)) {
+            List<OrderDishes> dishes = orderDishesService.selectOrderDishes(orderId);
+            totalPrice = CommonUtils.collect(dishes, OrderDishes::getOrderDishesPrice)
+                    .stream().filter(Objects::nonNull).reduce(0D, Double::sum);
+        }
+
         {
             GridPane gridPane = new GridPane();
             gridPane.setVgap(10);
             gridPane.setHgap(10);
+            gridPane.setPadding(new Insets(10));
             // gridPane.setStyle("-fx-border-width: 1 1 1 1;-fx-border-style: solid;-fx-border-color: red");
             Label l = new Label("桌号：" + orderDesk.getDeskName());
             l.setMinWidth(800);
@@ -94,46 +113,63 @@ public class OrderDetail extends VBox {
         {
             Separator separator2 = new Separator();
             separator2.setOrientation(Orientation.HORIZONTAL);
+            // separator2.setPadding(new Insets(10));
             this.getChildren().add(separator2);
         }
         {
             GridPane gridPane = new GridPane();
             gridPane.setVgap(10);
             gridPane.setHgap(10);
-            // gridPane.setStyle("-fx-border-width: 1 1 1 1;-fx-border-style: solid;-fx-border-color: red");
-            Label l = new Label("桌号：" + orderDesk.getDeskName());
-            l.setMinWidth(800);
-            l.setMinHeight(50);
-            l.setFont(new Font(18));
-            l.setAlignment(Pos.CENTER);
-            gridPane.add(l, 0, 0, 4, 1);
+            gridPane.setPadding(new Insets(10));
+            /// ----------- 第一行 ---------------
+            Label l = new Label("订单总额：" + totalPrice);
+            l.setMinWidth(200);
+            gridPane.add(l, 0, 0);
             // 第二行
-            Label labelCustNum = new Label("就餐人数: 2");
+            Label labelCustNum = new Label("已支付: " + paid);
             labelCustNum.setMinWidth(200);
-            gridPane.add(labelCustNum, 0, 1);
+            gridPane.add(labelCustNum, 1, 0);
 
-            Label labelOrder = new Label("订单号: 8888888");
-            labelOrder.setMinWidth(200);
-            gridPane.add(labelOrder, 1, 1);
+            Label notPaid = new Label("还需支付: " + (totalPrice - paid));
+            notPaid.setMinWidth(200);
+            notPaid.setStyle("-fx-font-size: 16; -fx-text-fill: red");
+            gridPane.add(notPaid, 2, 0);
 
-            Label labelOrderTime = new Label("就餐时间: 2021-04-25 20:01");
+            Label labelOrderTime = new Label("当前折扣: 无");
             labelOrderTime.setMinWidth(200);
-            gridPane.add(labelOrderTime, 2, 1);
+            gridPane.add(labelOrderTime, 3, 0);
 
-            Label labelPayStatus = new Label("支付状态: 待支付");
+            Label labelPayStatus = new Label("优惠金额: 0");
             labelPayStatus.setMinWidth(200);
-            gridPane.add(labelPayStatus, 3, 1);
+            gridPane.add(labelPayStatus, 4, 0);
 
-            // 关台按钮
-            Button button = new Button("关台");
-            button.setMinWidth(100);
-            gridPane.add(button, 4, 0, 1, 2);
+            /// ----------- 第二行 ---------------
+            Label reduction = new Label("抹零金额: 0");
+            reduction.setMinWidth(200);
+            gridPane.add(reduction, 0, 1);
+
+            Label mangerReduction = new Label("店长减免: 0");
+            mangerReduction.setMinWidth(200);
+            gridPane.add(mangerReduction, 1, 1);
+
+            Label discount = new Label("折扣金额: 0");
+            discount.setMinWidth(200);
+            gridPane.add(discount, 2, 1);
+
+            Label refund = new Label("退菜金额: 0");
+            refund.setMinWidth(200);
+            gridPane.add(refund, 3, 1);
+
+            Label fan = new Label("反结账金额: 0");
+            fan.setMinWidth(200);
+            gridPane.add(fan, 4, 1);
 
             this.getChildren().add(gridPane);
         }
         {
             Separator separator2 = new Separator();
             separator2.setOrientation(Orientation.HORIZONTAL);
+            // separator2.setPadding(new Insets(10));
             this.getChildren().add(separator2);
         }
 
