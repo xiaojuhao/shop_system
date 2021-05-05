@@ -177,11 +177,14 @@ public class OrderDetail extends VBox {
             TableView<TableItem> tv = new TableView<>();
             tv.setMaxHeight(300);
             tv.setPadding(new Insets(5, 0, 0, 5));
-            TableColumn<TableItem, SimpleStringProperty> col1 = newCol("列1", "col1", 200);
-            TableColumn<TableItem, SimpleStringProperty> col2 = newCol("列2", "col2", 200);
-            TableColumn<TableItem, SimpleStringProperty> col3 = newCol("列3", "col3", 200);
-            TableColumn<TableItem, SimpleStringProperty> col4 = newCol("列4", "col4", 100);
-            tv.getColumns().addAll(col1, col2, col3, col4);
+            tv.getColumns().addAll(
+                    newCol("列1", "col1", 200),
+                    newCol("列2", "col2", 200),
+                    newCol("列3", "col3", 200),
+                    newCol("列4", "col4", 100),
+                    newCol("列5", "col5", 100),
+                    newCol("列6", "col6", 200)
+            );
             this.getChildren().add(tv);
             tv.setItems(mockData());
         }
