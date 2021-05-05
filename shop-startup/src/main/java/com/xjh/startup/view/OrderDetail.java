@@ -21,12 +21,15 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.util.Callback;
 
 public class OrderDetail extends VBox {
     public OrderDetail(Desk orderDesk) {
@@ -257,6 +260,20 @@ public class OrderDetail extends VBox {
         c.setMinWidth(width);
         c.setCellValueFactory(new PropertyValueFactory<>(filed));
         c.setStyle("-fx-alignment: center-right; -fx-border-width: 0px; ");
+        c.setCellFactory(new Callback<TableColumn<TableItem, SimpleStringProperty>, TableCell<TableItem, SimpleStringProperty>>() {
+            public TableCell<TableItem, String> call(TableColumn param) {
+                return new TableCell<TableItem, String>() {
+                    public void updateItem(String item, boolean empty) {
+                        if (CommonUtils.isNotBlank(item)) {
+                            if (item.contains("@")) {
+                                setTextFill(Color.RED);
+                            }
+                            setText(item);
+                        }
+                    }
+                };
+            }
+        });
         return c;
     }
 
