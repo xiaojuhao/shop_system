@@ -14,6 +14,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import com.xjh.common.utils.LogUtils;
 import com.xjh.dao.dataobject.Reader;
 import com.xjh.service.domain.ReaderService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
@@ -175,7 +176,7 @@ public class ReaderController implements Initializable {
             @Override
             public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
                 //给读者对象设置选中的角色
-                System.out.println(group.getSelectedToggle().getUserData().toString());
+                LogUtils.info(group.getSelectedToggle().getUserData().toString());
                 reader.setRole(group.getSelectedToggle().getUserData().toString());
             }
         });
@@ -244,7 +245,7 @@ public class ReaderController implements Initializable {
             reader.setJoinDate(joinDate);
             reader.setEmail(emailString);
             reader.setMobile(mobileString);
-            System.out.println(reader.getName() + reader.getRole() + reader.getMobile());
+            LogUtils.info(reader.getName() + reader.getRole() + reader.getMobile());
             readerService.addReader(reader);
             stage.close();
             //重新读取一下数据显示

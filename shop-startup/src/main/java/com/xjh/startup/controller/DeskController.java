@@ -3,6 +3,7 @@ package com.xjh.startup.controller;
 import java.util.List;
 
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.LogUtils;
 import com.xjh.common.utils.ThreadUtils;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.service.domain.DeskService;
@@ -38,7 +39,7 @@ public class DeskController {
         pane.setVgap(5);
         pane.setPrefWidth(width);
         pane.setPrefHeight(height);
-        System.out.println("screen width:" + width + ",height:" + height);
+        LogUtils.info("screen width:" + width + ",height:" + height);
         //s.setFitToWidth(true);
         s.setContent(pane);
 
@@ -55,7 +56,7 @@ public class DeskController {
                 desks.forEach(this::detectChange);
                 CommonUtils.sleep(1000);
             }
-            System.out.println("******* DeskController 循环退出." + Thread.currentThread().getName());
+            LogUtils.info("******* DeskController 循环退出." + Thread.currentThread().getName());
             System.gc();
         });
         return s;
@@ -75,6 +76,6 @@ public class DeskController {
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
-        System.out.println("DeskController被销毁了。。。。。。。。");
+        LogUtils.info("DeskController被销毁了。。。。。。。。");
     }
 }

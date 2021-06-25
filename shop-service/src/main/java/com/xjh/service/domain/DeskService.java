@@ -9,6 +9,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.utils.LogUtils;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Info;
 import com.xjh.dao.mapper.DeskDAO;
@@ -57,7 +58,7 @@ public class DeskService {
         List<Desk> desks = new ArrayList<>();
         try {
             infoDAO.select(new Info()).forEach(info -> {
-                System.out.println("读取INFO信息:" + JSON.toJSONString(info));
+                LogUtils.info("读取INFO信息:" + JSON.toJSONString(info));
             });
             desks.addAll(deskDAO.select(new Desk()));
         } catch (Exception ex) {

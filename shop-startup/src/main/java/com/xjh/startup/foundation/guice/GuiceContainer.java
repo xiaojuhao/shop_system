@@ -3,8 +3,9 @@ package com.xjh.startup.foundation.guice;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.xjh.common.utils.Holder;
-import com.xjh.dao.DataSourceModule;
+import com.xjh.common.utils.LogUtils;
 import com.xjh.dao.DaoModule;
+import com.xjh.dao.DataSourceModule;
 import com.xjh.service.ServiceModule;
 
 public class GuiceContainer {
@@ -25,7 +26,7 @@ public class GuiceContainer {
                     new DataSourceModule()
             );
             injector.set(ij);
-            System.out.println("初始化Guice, 耗时:" + (System.currentTimeMillis() - start));
+            LogUtils.info("初始化Guice, 耗时:" + (System.currentTimeMillis() - start));
             return ij;
         }
     }

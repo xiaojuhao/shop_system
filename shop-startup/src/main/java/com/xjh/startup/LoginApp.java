@@ -1,8 +1,9 @@
 package com.xjh.startup;
 
+import com.xjh.common.utils.LogUtils;
 import com.xjh.common.utils.TimeRecord;
-
 import com.xjh.startup.view.FxmlView;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -19,14 +20,14 @@ public class LoginApp extends Application {
         VBox root = FxmlView.load("login");
         root.setAlignment(Pos.CENTER);
         root.setPadding(new Insets(0, 400, 0, 400));
-        System.out.println("加载登录界面:" + timeRecord.getCostAndReset());
+        LogUtils.info("加载登录界面:" + timeRecord.getCostAndReset());
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/css/style.css");
         primaryStage.setMaximized(true);
         // primaryStage.getIcons().add(new Image("/img/logo.png"));
         primaryStage.setScene(scene);
         primaryStage.show();
-        System.out.println("主页面渲染:" + timeRecord.getCostAndReset());
+        LogUtils.info("主页面渲染:" + timeRecord.getCostAndReset());
     }
 
     public static void main(String[] args) {

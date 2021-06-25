@@ -29,17 +29,17 @@ public class MenuBarController {
         // 餐桌管理
         bar.getMenus().add(createTableMenu());
         // 会员管理
-        bar.getMenus().add(createMemberMenu());
+        // bar.getMenus().add(createMemberMenu());
         // 打印管理
         bar.getMenus().add(createPrintMenu());
         // 卡券管理
-        bar.getMenus().add(createCouponMenu());
+        // bar.getMenus().add(createCouponMenu());
         // 订单管理
         bar.getMenus().add(createOrderMenu());
         // 门店管理
-        bar.getMenus().add(createShopMenu());
+        // bar.getMenus().add(createShopMenu());
         // 设备管理
-        bar.getMenus().add(createDeviceMenu());
+        // bar.getMenus().add(createDeviceMenu());
         // 预约点菜
         bar.getMenus().add(createPreserveMenu());
         // 账号管理

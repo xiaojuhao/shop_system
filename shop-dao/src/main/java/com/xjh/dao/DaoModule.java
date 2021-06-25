@@ -1,6 +1,7 @@
 package com.xjh.dao;
 
 import com.google.inject.AbstractModule;
+import com.xjh.common.utils.LogUtils;
 import com.xjh.dao.mapper.AdminDAO;
 import com.xjh.dao.mapper.BookDAO;
 import com.xjh.dao.mapper.DeskDAO;
@@ -31,6 +32,6 @@ public class DaoModule extends AbstractModule {
         bind(InfoDAO.class).to(InfoDAOImpl.class);
         bind(OrderDAO.class).to(OrderDAOImpl.class);
         bind(OrderDishesDAO.class).to(OrderDishesDAOImpl.class);
-        System.out.println("DaoModule 耗时: " + (System.currentTimeMillis() - start));
+        LogUtils.info("DaoModule 耗时: " + (System.currentTimeMillis() - start));
     }
 }

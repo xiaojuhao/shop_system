@@ -1,6 +1,7 @@
 package com.xjh.service;
 
 import com.google.inject.AbstractModule;
+import com.xjh.common.utils.LogUtils;
 import com.xjh.service.domain.AdminService;
 import com.xjh.service.domain.AnalysisService;
 import com.xjh.service.domain.BookService;
@@ -24,6 +25,6 @@ public class ServiceModule extends AbstractModule {
         bind(DeskService.class);
         bind(OrderService.class);
         bind(OrderDishesService.class);
-        System.out.println("ServiceModule 耗时:" + (System.currentTimeMillis() - start));
+        LogUtils.info("ServiceModule 耗时:" + (System.currentTimeMillis() - start));
     }
 }

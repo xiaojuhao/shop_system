@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import com.xjh.common.utils.LogUtils;
 import com.xjh.dao.dataobject.Book;
 import com.xjh.dao.dataobject.Type;
 import com.xjh.service.domain.BookService;
@@ -63,7 +64,7 @@ public class AddBookController implements Initializable {
         String stock = bookStock.getText();
         String cover = bookCover.getText();
         String summary = bookSummary.getText();
-        System.out.println(stock);
+        LogUtils.info(stock);
         Book book = new Book();
         book.setTypeId(typeId);
         book.setName(name);

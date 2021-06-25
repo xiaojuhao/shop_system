@@ -4,6 +4,7 @@ import java.io.File;
 
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
+import com.xjh.common.utils.LogUtils;
 
 public class BerkeleyDBEnv {
     static Environment staticEnv = null;
@@ -17,7 +18,7 @@ public class BerkeleyDBEnv {
                 return staticEnv;
             }
             File homeDirectory = new File(".rundata/bdb");
-            System.out.println("home path : " + homeDirectory.getAbsolutePath());
+            LogUtils.info("home path : " + homeDirectory.getAbsolutePath());
             if (!homeDirectory.exists()) {
                 homeDirectory.mkdirs();
             }

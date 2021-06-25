@@ -1,16 +1,17 @@
 package com.xjh.dao.datasource;
 
+import java.io.File;
+
 import com.google.inject.Provider;
+import com.xjh.common.utils.LogUtils;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-
-import java.io.File;
 
 public class LocalSqliteDataSourceProvider implements Provider<HikariDataSource> {
     @Override
     public HikariDataSource get() {
         File home = new File(".rundata/sqlite");
-        System.out.println("Home path: " + home.getAbsolutePath());
+        LogUtils.info("Home path: " + home.getAbsolutePath());
         if (!home.exists()) {
             home.mkdirs();
         }

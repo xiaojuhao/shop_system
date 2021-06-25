@@ -7,6 +7,7 @@ import java.util.Date;
 
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.utils.LogUtils;
 import com.xjh.common.utils.ReflectionUtils;
 
 import cn.hutool.db.Entity;
@@ -109,7 +110,7 @@ public class EntityUtils {
                 return val;
             }
         }
-        System.out.println("不支持的类型：" + columnName + ", " + targetClass);
+        LogUtils.info("不支持的类型：" + columnName + ", " + targetClass);
         return null;
     }
 

@@ -257,9 +257,9 @@ public class OrderDetail extends VBox {
 
     private TableColumn newCol(String name, String filed, double width) {
         TableColumn<TableItem, SimpleStringProperty> c = new TableColumn<>(name);
+        c.setStyle("-fx-border-width: 0px; ");
         c.setMinWidth(width);
         c.setCellValueFactory(new PropertyValueFactory<>(filed));
-        c.setStyle("-fx-alignment: center-right; -fx-border-width: 0px; ");
         c.setCellFactory(new Callback<TableColumn<TableItem, SimpleStringProperty>, TableCell<TableItem, SimpleStringProperty>>() {
             public TableCell<TableItem, String> call(TableColumn param) {
                 return new TableCell<TableItem, String>() {
@@ -267,6 +267,8 @@ public class OrderDetail extends VBox {
                         if (CommonUtils.isNotBlank(item)) {
                             if (item.contains("@")) {
                                 setTextFill(Color.RED);
+                            } else {
+                                setAlignment(Pos.CENTER_RIGHT);
                             }
                             setText(item);
                         }
