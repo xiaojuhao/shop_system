@@ -9,6 +9,7 @@ public class OrderDishes {
     String subOrderId;
     Integer dishesTypeId;
     Integer ifDishesPackage;
+    Integer dishesId;
     Double orderDishesPrice;
     Double orderDishesDiscountPrice;
     Integer orderDishesNums;
@@ -75,6 +76,14 @@ public class OrderDishes {
 
     public void setOrderDishesDiscountPrice(Double orderDishesDiscountPrice) {
         this.orderDishesDiscountPrice = orderDishesDiscountPrice;
+    }
+
+    public Integer getDishesId() {
+        return dishesId;
+    }
+
+    public void setDishesId(Integer dishesId) {
+        this.dishesId = dishesId;
     }
 
     public Integer getOrderDishesNums() {

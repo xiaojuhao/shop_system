@@ -3,12 +3,19 @@ package com.xjh.startup.view;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import com.xjh.common.enumeration.EnumOrderSaleType;
+import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.dao.dataobject.Desk;
+import com.xjh.dao.dataobject.Dishes;
+import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
+import com.xjh.dao.mapper.DishesDAO;
+import com.xjh.dao.mapper.DishesPackageDAO;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
@@ -50,23 +57,7 @@ public class OrderDetail extends VBox {
             order = orderService.getOrder(orderId);
             if (order != null) {
                 orderTime = DateBuilder.base(order.getCreateTime()).format("yyyy-MM-dd HH:mm:ss");
-                Integer orderStatus = order.getOrderStatus();
-                if (orderStatus == null) {
-                    payStatusName = "无";
-                } else if (orderStatus == 1) {
-                    payStatusName = "未支付";
-                } else if (orderStatus == 2) {
-                    payStatusName = "已付款";
-                } else if (orderStatus == 3) {
-                    payStatusName = "部分支付";
-                } else if (orderStatus == 4) {
-                    payStatusName = "合并餐桌";
-                } else if (orderStatus == 5) {
-                    payStatusName = "逃单";
-                } else if (orderStatus == 6) {
-                    payStatusName = "免单";
-                }
-
+                payStatusName = EnumOrderStatus.of(order.getOrderStatus()).remark;
                 paid = order.getOrderHadpaid();
             }
         }
@@ -196,92 +187,31 @@ public class OrderDetail extends VBox {
         }
 
         {
-            TableView<TableItem> tv = new TableView<>();
+            TableView<OrderDishesTableItemVO> tv = new TableView<>();
             tv.setMaxHeight(300);
             tv.setPadding(new Insets(5, 0, 0, 5));
             tv.getColumns().addAll(
-                    newCol("列1", "col1", 200),
-                    newCol("列2", "col2", 200),
-                    newCol("列3", "col3", 300),
-                    newCol("列4", "col4", 100),
-                    newCol("列5", "col5", 100),
-                    newCol("列6", "col6", 200)
+                    newCol("序号", "col1", 100),
+                    newCol("子订单", "col2", 100),
+                    newCol("菜名名称", "col3", 300),
+                    newCol("单价", "col4", 100),
+                    newCol("折后价", "col5", 100),
+                    newCol("数量", "col6", 100),
+                    newCol("类型", "col7", 100)
             );
             this.getChildren().add(tv);
-            tv.setItems(mockData());
-        }
-    }
-
-    public static class TableItem {
-        SimpleStringProperty col1;
-        SimpleStringProperty col2;
-        SimpleStringProperty col3;
-        SimpleStringProperty col4;
-
-        public TableItem(String col1, String col2, String col3, String col4) {
-            this.col1 = new SimpleStringProperty(col1);
-            this.col2 = new SimpleStringProperty(col2);
-            this.col3 = new SimpleStringProperty(col3);
-            this.col4 = new SimpleStringProperty(col4);
-        }
-
-        public String getCol1() {
-            return col1.get();
-        }
-
-        public SimpleStringProperty col1Property() {
-            return col1;
-        }
-
-        public void setCol1(String col1) {
-            this.col1.set(col1);
-        }
-
-        public String getCol2() {
-            return col2.get();
-        }
-
-        public SimpleStringProperty col2Property() {
-            return col2;
-        }
-
-        public void setCol2(String col2) {
-            this.col2.set(col2);
-        }
-
-        public String getCol3() {
-            return col3.get();
-        }
-
-        public SimpleStringProperty col3Property() {
-            return col3;
-        }
-
-        public void setCol3(String col3) {
-            this.col3.set(col3);
-        }
-
-        public String getCol4() {
-            return col4.get();
-        }
-
-        public SimpleStringProperty col4Property() {
-            return col4;
-        }
-
-        public void setCol4(String col4) {
-            this.col4.set(col4);
+            tv.setItems(loadOrderDishes(orderId));
         }
     }
 
     private TableColumn newCol(String name, String filed, double width) {
-        TableColumn<TableItem, SimpleStringProperty> c = new TableColumn<>(name);
+        TableColumn<OrderDishesTableItemVO, SimpleStringProperty> c = new TableColumn<>(name);
         c.setStyle("-fx-border-width: 0px; ");
         c.setMinWidth(width);
         c.setCellValueFactory(new PropertyValueFactory<>(filed));
-        c.setCellFactory(new Callback<TableColumn<TableItem, SimpleStringProperty>, TableCell<TableItem, SimpleStringProperty>>() {
-            public TableCell<TableItem, String> call(TableColumn param) {
-                return new TableCell<TableItem, String>() {
+        c.setCellFactory(new Callback<TableColumn<OrderDishesTableItemVO, SimpleStringProperty>, TableCell<OrderDishesTableItemVO, SimpleStringProperty>>() {
+            public TableCell<OrderDishesTableItemVO, String> call(TableColumn param) {
+                return new TableCell<OrderDishesTableItemVO, String>() {
                     public void updateItem(String item, boolean empty) {
                         if (CommonUtils.isNotBlank(item)) {
                             if (item.contains("@")) {
@@ -298,36 +228,38 @@ public class OrderDetail extends VBox {
         return c;
     }
 
-    private ObservableList<TableItem> mockData() {
-        return FXCollections.observableArrayList(
-                new TableItem("Jacob", "Smith", "jacob.smith@example.com", "1111"),
-                new TableItem("Jacob", "Smith", "jacob.smith@example.com", "1111"),
-                new TableItem("Jacob", "Smith", "jacob.smith@example.com", "1111"),
-                new TableItem("Jacob", "Smith", "jacob.smith@example.com", "1111"),
-                new TableItem("Jacob", "Smith", "jacob.smith@example.com", "1111"),
-                new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
-                new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
-                new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
-                new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
-                new TableItem("", "", "", ""),
-                new TableItem("Isabella", "Johnson", "isabella.johnson@example.com", "1111"),
-                new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
-                new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
-                new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
-                new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
-                new TableItem("Ethan", "Williams", "ethan.williams@example.com", "1111"),
-                new TableItem("", "", "ethan.williams@example.com", ""),
-                new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                new TableItem("", "", "emma.jones@example.com", ""),
-                new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                new TableItem("Emma", "Jones", "emma.jones@example.com", "1111"),
-                new TableItem("Michael", "Brown", "michael.brown@example.com", "1111")
-        );
+    private ObservableList<OrderDishesTableItemVO> loadOrderDishes(String orderId) {
+        DishesPackageDAO dishesPackageDAO = GuiceContainer.getInstance(DishesPackageDAO.class);
+        DishesDAO dishesDAO = GuiceContainer.getInstance(DishesDAO.class);
+
+        OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
+        List<OrderDishes> orderDishes = orderDishesService.selectOrderDishes(orderId);
+        List<OrderDishesTableItemVO> items = orderDishes.stream().map(o -> {
+            String dishesName = "";
+            String price = CommonUtils.formatMoney(o.getOrderDishesPrice());
+            String discountPrice = CommonUtils.formatMoney(o.getOrderDishesDiscountPrice());
+            String saleType = EnumOrderSaleType.of(o.getOrderDishesSaletype()).remark;
+            // 套餐
+            if (o.getIfDishesPackage() == 1) {
+                DishesPackage pkg = dishesPackageDAO.getById(o.getDishesId());
+                if (pkg != null) {
+                    dishesName = pkg.getDishesPackageName();
+                }
+            } else {
+                Dishes d = dishesDAO.getById(o.getDishesId());
+                if (d != null) {
+                    dishesName = d.getDishesName();
+                }
+            }
+            return new OrderDishesTableItemVO(
+                    o.getOrderDishesId() + "",
+                    o.getSubOrderId(),
+                    dishesName,
+                    price, discountPrice,
+                    o.getOrderDishesNums() + "",
+                    saleType);
+        }).collect(Collectors.toList());
+        return FXCollections.observableArrayList(items);
 
     }
 }

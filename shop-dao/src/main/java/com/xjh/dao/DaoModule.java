@@ -5,6 +5,8 @@ import com.xjh.common.utils.LogUtils;
 import com.xjh.dao.mapper.AdminDAO;
 import com.xjh.dao.mapper.BookDAO;
 import com.xjh.dao.mapper.DeskDAO;
+import com.xjh.dao.mapper.DishesDAO;
+import com.xjh.dao.mapper.DishesPackageDAO;
 import com.xjh.dao.mapper.InfoDAO;
 import com.xjh.dao.mapper.OrderDAO;
 import com.xjh.dao.mapper.OrderDishesDAO;
@@ -32,6 +34,8 @@ public class DaoModule extends AbstractModule {
         bind(InfoDAO.class).to(InfoDAOImpl.class);
         bind(OrderDAO.class).to(OrderDAOImpl.class);
         bind(OrderDishesDAO.class).to(OrderDishesDAOImpl.class);
+        bind(DishesPackageDAO.class);
+        bind(DishesDAO.class);
         LogUtils.info("DaoModule 耗时: " + (System.currentTimeMillis() - start));
     }
 }

@@ -24,6 +24,16 @@ public class OrderDishesDAOImpl implements OrderDishesDAO {
 
 
     @Override
+    public List<OrderDishes> selectByOrderId(String orderId) {
+        if (CommonUtils.isBlank(orderId)) {
+            return new ArrayList<>();
+        }
+        OrderDishes cond = new OrderDishes();
+        cond.setOrderId(orderId);
+        return select(cond);
+    }
+
+    @Override
     public List<OrderDishes> select(OrderDishes example) {
         try {
             List<Entity> list = Db.use(ds).find(EntityUtils.create(example));

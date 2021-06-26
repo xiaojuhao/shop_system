@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +45,13 @@ public class CommonUtils {
         } else {
             return def;
         }
+    }
+
+    public static String formatMoney(Double value) {
+        if (value == null || value <= 0) {
+            return "0.00";
+        }
+        return new DecimalFormat("#.00").format(value);
     }
 
     public static String formatSeconds(long seconds) {

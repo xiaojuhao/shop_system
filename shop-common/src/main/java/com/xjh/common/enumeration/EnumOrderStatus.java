@@ -1,6 +1,8 @@
 package com.xjh.common.enumeration;
 
 public enum EnumOrderStatus {
+    UNKNOWN(0, "未知"),
+
     UNPAID(1, "未支付"),
 
     PAID(2, "已支付"),
@@ -20,5 +22,17 @@ public enum EnumOrderStatus {
     EnumOrderStatus(int status, String remark) {
         this.status = status;
         this.remark = remark;
+    }
+
+    public static EnumOrderStatus of(Integer status) {
+        if (status == null) {
+            return UNKNOWN;
+        }
+        for (EnumOrderStatus e : EnumOrderStatus.values()) {
+            if (e.status == status) {
+                return e;
+            }
+        }
+        return UNKNOWN;
     }
 }

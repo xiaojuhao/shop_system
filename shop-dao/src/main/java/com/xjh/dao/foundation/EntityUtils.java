@@ -3,7 +3,9 @@ package com.xjh.dao.foundation;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
@@ -46,6 +48,22 @@ public class EntityUtils {
             }
         });
         return entity;
+    }
+
+    public static <T> List<T> convertList(List<Entity> entitys, Class<T> clz) {
+        List<T> list = new ArrayList<>();
+        try {
+            for (Entity e : entitys) {
+                T t = convert(e, clz);
+                if (t != null) {
+                    list.add(t);
+                }
+            }
+            return list;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
     public static <T> T convert(Entity entity, Class<T> clz) {
