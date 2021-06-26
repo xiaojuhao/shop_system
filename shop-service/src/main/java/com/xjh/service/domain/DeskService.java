@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -12,10 +11,8 @@ import com.xjh.common.enumeration.EnumOrderServeStatus;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.enumeration.EnumOrderType;
 import com.xjh.common.utils.DateBuilder;
-import com.xjh.common.utils.LogUtils;
 import com.xjh.common.valueobject.OrderDiscount;
 import com.xjh.dao.dataobject.Desk;
-import com.xjh.dao.dataobject.Info;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.mapper.DeskDAO;
 import com.xjh.dao.mapper.InfoDAO;
@@ -82,9 +79,9 @@ public class DeskService {
 
         List<Desk> desks = new ArrayList<>();
         try {
-            infoDAO.select(new Info()).forEach(info -> {
-                LogUtils.info("读取INFO信息:" + JSON.toJSONString(info));
-            });
+            //            infoDAO.select(new Info()).forEach(info -> {
+            //                LogUtils.info("读取INFO信息:" + JSON.toJSONString(info));
+            //            });
             desks.addAll(deskDAO.select(new Desk()));
         } catch (Exception ex) {
             ex.printStackTrace();

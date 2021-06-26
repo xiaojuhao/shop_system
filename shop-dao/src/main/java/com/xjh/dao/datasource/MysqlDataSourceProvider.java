@@ -1,15 +1,16 @@
 package com.xjh.dao.datasource;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.inject.Provider;
+import com.xjh.common.utils.LogUtils;
 import com.xjh.dao.DataSourceModule;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MysqlDataSourceProvider implements Provider<HikariDataSource> {
     @Override
@@ -28,11 +29,12 @@ public class MysqlDataSourceProvider implements Provider<HikariDataSource> {
 
     private static Map<String, String> configMap() {
         Map<String, String> map = new HashMap<>();
-        URL url = DataSourceModule.class.getResource("/config/db.setting");
+        InputStream stream = DataSourceModule.class.getResourceAsStream("/config/db.setting");
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(url.getFile()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
             while ((line = reader.readLine()) != null) {
+                LogUtils.info("加载数据库配置文件:" + line);
                 map.putAll(asKV(line));
             }
             reader.close();
