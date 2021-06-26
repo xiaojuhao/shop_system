@@ -71,6 +71,17 @@ public class DateBuilder {
         return new Double(delta).longValue();
     }
 
+    public static long daythOfYear(LocalDateTime date) {
+        LocalDateTime start = base(base(date).format("yyyy") + "0101").localDateTime;
+        return diffDays(start, date);
+    }
+
+    public static long diffDays(LocalDateTime start, LocalDateTime end) {
+        long seconds = intervalSeconds(start, end);
+        double delta = Math.ceil(seconds / SECONDS_OF_DAY);
+        return new Double(delta).longValue();
+    }
+
     private static LocalDateTime min(LocalDateTime x, LocalDateTime y) {
         if (x == null) {
             return y;
