@@ -236,7 +236,7 @@ public class OrderDetail extends VBox {
                 JSONObject data = new JSONObject();
                 data.put("orderId", finalOrderId);
                 data.put("desk", orderDesk);
-                orderInfo.setScene(new Scene(new ShowDishesView(data)));
+                orderInfo.setScene(new Scene(new OrderDishesChoiceView(data)));
                 orderInfo.show();
             });
             Button sendBtn = createButton("送菜");
