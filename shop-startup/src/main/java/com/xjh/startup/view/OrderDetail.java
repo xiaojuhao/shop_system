@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.utils.CommonUtils;
@@ -27,6 +28,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
@@ -37,16 +39,23 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Callback;
 
 public class OrderDetail extends VBox {
     public OrderDetail(Desk orderDesk) {
+        // 依赖服务
         OrderService orderService = GuiceContainer.getInstance(OrderService.class);
         DeskService deskService = GuiceContainer.getInstance(DeskService.class);
+        OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
+
         String orderId = "";
         String orderTime = "";
         String payStatusName = "";
@@ -62,7 +71,7 @@ public class OrderDetail extends VBox {
             }
         }
 
-        OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
+
         double totalPrice = 0;
         if (CommonUtils.isNotBlank(orderId)) {
             List<OrderDishes> dishes = orderDishesService.selectOrderDishes(orderId);
@@ -202,6 +211,50 @@ public class OrderDetail extends VBox {
             this.getChildren().add(tv);
             tv.setItems(loadOrderDishes(orderId));
         }
+
+        {
+            Separator separator2 = new Separator();
+            separator2.setOrientation(Orientation.HORIZONTAL);
+            this.getChildren().add(separator2);
+        }
+        // 功能菜单
+        {
+            FlowPane pane = new FlowPane();
+            pane.setHgap(20);
+            pane.setPadding(new Insets(10, 0, 10, 20));
+            Button orderBtn = createButton("点菜");
+            String finalOrderId = orderId;
+            orderBtn.setOnMouseClicked(evt -> {
+                Stage orderInfo = new Stage();
+                orderInfo.initOwner(this.getScene().getWindow());
+                orderInfo.initModality(Modality.WINDOW_MODAL);
+                orderInfo.initStyle(StageStyle.DECORATED);
+                orderInfo.centerOnScreen();
+                orderInfo.setWidth(this.getScene().getWindow().getWidth());
+                orderInfo.setHeight(this.getScene().getWindow().getHeight());
+                orderInfo.setTitle("点菜");
+                JSONObject data = new JSONObject();
+                data.put("orderId", finalOrderId);
+                data.put("desk", orderDesk);
+                orderInfo.setScene(new Scene(new ShowDishesView(data)));
+                orderInfo.show();
+            });
+            Button sendBtn = createButton("送菜");
+            Button returnBtn = createButton("退菜");
+            Button transferBtn = createButton("转台");
+            Button splitBtn = createButton("拆台");
+            Button payBillBtn = createButton("结账");
+            pane.getChildren().addAll(orderBtn, sendBtn, returnBtn, transferBtn, splitBtn, payBillBtn);
+            this.getChildren().add(pane);
+        }
+
+    }
+
+    private Button createButton(String name) {
+        Button btn = new Button(name);
+        btn.setMinWidth(66);
+        btn.setMinHeight(50);
+        return btn;
     }
 
     private TableColumn newCol(String name, String filed, double width) {
@@ -229,10 +282,12 @@ public class OrderDetail extends VBox {
     }
 
     private ObservableList<OrderDishesTableItemVO> loadOrderDishes(String orderId) {
+        // 依赖服务
         DishesPackageDAO dishesPackageDAO = GuiceContainer.getInstance(DishesPackageDAO.class);
         DishesDAO dishesDAO = GuiceContainer.getInstance(DishesDAO.class);
-
         OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
+
+
         List<OrderDishes> orderDishes = orderDishesService.selectOrderDishes(orderId);
         List<OrderDishesTableItemVO> items = orderDishes.stream().map(o -> {
             String dishesName = "";

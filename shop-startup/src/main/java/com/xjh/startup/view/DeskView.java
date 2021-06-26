@@ -67,6 +67,7 @@ public class DeskView extends VBox {
                 orderInfo.setTitle("订单详情");
                 orderInfo.setScene(new Scene(new OrderDetail(runningData)));
                 orderInfo.show();
+                System.gc();
             } else {
                 OpenDeskDialog dialog = new OpenDeskDialog(desk.get());
                 Optional<Integer> result = dialog.showAndWait();
@@ -85,5 +86,11 @@ public class DeskView extends VBox {
         } else {
             vbox.setStyle("-fx-background-color: #228B22;");
         }
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        System.out.println("DeskVeiew    销毁了。。。。。。。");
     }
 }
