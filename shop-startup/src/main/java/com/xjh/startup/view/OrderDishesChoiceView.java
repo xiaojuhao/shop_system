@@ -4,7 +4,9 @@ import java.util.List;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.xjh.common.utils.ClickHelper;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.LogUtils;
 import com.xjh.common.valueobject.DishesImg;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.mapper.DishesDAO;
@@ -13,6 +15,8 @@ import com.xjh.startup.foundation.guice.GuiceContainer;
 import cn.hutool.core.codec.Base64;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
@@ -63,7 +67,20 @@ public class OrderDishesChoiceView extends VBox {
                         img = arr.get(0).getImageSrc();
                     }
                 }
-                box.getChildren().add(getImageView(img));
+                ImageView iv = getImageView(img);
+                iv.setOnMouseClicked(evt -> {
+                    if (ClickHelper.isDblClick()) {
+                        LogUtils.info("添加到购物车" +
+                                dishes.getDishesId() + "," +
+                                dishes.getDishesName() + ", "
+                                + data);
+                        Alert _alert = new Alert(AlertType.INFORMATION);
+                        _alert.setTitle("通知消息");
+                        _alert.setHeaderText("添加购物车成功");
+                        _alert.showAndWait();
+                    }
+                });
+                box.getChildren().add(iv);
                 box.getChildren().add(new Label(dishes.getDishesName()));
                 box.getChildren().add(new Label("单价:" + CommonUtils.formatMoney(dishes.getDishesPrice()) + "元"));
 
