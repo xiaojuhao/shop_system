@@ -6,6 +6,7 @@ import java.util.List;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.dao.dataobject.Desk;
@@ -31,8 +32,8 @@ public class DeskDAOImpl implements DeskDAO {
     @Override
     public List<Desk> select(Desk desk) throws SQLException {
         StringBuilder sql = new StringBuilder("select * from desks where 1 = 1 ");
-        if (desk.getId() != null) {
-            sql.append(" and deskId = ").append(desk.getId());
+        if (desk.getDeskId() != null) {
+            sql.append(" and deskId = ").append(desk.getDeskId());
         }
         if (CommonUtils.isNotBlank(desk.getDeskName())) {
             sql.append(" and deskName like '%").append(desk.getDeskName()).append("%' ");
@@ -53,7 +54,7 @@ public class DeskDAOImpl implements DeskDAO {
             return null;
         }
         Desk cond = new Desk();
-        cond.setId(id);
+        cond.setDeskId(id);
         List<Desk> desks = select(cond);
         return desks.stream().findFirst().orElse(null);
     }
@@ -71,9 +72,9 @@ public class DeskDAOImpl implements DeskDAO {
         return Db.use(ds).execute("update desks " +
                         " set orderId = ?," +
                         " createTime = ?, " +
-                        " useStatus = 2 " +
+                        " useStatus =  " + EnumDesKStatus.USED.status() +
                         " where deskId = ? ",
-                desk.getOrderId(), DateBuilder.base(desk.getOrderCreateTime()).mills(), desk.getId());
+                desk.getOrderId(), DateBuilder.base(desk.getOrderCreateTime()).mills(), desk.getDeskId());
     }
 
     @Override

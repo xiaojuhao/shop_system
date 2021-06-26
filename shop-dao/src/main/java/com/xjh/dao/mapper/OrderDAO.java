@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import com.xjh.dao.dataobject.Order;
 
 public interface OrderDAO {
-    int insert(Order order);
+    int insert(Order order) throws SQLException;
 
     int updateByOrderId(Order order);
 

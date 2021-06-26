@@ -63,7 +63,7 @@ public class DeskController {
     }
 
     void detectChange(SimpleObjectProperty<Desk> desk) {
-        Desk dd = deskService.getById(desk.get().getId());
+        Desk dd = deskService.getById(desk.get().getDeskId());
         if (dd != null) {
             Platform.runLater(() -> desk.set(dd));
         }

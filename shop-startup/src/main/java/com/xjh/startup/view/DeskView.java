@@ -51,7 +51,7 @@ public class DeskView extends VBox {
 
         this.setOnMouseClicked(evt -> {
             DeskService deskService = GuiceContainer.getInstance(DeskService.class);
-            Desk runningData = deskService.getById(desk.get().getId());
+            Desk runningData = deskService.getById(desk.get().getDeskId());
             EnumDesKStatus runStatus = EnumDesKStatus.FREE;
             if (runningData != null) {
                 runStatus = EnumDesKStatus.of(runningData.getStatus());
@@ -71,9 +71,9 @@ public class DeskView extends VBox {
                 OpenDeskDialog dialog = new OpenDeskDialog(desk.get());
                 Optional<Integer> result = dialog.showAndWait();
                 if (result.isPresent() && result.get() == 1) {
-                    deskService.openDesk(desk.get().getId());
+                    deskService.openDesk(desk.get().getDeskId());
                 } else if (result.isPresent() && result.get() == 2) {
-                    deskService.closeDesk(desk.get().getId());
+                    deskService.closeDesk(desk.get().getDeskId());
                 }
             }
         });

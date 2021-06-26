@@ -22,8 +22,8 @@ public class OrderDAOImpl implements OrderDAO {
     HikariDataSource ds;
 
     @Override
-    public int insert(Order order) {
-        return 0;
+    public int insert(Order order) throws SQLException {
+        return Db.use(ds).insert(EntityUtils.create(order));
     }
 
     @Override

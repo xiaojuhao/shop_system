@@ -2,12 +2,14 @@ package com.xjh.startup.view;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
+import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
@@ -18,7 +20,10 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableCell;
@@ -34,6 +39,7 @@ import javafx.util.Callback;
 public class OrderDetail extends VBox {
     public OrderDetail(Desk orderDesk) {
         OrderService orderService = GuiceContainer.getInstance(OrderService.class);
+        DeskService deskService = GuiceContainer.getInstance(DeskService.class);
         String orderId = "";
         String orderTime = "";
         String payStatusName = "";
@@ -109,6 +115,19 @@ public class OrderDetail extends VBox {
             // 关台按钮
             Button button = new Button("关台");
             button.setMinWidth(100);
+            button.setOnMouseClicked(evt -> {
+                Alert _alert = new Alert(Alert.AlertType.CONFIRMATION,
+                        "您确定要关台吗？",
+                        new ButtonType("取消", ButtonBar.ButtonData.NO),
+                        new ButtonType("确定", ButtonBar.ButtonData.YES));
+                _alert.setTitle("关台操作");
+                _alert.setHeaderText("当前订单已结清");
+                Optional<ButtonType> _buttonType = _alert.showAndWait();
+                if (_buttonType.get().getButtonData().equals(ButtonBar.ButtonData.YES)) {
+                    deskService.closeDesk(orderDesk.getDeskId());
+                    this.getScene().getWindow().hide();
+                }
+            });
             gridPane.add(button, 4, 0, 1, 2);
 
             this.getChildren().add(gridPane);

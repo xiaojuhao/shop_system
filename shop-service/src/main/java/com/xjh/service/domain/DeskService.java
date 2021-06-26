@@ -5,18 +5,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.enumeration.EnumOrderServeStatus;
+import com.xjh.common.enumeration.EnumOrderStatus;
+import com.xjh.common.enumeration.EnumOrderType;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.LogUtils;
+import com.xjh.common.valueobject.OrderDiscount;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Info;
+import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.mapper.DeskDAO;
 import com.xjh.dao.mapper.InfoDAO;
 
+import cn.hutool.core.codec.Base64;
+
 @Singleton
 public class DeskService {
+    @Inject
+    OrderService orderService;
     @Inject
     DeskDAO deskDAO;
     @Inject
@@ -37,17 +46,33 @@ public class DeskService {
             if (desk == null) {
                 return;
             }
-            desk.setOrderId(CommonUtils.randomNumber(1, 100000) + "");
+            desk.setOrderId(orderService.createNewOrderId());
             desk.setOrderCreateTime(DateBuilder.base(LocalDateTime.now()).mills());
             deskDAO.placeOrder(desk);
+            // 保存order信息
+            Order order = new Order();
+            order.setOrderId(desk.getOrderId());
+            order.setDeskId(desk.getDeskId().intValue());
+            order.setOrderStatus(EnumOrderStatus.UNPAID.status);
+            order.setStatus(EnumOrderServeStatus.START.status);
+            order.setOrderType(EnumOrderType.NORMAL.type);
+            order.setOrderDiscountInfo(Base64.encode(JSONObject.toJSONString(new OrderDiscount())));
+            order.setMemberId(0L);
+            order.setOrderCustomerNums(0);
+            order.setAccountId(0L);
+            order.setOrderErase(0D);
+            order.setOrderRefund(0D);
+            order.setOrderReduction(0D);
+            order.setOrderHadpaid(0D);
+            orderService.newOrder(order);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    public void closeDesk(Long id) {
+    public void closeDesk(Long deskId) {
         try {
-            deskDAO.clearOrder(id);
+            deskDAO.clearOrder(deskId);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
