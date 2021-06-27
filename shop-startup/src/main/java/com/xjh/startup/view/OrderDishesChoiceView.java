@@ -25,6 +25,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -35,6 +36,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class OrderDishesChoiceView extends VBox {
     DishesDAO dishesDAO = GuiceContainer.getInstance(DishesDAO.class);
@@ -63,6 +67,18 @@ public class OrderDishesChoiceView extends VBox {
         cartBtn.setText("查看购物车(" + cartNum.get() + ")");
         cartNum.addListener((cc, _old, _new) -> {
             cartBtn.setText("查看购物车(" + _new + ")");
+        });
+        cartBtn.setOnMouseClicked(evt -> {
+            Stage cartStage = new Stage();
+            cartStage.initOwner(this.getScene().getWindow());
+            cartStage.initModality(Modality.WINDOW_MODAL);
+            cartStage.initStyle(StageStyle.DECORATED);
+            cartStage.centerOnScreen();
+            cartStage.setWidth(this.getScene().getWindow().getWidth() - 100);
+            cartStage.setHeight(this.getScene().getWindow().getHeight() - 100);
+            cartStage.setTitle("购物车[桌号:" + data.getDeskName() + "]");
+            cartStage.setScene(new Scene(new CartView(data)));
+            cartStage.show();
         });
         hbox.getChildren().add(new Button("直接下单"));
         hbox.getChildren().add(cartBtn);
