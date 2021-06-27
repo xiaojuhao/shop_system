@@ -2,3 +2,4 @@
 .rundata
 target
 *.iml
+.config
