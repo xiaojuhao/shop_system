@@ -116,8 +116,9 @@ public class CartService {
             d.setOrderDishesNums(1);
             d.setOrderDishesNums(item.getNums());
             d.setOrderDishesSaletype(EnumOrderSaleType.NORMAL.type);
-            d.setOrderDishesOptions("");
-            d.setOrderDishesDiscountInfo("");
+            d.setOrderDishesOptions(Base64.encode("[]"));
+            d.setOrderDishesDiscountInfo(Base64.encode(""));
+
             orderDishesDAO.insert(d);
         }
 
