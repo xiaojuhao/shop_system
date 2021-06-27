@@ -1,14 +1,13 @@
 package com.xjh.startup.controller;
 
+import com.xjh.startup.LoginApp;
+
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -169,16 +168,17 @@ public class MenuBarController {
             Stage mainStage = (Stage) root.getScene().getWindow();
             mainStage.close();
             //弹出登录界面
-            Stage loginStage = new Stage();
-            loginStage.setTitle("Admin Login");
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
-            Parent root = fxmlLoader.load();
-            Scene scene = new Scene(root);
-            scene.getStylesheets().add("/css/style.css");
-            loginStage.setMaximized(true);
-            loginStage.getIcons().add(new Image("/img/logo.png"));
-            loginStage.setScene(scene);
-            loginStage.show();
+            //            Stage loginStage = new Stage();
+            //            loginStage.setTitle("Admin Login");
+            //            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
+            //            Parent root = fxmlLoader.load();
+            //            Scene scene = new Scene(root);
+            //            scene.getStylesheets().add("/css/style.css");
+            //            loginStage.setMaximized(true);
+            //            loginStage.getIcons().add(new Image("/img/logo.png"));
+            //            loginStage.setScene(scene);
+            //            loginStage.show();
+            LoginApp.loginStage.get().show();
         } catch (Exception ex) {
             ex.printStackTrace();
         }

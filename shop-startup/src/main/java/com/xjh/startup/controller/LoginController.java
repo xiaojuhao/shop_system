@@ -11,6 +11,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -36,9 +37,9 @@ public class LoginController implements Initializable {
     public void login() throws Exception {
         String account = accountField.getText().trim();
         String password = passwordField.getText().trim();
-        //调用登录功能
+        // 调用登录功能
         if (adminService.login(account, password)) {
-            //创建主界面舞台
+            // 创建主界面舞台
             Stage mainStage = new Stage();
             //读入布局
             // FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
@@ -60,9 +61,9 @@ public class LoginController implements Initializable {
             Stage loginStage = (Stage) accountField.getScene().getWindow();
             loginStage.close();
         } else {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("提示");
-            alert.setContentText("账号或密码错误，登录失败!");
+            alert.setHeaderText("账号或密码错误，登录失败!");
             alert.showAndWait();
         }
     }

@@ -10,7 +10,10 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<VBox styleClass="login-bg" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.xjh.startup.controller.LoginController">
+<VBox styleClass="login-bg"
+      xmlns="http://javafx.com/javafx/16"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.xjh.startup.controller.LoginController">
     <VBox alignment="CENTER" minWidth="450" prefWidth="500" styleClass="login-card">
         <Label styleClass="login-title" text="小句号点餐收银系统"/>
         <VBox alignment="CENTER" prefWidth="330" spacing="15">
