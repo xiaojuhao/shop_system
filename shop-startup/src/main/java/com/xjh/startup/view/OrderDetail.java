@@ -235,7 +235,7 @@ public class OrderDetail extends VBox {
                 orderInfo.centerOnScreen();
                 orderInfo.setWidth(this.getScene().getWindow().getWidth());
                 orderInfo.setHeight(this.getScene().getWindow().getHeight());
-                orderInfo.setTitle("点菜+[桌号:" + orderDesk.getDeskName() + "]");
+                orderInfo.setTitle("点菜[桌号:" + orderDesk.getDeskName() + "]");
                 orderInfo.setScene(new Scene(new OrderDishesChoiceView(deskOrderParam)));
                 orderInfo.show();
             });

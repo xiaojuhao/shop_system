@@ -2,50 +2,62 @@ package com.xjh.service.domain.model;
 
 import java.util.List;
 
+import com.alibaba.fastjson.JSONArray;
+import com.xjh.common.utils.CommonUtils;
+import com.xjh.dao.dataobject.Cart;
+
+import cn.hutool.core.codec.Base64;
+
 public class CartVO {
-    private int dishesId;
-    private int nums;
-    private List<DishesAttributeVO> selectDishesAttributes;
-    private int ifDishesPackage;
-    private int dishesPriceId;
+    Integer id;
+    Integer deskId;
+    List<CartItemVO> contents;
+    Long createTime;
 
-    public int getDishesId() {
-        return dishesId;
+    public static CartVO from(Cart cart) {
+        if (cart == null) {
+            return null;
+        }
+        CartVO vo = new CartVO();
+        vo.setId(cart.getId());
+        vo.setDeskId(cart.getDeskId());
+        vo.setCreateTime(cart.getCreateTime());
+        if (CommonUtils.isNotBlank(cart.getContents())) {
+            String str = Base64.decodeStr(cart.getContents());
+            vo.setContents(JSONArray.parseArray(str, CartItemVO.class));
+        }
+        return vo;
     }
 
-    public void setDishesId(int dishesId) {
-        this.dishesId = dishesId;
+    public Integer getId() {
+        return id;
     }
 
-    public int getNums() {
-        return nums;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    public void setNums(int nums) {
-        this.nums = nums;
+    public Integer getDeskId() {
+        return deskId;
     }
 
-    public List<DishesAttributeVO> getSelectDishesAttributes() {
-        return selectDishesAttributes;
+    public void setDeskId(Integer deskId) {
+        this.deskId = deskId;
     }
 
-    public void setSelectDishesAttributes(List<DishesAttributeVO> selectDishesAttributes) {
-        this.selectDishesAttributes = selectDishesAttributes;
+    public List<CartItemVO> getContents() {
+        return contents;
     }
 
-    public int getIfDishesPackage() {
-        return ifDishesPackage;
+    public void setContents(List<CartItemVO> contents) {
+        this.contents = contents;
     }
 
-    public void setIfDishesPackage(int ifDishesPackage) {
-        this.ifDishesPackage = ifDishesPackage;
+    public Long getCreateTime() {
+        return createTime;
     }
 
-    public int getDishesPriceId() {
-        return dishesPriceId;
-    }
-
-    public void setDishesPriceId(int dishesPriceId) {
-        this.dishesPriceId = dishesPriceId;
+    public void setCreateTime(Long createTime) {
+        this.createTime = createTime;
     }
 }

@@ -3,6 +3,8 @@ package com.xjh.startup.view;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.ClickHelper;
@@ -13,32 +15,67 @@ import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.model.CartItemVO;
+import com.xjh.service.domain.model.CartVO;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
 
 import cn.hutool.core.codec.Base64;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class OrderDishesChoiceView extends VBox {
+    DishesDAO dishesDAO = GuiceContainer.getInstance(DishesDAO.class);
+    CartService cartService = GuiceContainer.getInstance(CartService.class);
+
     private DeskOrderParam data;
+    private SimpleIntegerProperty cartNum = new SimpleIntegerProperty(0);
 
     public OrderDishesChoiceView(DeskOrderParam data) {
         this.data = data;
+        this.getChildren().add(top());
+        this.getChildren().add(separator());
         this.getChildren().add(dishesView());
     }
 
-    private ScrollPane dishesView() {
-        DishesDAO dishesDAO = GuiceContainer.getInstance(DishesDAO.class);
-        CartService cartService = GuiceContainer.getInstance(CartService.class);
+    private HBox top() {
+        try {
+            cartNum.set(cartService.selectByDeskId(data.getDeskId()).size());
+        } catch (Exception ex) {
+            LogUtils.error(ex.getMessage());
+        }
+        HBox hbox = new HBox();
+        hbox.setAlignment(Pos.CENTER);
+        hbox.setSpacing(10);
+        Button cartBtn = new Button();
+        cartBtn.setText("查看购物车(" + cartNum.get() + ")");
+        cartNum.addListener((cc, _old, _new) -> {
+            cartBtn.setText("查看购物车(" + _new + ")");
+        });
+        hbox.getChildren().add(new Button("直接下单"));
+        hbox.getChildren().add(cartBtn);
+        return hbox;
+    }
 
+    private Separator separator() {
+        Separator s = new Separator();
+        s.setOrientation(Orientation.HORIZONTAL);
+        return s;
+    }
+
+    private ScrollPane dishesView() {
         List<Dishes> dishesList = dishesDAO.selectList(new Dishes());
         ScrollPane sp = new ScrollPane();
         FlowPane pane = new FlowPane();
@@ -86,12 +123,13 @@ public class OrderDishesChoiceView extends VBox {
                         cartItem.setNums(1);
                         cartItem.setIfDishesPackage(0);
                         try {
-                            int i = cartService.addItem(data.getDeskId(), cartItem);
-                            if (i > 0) {
+                            CartVO cart = cartService.addItem(data.getDeskId(), cartItem);
+                            if (cart != null) {
                                 Alert _alert = new Alert(AlertType.INFORMATION);
                                 _alert.setTitle("通知消息");
                                 _alert.setHeaderText("添加购物车成功");
                                 _alert.showAndWait();
+                                cartNum.set(CollectionUtils.size(cart.getContents()));
                             } else {
                                 Alert _alert = new Alert(AlertType.ERROR);
                                 _alert.setTitle("报错消息");

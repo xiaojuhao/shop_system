@@ -13,6 +13,7 @@ import com.xjh.common.utils.CommonUtils;
 import com.xjh.dao.dataobject.Cart;
 import com.xjh.dao.mapper.CartDAO;
 import com.xjh.service.domain.model.CartItemVO;
+import com.xjh.service.domain.model.CartVO;
 
 import cn.hutool.core.codec.Base64;
 
@@ -21,13 +22,17 @@ public class CartService {
     @Inject
     CartDAO cartDAO;
 
-    public int addItem(Integer deskId, CartItemVO item) throws SQLException {
+    public CartVO addItem(Integer deskId, CartItemVO item) throws SQLException {
         Cart cart = new Cart();
         cart.setDeskId(deskId);
         List<CartItemVO> contentItems = selectByDeskId(deskId);
         contentItems.add(item);
         cart.setContents(Base64.encode(JSON.toJSONString(contentItems)));
-        return cartDAO.save(cart);
+        int i = cartDAO.save(cart);
+        if (i == 0) {
+            return null;
+        }
+        return CartVO.from(cart);
     }
 
     public List<CartItemVO> selectByDeskId(Integer deskId) throws SQLException {
