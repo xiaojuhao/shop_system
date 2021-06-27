@@ -121,7 +121,7 @@ public class OrderDishesChoiceView extends VBox {
         pane.setHgap(5);
         pane.setVgap(5);
         pane.setPrefWidth(1200);
-        dishesList.stream().limit(60).forEach(dishes -> {
+        dishesList.stream().forEach(dishes -> {
             Platform.runLater(() -> {
                 VBox box = new VBox();
                 box.setPrefWidth(200);
