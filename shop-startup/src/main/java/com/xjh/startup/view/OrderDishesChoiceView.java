@@ -32,6 +32,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -192,8 +193,9 @@ public class OrderDishesChoiceView extends VBox {
 
     private ImageView getImageView(String path) {
         try {
-            path = "/" + path.replaceAll("\\\\", "/");
-            ImageView iv = new ImageView(path);
+            String root = SysConfigView.get("imgPath");
+            path = root + "/" + path.replaceAll("\\\\", "/");
+            ImageView iv = new ImageView(new Image(path));
             iv.setFitWidth(180);
             iv.setFitHeight(100);
             return iv;

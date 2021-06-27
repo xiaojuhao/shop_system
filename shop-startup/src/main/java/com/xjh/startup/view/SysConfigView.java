@@ -1,8 +1,15 @@
 package com.xjh.startup.view;
 
+import java.io.File;
+
+import org.rocksdb.Options;
+import org.rocksdb.RocksDBException;
+import org.rocksdb.TtlDB;
+
 import com.oracle.tools.packager.Log;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.LogUtils;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
@@ -11,11 +18,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import org.rocksdb.Options;
-import org.rocksdb.RocksDBException;
-import org.rocksdb.TtlDB;
-
-import java.io.File;
 
 public class SysConfigView extends GridPane {
     public SysConfigView() {
@@ -68,7 +70,7 @@ public class SysConfigView extends GridPane {
 
     }
 
-    private static String get(String key) {
+    public static String get(String key) {
         String workDirectory = System.getProperty("user.dir");
         Log.info(workDirectory);
 
