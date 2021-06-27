@@ -1,11 +1,8 @@
 package com.xjh.startup.controller;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import com.xjh.service.domain.AdminService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
-
+import com.xjh.startup.view.SysConfigView;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Rectangle2D;
@@ -17,8 +14,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+
+import java.net.URL;
+import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
     @FXML
@@ -35,6 +37,13 @@ public class LoginController implements Initializable {
     AdminService adminService = GuiceContainer.getInstance(AdminService.class);
 
     public void login() throws Exception {
+        if (!SysConfigView.checkConfig()) {
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setTitle("提示");
+            alert.setHeaderText("系统基础配置信息缺失,请先配置!");
+            alert.showAndWait();
+            return;
+        }
         String account = accountField.getText().trim();
         String password = passwordField.getText().trim();
         // 调用登录功能
@@ -66,6 +75,19 @@ public class LoginController implements Initializable {
             alert.setHeaderText("账号或密码错误，登录失败!");
             alert.showAndWait();
         }
+    }
+
+    public void showConfig() {
+        Stage cfgStg = new Stage();
+        cfgStg.initOwner(accountField.getScene().getWindow());
+        cfgStg.initModality(Modality.WINDOW_MODAL);
+        cfgStg.initStyle(StageStyle.DECORATED);
+        cfgStg.centerOnScreen();
+        cfgStg.setWidth(600);
+        cfgStg.setHeight(500);
+        cfgStg.setTitle("系统配置");
+        cfgStg.setScene(new Scene(new SysConfigView()));
+        cfgStg.show();
     }
 
     @Override

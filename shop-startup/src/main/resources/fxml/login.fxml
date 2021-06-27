@@ -36,6 +36,7 @@
                 <ImageView fx:id="zfbImg" fitHeight="20" fitWidth="20"/>
                 <ImageView fx:id="dingdingImg" fitHeight="20" fitWidth="20"/>
                 <Label styleClass="font-green" text="注册账号"/>
+                <Label styleClass="font-green" onMouseClicked="#showConfig" text="系统配置"/>
                 <padding>
                     <Insets left="30" right="30"/>
                 </padding>

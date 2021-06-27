@@ -570,4 +570,6 @@ public class CommonUtils {
     public static boolean isNotBlank(String str) {
         return !isBlank(str);
     }
+
+    public static void emptyAction() {}
 }
