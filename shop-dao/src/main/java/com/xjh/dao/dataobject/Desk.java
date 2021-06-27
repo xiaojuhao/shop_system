@@ -9,7 +9,7 @@ import com.xjh.dao.foundation.Table;
 public class Desk implements Serializable {
     private static final long serialVersionUID = -2784348482896858640L;
     @Column("deskId")
-    Long deskId;
+    Integer deskId;
     @Column("deskName")
     String deskName;
     @Column("useStatus")
@@ -22,11 +22,11 @@ public class Desk implements Serializable {
     @Column("createTime")
     Long orderCreateTime;
 
-    public Long getDeskId() {
+    public Integer getDeskId() {
         return deskId;
     }
 
-    public void setDeskId(Long deskId) {
+    public void setDeskId(Integer deskId) {
         this.deskId = deskId;
     }
 

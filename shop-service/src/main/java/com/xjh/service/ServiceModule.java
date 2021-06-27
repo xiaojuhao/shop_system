@@ -2,9 +2,11 @@ package com.xjh.service;
 
 import com.google.inject.AbstractModule;
 import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.TimeRecord;
 import com.xjh.service.domain.AdminService;
 import com.xjh.service.domain.AnalysisService;
 import com.xjh.service.domain.BookService;
+import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
@@ -17,7 +19,7 @@ import com.xjh.service.domain.impl.ReaderServiceImpl;
 public class ServiceModule extends AbstractModule {
     @Override
     protected void configure() {
-        long start = System.currentTimeMillis();
+        TimeRecord timeRecord = TimeRecord.start();
         bind(AdminService.class).to(AdminServiceImpl.class);
         bind(AnalysisService.class).to(AnalysisServiceImpl.class);
         bind(BookService.class).to(BookServiceImpl.class);
@@ -25,6 +27,7 @@ public class ServiceModule extends AbstractModule {
         bind(DeskService.class);
         bind(OrderService.class);
         bind(OrderDishesService.class);
-        LogUtils.info("ServiceModule 耗时:" + (System.currentTimeMillis() - start));
+        bind(CartService.class);
+        LogUtils.info("ServiceModule 耗时:" + timeRecord.getCost());
     }
 }

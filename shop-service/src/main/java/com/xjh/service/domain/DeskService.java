@@ -28,7 +28,7 @@ public class DeskService {
     @Inject
     InfoDAO infoDAO;
 
-    public Desk getById(Long id) {
+    public Desk getById(Integer id) {
         try {
             return deskDAO.getById(id);
         } catch (Exception ex) {
@@ -37,9 +37,9 @@ public class DeskService {
         }
     }
 
-    public void openDesk(Long id) {
+    public void openDesk(Integer deskId) {
         try {
-            Desk desk = deskDAO.getById(id);
+            Desk desk = deskDAO.getById(deskId);
             if (desk == null) {
                 return;
             }
@@ -67,7 +67,7 @@ public class DeskService {
         }
     }
 
-    public void closeDesk(Long deskId) {
+    public void closeDesk(Integer deskId) {
         try {
             deskDAO.clearOrder(deskId);
         } catch (Exception ex) {

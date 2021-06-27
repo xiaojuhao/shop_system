@@ -2,10 +2,12 @@ package com.xjh.dao.foundation;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
@@ -33,20 +35,25 @@ public class EntityUtils {
         return entity;
     }
 
-    public static Entity idCond(Object dd) {
+    public static Entity idCond(Object dd) throws SQLException {
         Class<?> clz = dd.getClass();
         Table table = clz.getAnnotation(Table.class);
         String tableName = table.value();
         Entity entity = Entity.create(tableName);
+        AtomicBoolean hasId = new AtomicBoolean(false);
         ReflectionUtils.resolvePD(dd.getClass()).values().forEach(pd -> {
             try {
                 if (pd.getField().getAnnotation(Id.class) != null) {
+                    hasId.set(true);
                     entity.set(getColumnName(pd.getField()), pd.readValue(dd));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
+        if (!hasId.get()) {
+            throw new SQLException("not found id property");
+        }
         return entity;
     }
 

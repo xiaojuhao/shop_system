@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.utils.CommonUtils;
@@ -21,6 +20,7 @@ import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
+import com.xjh.startup.view.model.DeskOrderParam;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -223,7 +223,10 @@ public class OrderDetail extends VBox {
             pane.setHgap(20);
             pane.setPadding(new Insets(10, 0, 10, 20));
             Button orderBtn = createButton("点菜");
-            String finalOrderId = orderId;
+            DeskOrderParam deskOrderParam = new DeskOrderParam();
+            deskOrderParam.setDeskId(orderDesk.getDeskId());
+            deskOrderParam.setDeskName(orderDesk.getDeskName());
+            deskOrderParam.setOrderId(orderId);
             orderBtn.setOnMouseClicked(evt -> {
                 Stage orderInfo = new Stage();
                 orderInfo.initOwner(this.getScene().getWindow());
@@ -232,11 +235,8 @@ public class OrderDetail extends VBox {
                 orderInfo.centerOnScreen();
                 orderInfo.setWidth(this.getScene().getWindow().getWidth());
                 orderInfo.setHeight(this.getScene().getWindow().getHeight());
-                orderInfo.setTitle("点菜");
-                JSONObject data = new JSONObject();
-                data.put("orderId", finalOrderId);
-                data.put("desk", orderDesk);
-                orderInfo.setScene(new Scene(new OrderDishesChoiceView(data)));
+                orderInfo.setTitle("点菜+[桌号:" + orderDesk.getDeskName() + "]");
+                orderInfo.setScene(new Scene(new OrderDishesChoiceView(deskOrderParam)));
                 orderInfo.show();
             });
             Button sendBtn = createButton("送菜");

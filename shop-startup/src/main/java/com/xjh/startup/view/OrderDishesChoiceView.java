@@ -1,5 +1,6 @@
 package com.xjh.startup.view;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import com.alibaba.fastjson.JSONArray;
@@ -10,7 +11,10 @@ import com.xjh.common.utils.LogUtils;
 import com.xjh.common.valueobject.DishesImg;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.mapper.DishesDAO;
+import com.xjh.service.domain.CartService;
+import com.xjh.service.domain.model.CartItemVO;
 import com.xjh.startup.foundation.guice.GuiceContainer;
+import com.xjh.startup.view.model.DeskOrderParam;
 
 import cn.hutool.core.codec.Base64;
 import javafx.application.Platform;
@@ -24,15 +28,17 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 
 public class OrderDishesChoiceView extends VBox {
-    private JSONObject data;
+    private DeskOrderParam data;
 
-    public OrderDishesChoiceView(JSONObject data) {
+    public OrderDishesChoiceView(DeskOrderParam data) {
         this.data = data;
         this.getChildren().add(dishesView());
     }
 
     private ScrollPane dishesView() {
         DishesDAO dishesDAO = GuiceContainer.getInstance(DishesDAO.class);
+        CartService cartService = GuiceContainer.getInstance(CartService.class);
+
         List<Dishes> dishesList = dishesDAO.selectList(new Dishes());
         ScrollPane sp = new ScrollPane();
         FlowPane pane = new FlowPane();
@@ -74,10 +80,30 @@ public class OrderDishesChoiceView extends VBox {
                                 dishes.getDishesId() + "," +
                                 dishes.getDishesName() + ", "
                                 + data);
-                        Alert _alert = new Alert(AlertType.INFORMATION);
-                        _alert.setTitle("通知消息");
-                        _alert.setHeaderText("添加购物车成功");
-                        _alert.showAndWait();
+                        CartItemVO cartItem = new CartItemVO();
+                        cartItem.setDishesId(dishes.getDishesId());
+                        cartItem.setDishesPriceId(0);
+                        cartItem.setNums(1);
+                        cartItem.setIfDishesPackage(0);
+                        try {
+                            int i = cartService.addItem(data.getDeskId(), cartItem);
+                            if (i > 0) {
+                                Alert _alert = new Alert(AlertType.INFORMATION);
+                                _alert.setTitle("通知消息");
+                                _alert.setHeaderText("添加购物车成功");
+                                _alert.showAndWait();
+                            } else {
+                                Alert _alert = new Alert(AlertType.ERROR);
+                                _alert.setTitle("报错消息");
+                                _alert.setHeaderText("添加购物车失败");
+                                _alert.showAndWait();
+                            }
+                        } catch (SQLException ex) {
+                            Alert _alert = new Alert(AlertType.ERROR);
+                            _alert.setTitle("报错消息");
+                            _alert.setHeaderText("添加购物车异常" + ex.getMessage());
+                            _alert.showAndWait();
+                        }
                     }
                 });
                 box.getChildren().add(iv);
