@@ -5,13 +5,13 @@ import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.ClickHelper;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.LogUtils;
 import com.xjh.common.valueobject.DishesImg;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.mapper.DishesDAO;
+import com.xjh.dao.reqmodel.PageCond;
 import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.model.CartItemVO;
 import com.xjh.service.domain.model.CartVO;
@@ -111,7 +111,9 @@ public class OrderDishesChoiceView extends VBox {
     }
 
     private ScrollPane dishesView() {
-        List<Dishes> dishesList = dishesDAO.selectList(new Dishes());
+        PageCond page = new PageCond();
+        Dishes cond = new Dishes();
+        List<Dishes> dishesList = dishesDAO.pageQuery(cond, page);
         ScrollPane sp = new ScrollPane();
         FlowPane pane = new FlowPane();
         sp.setContent(pane);
@@ -121,7 +123,6 @@ public class OrderDishesChoiceView extends VBox {
         pane.setPrefWidth(1200);
         dishesList.stream().limit(60).forEach(dishes -> {
             Platform.runLater(() -> {
-                System.out.println("add dishes >> " + JSONObject.toJSONString(dishes));
                 VBox box = new VBox();
                 box.setPrefWidth(200);
                 // Canvas canvas = new Canvas();

@@ -40,11 +40,7 @@ public class CommonUtils {
     }
 
     public static <T> T orElse(T v, T def) {
-        if (v == null) {
-            return null;
-        } else {
-            return def;
-        }
+        return v != null ? v : def;
     }
 
     public static String formatMoney(Double value) {
