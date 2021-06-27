@@ -24,7 +24,7 @@ public class OrderService {
     @Inject
     OrderDAO orderDAO;
 
-    public Order getOrder(String orderId) {
+    public Order getOrder(Integer orderId) {
         try {
             return orderDAO.selectByOrderId(orderId);
         } catch (Exception ex) {
@@ -34,7 +34,7 @@ public class OrderService {
     }
 
     public Order newOrder(Order order) throws SQLException {
-        if (CommonUtils.isBlank(order.getOrderId())) {
+        if (order.getOrderId() == null) {
             order.setOrderId(createNewOrderId());
         }
         if (order.getCreateTime() == null) {
@@ -44,7 +44,7 @@ public class OrderService {
         return order;
     }
 
-    public String createNewOrderId() {
+    public Integer createNewOrderId() {
         LocalDateTime start = DateBuilder.base("2021-01-01 00:00:01").dateTime();
         LocalDateTime today = DateBuilder.now().dateTime();
         String todayStr = DateBuilder.today().format("yyyyMMdd");
@@ -55,13 +55,13 @@ public class OrderService {
         int nextId = nextId("orderId:sequence:" + todayStr);
         // 前16位保存时间，后16位保存序列号
         int val = diffDays << 16 | (nextId % 65535);
-        return String.valueOf(val);
+        return val;
     }
 
     public static void main(String[] args) {
         OrderService service = new OrderService();
         for (int i = 0; i < 9999; i++) {
-            System.out.println(Integer.parseInt(service.createNewOrderId()));
+            System.out.println(service.createNewOrderId());
         }
     }
 

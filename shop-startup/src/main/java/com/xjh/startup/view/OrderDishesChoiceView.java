@@ -1,6 +1,5 @@
 package com.xjh.startup.view;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -16,6 +15,7 @@ import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.model.CartItemVO;
 import com.xjh.service.domain.model.CartVO;
+import com.xjh.service.domain.model.PlaceOrderFromCartReq;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
 
@@ -80,7 +80,26 @@ public class OrderDishesChoiceView extends VBox {
             cartStage.setScene(new Scene(new CartView(data)));
             cartStage.show();
         });
-        hbox.getChildren().add(new Button("直接下单"));
+        Button placeOrder = new Button("直接下单");
+        placeOrder.setOnMouseClicked(evt -> {
+            try {
+                PlaceOrderFromCartReq req = new PlaceOrderFromCartReq();
+                req.setDeskId(data.getDeskId());
+                req.setOrderId(data.getOrderId());
+                cartService.createOrder(req);
+                cartNum.set(0);
+                Alert _alert = new Alert(AlertType.INFORMATION);
+                _alert.setTitle("通知消息");
+                _alert.setHeaderText("下单成功");
+                _alert.showAndWait();
+            } catch (Exception ex) {
+                Alert _alert = new Alert(AlertType.ERROR);
+                _alert.setTitle("通知消息");
+                _alert.setHeaderText("下单失败:" + ex.getMessage());
+                _alert.showAndWait();
+            }
+        });
+        hbox.getChildren().add(placeOrder);
         hbox.getChildren().add(cartBtn);
         return hbox;
     }
@@ -152,7 +171,7 @@ public class OrderDishesChoiceView extends VBox {
                                 _alert.setHeaderText("添加购物车失败");
                                 _alert.showAndWait();
                             }
-                        } catch (SQLException ex) {
+                        } catch (Exception ex) {
                             Alert _alert = new Alert(AlertType.ERROR);
                             _alert.setTitle("报错消息");
                             _alert.setHeaderText("添加购物车异常" + ex.getMessage());

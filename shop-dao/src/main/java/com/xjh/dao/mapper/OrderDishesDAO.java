@@ -1,5 +1,6 @@
 package com.xjh.dao.mapper;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,9 +22,12 @@ public class OrderDishesDAO {
     @Named("mysql")
     HikariDataSource ds;
 
+    public int insert(OrderDishes orderDishes) throws SQLException {
+        return Db.use(ds).insert(EntityUtils.create(orderDishes));
+    }
 
-    public List<OrderDishes> selectByOrderId(String orderId) {
-        if (CommonUtils.isBlank(orderId)) {
+    public List<OrderDishes> selectByOrderId(Integer orderId) {
+        if (orderId == null) {
             return new ArrayList<>();
         }
         OrderDishes cond = new OrderDishes();

@@ -6,7 +6,6 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import com.xjh.common.utils.CommonUtils;
 import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.dao.mapper.OrderDishesDAO;
 
@@ -15,8 +14,8 @@ public class OrderDishesService {
     @Inject
     OrderDishesDAO orderDishesDAO;
 
-    public List<OrderDishes> selectOrderDishes(String orderId) {
-        if (CommonUtils.isBlank(orderId)) {
+    public List<OrderDishes> selectOrderDishes(Integer orderId) {
+        if (orderId == null) {
             return new ArrayList<>();
         }
         OrderDishes c = new OrderDishes();

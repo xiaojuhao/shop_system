@@ -1,15 +1,15 @@
 package com.xjh.startup.view.model;
 
 public class DeskOrderParam {
-    String orderId;
+    Integer orderId;
     Integer deskId;
     String deskName;
 
-    public String getOrderId() {
+    public Integer getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(String orderId) {
+    public void setOrderId(Integer orderId) {
         this.orderId = orderId;
     }
 

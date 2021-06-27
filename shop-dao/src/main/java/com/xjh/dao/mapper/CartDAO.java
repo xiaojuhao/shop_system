@@ -40,6 +40,15 @@ public class CartDAO {
         );
     }
 
+    public void clearCart(Integer deskId) throws SQLException {
+        Cart cart = new Cart();
+        cart.setDeskId(deskId);
+        List<Cart> list = selectList(cart);
+        for (Cart c : list) {
+            Db.use(ds).del(EntityUtils.idCond(c));
+        }
+    }
+
     public Cart selectByDeskId(Integer deskId) throws SQLException {
         Cart cart = new Cart();
         cart.setDeskId(deskId);

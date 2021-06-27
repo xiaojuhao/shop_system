@@ -11,6 +11,7 @@ import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.model.CartItemVO;
+import com.xjh.service.domain.model.PlaceOrderFromCartReq;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.CartItemBO;
 import com.xjh.startup.view.model.DeskOrderParam;
@@ -20,6 +21,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableCell;
@@ -50,7 +53,7 @@ public class CartView extends VBox {
         box.setAlignment(Pos.CENTER);
         box.setSpacing(20);
         Button remove = new Button("删除");
-        Button place = new Button("下单");
+        Button place = new Button("直接下单");
         box.getChildren().add(remove);
         box.getChildren().add(place);
         remove.setOnMouseClicked(evt -> {
@@ -61,7 +64,21 @@ public class CartView extends VBox {
             });
         });
         place.setOnMouseClicked(evt -> {
-
+            try {
+                PlaceOrderFromCartReq req = new PlaceOrderFromCartReq();
+                req.setDeskId(param.getDeskId());
+                req.setOrderId(param.getOrderId());
+                cartService.createOrder(req);
+                Alert _alert = new Alert(AlertType.INFORMATION);
+                _alert.setTitle("通知消息");
+                _alert.setHeaderText("下单成功");
+                _alert.showAndWait();
+            } catch (Exception ex) {
+                Alert _alert = new Alert(AlertType.ERROR);
+                _alert.setTitle("通知消息");
+                _alert.setHeaderText("下单失败:" + ex.getMessage());
+                _alert.showAndWait();
+            }
         });
         return box;
     }

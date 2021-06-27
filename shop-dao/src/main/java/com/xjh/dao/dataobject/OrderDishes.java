@@ -1,12 +1,14 @@
 package com.xjh.dao.dataobject;
 
+import com.xjh.dao.foundation.Id;
 import com.xjh.dao.foundation.Table;
 
 @Table("order_dishes_list")
 public class OrderDishes {
+    @Id
     Long orderDishesId;
-    String orderId;
-    String subOrderId;
+    Integer orderId;
+    Integer subOrderId;
     Integer dishesTypeId;
     Integer ifDishesPackage;
     Integer dishesId;
@@ -30,19 +32,19 @@ public class OrderDishes {
         this.orderDishesId = orderDishesId;
     }
 
-    public String getOrderId() {
+    public Integer getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(String orderId) {
+    public void setOrderId(Integer orderId) {
         this.orderId = orderId;
     }
 
-    public String getSubOrderId() {
+    public Integer getSubOrderId() {
         return subOrderId;
     }
 
-    public void setSubOrderId(String subOrderId) {
+    public void setSubOrderId(Integer subOrderId) {
         this.subOrderId = subOrderId;
     }
 

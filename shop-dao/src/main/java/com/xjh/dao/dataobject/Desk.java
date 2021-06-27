@@ -18,7 +18,7 @@ public class Desk implements Serializable {
     Integer maxPerson;
     Integer deskType;
     @Column("orderId")
-    String orderId;
+    Integer orderId;
     @Column("createTime")
     Long orderCreateTime;
 
@@ -62,11 +62,11 @@ public class Desk implements Serializable {
         this.deskType = deskType;
     }
 
-    public String getOrderId() {
+    public Integer getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(String orderId) {
+    public void setOrderId(Integer orderId) {
         this.orderId = orderId;
     }
 

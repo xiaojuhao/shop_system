@@ -37,7 +37,7 @@ public class DeskDAO {
         if (desk.getStatus() != null) {
             sql.append(" and useStatus = ").append(desk.getStatus());
         }
-        if (CommonUtils.isNotBlank(desk.getOrderId())) {
+        if (desk.getOrderId() != null) {
             sql.append(" and orderId = '").append(desk.getOrderId()).append("'");
         }
         List<Entity> list = Db.use(ds).query(sql.toString());

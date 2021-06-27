@@ -56,28 +56,23 @@ public class OrderDetail extends VBox {
         DeskService deskService = GuiceContainer.getInstance(DeskService.class);
         OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
 
-        String orderId = "";
+        Integer orderId = orderDesk.getOrderId();
         String orderTime = "";
         String payStatusName = "";
         Double paid = 0D;
         Order order = null;
-        if (CommonUtils.isNotBlank(orderDesk.getOrderId())) {
-            orderId = orderDesk.getOrderId();
-            order = orderService.getOrder(orderId);
-            if (order != null) {
-                orderTime = DateBuilder.base(order.getCreateTime()).format("yyyy-MM-dd HH:mm:ss");
-                payStatusName = EnumOrderStatus.of(order.getOrderStatus()).remark;
-                paid = order.getOrderHadpaid();
-            }
+        order = orderService.getOrder(orderId);
+        if (order != null) {
+            orderTime = DateBuilder.base(order.getCreateTime()).format("yyyy-MM-dd HH:mm:ss");
+            payStatusName = EnumOrderStatus.of(order.getOrderStatus()).remark;
+            paid = order.getOrderHadpaid();
         }
 
 
         double totalPrice = 0;
-        if (CommonUtils.isNotBlank(orderId)) {
-            List<OrderDishes> dishes = orderDishesService.selectOrderDishes(orderId);
-            totalPrice = CommonUtils.collect(dishes, OrderDishes::getOrderDishesPrice)
-                    .stream().filter(Objects::nonNull).reduce(0D, Double::sum);
-        }
+        List<OrderDishes> dishes = orderDishesService.selectOrderDishes(orderId);
+        totalPrice = CommonUtils.collect(dishes, OrderDishes::getOrderDishesPrice)
+                .stream().filter(Objects::nonNull).reduce(0D, Double::sum);
 
         {
             GridPane gridPane = new GridPane();
@@ -281,7 +276,7 @@ public class OrderDetail extends VBox {
         return c;
     }
 
-    private ObservableList<OrderDishesTableItemVO> loadOrderDishes(String orderId) {
+    private ObservableList<OrderDishesTableItemVO> loadOrderDishes(Integer orderId) {
         // 依赖服务
         DishesPackageDAO dishesPackageDAO = GuiceContainer.getInstance(DishesPackageDAO.class);
         DishesDAO dishesDAO = GuiceContainer.getInstance(DishesDAO.class);
@@ -308,7 +303,7 @@ public class OrderDetail extends VBox {
             }
             return new OrderDishesTableItemVO(
                     o.getOrderDishesId() + "",
-                    o.getSubOrderId(),
+                    o.getSubOrderId() + "",
                     dishesName,
                     price, discountPrice,
                     o.getOrderDishesNums() + "",

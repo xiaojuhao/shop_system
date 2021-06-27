@@ -24,11 +24,14 @@ public class OrderDAO {
         return Db.use(ds).insert(EntityUtils.create(order));
     }
 
-    public int updateByOrderId(Order order) {
-        return 0;
+    public int updateByOrderId(Order order) throws SQLException {
+        return Db.use(ds).update(
+                EntityUtils.create(order),
+                EntityUtils.idCond(order)
+        );
     }
 
-    public Order selectByOrderId(String orderId) throws SQLException {
+    public Order selectByOrderId(Integer orderId) throws SQLException {
         Order cond = new Order();
         cond.setOrderId(orderId);
         List<Entity> list = Db.use(ds).find(EntityUtils.create(cond));
