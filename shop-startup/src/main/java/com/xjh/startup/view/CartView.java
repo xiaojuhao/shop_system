@@ -26,6 +26,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
@@ -44,16 +45,23 @@ public class CartView extends VBox {
         this.getChildren().add(functions());
     }
 
-    private VBox functions() {
-        VBox box = new VBox();
+    private HBox functions() {
+        HBox box = new HBox();
+        box.setAlignment(Pos.CENTER);
+        box.setSpacing(20);
         Button remove = new Button("删除");
+        Button place = new Button("下单");
         box.getChildren().add(remove);
+        box.getChildren().add(place);
         remove.setOnMouseClicked(evt -> {
             ObservableList<CartItemBO> list = tv.getSelectionModel().getSelectedItems();
             list.forEach(x -> {
                 LogUtils.info("删除:" + JSON.toJSONString(x));
                 tv.getItems().remove(x);
             });
+        });
+        place.setOnMouseClicked(evt -> {
+
         });
         return box;
     }
