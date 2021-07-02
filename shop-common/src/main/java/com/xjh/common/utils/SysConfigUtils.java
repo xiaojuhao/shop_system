@@ -7,20 +7,29 @@ import org.rocksdb.RocksDBException;
 import org.rocksdb.TtlDB;
 
 public class SysConfigUtils {
+
+    static Holder<String> cache = new Holder<>();
+
     public static String getWorkDir() {
+        if (cache.get() != null) {
+            return cache.get();
+        }
+        TimeRecord time = TimeRecord.start();
         String workDir = get("workDir");
+        LogUtils.info("获取WorkDir耗时 : " + time.getCost());
         if (workDir == null) {
             return null;
         }
-        if (workDir.endsWith("/")) {
-            return workDir;
-        } else {
-            return workDir + "/";
+        if (!workDir.endsWith("/")) {
+            workDir = workDir + "/";
         }
+        cache.set(workDir);
+        return workDir;
     }
 
     public static void setWorkDir(String dir) {
         set("workDir", dir);
+        cache.set(null);
     }
 
     private static String get(String key) {
