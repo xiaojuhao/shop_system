@@ -1,10 +1,8 @@
 package com.xjh.startup.view;
 
-import java.util.List;
-
-import org.apache.commons.collections4.CollectionUtils;
-
+import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSONArray;
+import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.ClickHelper;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.LogUtils;
@@ -18,16 +16,12 @@ import com.xjh.service.domain.model.CartVO;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
-
-import cn.hutool.core.codec.Base64;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -40,6 +34,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.List;
 
 public class OrderDishesChoiceView extends VBox {
     DishesDAO dishesDAO = GuiceContainer.getInstance(DishesDAO.class);
@@ -89,15 +86,9 @@ public class OrderDishesChoiceView extends VBox {
                 req.setOrderId(data.getOrderId());
                 cartService.createOrder(req);
                 cartNum.set(0);
-                Alert _alert = new Alert(AlertType.INFORMATION);
-                _alert.setTitle("通知消息");
-                _alert.setHeaderText("下单成功");
-                _alert.showAndWait();
+                AlertBuilder.INFO("通知消息", "下单成功").showAndWait();
             } catch (Exception ex) {
-                Alert _alert = new Alert(AlertType.ERROR);
-                _alert.setTitle("通知消息");
-                _alert.setHeaderText("下单失败:" + ex.getMessage());
-                _alert.showAndWait();
+                AlertBuilder.ERROR("通知消息", "下单失败").showAndWait();
             }
         });
         hbox.getChildren().add(placeOrder);
@@ -162,22 +153,13 @@ public class OrderDishesChoiceView extends VBox {
                         try {
                             CartVO cart = cartService.addItem(data.getDeskId(), cartItem);
                             if (cart != null) {
-                                Alert _alert = new Alert(AlertType.INFORMATION);
-                                _alert.setTitle("通知消息");
-                                _alert.setHeaderText("添加购物车成功");
-                                _alert.showAndWait();
+                                AlertBuilder.INFO("通知消息", "添加购物车成功").showAndWait();
                                 cartNum.set(CollectionUtils.size(cart.getContents()));
                             } else {
-                                Alert _alert = new Alert(AlertType.ERROR);
-                                _alert.setTitle("报错消息");
-                                _alert.setHeaderText("添加购物车失败");
-                                _alert.showAndWait();
+                                AlertBuilder.ERROR("报错消息", "添加购物车失败").showAndWait();
                             }
                         } catch (Exception ex) {
-                            Alert _alert = new Alert(AlertType.ERROR);
-                            _alert.setTitle("报错消息");
-                            _alert.setHeaderText("添加购物车异常" + ex.getMessage());
-                            _alert.showAndWait();
+                            AlertBuilder.ERROR("报错消息", "添加购物车异常").showAndWait();
                         }
                     }
                 });

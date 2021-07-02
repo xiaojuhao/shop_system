@@ -1,5 +1,6 @@
 package com.xjh.startup.controller;
 
+import com.xjh.common.utils.AlertBuilder;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -39,10 +40,7 @@ public class LoginController implements Initializable {
 
     public void login() throws Exception {
         if (!SysConfigView.checkConfig()) {
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setTitle("提示");
-            alert.setHeaderText("系统工作目录未设置,请先配置!");
-            alert.showAndWait();
+            AlertBuilder.ERROR("提示", "系统基础配置信息缺失,请先配置!").showAndWait();
             return;
         }
         String account = accountField.getText().trim();
@@ -71,10 +69,7 @@ public class LoginController implements Initializable {
             Stage loginStage = (Stage) accountField.getScene().getWindow();
             loginStage.close();
         } else {
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setTitle("提示");
-            alert.setHeaderText("账号或密码错误，登录失败!");
-            alert.showAndWait();
+            AlertBuilder.ERROR("提示", "账号或密码错误，登录失败!").showAndWait();
         }
     }
 

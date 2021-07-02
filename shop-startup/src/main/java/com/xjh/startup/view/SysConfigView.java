@@ -1,23 +1,21 @@
 package com.xjh.startup.view;
 
-import java.io.File;
-
-import org.rocksdb.Options;
-import org.rocksdb.RocksDBException;
-import org.rocksdb.TtlDB;
-
 import com.oracle.tools.packager.Log;
+import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.LogUtils;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import org.rocksdb.Options;
+import org.rocksdb.RocksDBException;
+import org.rocksdb.TtlDB;
+
+import java.io.File;
 
 public class SysConfigView extends GridPane {
     public SysConfigView() {
@@ -27,9 +25,7 @@ public class SysConfigView extends GridPane {
         try {
             showPath();
         } catch (Exception ex) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setHeaderText("系统异常:" + ex.getMessage());
-            alert.showAndWait();
+            AlertBuilder.ERROR("系统异常", ex.getMessage()).showAndWait();
         }
     }
 
@@ -81,9 +77,7 @@ public class SysConfigView extends GridPane {
             }
             return null;
         } catch (Exception ex) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setHeaderText("系统异常:" + ex.getMessage());
-            alert.showAndWait();
+            AlertBuilder.ERROR("系统异常", ex.getMessage()).showAndWait();
         } finally {
             close.run();
         }
@@ -100,9 +94,7 @@ public class SysConfigView extends GridPane {
             close = () -> CommonUtils.safeRun(db::close);
             db.put(key.getBytes(), val.getBytes());
         } catch (Exception ex) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setHeaderText("系统异常:" + ex.getMessage());
-            alert.showAndWait();
+            AlertBuilder.ERROR("系统异常", ex.getMessage()).showAndWait();
         } finally {
             close.run();
         }
