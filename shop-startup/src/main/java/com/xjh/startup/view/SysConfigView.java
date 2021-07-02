@@ -5,7 +5,7 @@ import org.rocksdb.RocksDBException;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.LogUtils;
-import com.xjh.dao.foundation.SysConfigUtils;
+import com.xjh.common.utils.SysConfigUtils;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

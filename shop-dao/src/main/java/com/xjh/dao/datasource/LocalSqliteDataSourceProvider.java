@@ -4,13 +4,21 @@ import java.io.File;
 
 import com.google.inject.Provider;
 import com.xjh.common.utils.LogUtils;
-import com.xjh.dao.foundation.SysConfigUtils;
+import com.xjh.common.utils.SysConfigUtils;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 public class LocalSqliteDataSourceProvider implements Provider<HikariDataSource> {
+    private static class Inst {
+        public static HikariDataSource ds = newDS();
+    }
+
     @Override
     public HikariDataSource get() {
+        return Inst.ds;
+    }
+
+    private static HikariDataSource newDS() {
         String workDir = SysConfigUtils.getWorkDir();
         File home = new File(workDir + ".rundata/sqlite");
         LogUtils.info("数据库目录：" + home.getAbsolutePath());

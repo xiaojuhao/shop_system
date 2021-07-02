@@ -160,8 +160,10 @@ public class CartService {
         } catch (Exception ex) {
             LogUtils.error("获取订单ID失败:" + group + "," + ex.getMessage());
             throw new RuntimeException("获取订单ID序列失败");
+        } finally {
+            txn.commit();
+            db.close();
         }
-        txn.commit();
         return newId;
     }
 }

@@ -1,13 +1,10 @@
-package com.xjh.dao.foundation;
+package com.xjh.common.utils;
 
 import java.io.File;
 
 import org.rocksdb.Options;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.TtlDB;
-
-import com.xjh.common.utils.AlertBuilder;
-import com.xjh.common.utils.CommonUtils;
 
 public class SysConfigUtils {
     public static String getWorkDir() {
