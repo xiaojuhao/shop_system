@@ -89,7 +89,6 @@ public class OrderService {
             throw new RuntimeException("获取订单ID序列失败");
         } finally {
             txn.commit();
-            db.close();
         }
         return newId;
     }

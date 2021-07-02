@@ -4,7 +4,6 @@ import org.rocksdb.RocksDBException;
 
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.LogUtils;
 import com.xjh.common.utils.SysConfigUtils;
 
 import javafx.geometry.Insets;
@@ -57,8 +56,8 @@ public class SysConfigView extends GridPane {
     }
 
     public static String getImageDir() {
-        String imageDir = SysConfigUtils.getWorkDir() + "/images/";
-        LogUtils.info("图片目录:" + imageDir);
+        String imageDir = SysConfigUtils.getWorkDir() + "images/";
+        // LogUtils.info("图片目录:" + imageDir);
         return imageDir;
     }
 
