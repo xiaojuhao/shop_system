@@ -232,7 +232,7 @@ public class DateBuilder {
         return this.localDateTime;
     }
 
-    public static class NumberRetriever {
+    private static class NumberRetriever {
         String str;
         int pos = 0;
 
