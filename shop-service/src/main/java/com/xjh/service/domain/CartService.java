@@ -1,6 +1,5 @@
 package com.xjh.service.domain;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,14 +9,8 @@ import javax.inject.Singleton;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.sleepycat.je.Database;
-import com.sleepycat.je.DatabaseEntry;
-import com.sleepycat.je.LockMode;
-import com.sleepycat.je.OperationStatus;
-import com.sleepycat.je.Transaction;
-import com.sleepycat.je.TransactionConfig;
 import com.xjh.common.enumeration.EnumOrderSaleType;
-import com.xjh.common.store.DeskKvDatabase;
+import com.xjh.common.store.SequenceDatabase;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.LogUtils;
@@ -133,36 +126,12 @@ public class CartService {
         if (diffDays <= 0) {
             throw new RuntimeException("电脑日期设置有误:" + today);
         }
-        int nextId = nextId("subOrderId:sequence:" + todayStr);
+        int nextId = nextId(todayStr);
         // 前16位保存时间，后16位保存序列号
         return diffDays << 18 | (nextId % 262143);
     }
 
     public synchronized int nextId(String group) {
-        String key = "sequence_" + group;
-        DatabaseEntry theKey = new DatabaseEntry(key.getBytes(StandardCharsets.UTF_8));
-        DatabaseEntry theData = new DatabaseEntry();
-        TransactionConfig txConfig = new TransactionConfig();
-        txConfig.setSerializableIsolation(true);
-        Database db = DeskKvDatabase.getDB();
-        Transaction txn = db.getEnvironment().beginTransaction(null, txConfig);
-        OperationStatus status = db.get(txn, theKey, theData, LockMode.DEFAULT);
-        int newId = 0;
-        try {
-            if (status == OperationStatus.SUCCESS) {
-                String value = new String(theData.getData());
-                newId = CommonUtils.parseInt(value, 1);
-            } else if (status == OperationStatus.NOTFOUND) {
-                newId = 1;
-            }
-            DatabaseEntry newData = new DatabaseEntry(String.valueOf(newId + 1).getBytes(StandardCharsets.UTF_8));
-            db.put(txn, theKey, newData);
-        } catch (Exception ex) {
-            LogUtils.error("获取订单ID失败:" + group + "," + ex.getMessage());
-            throw new RuntimeException("获取订单ID序列失败");
-        } finally {
-            txn.commit();
-        }
-        return newId;
+        return SequenceDatabase.nextId("subOrderId:sequence:" + group);
     }
 }
