@@ -193,8 +193,11 @@ public class OrderDishesChoiceView extends VBox {
 
     private ImageView getImageView(String path) {
         try {
-            String root = SysConfigView.get("imgPath");
-            path = root + "/" + path.replaceAll("\\\\", "/");
+            String imageDir = SysConfigView.getImageDir();
+            if (!imageDir.endsWith("/")) {
+                imageDir += "/";
+            }
+            path = imageDir + path.replaceAll("\\\\", "/");
             ImageView iv = new ImageView(new Image(path));
             iv.setFitWidth(180);
             iv.setFitHeight(100);

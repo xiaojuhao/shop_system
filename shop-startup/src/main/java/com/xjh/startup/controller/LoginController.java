@@ -1,8 +1,12 @@
 package com.xjh.startup.controller;
 
+import java.net.URL;
+import java.util.ResourceBundle;
+
 import com.xjh.service.domain.AdminService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.SysConfigView;
+
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Rectangle2D;
@@ -18,9 +22,6 @@ import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-
-import java.net.URL;
-import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
     @FXML
@@ -40,7 +41,7 @@ public class LoginController implements Initializable {
         if (!SysConfigView.checkConfig()) {
             Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("提示");
-            alert.setHeaderText("系统基础配置信息缺失,请先配置!");
+            alert.setHeaderText("系统工作目录未设置,请先配置!");
             alert.showAndWait();
             return;
         }

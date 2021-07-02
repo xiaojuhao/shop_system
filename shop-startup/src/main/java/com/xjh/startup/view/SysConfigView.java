@@ -34,7 +34,7 @@ public class SysConfigView extends GridPane {
     }
 
     public static boolean checkConfig() {
-        if (CommonUtils.isBlank(get("imgPath"))) {
+        if (CommonUtils.isBlank(get("workDir"))) {
             return false;
         }
         return true;
@@ -42,18 +42,13 @@ public class SysConfigView extends GridPane {
 
     private void showPath() throws RocksDBException {
         int row = 0;
-        String workDirectory = System.getProperty("user.dir");
-        Log.info(workDirectory);
-        Label workDirectoryPath = new Label(workDirectory);
-        workDirectoryPath.setPrefWidth(450);
-        this.add(new Label("基础路基："), 0, row);
-        this.add(workDirectoryPath, 1, row);
-
-        // 图片地址
+        // 工作目录配置
+        String workDirPropName = "workDir";
         row++;
         TextField imgPathField = new TextField();
-        imgPathField.setText(get("imgPath"));
-        this.add(new Label("图片目录："), 0, row);
+        imgPathField.setText(get(workDirPropName));
+        imgPathField.setPrefWidth(450);
+        this.add(new Label("工作目录："), 0, row);
         this.add(imgPathField, 1, row);
 
         // save button
@@ -65,18 +60,20 @@ public class SysConfigView extends GridPane {
         this.add(saveRow, 0, row, 2, 1);
         saveBtn.setOnMouseClicked(evt -> {
             String data = imgPathField.getText();
-            set("imgPath", data);
+            set(workDirPropName, data);
         });
-
     }
 
-    public static String get(String key) {
-        String workDirectory = System.getProperty("user.dir");
-        Log.info(workDirectory);
+    public static String getImageDir() {
+        String imageDir = get("workDir") + "/images/";
+        LogUtils.info("图片目录:" + imageDir);
+        return imageDir;
+    }
 
+    private static String get(String key) {
         Runnable close = CommonUtils::emptyAction;
         try {
-            TtlDB db = getDB(workDirectory);
+            TtlDB db = openDB();
             close = () -> CommonUtils.safeRun(db::close);
             byte[] imgPathB = db.get(key.getBytes());
             if (imgPathB != null) {
@@ -99,9 +96,7 @@ public class SysConfigView extends GridPane {
         }
         Runnable close = CommonUtils::emptyAction;
         try {
-            String workDirectory = System.getProperty("user.dir");
-            Log.info(workDirectory);
-            TtlDB db = getDB(workDirectory);
+            TtlDB db = openDB();
             close = () -> CommonUtils.safeRun(db::close);
             db.put(key.getBytes(), val.getBytes());
         } catch (Exception ex) {
@@ -113,12 +108,15 @@ public class SysConfigView extends GridPane {
         }
     }
 
-    public static TtlDB getDB(String dir) throws RocksDBException {
-        File home = new File(dir + "/.config");
-        LogUtils.info("配置数据库目录:" + home.getAbsolutePath());
+    private static TtlDB openDB() throws RocksDBException {
+        String userHome = System.getProperty("user.home");
+        Log.info("user home = " + userHome);
+
+        File home = new File(userHome + "/ShopSystem/.config");
+        LogUtils.info("系统基础信息目录:" + home.getAbsolutePath());
         if (!home.exists()) {
             if (!home.mkdirs()) {
-                throw new RocksDBException("配置数据库目录失败:" + home.getAbsolutePath());
+                throw new RocksDBException("系统基础信息目录:" + home.getAbsolutePath());
             }
         }
         TtlDB.loadLibrary();
