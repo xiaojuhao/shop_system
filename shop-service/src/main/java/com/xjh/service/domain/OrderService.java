@@ -37,15 +37,17 @@ public class OrderService {
 
     public Integer createNewOrderId() {
         LocalDateTime start = DateBuilder.base("2021-01-01 00:00:01").dateTime();
-        LocalDateTime today = DateBuilder.now().dateTime();
-        String todayStr = DateBuilder.today().format("yyyyMMddHH");
-        int diffHours = (int) DateBuilder.diffHours(start, today);
+        String timeStr = DateBuilder.today().format("yyyyMMddHH");
+        int diffHours = (int) DateBuilder.diffHours(start, DateBuilder.base(timeStr).dateTime());
         if (diffHours <= 0) {
-            throw new RuntimeException("电脑日期设置有误:" + today);
+            throw new RuntimeException("电脑日期设置有误:" + timeStr);
         }
-        int nextId = nextId(todayStr);
+        int nextId = nextId(timeStr);
+        if (nextId >= 2 << 15) {
+            throw new RuntimeException("循环次数已达最大上限:" + timeStr);
+        }
         // 前17位保存时间，后15位保存序列号
-        return diffHours << 15 | (nextId % 32767);
+        return diffHours << 15 | nextId;
     }
 
     public synchronized int nextId(String group) {
