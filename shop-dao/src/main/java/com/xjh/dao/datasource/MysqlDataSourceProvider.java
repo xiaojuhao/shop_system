@@ -13,8 +13,16 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 public class MysqlDataSourceProvider implements Provider<HikariDataSource> {
+    private static class Inst {
+        public static HikariDataSource ds = newDS();
+    }
+
     @Override
     public HikariDataSource get() {
+        return Inst.ds;
+    }
+
+    private static HikariDataSource newDS() {
         Map<String, String> config = configMap();
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(config.get("url"));
@@ -32,7 +40,7 @@ public class MysqlDataSourceProvider implements Provider<HikariDataSource> {
         InputStream stream = DataSourceModule.class.getResourceAsStream("/config/db.setting");
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-            String line = null;
+            String line;
             while ((line = reader.readLine()) != null) {
                 LogUtils.info("加载数据库配置文件:" + line);
                 map.putAll(asKV(line));

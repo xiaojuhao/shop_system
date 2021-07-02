@@ -1,9 +1,9 @@
 package com.xjh.startup.controller;
 
-import com.xjh.common.utils.AlertBuilder;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import com.xjh.common.utils.AlertBuilder;
 import com.xjh.service.domain.AdminService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.SysConfigView;
@@ -12,8 +12,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -36,13 +34,12 @@ public class LoginController implements Initializable {
     @FXML
     ImageView dingdingImg;
 
-    AdminService adminService = GuiceContainer.getInstance(AdminService.class);
-
     public void login() throws Exception {
         if (!SysConfigView.checkConfig()) {
             AlertBuilder.ERROR("提示", "系统基础配置信息缺失,请先配置!").showAndWait();
             return;
         }
+        AdminService adminService = GuiceContainer.getInstance(AdminService.class);
         String account = accountField.getText().trim();
         String password = passwordField.getText().trim();
         // 调用登录功能

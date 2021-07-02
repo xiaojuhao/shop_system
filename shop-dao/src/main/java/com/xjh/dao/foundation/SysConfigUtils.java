@@ -6,10 +6,8 @@ import org.rocksdb.Options;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.TtlDB;
 
-import com.oracle.tools.packager.Log;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.LogUtils;
 
 public class SysConfigUtils {
     public static String getWorkDir() {
@@ -64,10 +62,9 @@ public class SysConfigUtils {
 
     private static TtlDB openDB() throws RocksDBException {
         String userHome = System.getProperty("user.home");
-        Log.info("user home = " + userHome);
 
         File home = new File(userHome + "/ShopSystem/.config");
-        LogUtils.info("系统基础信息目录:" + home.getAbsolutePath());
+        // LogUtils.info("系统基础信息目录:" + home.getAbsolutePath());
         if (!home.exists()) {
             if (!home.mkdirs()) {
                 throw new RocksDBException("系统基础信息目录:" + home.getAbsolutePath());
