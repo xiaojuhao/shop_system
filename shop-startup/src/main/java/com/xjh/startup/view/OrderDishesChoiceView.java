@@ -1,6 +1,9 @@
 package com.xjh.startup.view;
 
-import cn.hutool.core.codec.Base64;
+import java.util.List;
+
+import org.apache.commons.collections4.CollectionUtils;
+
 import com.alibaba.fastjson.JSONArray;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.ClickHelper;
@@ -16,6 +19,8 @@ import com.xjh.service.domain.model.CartVO;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
+
+import cn.hutool.core.codec.Base64;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Insets;
@@ -34,9 +39,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import org.apache.commons.collections4.CollectionUtils;
-
-import java.util.List;
 
 public class OrderDishesChoiceView extends VBox {
     DishesDAO dishesDAO = GuiceContainer.getInstance(DishesDAO.class);
@@ -179,7 +181,7 @@ public class OrderDishesChoiceView extends VBox {
             if (!imageDir.endsWith("/")) {
                 imageDir += "/";
             }
-            path = imageDir + path.replaceAll("\\\\", "/");
+            path = "file:" + imageDir + path.replaceAll("\\\\", "/");
             ImageView iv = new ImageView(new Image(path));
             iv.setFitWidth(180);
             iv.setFitHeight(100);
