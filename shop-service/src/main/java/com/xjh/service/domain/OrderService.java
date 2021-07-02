@@ -38,7 +38,7 @@ public class OrderService {
     public Integer createNewOrderId() {
         LocalDateTime start = DateBuilder.base("2021-01-01 00:00:01").dateTime();
         LocalDateTime today = DateBuilder.now().dateTime();
-        String todayStr = DateBuilder.today().format("yyyyMMdd");
+        String todayStr = DateBuilder.today().format("yyyyMMddHH");
         int diffHours = (int) DateBuilder.diffHours(start, today);
         if (diffHours <= 0) {
             throw new RuntimeException("电脑日期设置有误:" + today);
