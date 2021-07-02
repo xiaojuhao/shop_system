@@ -8,7 +8,8 @@ import java.util.Date;
 
 public class DateBuilder {
     private LocalDateTime localDateTime = null;
-    private static final double SECONDS_OF_DAY = 60 * 60 * 24;
+    private static final double SECONDS_OF_HOUR = 3600;
+    private static final double SECONDS_OF_DAY = SECONDS_OF_HOUR * 24;
 
     public static DateBuilder now() {
         return base(LocalDateTime.now());
@@ -79,6 +80,12 @@ public class DateBuilder {
     public static long diffDays(LocalDateTime start, LocalDateTime end) {
         long seconds = intervalSeconds(start, end);
         double delta = Math.ceil(seconds / SECONDS_OF_DAY);
+        return new Double(delta).longValue();
+    }
+
+    public static long diffHours(LocalDateTime start, LocalDateTime end) {
+        long seconds = intervalSeconds(start, end);
+        double delta = Math.ceil(seconds / SECONDS_OF_HOUR);
         return new Double(delta).longValue();
     }
 

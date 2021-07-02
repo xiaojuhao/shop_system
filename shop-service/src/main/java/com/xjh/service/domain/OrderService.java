@@ -39,20 +39,13 @@ public class OrderService {
         LocalDateTime start = DateBuilder.base("2021-01-01 00:00:01").dateTime();
         LocalDateTime today = DateBuilder.now().dateTime();
         String todayStr = DateBuilder.today().format("yyyyMMdd");
-        int diffDays = (int) DateBuilder.diffDays(start, today);
-        if (diffDays <= 0) {
+        int diffHours = (int) DateBuilder.diffHours(start, today);
+        if (diffHours <= 0) {
             throw new RuntimeException("电脑日期设置有误:" + today);
         }
         int nextId = nextId(todayStr);
-        // 前16位保存时间，后16位保存序列号
-        return diffDays << 16 | (nextId % 65535);
-    }
-
-    public static void main(String[] args) {
-        OrderService service = new OrderService();
-        for (int i = 0; i < 9999; i++) {
-            System.out.println(service.createNewOrderId());
-        }
+        // 前17位保存时间，后15位保存序列号
+        return diffHours << 15 | (nextId % 32767);
     }
 
     public synchronized int nextId(String group) {
