@@ -1,8 +1,11 @@
 package com.xjh.startup.view;
 
+import org.rocksdb.RocksDBException;
+
 import com.xjh.common.store.SysConfigUtils;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -10,7 +13,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import org.rocksdb.RocksDBException;
 
 public class SysConfigView extends GridPane {
     public SysConfigView() {
@@ -20,7 +22,7 @@ public class SysConfigView extends GridPane {
         try {
             showPath();
         } catch (Exception ex) {
-            AlertBuilder.ERROR("系统异常", ex.getMessage()).showAndWait();
+            AlertBuilder.ERROR("系统异常", ex.getMessage());
         }
     }
 
@@ -50,7 +52,7 @@ public class SysConfigView extends GridPane {
         saveBtn.setOnMouseClicked(evt -> {
             String data = imgPathField.getText();
             SysConfigUtils.setWorkDir(data);
-            AlertBuilder.INFO("提示", "保存成功").showAndWait();
+            AlertBuilder.INFO("提示", "保存成功");
         });
     }
 

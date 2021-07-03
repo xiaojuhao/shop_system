@@ -10,7 +10,9 @@ import com.google.inject.Singleton;
 import com.xjh.common.enumeration.EnumOrderServeStatus;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.enumeration.EnumOrderType;
+import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.utils.LogUtils;
 import com.xjh.common.valueobject.OrderDiscount;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Order;
@@ -63,7 +65,8 @@ public class DeskService {
             order.setOrderHadpaid(0D);
             orderService.newOrder(order);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LogUtils.info("开桌失败" + ex.getMessage());
+            AlertBuilder.ERROR("下单失败", "开桌失败:" + ex.getMessage());
         }
     }
 

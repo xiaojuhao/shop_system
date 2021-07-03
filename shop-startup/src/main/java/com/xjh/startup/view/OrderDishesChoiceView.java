@@ -88,9 +88,10 @@ public class OrderDishesChoiceView extends VBox {
                 req.setOrderId(data.getOrderId());
                 cartService.createOrder(req);
                 cartNum.set(0);
-                AlertBuilder.INFO("通知消息", "下单成功").showAndWait();
+                AlertBuilder.INFO("通知消息", "下单成功");
             } catch (Exception ex) {
-                AlertBuilder.ERROR("通知消息", "下单失败").showAndWait();
+                LogUtils.info("下单失败:" + ex.getMessage());
+                AlertBuilder.ERROR("通知消息", "下单失败");
             }
         });
         hbox.getChildren().add(placeOrder);
@@ -155,13 +156,13 @@ public class OrderDishesChoiceView extends VBox {
                         try {
                             CartVO cart = cartService.addItem(data.getDeskId(), cartItem);
                             if (cart != null) {
-                                AlertBuilder.INFO("通知消息", "添加购物车成功").showAndWait();
+                                AlertBuilder.INFO("通知消息", "添加购物车成功");
                                 cartNum.set(CollectionUtils.size(cart.getContents()));
                             } else {
-                                AlertBuilder.ERROR("报错消息", "添加购物车失败").showAndWait();
+                                AlertBuilder.ERROR("报错消息", "添加购物车失败");
                             }
                         } catch (Exception ex) {
-                            AlertBuilder.ERROR("报错消息", "添加购物车异常").showAndWait();
+                            AlertBuilder.ERROR("报错消息", "添加购物车异常");
                         }
                     }
                 });

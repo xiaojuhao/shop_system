@@ -3,6 +3,7 @@ package com.xjh.common.store;
 import java.nio.charset.StandardCharsets;
 
 import com.sleepycat.je.Database;
+import com.sleepycat.je.DatabaseConfig;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
@@ -18,7 +19,7 @@ public class SequenceDatabase {
         DatabaseEntry theData = new DatabaseEntry();
         TransactionConfig txConfig = new TransactionConfig();
         txConfig.setSerializableIsolation(true);
-        Database db = DeskKvDatabase.getDB();
+        Database db = getDB();
         Transaction txn = db.getEnvironment().beginTransaction(null, txConfig);
         OperationStatus status = db.get(txn, theKey, theData, LockMode.DEFAULT);
         int newId = 0;
@@ -38,5 +39,27 @@ public class SequenceDatabase {
             txn.commit();
         }
         return newId;
+    }
+
+
+    static final String dbName = "sequence";
+    static Database staticInst = null;
+
+    public static Database getDB() {
+        if (staticInst != null) {
+            return staticInst;
+        }
+        synchronized (SequenceDatabase.class) {
+            if (staticInst != null) {
+                return staticInst;
+            }
+            DatabaseConfig dbConfig = new DatabaseConfig();
+            dbConfig.setTransactional(true);
+            dbConfig.setAllowCreate(true);
+            Database db = BerkeleyDBUtils.getEnv()
+                    .openDatabase(null, dbName, dbConfig);
+            staticInst = db;
+            return db;
+        }
     }
 }
