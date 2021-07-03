@@ -443,6 +443,10 @@ public class CommonUtils {
         return coll == null || coll.size() == 0;
     }
 
+    public static boolean isNotEmpty(Collection<?> coll) {
+        return !isEmpty(coll);
+    }
+
     public static String stringJoin(Collection<String> coll, String delimiter) {
         if (isEmpty(coll)) {
             return "";

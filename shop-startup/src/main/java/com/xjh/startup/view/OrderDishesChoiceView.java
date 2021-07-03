@@ -27,6 +27,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -78,7 +79,7 @@ public class OrderDishesChoiceView extends VBox {
             cartStage.setHeight(this.getScene().getWindow().getHeight() - 100);
             cartStage.setTitle("购物车[桌号:" + data.getDeskName() + "]");
             cartStage.setScene(new Scene(new CartView(data)));
-            cartStage.show();
+            cartStage.showAndWait();
         });
         Button placeOrder = new Button("直接下单");
         placeOrder.setOnMouseClicked(evt -> {
@@ -116,83 +117,140 @@ public class OrderDishesChoiceView extends VBox {
         pane.setHgap(5);
         pane.setVgap(5);
         pane.setPrefWidth(1200);
-        dishesList.stream().forEach(dishes -> {
-            Platform.runLater(() -> {
-                VBox box = new VBox();
-                box.setPrefWidth(200);
-                // Canvas canvas = new Canvas();
-                // canvas.setWidth(200);
-                // canvas.setHeight(200);
-                // try {
-                //   javafx.scene.image.Image img = new javafx.scene.image.Image("/img/book1.jpg");
-                //   canvas.getGraphicsContext2D().drawImage(img, 0, 15, 180, 160);
-                // } catch (Exception e) {
-                //   e.printStackTrace();
-                // }
-                // canvas.getGraphicsContext2D().fillText(dishes.getDishesName(), 10,30);
-                // canvas.getGraphicsContext2D().fillText(dishes.getDishesName(), 10,166);
-                // box.getChildren().add(canvas);
-                String img = null;
-                String base64Imgs = dishes.getDishesImgs();
-                if (CommonUtils.isNotBlank(base64Imgs)) {
-                    String json = Base64.decodeStr(base64Imgs);
-                    List<DishesImg> arr = JSONArray.parseArray(json, DishesImg.class);
-                    if (arr != null && arr.size() > 0) {
-                        img = arr.get(0).getImageSrc();
-                    }
-                }
-                ImageView iv = getImageView(img);
-                iv.setOnMouseClicked(evt -> {
-                    if (ClickHelper.isDblClick()) {
-                        LogUtils.info("添加到购物车" +
-                                dishes.getDishesId() + "," +
-                                dishes.getDishesName() + ", "
-                                + data);
-                        CartItemVO cartItem = new CartItemVO();
-                        cartItem.setDishesId(dishes.getDishesId());
-                        cartItem.setDishesPriceId(0);
-                        cartItem.setNums(1);
-                        cartItem.setIfDishesPackage(0);
-                        try {
-                            CartVO cart = cartService.addItem(data.getDeskId(), cartItem);
-                            if (cart != null) {
-                                AlertBuilder.INFO("通知消息", "添加购物车成功");
-                                cartNum.set(CollectionUtils.size(cart.getContents()));
-                            } else {
-                                AlertBuilder.ERROR("报错消息", "添加购物车失败");
-                            }
-                        } catch (Exception ex) {
-                            AlertBuilder.ERROR("报错消息", "添加购物车异常");
-                        }
-                    }
-                });
-                box.getChildren().add(iv);
-                box.getChildren().add(new Label(dishes.getDishesName()));
-                box.getChildren().add(new Label("单价:" + CommonUtils.formatMoney(dishes.getDishesPrice()) + "元"));
-
-                pane.getChildren().add(box);
-            });
+        dishesList.forEach(dishes -> {
+            Platform.runLater(() -> pane.getChildren().add(paintDishesView(dishes)));
         });
         return sp;
     }
 
+    private VBox buildDishesView(Dishes dishes) {
+        VBox box = new VBox();
+        box.setPrefWidth(200);
+        // Canvas canvas = new Canvas();
+        // canvas.setWidth(200);
+        // canvas.setHeight(200);
+        // try {
+        //   javafx.scene.image.Image img = new javafx.scene.image.Image("/img/book1.jpg");
+        //   canvas.getGraphicsContext2D().drawImage(img, 0, 15, 180, 160);
+        // } catch (Exception e) {
+        //   e.printStackTrace();
+        // }
+        // canvas.getGraphicsContext2D().fillText(dishes.getDishesName(), 10,30);
+        // canvas.getGraphicsContext2D().fillText(dishes.getDishesName(), 10,166);
+        // box.getChildren().add(canvas);
+        String img = null;
+        String base64Imgs = dishes.getDishesImgs();
+        if (CommonUtils.isNotBlank(base64Imgs)) {
+            String json = Base64.decodeStr(base64Imgs);
+            List<DishesImg> arr = JSONArray.parseArray(json, DishesImg.class);
+            if (arr != null && arr.size() > 0) {
+                img = arr.get(0).getImageSrc();
+            }
+        }
+        ImageView iv = getImageView(img);
+        iv.setOnMouseClicked(evt -> {
+            if (ClickHelper.isDblClick()) {
+                LogUtils.info("添加到购物车" +
+                        dishes.getDishesId() + "," +
+                        dishes.getDishesName() + ", "
+                        + data);
+                CartItemVO cartItem = new CartItemVO();
+                cartItem.setDishesId(dishes.getDishesId());
+                cartItem.setDishesPriceId(0);
+                cartItem.setNums(1);
+                cartItem.setIfDishesPackage(0);
+                try {
+                    CartVO cart = cartService.addItem(data.getDeskId(), cartItem);
+                    if (cart != null) {
+                        AlertBuilder.INFO("通知消息", "添加购物车成功");
+                        cartNum.set(CollectionUtils.size(cart.getContents()));
+                    } else {
+                        AlertBuilder.ERROR("报错消息", "添加购物车失败");
+                    }
+                } catch (Exception ex) {
+                    AlertBuilder.ERROR("报错消息", "添加购物车异常");
+                }
+            }
+        });
+        box.getChildren().add(iv);
+        box.getChildren().add(new Label(dishes.getDishesName()));
+        box.getChildren().add(new Label("单价:" + CommonUtils.formatMoney(dishes.getDishesPrice()) + "元"));
+
+        return box;
+    }
+
+    private VBox paintDishesView(Dishes dishes) {
+        VBox box = new VBox();
+        box.setPrefWidth(200);
+        Canvas canvas = new Canvas();
+        canvas.setWidth(200);
+        canvas.setHeight(210);
+
+        String imgSrc = null;
+        String base64Imgs = dishes.getDishesImgs();
+        try {
+            if (CommonUtils.isNotBlank(base64Imgs)) {
+                String json = Base64.decodeStr(base64Imgs);
+                List<DishesImg> arr = JSONArray.parseArray(json, DishesImg.class);
+                if (CommonUtils.isNotEmpty(arr)) {
+                    imgSrc = getImageUrl(arr.get(0).getImageSrc());
+                }
+            }
+            Image img = new Image(imgSrc);
+            canvas.getGraphicsContext2D().drawImage(img, 0, 10, 180, 160);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        canvas.getGraphicsContext2D().fillText(dishes.getDishesName(), 10, 185);
+        canvas.getGraphicsContext2D().fillText("单价:" + dishes.getDishesPrice(), 10, 200);
+        canvas.setOnMouseClicked(evt -> {
+            if (ClickHelper.isDblClick()) {
+                LogUtils.info("添加到购物车" +
+                        dishes.getDishesId() + "," +
+                        dishes.getDishesName() + ", "
+                        + data);
+                CartItemVO cartItem = new CartItemVO();
+                cartItem.setDishesId(dishes.getDishesId());
+                cartItem.setDishesPriceId(0);
+                cartItem.setNums(1);
+                cartItem.setIfDishesPackage(0);
+                try {
+                    CartVO cart = cartService.addItem(data.getDeskId(), cartItem);
+                    if (cart != null) {
+                        AlertBuilder.INFO("通知消息", "添加购物车成功");
+                        cartNum.set(CollectionUtils.size(cart.getContents()));
+                    } else {
+                        AlertBuilder.ERROR("报错消息", "添加购物车失败");
+                    }
+                } catch (Exception ex) {
+                    AlertBuilder.ERROR("报错消息", "添加购物车异常");
+                }
+            }
+        });
+        box.getChildren().add(canvas);
+        return box;
+    }
+
     private ImageView getImageView(String path) {
         try {
-            String imageDir = SysConfigView.getImageDir();
-            if (!imageDir.endsWith("/")) {
-                imageDir += "/";
-            }
-            path = "file:" + imageDir + path.replaceAll("\\\\", "/");
-            ImageView iv = new ImageView(new Image(path));
+            ImageView iv = new ImageView(new Image(getImageUrl(path)));
             iv.setFitWidth(180);
             iv.setFitHeight(100);
             return iv;
         } catch (Exception ex) {
-            ImageView iv = new ImageView("/img/book1.jpg");
+            ImageView iv = new ImageView(getImageUrl(""));
             iv.setFitWidth(180);
             iv.setFitHeight(100);
             return iv;
         }
+    }
+
+    private String getImageUrl(String url) {
+        if (CommonUtils.isBlank(url)) {
+            url = "/img/book1.jpg";
+        }
+        String imageDir = SysConfigView.getImageDir();
+        return "file:" + imageDir + url.replaceAll("\\\\", "/");
     }
 
     @Override
