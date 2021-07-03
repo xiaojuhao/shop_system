@@ -44,7 +44,7 @@ public class SysConfigUtils {
                 throw new RuntimeException("系统基础信息目录:" + home.getAbsolutePath());
             }
         }
-        LogUtils.info("回写配置系统目录:" + home.getAbsolutePath());
+        // LogUtils.info("回写配置系统目录:" + home.getAbsolutePath());
         File file = new File(home.getAbsolutePath() , "runtime.properties");
         PropertiesUtils.dumpProperties(file, properties);
     }
@@ -57,7 +57,7 @@ public class SysConfigUtils {
                 throw new RuntimeException("系统基础信息目录:" + home.getAbsolutePath());
             }
         }
-        LogUtils.info("系统目录:" + home.getAbsolutePath());
+        // LogUtils.info("系统目录:" + home.getAbsolutePath());
         return PropertiesUtils.loadProperties(home.getAbsolutePath(), "runtime.properties");
     }
 
