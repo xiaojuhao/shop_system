@@ -45,7 +45,7 @@ public class SysConfigUtils {
             }
         }
         LogUtils.info("回写配置系统目录:" + home.getAbsolutePath());
-        File file = new File(home.getAbsolutePath() + "/runtime.properties");
+        File file = new File(home.getAbsolutePath() , "runtime.properties");
         PropertiesUtils.dumpProperties(file, properties);
     }
 
