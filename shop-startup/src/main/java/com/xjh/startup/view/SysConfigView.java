@@ -1,10 +1,10 @@
 package com.xjh.startup.view;
 
+import com.xjh.common.store.BerkeleyDBEnv;
 import org.rocksdb.RocksDBException;
 
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.SysConfigUtils;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -27,7 +27,7 @@ public class SysConfigView extends GridPane {
     }
 
     public static boolean checkConfig() {
-        if (CommonUtils.isBlank(SysConfigUtils.getWorkDir())) {
+        if (CommonUtils.isBlank(BerkeleyDBEnv.SysConfigUtils.getWorkDir())) {
             return false;
         }
         return true;
@@ -37,7 +37,7 @@ public class SysConfigView extends GridPane {
         int row = 0;
         row++;
         TextField imgPathField = new TextField();
-        imgPathField.setText(SysConfigUtils.getWorkDir());
+        imgPathField.setText(BerkeleyDBEnv.SysConfigUtils.getWorkDir());
         imgPathField.setPrefWidth(450);
         this.add(new Label("工作目录："), 0, row);
         this.add(imgPathField, 1, row);
@@ -51,13 +51,13 @@ public class SysConfigView extends GridPane {
         this.add(saveRow, 0, row, 2, 1);
         saveBtn.setOnMouseClicked(evt -> {
             String data = imgPathField.getText();
-            SysConfigUtils.setWorkDir(data);
+            BerkeleyDBEnv.SysConfigUtils.setWorkDir(data);
             AlertBuilder.INFO("提示", "保存成功").showAndWait();
         });
     }
 
     public static String getImageDir() {
-        String imageDir = SysConfigUtils.getWorkDir() + "images/";
+        String imageDir = BerkeleyDBEnv.SysConfigUtils.getWorkDir() + "images/";
         // LogUtils.info("图片目录:" + imageDir);
         return imageDir;
     }
