@@ -1,7 +1,8 @@
 package com.xjh.dao.mapper.impl;
 
-import cn.hutool.db.Db;
-import cn.hutool.db.Entity;
+import java.sql.SQLException;
+import java.util.List;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -10,8 +11,8 @@ import com.xjh.dao.dataobject.Info;
 import com.xjh.dao.mapper.InfoDAO;
 import com.zaxxer.hikari.HikariDataSource;
 
-import java.sql.SQLException;
-import java.util.List;
+import cn.hutool.db.Db;
+import cn.hutool.db.Entity;
 
 @Singleton
 public class InfoDAOImpl implements InfoDAO {
@@ -32,7 +33,7 @@ public class InfoDAOImpl implements InfoDAO {
     public List<Info> select(Info info) throws SQLException {
         StringBuilder sql = new StringBuilder("select * from t_info where 1 = 1 ");
         List<Entity> list = Db.use(ds).query(sql.toString());
-        return CommonUtils.collect(list, this::convert);
+        return CommonUtils.map(list, this::convert);
     }
 
     private Info convert(Entity entity) {

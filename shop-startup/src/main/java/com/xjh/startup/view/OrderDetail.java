@@ -71,7 +71,7 @@ public class OrderDetail extends VBox {
 
         double totalPrice = 0;
         List<OrderDishes> dishes = orderDishesService.selectOrderDishes(orderId);
-        totalPrice = CommonUtils.collect(dishes, OrderDishes::getOrderDishesPrice)
+        totalPrice = CommonUtils.map(dishes, OrderDishes::getOrderDishesPrice)
                 .stream().filter(Objects::nonNull).reduce(0D, Double::sum);
 
         {

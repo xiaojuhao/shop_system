@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings({"unused"})
 public class CommonUtils {
-    public static <V, R> List<R> collect(List<V> list, Function<V, R> fun) {
+    public static <V, R> List<R> map(List<V> list, Function<V, R> fun) {
         if (list == null || list.size() == 0) {
             return new ArrayList<>();
         }

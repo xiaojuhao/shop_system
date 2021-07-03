@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.ClickHelper;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.CopyUtils;
 import com.xjh.common.utils.LogUtils;
 import com.xjh.common.valueobject.DishesImg;
 import com.xjh.dao.dataobject.Dishes;
@@ -19,10 +20,13 @@ import com.xjh.service.domain.model.CartVO;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
+import com.xjh.startup.view.model.DishesQueryCond;
 
 import cn.hutool.core.codec.Base64;
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -47,12 +51,13 @@ public class OrderDishesChoiceView extends VBox {
 
     private DeskOrderParam data;
     private SimpleIntegerProperty cartNum = new SimpleIntegerProperty(0);
+    private ObjectProperty<DishesQueryCond> dishesCond = new SimpleObjectProperty<>();
 
     public OrderDishesChoiceView(DeskOrderParam data) {
         this.data = data;
         this.getChildren().add(top());
         this.getChildren().add(separator());
-        this.getChildren().add(dishesView());
+        this.getChildren().add(initDishesView());
     }
 
     private HBox top() {
@@ -64,9 +69,27 @@ public class OrderDishesChoiceView extends VBox {
         HBox hbox = new HBox();
         hbox.setAlignment(Pos.CENTER);
         hbox.setSpacing(10);
+        Button nextPage = new Button();
+        nextPage.setText("下一页");
+        nextPage.setOnMouseClicked(evt -> {
+            DishesQueryCond _old = dishesCond.get();
+            DishesQueryCond _new = CopyUtils.cloneObj(_old);
+            _new.setPageNo(_old.getPageNo() + 1);
+            dishesCond.set(_new);
+        });
+
+        Button prevPage = new Button();
+        prevPage.setText("上一页");
+        prevPage.setOnMouseClicked(evt -> {
+            DishesQueryCond _old = dishesCond.get();
+            DishesQueryCond _new = CopyUtils.cloneObj(_old);
+            _new.setPageNo(Math.max(1, _old.getPageNo() - 1));
+            dishesCond.set(_new);
+        });
+
         Button cartBtn = new Button();
         cartBtn.setText("查看购物车(" + cartNum.get() + ")");
-        cartNum.addListener((cc, _old, _new) -> {
+        cartNum.addListener((_this, _old, _new) -> {
             cartBtn.setText("查看购物车(" + _new + ")");
         });
         cartBtn.setOnMouseClicked(evt -> {
@@ -95,6 +118,8 @@ public class OrderDishesChoiceView extends VBox {
                 AlertBuilder.ERROR("通知消息", "下单失败");
             }
         });
+        hbox.getChildren().add(prevPage);
+        hbox.getChildren().add(nextPage);
         hbox.getChildren().add(placeOrder);
         hbox.getChildren().add(cartBtn);
         return hbox;
@@ -106,10 +131,7 @@ public class OrderDishesChoiceView extends VBox {
         return s;
     }
 
-    private ScrollPane dishesView() {
-        PageCond page = new PageCond();
-        Dishes cond = new Dishes();
-        List<Dishes> dishesList = dishesDAO.pageQuery(cond, page);
+    private ScrollPane initDishesView() {
         ScrollPane sp = new ScrollPane();
         FlowPane pane = new FlowPane();
         sp.setContent(pane);
@@ -117,27 +139,29 @@ public class OrderDishesChoiceView extends VBox {
         pane.setHgap(5);
         pane.setVgap(5);
         pane.setPrefWidth(1200);
-        dishesList.forEach(dishes -> {
-            Platform.runLater(() -> pane.getChildren().add(paintDishesView(dishes)));
+        dishesCond.addListener((_this, _old, _new) -> {
+            List<Dishes> dishesList = queryList(_new);
+            List<VBox> list = CommonUtils.map(dishesList, this::buildDishesView);
+            Platform.runLater(() -> {
+                pane.getChildren().clear();
+                pane.getChildren().addAll(list);
+            });
         });
+        dishesCond.set(new DishesQueryCond());
         return sp;
+    }
+
+    private List<Dishes> queryList(DishesQueryCond queryCond) {
+        PageCond page = new PageCond();
+        page.setPageNo(queryCond.getPageNo());
+        page.setPageSize(queryCond.getPageSize());
+        Dishes cond = new Dishes();
+        return dishesDAO.pageQuery(cond, page);
     }
 
     private VBox buildDishesView(Dishes dishes) {
         VBox box = new VBox();
         box.setPrefWidth(200);
-        // Canvas canvas = new Canvas();
-        // canvas.setWidth(200);
-        // canvas.setHeight(200);
-        // try {
-        //   javafx.scene.image.Image img = new javafx.scene.image.Image("/img/book1.jpg");
-        //   canvas.getGraphicsContext2D().drawImage(img, 0, 15, 180, 160);
-        // } catch (Exception e) {
-        //   e.printStackTrace();
-        // }
-        // canvas.getGraphicsContext2D().fillText(dishes.getDishesName(), 10,30);
-        // canvas.getGraphicsContext2D().fillText(dishes.getDishesName(), 10,166);
-        // box.getChildren().add(canvas);
         String img = null;
         String base64Imgs = dishes.getDishesImgs();
         if (CommonUtils.isNotBlank(base64Imgs)) {
