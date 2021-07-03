@@ -52,6 +52,7 @@ public class SysConfigView extends GridPane {
         saveBtn.setOnMouseClicked(evt -> {
             String data = imgPathField.getText();
             SysConfigUtils.setWorkDir(data);
+            AlertBuilder.INFO("提示", "保存成功").showAndWait();
         });
     }
 
