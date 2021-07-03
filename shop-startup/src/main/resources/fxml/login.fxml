@@ -31,11 +31,11 @@
             </AnchorPane>
             <Button onAction="#login" styleClass="login-btn" text="登入"/>
             <HBox alignment="BOTTOM_LEFT" spacing="12">
-                <Label styleClass="font-gray" text="社交账号注册"/>
+                <Label styleClass="font-gray" text="社交账号"/>
                 <ImageView fx:id="wxImg" fitHeight="20" fitWidth="20"/>
                 <ImageView fx:id="zfbImg" fitHeight="20" fitWidth="20"/>
                 <ImageView fx:id="dingdingImg" fitHeight="20" fitWidth="20"/>
-                <Label styleClass="font-green" text="注册账号"/>
+                <!--                <Label styleClass="font-green" text="注册账号"/>-->
                 <Label styleClass="font-green" onMouseClicked="#showConfig" text="系统配置"/>
                 <padding>
                     <Insets left="30" right="30"/>

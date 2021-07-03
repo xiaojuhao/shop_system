@@ -7,7 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.inject.Provider;
+import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.TimeRecord;
 import com.xjh.dao.DataSourceModule;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -23,6 +25,7 @@ public class MysqlDataSourceProvider implements Provider<HikariDataSource> {
     }
 
     private static HikariDataSource newDS() {
+        TimeRecord record = TimeRecord.start();
         Map<String, String> config = configMap();
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(config.get("url"));
@@ -32,7 +35,9 @@ public class MysqlDataSourceProvider implements Provider<HikariDataSource> {
         hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
         hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
         hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-        return new HikariDataSource(hikariConfig);
+        HikariDataSource ds = new HikariDataSource(hikariConfig);
+        LogUtils.info("初始化MySql数据源: cost " + record.getCost());
+        return ds;
     }
 
     private static Map<String, String> configMap() {
@@ -42,10 +47,13 @@ public class MysqlDataSourceProvider implements Provider<HikariDataSource> {
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
             String line;
             while ((line = reader.readLine()) != null) {
-                LogUtils.info("加载数据库配置文件:" + line);
+                if (CommonUtils.isBlank(line) || line.startsWith("#")) {
+                    continue;
+                }
                 map.putAll(asKV(line));
             }
             reader.close();
+            LogUtils.info("加载数据库配置文件:" + map);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
