@@ -190,8 +190,8 @@ public class OrderDetail extends VBox {
             this.getChildren().add(separator2);
         }
 
+        TableView<OrderDishesTableItemVO> tv = new TableView<>();
         {
-            TableView<OrderDishesTableItemVO> tv = new TableView<>();
             tv.setMaxHeight(300);
             tv.setPadding(new Insets(5, 0, 0, 5));
             tv.getColumns().addAll(
@@ -223,16 +223,19 @@ public class OrderDetail extends VBox {
             deskOrderParam.setDeskName(orderDesk.getDeskName());
             deskOrderParam.setOrderId(orderId);
             orderBtn.setOnMouseClicked(evt -> {
-                Stage orderInfo = new Stage();
-                orderInfo.initOwner(this.getScene().getWindow());
-                orderInfo.initModality(Modality.WINDOW_MODAL);
-                orderInfo.initStyle(StageStyle.DECORATED);
-                orderInfo.centerOnScreen();
-                orderInfo.setWidth(this.getScene().getWindow().getWidth());
-                orderInfo.setHeight(this.getScene().getWindow().getHeight());
-                orderInfo.setTitle("点菜[桌号:" + orderDesk.getDeskName() + "]");
-                orderInfo.setScene(new Scene(new OrderDishesChoiceView(deskOrderParam)));
-                orderInfo.show();
+                Stage orderDishesStg = new Stage();
+                orderDishesStg.initOwner(this.getScene().getWindow());
+                orderDishesStg.initModality(Modality.WINDOW_MODAL);
+                orderDishesStg.initStyle(StageStyle.DECORATED);
+                orderDishesStg.centerOnScreen();
+                orderDishesStg.setWidth(this.getScene().getWindow().getWidth());
+                orderDishesStg.setHeight(this.getScene().getWindow().getHeight());
+                orderDishesStg.setTitle("点菜[桌号:" + orderDesk.getDeskName() + "]");
+                orderDishesStg.setScene(new Scene(new OrderDishesChoiceView(deskOrderParam)));
+                orderDishesStg.setOnCloseRequest(e -> {
+                    tv.setItems(loadOrderDishes(orderId));
+                });
+                orderDishesStg.showAndWait();
             });
             Button sendBtn = createButton("送菜");
             Button returnBtn = createButton("退菜");

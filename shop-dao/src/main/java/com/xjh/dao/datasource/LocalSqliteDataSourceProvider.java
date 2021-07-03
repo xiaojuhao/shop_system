@@ -1,12 +1,12 @@
 package com.xjh.dao.datasource;
 
+import java.io.File;
+
 import com.google.inject.Provider;
 import com.xjh.common.store.SysConfigUtils;
 import com.xjh.common.utils.LogUtils;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-
-import java.io.File;
 
 public class LocalSqliteDataSourceProvider implements Provider<HikariDataSource> {
     private static class Inst {
@@ -20,7 +20,7 @@ public class LocalSqliteDataSourceProvider implements Provider<HikariDataSource>
 
     private static HikariDataSource newDS() {
         String workDir = SysConfigUtils.getWorkDir();
-        File home = new File(workDir + ".rundata/sqlite");
+        File home = new File(workDir + "database/sqlite");
         LogUtils.info("数据库目录：" + home.getAbsolutePath());
         if (!home.exists()) {
             home.mkdirs();

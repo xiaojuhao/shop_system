@@ -11,7 +11,7 @@ import com.xjh.common.utils.LogUtils;
 public class RocksDbUtilization {
     public static TtlDB getDB(String dbname) throws RocksDBException {
         String workDir = SysConfigUtils.getWorkDir();
-        File home = new File(workDir + ".rundata/kv/rocksdb/" + dbname);
+        File home = new File(workDir + "database/kv/rocksdb/" + dbname);
         LogUtils.info("根目录:" + home.getAbsolutePath());
         if (!home.exists()) {
             if (!home.mkdirs()) {
