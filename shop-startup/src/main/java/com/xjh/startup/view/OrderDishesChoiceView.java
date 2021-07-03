@@ -12,7 +12,9 @@ import com.xjh.common.utils.CopyUtils;
 import com.xjh.common.utils.LogUtils;
 import com.xjh.common.valueobject.DishesImg;
 import com.xjh.dao.dataobject.Dishes;
+import com.xjh.dao.dataobject.DishesType;
 import com.xjh.dao.mapper.DishesDAO;
+import com.xjh.dao.mapper.DishesTypeDAO;
 import com.xjh.dao.reqmodel.PageCond;
 import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.model.CartItemVO;
@@ -27,15 +29,19 @@ import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
@@ -44,14 +50,15 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.StringConverter;
 
 public class OrderDishesChoiceView extends VBox {
     DishesDAO dishesDAO = GuiceContainer.getInstance(DishesDAO.class);
     CartService cartService = GuiceContainer.getInstance(CartService.class);
 
     private DeskOrderParam data;
-    private SimpleIntegerProperty cartNum = new SimpleIntegerProperty(0);
-    private ObjectProperty<DishesQueryCond> dishesCond = new SimpleObjectProperty<>();
+    private SimpleIntegerProperty cartSize = new SimpleIntegerProperty(0);
+    private ObjectProperty<DishesQueryCond> qryDishesCond = new SimpleObjectProperty<>();
 
     public OrderDishesChoiceView(DeskOrderParam data) {
         this.data = data;
@@ -62,34 +69,28 @@ public class OrderDishesChoiceView extends VBox {
 
     private HBox top() {
         try {
-            cartNum.set(cartService.selectByDeskId(data.getDeskId()).size());
+            cartSize.set(cartService.selectByDeskId(data.getDeskId()).size());
         } catch (Exception ex) {
             LogUtils.error(ex.getMessage());
         }
         HBox hbox = new HBox();
         hbox.setAlignment(Pos.CENTER);
         hbox.setSpacing(10);
-        Button nextPage = new Button();
-        nextPage.setText("下一页");
-        nextPage.setOnMouseClicked(evt -> {
-            DishesQueryCond _old = dishesCond.get();
-            DishesQueryCond _new = CopyUtils.cloneObj(_old);
-            _new.setPageNo(_old.getPageNo() + 1);
-            dishesCond.set(_new);
+
+        TextField dishesNameField = new TextField();
+        dishesNameField.focusedProperty().addListener((_obs, _old, _new) -> {
+            qryDishesCond.get().setDishesName(dishesNameField.getText());
         });
 
-        Button prevPage = new Button();
-        prevPage.setText("上一页");
-        prevPage.setOnMouseClicked(evt -> {
-            DishesQueryCond _old = dishesCond.get();
-            DishesQueryCond _new = CopyUtils.cloneObj(_old);
-            _new.setPageNo(Math.max(1, _old.getPageNo() - 1));
-            dishesCond.set(_new);
+        Button queryBtn = new Button();
+        queryBtn.setText("查 询");
+        queryBtn.setOnMouseClicked(evt -> {
+            qryDishesCond.set(CopyUtils.cloneObj(qryDishesCond.get()));
         });
 
         Button cartBtn = new Button();
-        cartBtn.setText("查看购物车(" + cartNum.get() + ")");
-        cartNum.addListener((_this, _old, _new) -> {
+        cartBtn.setText("查看购物车(" + cartSize.get() + ")");
+        cartSize.addListener((_this, _old, _new) -> {
             cartBtn.setText("查看购物车(" + _new + ")");
         });
         cartBtn.setOnMouseClicked(evt -> {
@@ -111,15 +112,17 @@ public class OrderDishesChoiceView extends VBox {
                 req.setDeskId(data.getDeskId());
                 req.setOrderId(data.getOrderId());
                 cartService.createOrder(req);
-                cartNum.set(0);
+                cartSize.set(0);
                 AlertBuilder.INFO("通知消息", "下单成功");
             } catch (Exception ex) {
                 LogUtils.info("下单失败:" + ex.getMessage());
                 AlertBuilder.ERROR("通知消息", "下单失败");
             }
         });
-        hbox.getChildren().add(prevPage);
-        hbox.getChildren().add(nextPage);
+        hbox.getChildren().add(new Label("名称:"));
+        hbox.getChildren().add(dishesNameField);
+        hbox.getChildren().add(dishesTypeIdSelector());
+        hbox.getChildren().add(queryBtn);
         hbox.getChildren().add(placeOrder);
         hbox.getChildren().add(cartBtn);
         return hbox;
@@ -131,7 +134,8 @@ public class OrderDishesChoiceView extends VBox {
         return s;
     }
 
-    private ScrollPane initDishesView() {
+    private VBox initDishesView() {
+        VBox box = new VBox();
         ScrollPane sp = new ScrollPane();
         FlowPane pane = new FlowPane();
         sp.setContent(pane);
@@ -139,7 +143,7 @@ public class OrderDishesChoiceView extends VBox {
         pane.setHgap(5);
         pane.setVgap(5);
         pane.setPrefWidth(1200);
-        dishesCond.addListener((_this, _old, _new) -> {
+        qryDishesCond.addListener((_this, _old, _new) -> {
             List<Dishes> dishesList = queryList(_new);
             List<VBox> list = CommonUtils.map(dishesList, this::buildDishesView);
             Platform.runLater(() -> {
@@ -147,8 +151,32 @@ public class OrderDishesChoiceView extends VBox {
                 pane.getChildren().addAll(list);
             });
         });
-        dishesCond.set(new DishesQueryCond());
-        return sp;
+        qryDishesCond.set(new DishesQueryCond());
+        box.getChildren().add(sp);
+        // 分页
+        Button nextPage = new Button();
+        nextPage.setText("下一页");
+        nextPage.setOnMouseClicked(evt -> {
+            DishesQueryCond _old = qryDishesCond.get();
+            DishesQueryCond _new = CopyUtils.cloneObj(_old);
+            _new.setPageNo(_old.getPageNo() + 1);
+            qryDishesCond.set(_new);
+        });
+
+        Button prevPage = new Button();
+        prevPage.setText("上一页");
+        prevPage.setOnMouseClicked(evt -> {
+            DishesQueryCond _old = qryDishesCond.get();
+            DishesQueryCond _new = CopyUtils.cloneObj(_old);
+            _new.setPageNo(Math.max(1, _old.getPageNo() - 1));
+            qryDishesCond.set(_new);
+        });
+        HBox page = new HBox();
+        page.setSpacing(20);
+        page.getChildren().add(prevPage);
+        page.getChildren().add(nextPage);
+        box.getChildren().add(page);
+        return box;
     }
 
     private List<Dishes> queryList(DishesQueryCond queryCond) {
@@ -156,6 +184,8 @@ public class OrderDishesChoiceView extends VBox {
         page.setPageNo(queryCond.getPageNo());
         page.setPageSize(queryCond.getPageSize());
         Dishes cond = new Dishes();
+        cond.setDishesTypeId(queryCond.getDishesTypeId());
+        cond.setDishesName(queryCond.getDishesName());
         return dishesDAO.pageQuery(cond, page);
     }
 
@@ -187,7 +217,7 @@ public class OrderDishesChoiceView extends VBox {
                     CartVO cart = cartService.addItem(data.getDeskId(), cartItem);
                     if (cart != null) {
                         AlertBuilder.INFO("通知消息", "添加购物车成功");
-                        cartNum.set(CollectionUtils.size(cart.getContents()));
+                        cartSize.set(CollectionUtils.size(cart.getContents()));
                     } else {
                         AlertBuilder.ERROR("报错消息", "添加购物车失败");
                     }
@@ -201,6 +231,33 @@ public class OrderDishesChoiceView extends VBox {
         box.getChildren().add(new Label("单价:" + CommonUtils.formatMoney(dishes.getDishesPrice()) + "元"));
 
         return box;
+    }
+
+    private ComboBox<DishesType> dishesTypeIdSelector() {
+        DishesTypeDAO dao = GuiceContainer.getInstance(DishesTypeDAO.class);
+        List<DishesType> types = dao.selectAll();
+        ObservableList<DishesType> options = FXCollections.observableArrayList(types);
+        ComboBox<DishesType> selector = new ComboBox<>(options);
+        selector.setConverter(new StringConverter<DishesType>() {
+            @Override
+            public String toString(DishesType object) {
+                return object.getTypeName();
+            }
+
+            @Override
+            public DishesType fromString(String string) {
+                return null;
+            }
+        });
+        selector.valueProperty().addListener((_this, _old, _new) -> {
+            DishesQueryCond cond = CopyUtils.cloneObj(qryDishesCond.get());
+            if (cond.getDishesTypeId() == null || !cond.getDishesTypeId().equals(_new.getTypeId())) {
+                cond.setDishesTypeId(_new.getTypeId());
+                cond.setPageNo(1);
+                qryDishesCond.set(cond);
+            }
+        });
+        return selector;
     }
 
     private VBox paintDishesView(Dishes dishes) {
@@ -242,7 +299,7 @@ public class OrderDishesChoiceView extends VBox {
                     CartVO cart = cartService.addItem(data.getDeskId(), cartItem);
                     if (cart != null) {
                         AlertBuilder.INFO("通知消息", "添加购物车成功");
-                        cartNum.set(CollectionUtils.size(cart.getContents()));
+                        cartSize.set(CollectionUtils.size(cart.getContents()));
                     } else {
                         AlertBuilder.ERROR("报错消息", "添加购物车失败");
                     }

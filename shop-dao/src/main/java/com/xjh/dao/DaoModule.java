@@ -9,6 +9,7 @@ import com.xjh.dao.mapper.CartDAO;
 import com.xjh.dao.mapper.DeskDAO;
 import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.dao.mapper.DishesPackageDAO;
+import com.xjh.dao.mapper.DishesTypeDAO;
 import com.xjh.dao.mapper.InfoDAO;
 import com.xjh.dao.mapper.OrderDAO;
 import com.xjh.dao.mapper.OrderDishesDAO;
@@ -38,6 +39,7 @@ public class DaoModule extends AbstractModule {
         bind(DishesDAO.class);
         bind(CartDAO.class);
         bind(SubOrderDAO.class);
+        bind(DishesTypeDAO.class);
         LogUtils.info("DaoModule 耗时: " + timeRecord.getCost());
     }
 }

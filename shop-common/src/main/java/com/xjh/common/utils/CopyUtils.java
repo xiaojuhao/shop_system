@@ -6,6 +6,9 @@ import com.xjh.common.utils.ReflectionUtils.PropertyDescriptor;
 
 public class CopyUtils {
     public static <T> T cloneObj(T obj) {
+        if (obj == null) {
+            return null;
+        }
         Map<String, PropertyDescriptor> pds = ReflectionUtils.resolvePD(obj.getClass());
         try {
             T _new = (T) obj.getClass().newInstance();

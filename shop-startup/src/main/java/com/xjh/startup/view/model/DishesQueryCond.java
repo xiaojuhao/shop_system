@@ -4,6 +4,7 @@ public class DishesQueryCond {
     int pageNo = 1;
     int pageSize = 20;
     String dishesName;
+    Integer dishesTypeId;
 
     public int getPageNo() {
         return pageNo;
@@ -27,5 +28,13 @@ public class DishesQueryCond {
 
     public void setDishesName(String dishesName) {
         this.dishesName = dishesName;
+    }
+
+    public Integer getDishesTypeId() {
+        return dishesTypeId;
+    }
+
+    public void setDishesTypeId(Integer dishesTypeId) {
+        this.dishesTypeId = dishesTypeId;
     }
 }
