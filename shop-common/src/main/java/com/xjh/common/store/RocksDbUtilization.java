@@ -7,7 +7,6 @@ import org.rocksdb.RocksDBException;
 import org.rocksdb.TtlDB;
 
 import com.xjh.common.utils.LogUtils;
-import com.xjh.common.utils.SysConfigUtils;
 
 public class RocksDbUtilization {
     public static TtlDB getDB(String dbname) throws RocksDBException {

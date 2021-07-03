@@ -1,12 +1,12 @@
 package com.xjh.dao.datasource;
 
-import java.io.File;
-
 import com.google.inject.Provider;
+import com.xjh.common.store.SysConfigUtils;
 import com.xjh.common.utils.LogUtils;
-import com.xjh.common.utils.SysConfigUtils;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+
+import java.io.File;
 
 public class LocalSqliteDataSourceProvider implements Provider<HikariDataSource> {
     private static class Inst {
