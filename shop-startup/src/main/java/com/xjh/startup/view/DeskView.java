@@ -4,11 +4,14 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import com.xjh.common.enumeration.EnumDesKStatus;
+import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.service.domain.DeskService;
+import com.xjh.service.domain.model.OpenDeskParam;
 import com.xjh.startup.foundation.guice.GuiceContainer;
+import com.xjh.startup.view.model.OpenDeskInputParam;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Pos;
@@ -70,11 +73,16 @@ public class DeskView extends VBox {
                 System.gc();
             } else {
                 OpenDeskDialog dialog = new OpenDeskDialog(desk.get());
-                Optional<Integer> result = dialog.showAndWait();
-                if (result.isPresent() && result.get() == 1) {
-                    deskService.openDesk(desk.get().getDeskId());
-                } else if (result.isPresent() && result.get() == 2) {
-                    deskService.closeDesk(desk.get().getDeskId());
+                Optional<OpenDeskInputParam> result = dialog.showAndWait();
+                if (result.isPresent() && result.get().getResult() == 1) {
+                    if (result.get().getCustomerNum() <= 0) {
+                        AlertBuilder.ERROR("请输入就餐人数");
+                        return;
+                    }
+                    OpenDeskParam openDeskParam = new OpenDeskParam();
+                    openDeskParam.setDeskId(desk.get().getDeskId());
+                    openDeskParam.setCustomerNum(result.get().getCustomerNum());
+                    deskService.openDesk(openDeskParam);
                 }
             }
         });

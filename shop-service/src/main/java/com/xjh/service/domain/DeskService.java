@@ -18,6 +18,7 @@ import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.mapper.DeskDAO;
 import com.xjh.dao.mapper.InfoDAO;
+import com.xjh.service.domain.model.OpenDeskParam;
 
 import cn.hutool.core.codec.Base64;
 
@@ -39,8 +40,9 @@ public class DeskService {
         }
     }
 
-    public void openDesk(Integer deskId) {
+    public void openDesk(OpenDeskParam param) {
         try {
+            int deskId = param.getDeskId();
             Desk desk = deskDAO.getById(deskId);
             if (desk == null) {
                 return;
@@ -57,7 +59,7 @@ public class DeskService {
             order.setOrderType(EnumOrderType.NORMAL.type);
             order.setOrderDiscountInfo(Base64.encode(JSONObject.toJSONString(new OrderDiscount())));
             order.setMemberId(0L);
-            order.setOrderCustomerNums(0);
+            order.setOrderCustomerNums(param.getCustomerNum());
             order.setAccountId(0L);
             order.setOrderErase(0D);
             order.setOrderRefund(0D);
