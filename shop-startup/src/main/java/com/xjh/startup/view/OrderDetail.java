@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.enumeration.EnumOrderStatus;
+import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.dao.dataobject.Desk;
@@ -111,6 +112,11 @@ public class OrderDetail extends VBox {
             Button button = new Button("关台");
             button.setMinWidth(100);
             button.setOnMouseClicked(evt -> {
+                double notPaidBillAmount = orderService.notPaidBillAmount(orderId);
+                if (notPaidBillAmount > 0) {
+                    AlertBuilder.INFO("未支付完成，无法关台");
+                    return;
+                }
                 Alert _alert = new Alert(Alert.AlertType.CONFIRMATION,
                         "您确定要关台吗？",
                         new ButtonType("取消", ButtonBar.ButtonData.NO),

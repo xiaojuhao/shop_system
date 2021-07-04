@@ -2,18 +2,25 @@ package com.xjh.service.domain;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.enumeration.EnumOrderServeStatus;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.enumeration.EnumOrderType;
 import com.xjh.common.store.SequenceDatabase;
 import com.xjh.common.utils.AlertBuilder;
+import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.utils.LogUtils;
 import com.xjh.common.valueobject.OrderDiscount;
 import com.xjh.dao.dataobject.Order;
+import com.xjh.dao.dataobject.OrderDishes;
+import com.xjh.dao.dataobject.SubOrder;
 import com.xjh.dao.mapper.OrderDAO;
 import com.xjh.dao.mapper.SubOrderDAO;
 import com.xjh.service.domain.model.CreateOrderParam;
@@ -26,6 +33,8 @@ public class OrderService {
     OrderDAO orderDAO;
     @Inject
     SubOrderDAO subOrderDAO;
+    @Inject
+    OrderDishesService orderDishesService;
 
     public Order getOrder(Integer orderId) {
         try {
@@ -57,6 +66,54 @@ public class OrderService {
             AlertBuilder.ERROR("查询数据失败");
             return null;
         }
+    }
+
+    public List<SubOrder> findSubOrders(Integer orderId) {
+        try {
+            if (orderId == null) {
+                return new ArrayList<>();
+            }
+            SubOrder cond = new SubOrder();
+            cond.setOrderId(orderId);
+            List<SubOrder> subOrders = subOrderDAO.selectList(cond);
+            if (CommonUtils.isEmpty(subOrders)) {
+                return new ArrayList<>();
+            }
+            return subOrders;
+        } catch (Exception ex) {
+            LogUtils.error("查询子订单异常:" + ex.getMessage());
+            AlertBuilder.ERROR("查询子订单异常");
+            return new ArrayList<>();
+        }
+    }
+
+    public double sumBillAmount(Integer orderId) {
+        List<OrderDishes> orderDishes = orderDishesService.selectOrderDishes(orderId);
+        double billAmount = 0;
+        for (OrderDishes od : orderDishes) {
+            billAmount += od.getOrderDishesDiscountPrice() * od.getOrderDishesNums();
+        }
+        return billAmount;
+    }
+
+    public double sumReturnAmount(Integer orderId) {
+        List<OrderDishes> orderDishes = orderDishesService.selectOrderDishes(orderId);
+        double billAmount = 0;
+        for (OrderDishes od : orderDishes) {
+            if (EnumOrderSaleType.of(od.getOrderDishesSaletype()) == EnumOrderSaleType.RETURN) {
+                billAmount += od.getOrderDishesDiscountPrice() * od.getOrderDishesNums();
+            }
+        }
+        return billAmount;
+    }
+
+    public double notPaidBillAmount(Integer orderId) {
+        Order order = getOrder(orderId);
+        if (order == null) {
+            return 0;
+        }
+        double totalAmount = sumBillAmount(orderId) - sumReturnAmount(orderId);
+        return totalAmount - order.getOrderErase() - order.getOrderReduction() - order.getOrderHadpaid();
     }
 
     public Order createOrder(CreateOrderParam param) throws SQLException {

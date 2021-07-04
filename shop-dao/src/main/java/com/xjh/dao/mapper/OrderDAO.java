@@ -32,6 +32,9 @@ public class OrderDAO {
     }
 
     public Order selectByOrderId(Integer orderId) throws SQLException {
+        if (orderId == null) {
+            return null;
+        }
         Order cond = new Order();
         cond.setOrderId(orderId);
         List<Entity> list = Db.use(ds).find(EntityUtils.create(cond));
