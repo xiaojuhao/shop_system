@@ -197,6 +197,7 @@ public class OrderDetail extends VBox {
         }
 
         TableView<OrderDishesTableItemVO> tv = new TableView<>();
+        Runnable refreshTableView = () -> tv.setItems(loadOrderDishes(orderId));
         {
             tv.setMaxHeight(300);
             tv.setPadding(new Insets(5, 0, 0, 5));
@@ -210,7 +211,7 @@ public class OrderDetail extends VBox {
                     newCol("类型", "col7", 100)
             );
             this.getChildren().add(tv);
-            tv.setItems(loadOrderDishes(orderId));
+            refreshTableView.run();
         }
 
         {
@@ -238,9 +239,7 @@ public class OrderDetail extends VBox {
                 orderDishesStg.setHeight(this.getScene().getWindow().getHeight());
                 orderDishesStg.setTitle("点菜[桌号:" + orderDesk.getDeskName() + "]");
                 orderDishesStg.setScene(new Scene(new OrderDishesChoiceView(deskOrderParam)));
-                orderDishesStg.setOnCloseRequest(e -> {
-                    tv.setItems(loadOrderDishes(orderId));
-                });
+                orderDishesStg.setOnCloseRequest(e -> refreshTableView.run());
                 orderDishesStg.showAndWait();
             });
             Button sendBtn = createButton("送菜");
@@ -248,6 +247,19 @@ public class OrderDetail extends VBox {
             Button transferBtn = createButton("转台");
             Button splitBtn = createButton("拆台");
             Button payBillBtn = createButton("结账");
+            payBillBtn.setOnMouseClicked(evt -> {
+                Stage orderDishesStg = new Stage();
+                orderDishesStg.initOwner(this.getScene().getWindow());
+                orderDishesStg.initModality(Modality.WINDOW_MODAL);
+                orderDishesStg.initStyle(StageStyle.DECORATED);
+                orderDishesStg.centerOnScreen();
+                orderDishesStg.setWidth(this.getScene().getWindow().getWidth() / 3);
+                orderDishesStg.setHeight(this.getScene().getWindow().getHeight() / 3 * 2);
+                orderDishesStg.setTitle("结账[桌号:" + orderDesk.getDeskName() + "]");
+                orderDishesStg.setScene(new Scene(new PayWayChoiceView(deskOrderParam)));
+                orderDishesStg.setOnCloseRequest(e -> refreshTableView.run());
+                orderDishesStg.showAndWait();
+            });
             pane.getChildren().addAll(orderBtn, sendBtn, returnBtn, transferBtn, splitBtn, payBillBtn);
             this.getChildren().add(pane);
         }
