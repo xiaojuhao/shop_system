@@ -47,13 +47,14 @@ public class DeskService {
             if (desk == null) {
                 return;
             }
-            desk.setOrderId(orderService.createNewOrderId());
+            Integer orderId = orderService.createNewOrderId();
+            desk.setOrderId(orderId);
             desk.setOrderCreateTime(DateBuilder.base(LocalDateTime.now()).mills());
-            deskDAO.placeOrder(desk);
+            deskDAO.useDesk(desk);
             // 保存order信息
             Order order = new Order();
-            order.setOrderId(desk.getOrderId());
-            order.setDeskId(desk.getDeskId().intValue());
+            order.setOrderId(orderId);
+            order.setDeskId(desk.getDeskId());
             order.setOrderStatus(EnumOrderStatus.UNPAID.status);
             order.setStatus(EnumOrderServeStatus.START.status);
             order.setOrderType(EnumOrderType.NORMAL.type);
@@ -74,7 +75,7 @@ public class DeskService {
 
     public void closeDesk(Integer deskId) {
         try {
-            deskDAO.clearOrder(deskId);
+            deskDAO.freeDesk(deskId);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

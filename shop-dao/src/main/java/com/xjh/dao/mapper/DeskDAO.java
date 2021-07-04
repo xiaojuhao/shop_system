@@ -61,7 +61,7 @@ public class DeskDAO {
         );
     }
 
-    public int placeOrder(Desk desk) throws SQLException {
+    public int useDesk(Desk desk) throws SQLException {
         return Db.use(ds).execute("update desks " +
                         " set orderId = ?," +
                         " createTime = ?, " +
@@ -70,7 +70,7 @@ public class DeskDAO {
                 desk.getOrderId(), DateBuilder.base(desk.getOrderCreateTime()).mills(), desk.getDeskId());
     }
 
-    public int clearOrder(Integer id) throws SQLException {
+    public int freeDesk(Integer id) throws SQLException {
         return Db.use(ds).execute("update desks " +
                 " set orderId = 0," +
                 " createTime = null, " +
