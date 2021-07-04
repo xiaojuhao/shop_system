@@ -39,11 +39,11 @@ public class DeskController {
         pane.setVgap(5);
         pane.setPrefWidth(width);
         pane.setPrefHeight(height);
-        LogUtils.info("screen width:" + width + ",height:" + height);
+        // LogUtils.info("screen width:" + width + ",height:" + height);
         //s.setFitToWidth(true);
         s.setContent(pane);
 
-        ThreadUtils.runInDaemon(() -> {
+        ThreadUtils.runInNewThread(() -> {
             // 加载所有的tables
             allDesks().forEach(desk -> desks.add(new SimpleObjectProperty<>(desk)));
             // 渲染tables

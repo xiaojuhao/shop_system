@@ -20,6 +20,32 @@ public class SubOrderDAO {
     @Named("mysql")
     HikariDataSource ds;
 
+    public int countSubOrders(Integer orderId) throws SQLException {
+        if (orderId == null) {
+            return 0;
+        }
+        String sql = "select count(*) from suborder_list where orderId = " + orderId;
+        Number number = Db.use(ds).queryNumber(sql);
+        if (number != null) {
+            return number.intValue();
+        } else {
+            return 0;
+        }
+    }
+
+    public Long firsSubOrderTime(Integer orderId) throws SQLException {
+        if (orderId == null) {
+            return null;
+        }
+        String sql = "select min(createtime) createtime" +
+                " from suborder_list where orderId = " + orderId;
+        Entity rs = Db.use(ds).queryOne(sql);
+        if (rs == null) {
+            return null;
+        }
+        return rs.getLong("createtime");
+    }
+
     public int insert(SubOrder subOrder) throws SQLException {
         return Db.use(ds).insert(EntityUtils.create(subOrder));
     }

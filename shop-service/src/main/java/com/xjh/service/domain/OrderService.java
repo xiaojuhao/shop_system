@@ -10,10 +10,12 @@ import com.xjh.common.enumeration.EnumOrderServeStatus;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.enumeration.EnumOrderType;
 import com.xjh.common.store.SequenceDatabase;
+import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.valueobject.OrderDiscount;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.mapper.OrderDAO;
+import com.xjh.dao.mapper.SubOrderDAO;
 import com.xjh.service.domain.model.CreateOrderParam;
 
 import cn.hutool.core.codec.Base64;
@@ -22,12 +24,37 @@ import cn.hutool.core.codec.Base64;
 public class OrderService {
     @Inject
     OrderDAO orderDAO;
+    @Inject
+    SubOrderDAO subOrderDAO;
 
     public Order getOrder(Integer orderId) {
         try {
             return orderDAO.selectByOrderId(orderId);
         } catch (Exception ex) {
             ex.printStackTrace();
+            return null;
+        }
+    }
+
+    public int countSubOrder(Integer orderId) {
+        try {
+            return subOrderDAO.countSubOrders(orderId);
+        } catch (Exception ex) {
+            AlertBuilder.ERROR("查询数据失败");
+            return 0;
+        }
+    }
+
+    public LocalDateTime firstSubOrderTime(Integer orderId) {
+        try {
+            Long mills = subOrderDAO.firsSubOrderTime(orderId);
+            if (mills != null) {
+                return DateBuilder.base(mills).dateTime();
+            } else {
+                return null;
+            }
+        } catch (Exception ex) {
+            AlertBuilder.ERROR("查询数据失败");
             return null;
         }
     }

@@ -65,10 +65,10 @@ public class DeskDAO {
         return Db.use(ds).execute("update desks " +
                         " set orderId = ?," +
                         " createTime = ?, " +
-                        " useStatus =  ?, " +
+                        " useStatus =  ? " +
                         " where deskId = ? ",
                 desk.getOrderId(),
-                DateBuilder.base(desk.getOrderCreateTime()).mills(),
+                DateBuilder.now().mills(),
                 EnumDesKStatus.USED.status(),
                 desk.getDeskId());
     }

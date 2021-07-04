@@ -116,7 +116,7 @@ public class OrderDishesChoiceView extends VBox {
                 AlertBuilder.INFO("通知消息", "下单成功");
             } catch (Exception ex) {
                 LogUtils.info("下单失败:" + ex.getMessage());
-                AlertBuilder.ERROR("通知消息", "下单失败");
+                AlertBuilder.ERROR("通知消息", "下单失败:" + ex.getMessage());
             }
         });
         hbox.getChildren().add(new Label("名称:"));
