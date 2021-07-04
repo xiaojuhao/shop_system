@@ -15,7 +15,6 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
-import cn.hutool.db.Page;
 
 @Singleton
 public class DishesDAO {
@@ -52,8 +51,22 @@ public class DishesDAO {
         try {
             int pageNo = CommonUtils.orElse(page.getPageNo(), 1);
             int pageSize = CommonUtils.orElse(page.getPageSize(), 20);
-            Page pageCond = new Page(pageNo, pageSize);
-            List<Entity> list = Db.use(ds).pageForEntityList(EntityUtils.create(cond), pageCond);
+            StringBuilder where = new StringBuilder();
+            if (cond.getDishesId() != null) {
+                where.append(" and dishesId = ").append(cond.getDishesId());
+            }
+            if (CommonUtils.isNotBlank(cond.getDishesName())) {
+                where.append(" and dishesName like '%" + cond.getDishesName() + "%'");
+            }
+            if (cond.getDishesTypeId() != null) {
+                where.append(" and dishesTypeId = " + cond.getDishesTypeId());
+            }
+            if (cond.getDishesStatus() != null) {
+                where.append(" and dishesStatus = " + cond.getDishesStatus());
+            }
+            String sql = "select * from dishes_list where 1=1 " + where
+                    + " limit " + (pageNo - 1) + "," + pageSize;
+            List<Entity> list = Db.use(ds).query(sql);
             return EntityUtils.convertList(list, Dishes.class);
         } catch (Exception ex) {
             ex.printStackTrace();
