@@ -3,12 +3,20 @@ package com.xjh.service.domain;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.xjh.common.enumeration.EnumOrderServeStatus;
+import com.xjh.common.enumeration.EnumOrderStatus;
+import com.xjh.common.enumeration.EnumOrderType;
 import com.xjh.common.store.SequenceDatabase;
 import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.valueobject.OrderDiscount;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.mapper.OrderDAO;
+import com.xjh.service.domain.model.CreateOrderParam;
+
+import cn.hutool.core.codec.Base64;
 
 @Singleton
 public class OrderService {
@@ -24,10 +32,22 @@ public class OrderService {
         }
     }
 
-    public Order newOrder(Order order) throws SQLException {
-        if (order.getOrderId() == null) {
-            order.setOrderId(createNewOrderId());
-        }
+    public Order createOrder(CreateOrderParam param) throws SQLException {
+        Order order = new Order();
+        order.setOrderId(param.getOrderId());
+        order.setDeskId(param.getDeskId());
+        order.setOrderStatus(EnumOrderStatus.UNPAID.status);
+        order.setStatus(EnumOrderServeStatus.START.status);
+        order.setOrderType(EnumOrderType.NORMAL.type);
+        order.setOrderDiscountInfo(Base64.encode(JSONObject.toJSONString(new OrderDiscount())));
+        order.setMemberId(0L);
+        order.setOrderCustomerNums(param.getCustomerNum());
+        order.setAccountId(0L);
+        order.setOrderErase(0D);
+        order.setOrderRefund(0D);
+        order.setOrderReduction(0D);
+        order.setOrderHadpaid(0D);
+
         if (order.getCreateTime() == null) {
             order.setCreateTime(DateBuilder.now().mills());
         }

@@ -1,26 +1,19 @@
 package com.xjh.service.domain;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.xjh.common.enumeration.EnumOrderServeStatus;
-import com.xjh.common.enumeration.EnumOrderStatus;
-import com.xjh.common.enumeration.EnumOrderType;
 import com.xjh.common.utils.AlertBuilder;
-import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.LogUtils;
-import com.xjh.common.valueobject.OrderDiscount;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.mapper.DeskDAO;
 import com.xjh.dao.mapper.InfoDAO;
+import com.xjh.service.domain.model.CreateOrderParam;
 import com.xjh.service.domain.model.OpenDeskParam;
-
-import cn.hutool.core.codec.Base64;
 
 @Singleton
 public class DeskService {
@@ -45,28 +38,20 @@ public class DeskService {
             int deskId = param.getDeskId();
             Desk desk = deskDAO.getById(deskId);
             if (desk == null) {
+                AlertBuilder.ERROR("开桌失败", "桌号不存在:" + deskId);
                 return;
             }
+            // 开桌
             Integer orderId = orderService.createNewOrderId();
             desk.setOrderId(orderId);
-            desk.setOrderCreateTime(DateBuilder.base(LocalDateTime.now()).mills());
             deskDAO.useDesk(desk);
-            // 保存order信息
-            Order order = new Order();
-            order.setOrderId(orderId);
-            order.setDeskId(desk.getDeskId());
-            order.setOrderStatus(EnumOrderStatus.UNPAID.status);
-            order.setStatus(EnumOrderServeStatus.START.status);
-            order.setOrderType(EnumOrderType.NORMAL.type);
-            order.setOrderDiscountInfo(Base64.encode(JSONObject.toJSONString(new OrderDiscount())));
-            order.setMemberId(0L);
-            order.setOrderCustomerNums(param.getCustomerNum());
-            order.setAccountId(0L);
-            order.setOrderErase(0D);
-            order.setOrderRefund(0D);
-            order.setOrderReduction(0D);
-            order.setOrderHadpaid(0D);
-            orderService.newOrder(order);
+            // 下单
+            CreateOrderParam createOrderParam = new CreateOrderParam();
+            createOrderParam.setOrderId(orderId);
+            createOrderParam.setDeskId(deskId);
+            createOrderParam.setCustomerNum(param.getCustomerNum());
+            Order order = orderService.createOrder(createOrderParam);
+            LogUtils.info("下单成功: " + JSON.toJSONString(order));
         } catch (Exception ex) {
             LogUtils.info("开桌失败" + ex.getMessage());
             AlertBuilder.ERROR("下单失败", "开桌失败:" + ex.getMessage());

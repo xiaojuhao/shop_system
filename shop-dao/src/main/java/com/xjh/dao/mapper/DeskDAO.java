@@ -65,17 +65,22 @@ public class DeskDAO {
         return Db.use(ds).execute("update desks " +
                         " set orderId = ?," +
                         " createTime = ?, " +
-                        " useStatus =  " + EnumDesKStatus.USED.status() +
+                        " useStatus =  ?, " +
                         " where deskId = ? ",
-                desk.getOrderId(), DateBuilder.base(desk.getOrderCreateTime()).mills(), desk.getDeskId());
+                desk.getOrderId(),
+                DateBuilder.base(desk.getOrderCreateTime()).mills(),
+                EnumDesKStatus.USED.status(),
+                desk.getDeskId());
     }
 
     public int freeDesk(Integer id) throws SQLException {
         return Db.use(ds).execute("update desks " +
-                " set orderId = 0," +
-                " createTime = null, " +
-                " useStatus = 1 " +
-                " where deskId = ? ", id);
+                        " set orderId = 0," +
+                        " createTime = null, " +
+                        " useStatus = ? " +
+                        " where deskId = ? ",
+                EnumDesKStatus.FREE.status(),
+                id);
     }
 
     private Desk convert(Entity entity) {
