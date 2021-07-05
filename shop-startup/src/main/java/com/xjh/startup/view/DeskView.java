@@ -59,7 +59,7 @@ public class DeskView extends VBox {
         this.setOnMouseClicked(evt -> {
             DeskService deskService = GuiceContainer.getInstance(DeskService.class);
             EnumDesKStatus runStatus = EnumDesKStatus.of(desk.get().getStatus());
-            if (runStatus == EnumDesKStatus.USED) {
+            if (runStatus == EnumDesKStatus.USED || runStatus == EnumDesKStatus.PAID) {
                 Stage orderInfo = new Stage();
                 orderInfo.initOwner(this.getScene().getWindow());
                 orderInfo.initModality(Modality.WINDOW_MODAL);

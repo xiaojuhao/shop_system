@@ -68,7 +68,7 @@ public class PayWayChoiceView extends VBox {
                 return;
             }
             double notPaidBillAmount = orderService.notPaidBillAmount(param.getOrderId());
-            if (notPaidBillAmount <= paymentResult.getPayAmount()) {
+            if (notPaidBillAmount < paymentResult.getPayAmount()) {
                 AlertBuilder.ERROR("支付金额大于订单金额");
                 return;
             }
