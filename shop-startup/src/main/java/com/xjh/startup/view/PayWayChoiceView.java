@@ -46,6 +46,10 @@ public class PayWayChoiceView extends VBox {
 
     private void addPay(DeskOrderParam param, PaymentResult paymentResult) {
         try {
+            // 取消支付
+            if (paymentResult.getPayAction() == 0) {
+                return;
+            }
             OrderDAO orderDAO = GuiceContainer.getInstance(OrderDAO.class);
             Order order = orderDAO.selectByOrderId(param.getOrderId());
             OrderService orderService = GuiceContainer.getInstance(OrderService.class);
