@@ -1,9 +1,11 @@
 package com.xjh.startup.view;
 
+import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
+import com.xjh.startup.view.model.PaymentResult;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonBar;
@@ -13,7 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
-public class PaymentByCashDialog extends Dialog<Integer> {
+public class PaymentByCashDialog extends Dialog<PaymentResult> {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
 
     public PaymentByCashDialog(DeskOrderParam param) {
@@ -34,10 +36,10 @@ public class PaymentByCashDialog extends Dialog<Integer> {
         grid.add(new Label(CommonUtils.formatMoney(pay) + " 元"), 1, row);
 
         row++;
-        TextField customerNumFiled = new TextField();
-        customerNumFiled.setPromptText("支付金额");
+        TextField payAmountField = new TextField();
+        payAmountField.setPromptText("支付金额");
         grid.add(new Label("支付金额:"), 0, row);
-        grid.add(customerNumFiled, 1, row);
+        grid.add(payAmountField, 1, row);
 
         row++;
         TextField remarkField = new TextField();
@@ -46,8 +48,21 @@ public class PaymentByCashDialog extends Dialog<Integer> {
         grid.add(remarkField, 1, row);
 
         this.getDialogPane().setContent(grid);
-        ButtonType openDesk = new ButtonType("确认支付", ButtonBar.ButtonData.OK_DONE);
-        this.getDialogPane().getButtonTypes().addAll(openDesk, ButtonType.CANCEL);
-        this.setResultConverter(btn -> 1);
+        ButtonType confirmPayBtn = new ButtonType("确认支付", ButtonBar.ButtonData.OK_DONE);
+        this.getDialogPane().getButtonTypes().addAll(confirmPayBtn, ButtonType.CANCEL);
+        this.setResultConverter(btn -> {
+            PaymentResult result = new PaymentResult();
+            result.setPayMethod(EnumPayMethod.CASH);
+            if (btn == confirmPayBtn) {
+                result.setPayAction(1);
+                result.setPayAmount(CommonUtils.parseDouble(payAmountField.getText(), 0D));
+                result.setPayRemark(remarkField.getText());
+            } else {
+                result.setPayAction(0);
+                result.setPayAmount(0D);
+                result.setPayRemark(null);
+            }
+            return result;
+        });
     }
 }

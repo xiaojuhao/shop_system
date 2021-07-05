@@ -1,10 +1,12 @@
 package com.xjh.dao.dataobject;
 
 import com.xjh.dao.foundation.Column;
+import com.xjh.dao.foundation.Id;
 import com.xjh.dao.foundation.Table;
 
 @Table("order_list")
 public class Order {
+    @Id
     @Column("orderId")
     Integer orderId;
     @Column("orderStatus")
