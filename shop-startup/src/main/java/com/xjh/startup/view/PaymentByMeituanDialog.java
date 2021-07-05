@@ -15,11 +15,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
-public class PaymentByCashDialog extends Dialog<PaymentResult> {
+public class PaymentByMeituanDialog extends Dialog<PaymentResult> {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
 
-    public PaymentByCashDialog(DeskOrderParam param) {
-        this.setTitle("现金结账");
+    public PaymentByMeituanDialog(DeskOrderParam param) {
+        this.setTitle("POS结账");
         this.setWidth(300);
         GridPane grid = new GridPane();
         grid.setHgap(10);
@@ -36,8 +36,16 @@ public class PaymentByCashDialog extends Dialog<PaymentResult> {
         grid.add(new Label(CommonUtils.formatMoney(pay) + " 元"), 1, row);
 
         row++;
+        TextField cardNumFiled = new TextField();
+        cardNumFiled.setPromptText("交易编号");
+        cardNumFiled.setText(CommonUtils.formatMoney(pay));
+        grid.add(new Label("交易编号:"), 0, row);
+        grid.add(cardNumFiled, 1, row);
+
+        row++;
         TextField payAmountField = new TextField();
         payAmountField.setPromptText("支付金额");
+        payAmountField.setText(CommonUtils.formatMoney(pay));
         grid.add(new Label("支付金额:"), 0, row);
         grid.add(payAmountField, 1, row);
 
@@ -52,12 +60,13 @@ public class PaymentByCashDialog extends Dialog<PaymentResult> {
         this.getDialogPane().getButtonTypes().addAll(confirmPayBtn, ButtonType.CANCEL);
         this.setResultConverter(btn -> {
             PaymentResult result = new PaymentResult();
-            result.setPayMethod(EnumPayMethod.CASH);
+            result.setPayMethod(EnumPayMethod.MEITUAN);
             if (btn == confirmPayBtn) {
                 result.setPayAction(1);
                 result.setPayAmount(CommonUtils.parseDouble(payAmountField.getText(), 0D));
-                result.setPayRemark("现金支付:" + payAmountField.getText()
+                result.setPayRemark("美团支付:" + payAmountField.getText()
                         + "\n" + remarkField.getText());
+                result.setCardNumber(cardNumFiled.getText());
             } else {
                 result.setPayAction(0);
                 result.setPayAmount(0D);

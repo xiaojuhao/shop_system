@@ -34,8 +34,18 @@ public class PayWayChoiceView extends VBox {
             addPay(param, payResult.get());
         });
         pane.getChildren().add(payByCash);
-        pane.getChildren().add(new Button("银联POS机"));
-        pane.getChildren().add(new Button("美团收单结账"));
+        Button posBtn = new Button("银联POS机");
+        posBtn.setOnMouseClicked(event -> {
+            Optional<PaymentResult> payResult = new PaymentByPOSDialog(param).showAndWait();
+            addPay(param, payResult.get());
+        });
+        pane.getChildren().add(posBtn);
+        Button meituan = new Button("美团收单结账");
+        meituan.setOnMouseClicked(event -> {
+            Optional<PaymentResult> payResult = new PaymentByMeituanDialog(param).showAndWait();
+            addPay(param, payResult.get());
+        });
+        pane.getChildren().add(meituan);
         pane.getChildren().add(new Button("代金券结账"));
         pane.getChildren().add(new Button("充值卡结账"));
         pane.getChildren().add(new Button("逃单"));

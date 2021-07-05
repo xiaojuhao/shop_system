@@ -8,7 +8,8 @@ public enum EnumPayMethod {
     WECHAT(5, "微信"),
     ALIPAY(6, "支付宝"),
     MEITUAN(7, "美团"),
-    KOUBEI(8, "口碑");
+    KOUBEI(8, "口碑"),
+    POS(23, "POS机");
     public int code;
     public String name;
 
