@@ -22,6 +22,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.Window;
 
 public class DeskView extends VBox {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
@@ -60,13 +61,14 @@ public class DeskView extends VBox {
             DeskService deskService = GuiceContainer.getInstance(DeskService.class);
             EnumDesKStatus runStatus = EnumDesKStatus.of(desk.get().getStatus());
             if (runStatus == EnumDesKStatus.USED || runStatus == EnumDesKStatus.PAID) {
+                Window sceneWindow = this.getScene().getWindow();
                 Stage orderInfo = new Stage();
-                orderInfo.initOwner(this.getScene().getWindow());
+                orderInfo.initOwner(sceneWindow);
                 orderInfo.initModality(Modality.WINDOW_MODAL);
                 orderInfo.initStyle(StageStyle.DECORATED);
                 orderInfo.centerOnScreen();
-                orderInfo.setWidth(this.getScene().getWindow().getWidth() / 10 * 9);
-                orderInfo.setHeight(this.getScene().getWindow().getHeight() / 10 * 9);
+                orderInfo.setWidth(sceneWindow.getWidth() / 10 * 9);
+                orderInfo.setHeight(sceneWindow.getHeight() / 10 * 9);
                 orderInfo.setTitle("订单详情");
                 orderInfo.setScene(new Scene(new OrderDetail(desk.get())));
                 orderInfo.show();
