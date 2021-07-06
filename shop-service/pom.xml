@@ -62,6 +62,10 @@
             <artifactId>guice</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.java-websocket</groupId>
+            <artifactId>Java-WebSocket</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.xjh</groupId>
             <artifactId>shop-dao</artifactId>
         </dependency>

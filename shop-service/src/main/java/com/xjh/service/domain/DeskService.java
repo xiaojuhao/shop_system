@@ -6,8 +6,8 @@ import java.util.List;
 import com.alibaba.fastjson.JSON;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.mapper.DeskDAO;
@@ -33,13 +33,12 @@ public class DeskService {
         }
     }
 
-    public void openDesk(OpenDeskParam param) {
+    public Result<String> openDesk(OpenDeskParam param) {
         try {
             int deskId = param.getDeskId();
             Desk desk = deskDAO.getById(deskId);
             if (desk == null) {
-                AlertBuilder.ERROR("开桌失败", "桌号不存在:" + deskId);
-                return;
+                return Result.fail("桌号不存在:" + deskId);
             }
             // 开桌
             Integer orderId = orderService.createNewOrderId();
@@ -52,9 +51,10 @@ public class DeskService {
             createOrderParam.setCustomerNum(param.getCustomerNum());
             Order order = orderService.createOrder(createOrderParam);
             LogUtils.info("下单成功: " + JSON.toJSONString(order));
+            return Result.success("下单成功");
         } catch (Exception ex) {
             LogUtils.info("开桌失败" + ex.getMessage());
-            AlertBuilder.ERROR("下单失败", "开桌失败:" + ex.getMessage());
+            return Result.fail("开桌失败:" + ex.getMessage());
         }
     }
 

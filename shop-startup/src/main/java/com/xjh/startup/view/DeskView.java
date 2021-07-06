@@ -7,6 +7,7 @@ import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderService;
@@ -84,7 +85,10 @@ public class DeskView extends VBox {
                     OpenDeskParam openDeskParam = new OpenDeskParam();
                     openDeskParam.setDeskId(desk.get().getDeskId());
                     openDeskParam.setCustomerNum(result.get().getCustomerNum());
-                    deskService.openDesk(openDeskParam);
+                    Result<String> openDeskRs = deskService.openDesk(openDeskParam);
+                    if (!openDeskRs.isSuccess()) {
+                        AlertBuilder.ERROR("开桌失败", openDeskRs.getMsg());
+                    }
                 }
             }
         });

@@ -5,6 +5,7 @@ import java.util.ResourceBundle;
 
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.service.domain.AdminService;
+import com.xjh.startup.LoginApp;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.SysConfigView;
 
@@ -62,6 +63,14 @@ public class LoginController implements Initializable {
             mainStage.setHeight(height - 10);
             //mainStage.setMaximized(true);
             mainStage.setScene(scene);
+            mainStage.setOnCloseRequest(evt -> {
+                // 主页面关闭
+                try {
+                    LoginApp.server.get().stop();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
             mainStage.show();
             Stage loginStage = (Stage) accountField.getScene().getWindow();
             loginStage.close();
