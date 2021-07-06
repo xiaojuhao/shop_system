@@ -12,6 +12,7 @@ import com.xjh.common.utils.CommonUtils;
 import com.xjh.startup.server.handlers.AddCartHandler;
 import com.xjh.startup.server.handlers.CloseDeskHandler;
 import com.xjh.startup.server.handlers.OpenDeskHandler;
+import com.xjh.startup.server.handlers.OrderCartHandler;
 
 public class XjhWebSocketServer extends WebSocketServer {
     public XjhWebSocketServer(int port) {
@@ -41,13 +42,19 @@ public class XjhWebSocketServer extends WebSocketServer {
     @Override
     public void onMessage(WebSocket ws, String message) {
         JSONObject msg = JSONObject.parseObject(message);
+        JSONObject resp = null;
         String type = msg.getString("API_TYPE");
         if (CommonUtils.equals(type, "openDesk")) {
-            ws.send(new OpenDeskHandler().handle(msg).toJSONString());
+            resp = new OpenDeskHandler().handle(msg);
         } else if (CommonUtils.eq(type, "closetable")) {
-            ws.send(new CloseDeskHandler().handle(msg).toJSONString());
+            resp = new CloseDeskHandler().handle(msg);
         } else if (CommonUtils.eq(type, "addDishesToCart")) {
-            ws.send(new AddCartHandler().handle(msg).toJSONString());
+            resp = new AddCartHandler().handle(msg);
+        } else if (CommonUtils.eq(type, "orderCart")) {
+            resp = new OrderCartHandler().handle(msg);
+        }
+        if (resp != null) {
+            ws.send(resp.toJSONString());
         }
         ws.close();
     }

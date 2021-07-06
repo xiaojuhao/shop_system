@@ -74,54 +74,59 @@ public class CartService {
         return new ArrayList<>();
     }
 
-    public void createOrder(PlaceOrderFromCartReq param) throws Exception {
-        Integer deskId = param.getDeskId();
-        Integer orderId = param.getOrderId();
-        Cart cart = cartDAO.selectByDeskId(deskId);
-        CartVO cartVO = CartVO.from(cart);
-        Order order = orderDAO.selectByOrderId(orderId);
-        // 条件校验
-        if (cartVO.getContents() == null || cartVO.getContents().size() == 0) {
-            LogUtils.error("购物车空:" + JSON.toJSONString(param));
-            return;
+    public Result<String> createOrder(PlaceOrderFromCartReq param) {
+        try {
+            Integer deskId = param.getDeskId();
+            Integer orderId = param.getOrderId();
+            Cart cart = cartDAO.selectByDeskId(deskId);
+            CartVO cartVO = CartVO.from(cart);
+            Order order = orderDAO.selectByOrderId(orderId);
+            // 条件校验
+            if (cartVO.getContents() == null || cartVO.getContents().size() == 0) {
+                LogUtils.error("购物车空:" + JSON.toJSONString(param));
+                return Result.fail("购物车空");
+            }
+            Integer subOrderId = createNewId();
+            SubOrder subOrder = new SubOrder();
+            subOrder.setSubOrderId(subOrderId);
+            subOrder.setOrderId(orderId);
+            subOrder.setOrderType(0);
+            subOrder.setSubOrderStatus(0);
+            subOrder.setAccountId(0);
+            subOrder.setCreatetime(DateBuilder.now().mills());
+            int subInsertRs = subOrderDAO.insert(subOrder);
+
+            // order dishes
+            List<OrderDishes> orderDishes = new ArrayList<>();
+            for (CartItemVO item : cartVO.getContents()) {
+                Dishes dishes = dishesDAO.getById(item.getDishesId());
+                OrderDishes d = new OrderDishes();
+                orderDishes.add(d);
+                d.setOrderId(orderId);
+                d.setSubOrderId(subOrderId);
+                d.setDishesId(item.getDishesId());
+                d.setDishesPriceId(0);
+                d.setDishesTypeId(dishes.getDishesTypeId());
+                d.setOrderDishesPrice(dishes.getDishesPrice());
+                d.setOrderDishesDiscountPrice(dishes.getDishesPrice());
+                d.setCreatetime(DateBuilder.now().mills());
+                d.setIfDishesPackage(0);
+                d.setOrderDishesIfchange(0);
+                d.setOrderDishesIfrefund(0);
+                d.setOrderDishesNums(1);
+                d.setOrderDishesNums(item.getNums());
+                d.setOrderDishesSaletype(EnumOrderSaleType.NORMAL.type);
+                d.setOrderDishesOptions(Base64.encode("[]"));
+                d.setOrderDishesDiscountInfo(Base64.encode(""));
+
+                orderDishesDAO.insert(d);
+            }
+            cartDAO.clearCart(deskId);
+            return Result.success("下单成功");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail("下单失败:" + ex.getMessage());
         }
-        Integer subOrderId = createNewId();
-        SubOrder subOrder = new SubOrder();
-        subOrder.setSubOrderId(subOrderId);
-        subOrder.setOrderId(orderId);
-        subOrder.setOrderType(0);
-        subOrder.setSubOrderStatus(0);
-        subOrder.setAccountId(0);
-        subOrder.setCreatetime(DateBuilder.now().mills());
-        int subInsertRs = subOrderDAO.insert(subOrder);
-
-        // order dishes
-        List<OrderDishes> orderDishes = new ArrayList<>();
-        for (CartItemVO item : cartVO.getContents()) {
-            Dishes dishes = dishesDAO.getById(item.getDishesId());
-            OrderDishes d = new OrderDishes();
-            orderDishes.add(d);
-            d.setOrderId(orderId);
-            d.setSubOrderId(subOrderId);
-            d.setDishesId(item.getDishesId());
-            d.setDishesPriceId(0);
-            d.setDishesTypeId(dishes.getDishesTypeId());
-            d.setOrderDishesPrice(dishes.getDishesPrice());
-            d.setOrderDishesDiscountPrice(dishes.getDishesPrice());
-            d.setCreatetime(DateBuilder.now().mills());
-            d.setIfDishesPackage(0);
-            d.setOrderDishesIfchange(0);
-            d.setOrderDishesIfrefund(0);
-            d.setOrderDishesNums(1);
-            d.setOrderDishesNums(item.getNums());
-            d.setOrderDishesSaletype(EnumOrderSaleType.NORMAL.type);
-            d.setOrderDishesOptions(Base64.encode("[]"));
-            d.setOrderDishesDiscountInfo(Base64.encode(""));
-
-            orderDishesDAO.insert(d);
-        }
-
-        cartDAO.clearCart(deskId);
     }
 
     public Integer createNewId() {

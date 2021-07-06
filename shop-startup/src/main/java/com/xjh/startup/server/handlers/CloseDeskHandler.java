@@ -10,10 +10,12 @@ public class CloseDeskHandler {
 
     public JSONObject handle(JSONObject msg) {
         JSONObject resp = new JSONObject();
+        resp.put("API_TYPE", "closetable_ACK");
+
         int deskId = msg.getIntValue("tables_id");
 
         Result<String> openDeskRs = deskService.closeDesk(deskId);
-        resp.put("API_TYPE", "closetable_ACK");
+
         if (openDeskRs.isSuccess()) {
             resp.put("status", 0);
         } else {

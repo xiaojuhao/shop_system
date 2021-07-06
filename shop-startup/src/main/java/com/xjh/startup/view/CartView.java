@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.alibaba.fastjson.JSON;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.service.domain.CartService;
@@ -64,19 +65,19 @@ public class CartView extends VBox {
             });
         });
         place.setOnMouseClicked(evt -> {
-            try {
-                PlaceOrderFromCartReq req = new PlaceOrderFromCartReq();
-                req.setDeskId(param.getDeskId());
-                req.setOrderId(param.getOrderId());
-                cartService.createOrder(req);
+            PlaceOrderFromCartReq req = new PlaceOrderFromCartReq();
+            req.setDeskId(param.getDeskId());
+            req.setOrderId(param.getOrderId());
+            Result<String> createOrderRs = cartService.createOrder(req);
+            if (createOrderRs.isSuccess()) {
                 Alert _alert = new Alert(AlertType.INFORMATION);
                 _alert.setTitle("通知消息");
                 _alert.setHeaderText("下单成功");
                 _alert.showAndWait();
-            } catch (Exception ex) {
+            } else {
                 Alert _alert = new Alert(AlertType.ERROR);
                 _alert.setTitle("通知消息");
-                _alert.setHeaderText("下单失败:" + ex.getMessage());
+                _alert.setHeaderText(createOrderRs.getMsg());
                 _alert.showAndWait();
             }
         });

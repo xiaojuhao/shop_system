@@ -112,9 +112,13 @@ public class OrderDishesChoiceView extends VBox {
                 PlaceOrderFromCartReq req = new PlaceOrderFromCartReq();
                 req.setDeskId(data.getDeskId());
                 req.setOrderId(data.getOrderId());
-                cartService.createOrder(req);
-                cartSize.set(0);
-                AlertBuilder.INFO("通知消息", "下单成功");
+                Result<String> createOrderRs = cartService.createOrder(req);
+                if (createOrderRs.isSuccess()) {
+                    cartSize.set(0);
+                    AlertBuilder.INFO("通知消息", "下单成功");
+                } else {
+                    AlertBuilder.ERROR(createOrderRs.getMsg());
+                }
             } catch (Exception ex) {
                 LogUtils.info("下单失败:" + ex.getMessage());
                 AlertBuilder.ERROR("通知消息", "下单失败:" + ex.getMessage());

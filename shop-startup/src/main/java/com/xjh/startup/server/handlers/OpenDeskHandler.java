@@ -11,6 +11,8 @@ public class OpenDeskHandler {
 
     public JSONObject handle(JSONObject msg) {
         JSONObject resp = new JSONObject();
+        resp.put("API_TYPE", "openDesk_ACK");
+
         int customerNums = msg.getIntValue("meal_number");
         int deskId = msg.getIntValue("tables_id");
         String recommender = msg.getString("recommender");
@@ -19,7 +21,6 @@ public class OpenDeskHandler {
         openDeskParam.setDeskId(deskId);
         openDeskParam.setCustomerNum(customerNums);
         Result<String> openDeskRs = deskService.openDesk(openDeskParam);
-        resp.put("API_TYPE", "openDesk_ACK");
         if (openDeskRs.isSuccess()) {
             resp.put("status", 0);
         } else {
