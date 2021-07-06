@@ -10,6 +10,7 @@ import com.xjh.common.utils.ClickHelper;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.CopyUtils;
 import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.DishesImg;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesType;
@@ -214,15 +215,15 @@ public class OrderDishesChoiceView extends VBox {
                 cartItem.setNums(1);
                 cartItem.setIfDishesPackage(0);
                 try {
-                    CartVO cart = cartService.addItem(data.getDeskId(), cartItem);
-                    if (cart != null) {
+                    Result<CartVO> addCartRs = cartService.addItem(data.getDeskId(), cartItem);
+                    if (addCartRs.isSuccess()) {
                         AlertBuilder.INFO("通知消息", "添加购物车成功");
-                        cartSize.set(CollectionUtils.size(cart.getContents()));
+                        cartSize.set(CollectionUtils.size(addCartRs.getData().getContents()));
                     } else {
-                        AlertBuilder.ERROR("报错消息", "添加购物车失败");
+                        AlertBuilder.ERROR(addCartRs.getMsg());
                     }
                 } catch (Exception ex) {
-                    AlertBuilder.ERROR("报错消息", "添加购物车异常");
+                    AlertBuilder.ERROR("报错消息", "添加购物车异常," + ex.getMessage());
                 }
             }
         });
@@ -296,12 +297,12 @@ public class OrderDishesChoiceView extends VBox {
                 cartItem.setNums(1);
                 cartItem.setIfDishesPackage(0);
                 try {
-                    CartVO cart = cartService.addItem(data.getDeskId(), cartItem);
-                    if (cart != null) {
+                    Result<CartVO> addCartRs = cartService.addItem(data.getDeskId(), cartItem);
+                    if (addCartRs.isSuccess()) {
                         AlertBuilder.INFO("通知消息", "添加购物车成功");
-                        cartSize.set(CollectionUtils.size(cart.getContents()));
+                        cartSize.set(CollectionUtils.size(addCartRs.getData().getContents()));
                     } else {
-                        AlertBuilder.ERROR("报错消息", "添加购物车失败");
+                        AlertBuilder.ERROR(addCartRs.getMsg());
                     }
                 } catch (Exception ex) {
                     AlertBuilder.ERROR("报错消息", "添加购物车异常");

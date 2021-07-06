@@ -10,6 +10,7 @@ import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackage;
@@ -125,7 +126,11 @@ public class OrderDetail extends VBox {
                 _alert.setHeaderText("当前订单已结清");
                 Optional<ButtonType> _buttonType = _alert.showAndWait();
                 if (_buttonType.get().getButtonData().equals(ButtonBar.ButtonData.YES)) {
-                    deskService.closeDesk(orderDesk.getDeskId());
+                    Result<String> closeDeskRs = deskService.closeDesk(orderDesk.getDeskId());
+                    if (!closeDeskRs.isSuccess()) {
+                        AlertBuilder.ERROR(closeDeskRs.getMsg());
+                        return;
+                    }
                     this.getScene().getWindow().hide();
                 }
             });

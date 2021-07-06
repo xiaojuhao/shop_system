@@ -58,11 +58,17 @@ public class DeskService {
         }
     }
 
-    public void closeDesk(Integer deskId) {
+    public Result<String> closeDesk(Integer deskId) {
         try {
-            deskDAO.freeDesk(deskId);
+            int i = deskDAO.freeDesk(deskId);
+            if (i == 0) {
+                return Result.fail("关台失败, 更新数据库失败");
+            } else {
+                return Result.success("关台成功");
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
+            return Result.fail("关台失败," + ex.getMessage());
         }
     }
 

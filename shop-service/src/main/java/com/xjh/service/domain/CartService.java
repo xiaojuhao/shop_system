@@ -14,6 +14,7 @@ import com.xjh.common.store.SequenceDatabase;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Cart;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.Order;
@@ -43,17 +44,22 @@ public class CartService {
     @Inject
     OrderDishesDAO orderDishesDAO;
 
-    public CartVO addItem(Integer deskId, CartItemVO item) throws Exception {
-        Cart cart = new Cart();
-        cart.setDeskId(deskId);
-        List<CartItemVO> contentItems = selectByDeskId(deskId);
-        contentItems.add(item);
-        cart.setContents(Base64.encode(JSON.toJSONString(contentItems)));
-        int i = cartDAO.save(cart);
-        if (i == 0) {
-            return null;
+    public Result<CartVO> addItem(Integer deskId, CartItemVO item) {
+        try {
+            Cart cart = new Cart();
+            cart.setDeskId(deskId);
+            List<CartItemVO> contentItems = selectByDeskId(deskId);
+            contentItems.add(item);
+            cart.setContents(Base64.encode(JSON.toJSONString(contentItems)));
+            int i = cartDAO.save(cart);
+            if (i == 0) {
+                return Result.fail("添加购物车失败,保存数据库失败");
+            }
+            return Result.success(CartVO.from(cart));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail("添加购物车失败," + ex.getMessage());
         }
-        return CartVO.from(cart);
     }
 
     public List<CartItemVO> selectByDeskId(Integer deskId) throws Exception {
