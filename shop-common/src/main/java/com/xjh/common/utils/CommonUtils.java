@@ -22,6 +22,8 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSON;
+
 @SuppressWarnings({"unused"})
 public class CommonUtils {
     public static <V, R> List<R> map(List<V> list, Function<V, R> fun) {
@@ -89,6 +91,21 @@ public class CommonUtils {
             return ((LocalDateTime) a).isEqual((LocalDateTime) b);
         }
         return a.equals(b);
+    }
+
+    public static String reflectString(Object data) {
+        try {
+            if (data == null) {
+                return "null";
+            }
+            if (data instanceof String || data instanceof Number) {
+                return data.toString();
+            }
+            return JSON.toJSONString(data);
+        } catch (Exception ex) {
+            LogUtils.error("序列化对象失败:" + ex.getMessage());
+            return "error:" + ex.getMessage();
+        }
     }
 
     public static String readFile(String file) throws Exception {
@@ -575,5 +592,6 @@ public class CommonUtils {
         return !isBlank(str);
     }
 
-    public static void emptyAction() {}
+    public static void emptyAction() {
+    }
 }
