@@ -5,15 +5,12 @@ import com.xjh.common.utils.LogUtils;
 import com.xjh.common.utils.TimeRecord;
 import com.xjh.startup.server.XjhWebSocketServer;
 import com.xjh.startup.view.FxmlView;
-
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
-import java.io.IOException;
 
 public class LoginApp extends Application {
     public static Holder<Stage> loginStage = new Holder<>();
