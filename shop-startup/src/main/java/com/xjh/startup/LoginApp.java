@@ -13,6 +13,8 @@ import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+
 public class LoginApp extends Application {
     public static Holder<Stage> loginStage = new Holder<>();
     public static Holder<XjhWebSocketServer> server = new Holder<>();
@@ -31,6 +33,13 @@ public class LoginApp extends Application {
         loginScene.getStylesheets().add("/css/style.css");
         primaryStage.setMaximized(true);
         primaryStage.setScene(loginScene);
+        primaryStage.setOnCloseRequest(evt -> {
+            try {
+                server.get().stop();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
         primaryStage.show();
         loginStage.set(primaryStage);
         LogUtils.info("主页面渲染, cost " + timeRecord.getCostAndReset());
