@@ -209,7 +209,7 @@ public class OrderDishesChoiceView extends VBox {
         ImageView iv = getImageView(img);
         iv.setOnMouseClicked(evt -> {
             if (ClickHelper.isDblClick()) {
-                LogUtils.info("添加到购物车, desk " +
+                LogUtils.info("添加到购物车, DishesId=" +
                         dishes.getDishesId() + "," +
                         dishes.getDishesName() + ", "
                         + CommonUtils.reflectString(data));
@@ -291,7 +291,7 @@ public class OrderDishesChoiceView extends VBox {
         canvas.getGraphicsContext2D().fillText("单价:" + dishes.getDishesPrice(), 10, 200);
         canvas.setOnMouseClicked(evt -> {
             if (ClickHelper.isDblClick()) {
-                LogUtils.info("添加到购物车, desk " +
+                LogUtils.info("添加到购物车, DishesId=" +
                         dishes.getDishesId() + "," +
                         dishes.getDishesName() + ", "
                         + CommonUtils.reflectString(data));
