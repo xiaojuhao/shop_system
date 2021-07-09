@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.alibaba.fastjson.JSON;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.LogUtils;
@@ -157,7 +156,7 @@ public class CartView extends VBox {
                 }
                 return bo;
             }).collect(Collectors.toList());
-            System.out.println(JSON.toJSONString(bolist));
+            // System.out.println(JSON.toJSONString(bolist));
             return bolist;
         } catch (Exception ex) {
             LogUtils.error("查询购物车异常:" + param.getDeskName() + ", " + ex.getMessage());
