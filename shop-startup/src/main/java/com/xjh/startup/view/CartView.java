@@ -127,7 +127,8 @@ public class CartView extends VBox {
                     newCol("菜品ID", "dishesId", 100),
                     newCol("菜品名称", "dishesName", 200),
                     newCol("价格", "dishesPrice", 100),
-                    newCol("数量", "nums", 100)
+                    newCol("数量", "nums", 100),
+                    newCol("小计", "totalPrice", 100)
             );
             reloadData();
         } catch (Exception ex) {
@@ -150,10 +151,13 @@ public class CartView extends VBox {
                 CartItemBO bo = new CartItemBO();
                 bo.setDishesId(it.getDishesId().toString());
                 bo.setNums(it.getNums() + "");
+                bo.setTotalPrice("0.00");
                 if (dishes != null) {
                     bo.setDishesName(dishes.getDishesName());
                     bo.setDishesPrice(CommonUtils.formatMoney(dishes.getDishesPrice()));
+                    bo.setTotalPrice(CommonUtils.formatMoney(it.getNums() * dishes.getDishesPrice()));
                 }
+
                 return bo;
             }).collect(Collectors.toList());
             // System.out.println(JSON.toJSONString(bolist));

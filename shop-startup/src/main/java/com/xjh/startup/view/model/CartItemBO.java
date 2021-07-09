@@ -6,6 +6,7 @@ public class CartItemBO {
     String dishesPriceId;
     String dishesPrice;
     String nums;
+    String totalPrice;
     String ifDishesPackage;
 
     public String getDishesId() {
@@ -54,5 +55,13 @@ public class CartItemBO {
 
     public void setIfDishesPackage(String ifDishesPackage) {
         this.ifDishesPackage = ifDishesPackage;
+    }
+
+    public String getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(String totalPrice) {
+        this.totalPrice = totalPrice;
     }
 }
