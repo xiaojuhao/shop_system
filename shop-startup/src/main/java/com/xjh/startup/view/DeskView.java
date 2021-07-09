@@ -49,7 +49,12 @@ public class DeskView extends VBox {
             setBackground(this, desKStatus);
             statusLabel.setText(desKStatus.remark());
 
-            LocalDateTime firstSubOrderTime = orderService.firstSubOrderTime(_new.getOrderId());
+            Result<LocalDateTime> firstSubOrderTimeRs = orderService.firstSubOrderTime(_new.getOrderId());
+            if (!firstSubOrderTimeRs.isSuccess()) {
+                AlertBuilder.ERROR(firstSubOrderTimeRs.getMsg());
+                return;
+            }
+            LocalDateTime firstSubOrderTime = firstSubOrderTimeRs.getData();
             if (firstSubOrderTime != null && desKStatus != EnumDesKStatus.FREE) {
                 long usedSeconds = DateBuilder.intervalSeconds(firstSubOrderTime, LocalDateTime.now());
                 timeLabel.setText("已用" + CommonUtils.formatSeconds(usedSeconds));

@@ -13,10 +13,10 @@ import com.xjh.common.enumeration.EnumOrderServeStatus;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.enumeration.EnumOrderType;
 import com.xjh.common.store.SequenceDatabase;
-import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.OrderDiscount;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
@@ -45,45 +45,45 @@ public class OrderService {
         }
     }
 
-    public int countSubOrder(Integer orderId) {
+    public Result<Integer> countSubOrder(Integer orderId) {
         try {
-            return subOrderDAO.countSubOrders(orderId);
+            return Result.success(subOrderDAO.countSubOrders(orderId));
         } catch (Exception ex) {
-            AlertBuilder.ERROR("查询数据失败");
-            return 0;
+            LogUtils.error("countSubOrder ::" + ex.getMessage());
+            return Result.fail(ex.getMessage());
         }
     }
 
-    public LocalDateTime firstSubOrderTime(Integer orderId) {
+    public Result<LocalDateTime> firstSubOrderTime(Integer orderId) {
         try {
             Long mills = subOrderDAO.firsSubOrderTime(orderId);
             if (mills != null) {
-                return DateBuilder.base(mills).dateTime();
+                return Result.success(DateBuilder.base(mills).dateTime());
             } else {
-                return null;
+                return Result.success(null);
             }
         } catch (Exception ex) {
-            AlertBuilder.ERROR("查询数据失败");
-            return null;
+            LogUtils.info("查询数据失败" + ex.getMessage());
+            return Result.fail("查询数据失败" + ex.getMessage());
         }
     }
 
-    public List<SubOrder> findSubOrders(Integer orderId) {
+    public Result<List<SubOrder>> findSubOrders(Integer orderId) {
         try {
             if (orderId == null) {
-                return new ArrayList<>();
+                return Result.success(new ArrayList<>());
             }
             SubOrder cond = new SubOrder();
             cond.setOrderId(orderId);
             List<SubOrder> subOrders = subOrderDAO.selectList(cond);
             if (CommonUtils.isEmpty(subOrders)) {
-                return new ArrayList<>();
+                return Result.success(new ArrayList<>());
             }
-            return subOrders;
+            return Result.success(subOrders);
         } catch (Exception ex) {
             LogUtils.error("查询子订单异常:" + ex.getMessage());
-            AlertBuilder.ERROR("查询子订单异常");
-            return new ArrayList<>();
+            // AlertBuilder.ERROR("查询子订单异常");
+            return Result.fail("查询子订单异常:" + ex.getMessage());
         }
     }
 

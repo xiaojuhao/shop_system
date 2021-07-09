@@ -62,6 +62,22 @@ public class CartService {
         }
     }
 
+    public Result<CartVO> updateCart(Integer deskId, CartVO vo) {
+        try {
+            Cart cart = new Cart();
+            cart.setDeskId(deskId);
+            cart.setContents(Base64.encode(JSON.toJSONString(vo.getContents())));
+            int i = cartDAO.save(cart);
+            if (i == 0) {
+                return Result.fail("更新购物失败,保存数据库失败");
+            }
+            return Result.success(CartVO.from(cart));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail("更新购物失败," + ex.getMessage());
+        }
+    }
+
     public List<CartItemVO> selectByDeskId(Integer deskId) throws Exception {
         Cart cart = cartDAO.selectByDeskId(deskId);
         if (cart != null) {
@@ -72,6 +88,16 @@ public class CartService {
             }
         }
         return new ArrayList<>();
+    }
+
+    public Result<CartVO> getCartOfDesk(Integer deskId) {
+        try {
+            Cart cart = cartDAO.selectByDeskId(deskId);
+            return Result.success(CartVO.from(cart));
+        } catch (Exception ex) {
+            LogUtils.error("getCartOfDesk:" + ex.getMessage());
+            return Result.fail(ex.getMessage());
+        }
     }
 
     public Result<String> createOrder(PlaceOrderFromCartReq param) {
