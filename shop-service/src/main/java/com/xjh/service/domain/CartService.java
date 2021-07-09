@@ -3,6 +3,7 @@ package com.xjh.service.domain;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -49,7 +50,16 @@ public class CartService {
             Cart cart = new Cart();
             cart.setDeskId(deskId);
             List<CartItemVO> contentItems = selectByDeskId(deskId);
-            contentItems.add(item);
+            boolean exists = false;
+            for (CartItemVO vo : contentItems) {
+                if (Objects.equals(vo.getDishesId(), item.getDishesId())) {
+                    vo.setNums(vo.getNums() + item.getNums());
+                    exists = true;
+                }
+            }
+            if (!exists) {
+                contentItems.add(item);
+            }
             cart.setContents(Base64.encode(JSON.toJSONString(contentItems)));
             int i = cartDAO.save(cart);
             if (i == 0) {
