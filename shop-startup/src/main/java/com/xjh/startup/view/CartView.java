@@ -2,7 +2,9 @@ package com.xjh.startup.view;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import com.xjh.common.utils.AlertBuilder;
@@ -12,8 +14,10 @@ import com.xjh.common.utils.Result;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.dao.dataobject.Dishes;
+import com.xjh.dao.dataobject.DishesType;
 import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.service.domain.CartService;
+import com.xjh.service.domain.DishesTypeService;
 import com.xjh.service.domain.model.CartItemVO;
 import com.xjh.service.domain.model.CartVO;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
@@ -39,6 +43,7 @@ import javafx.scene.paint.Color;
 
 public class CartView extends VBox {
     CartService cartService = GuiceContainer.getInstance(CartService.class);
+    DishesTypeService dishesTypeService = GuiceContainer.getInstance(DishesTypeService.class);
     DishesDAO dishesDAO = GuiceContainer.getInstance(DishesDAO.class);
 
     private final DeskOrderParam param;
@@ -124,7 +129,8 @@ public class CartView extends VBox {
     private TableView<CartItemBO> tableList() {
         try {
             tv.getColumns().addAll(
-                    newCol("菜品ID", "dishesId", 100),
+                    newCol("序号", "seqNo", 100),
+                    newCol("菜品类型", "dishesTypeName", 100),
                     newCol("菜品名称", "dishesName", 200),
                     newCol("价格", "dishesPrice", 100),
                     newCol("数量", "nums", 100),
@@ -145,14 +151,21 @@ public class CartView extends VBox {
 
     private List<CartItemBO> loadCartItems() {
         try {
+            Map<Integer, DishesType> typeMap = dishesTypeService.dishesTypeMap();
             List<CartItemVO> list = cartService.selectByDeskId(param.getDeskId());
+            AtomicInteger seqNo = new AtomicInteger();
             return list.stream().map(it -> {
                 Dishes dishes = dishesDAO.getById(it.getDishesId());
                 CartItemBO bo = new CartItemBO();
+                bo.setSeqNo(seqNo.incrementAndGet());
                 bo.setDishesId(it.getDishesId());
                 bo.setNums(CommonUtils.orElse(it.getNums(), 1));
                 if (dishes != null) {
-                    bo.setDishesName(new RichText(dishes.getDishesName()).with(Color.RED));
+                    DishesType type = typeMap.get(dishes.getDishesTypeId());
+                    if (type != null) {
+                        bo.setDishesTypeName(new RichText(type.getTypeName()).with(Color.RED));
+                    }
+                    bo.setDishesName(new RichText(dishes.getDishesName()));
                     bo.setDishesPrice(new Money(dishes.getDishesPrice()));
                     bo.setTotalPrice(new Money(bo.getNums() * dishes.getDishesPrice()));
                 }

@@ -15,9 +15,9 @@ import com.xjh.common.valueobject.DishesImg;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesType;
 import com.xjh.dao.mapper.DishesDAO;
-import com.xjh.dao.mapper.DishesTypeDAO;
 import com.xjh.dao.reqmodel.PageCond;
 import com.xjh.service.domain.CartService;
+import com.xjh.service.domain.DishesTypeService;
 import com.xjh.service.domain.model.CartItemVO;
 import com.xjh.service.domain.model.CartVO;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
@@ -239,8 +239,8 @@ public class OrderDishesChoiceView extends VBox {
     }
 
     private ComboBox<DishesType> dishesTypeIdSelector() {
-        DishesTypeDAO dao = GuiceContainer.getInstance(DishesTypeDAO.class);
-        List<DishesType> types = dao.selectAll();
+        DishesTypeService dishesTypeService = GuiceContainer.getInstance(DishesTypeService.class);
+        List<DishesType> types = dishesTypeService.loadAllTypes();
         ObservableList<DishesType> options = FXCollections.observableArrayList(types);
         ComboBox<DishesType> selector = new ComboBox<>(options);
         selector.setConverter(new StringConverter<DishesType>() {

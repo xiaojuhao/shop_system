@@ -4,13 +4,31 @@ import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.RichText;
 
 public class CartItemBO {
+    Integer seqNo;
     Integer dishesId;
+    RichText dishesTypeName;
     RichText dishesName;
     String dishesPriceId;
     Money dishesPrice;
     Integer nums;
     Money totalPrice;
     String ifDishesPackage;
+
+    public Integer getSeqNo() {
+        return seqNo;
+    }
+
+    public void setSeqNo(Integer seqNo) {
+        this.seqNo = seqNo;
+    }
+
+    public RichText getDishesTypeName() {
+        return dishesTypeName;
+    }
+
+    public void setDishesTypeName(RichText dishesTypeName) {
+        this.dishesTypeName = dishesTypeName;
+    }
 
     public Integer getDishesId() {
         return dishesId;
