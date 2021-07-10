@@ -45,8 +45,8 @@ public class CommonUtils {
         return v != null ? v : def;
     }
 
-    public static String formatMoney(Double value) {
-        if (value == null || value <= 0) {
+    public static String formatMoney(Number value) {
+        if (value == null) {
             return "￥0.00";
         }
         return new DecimalFormat("￥#.00").format(value);

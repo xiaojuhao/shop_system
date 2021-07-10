@@ -2,6 +2,7 @@ package com.xjh.startup.another;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.cellvalue.Money;
@@ -47,22 +48,25 @@ public class TableViewTest extends Application {
     }
 
 
+    static AtomicLong index = new AtomicLong();
     private TableColumn<DataModel, Money> newPriceColumn() {
         TableColumn<DataModel, Money> column = new TableColumn<>("价格");
         column.setStyle("-fx-border-width: 0px; ");
         column.setMinWidth(100);
         column.setCellValueFactory(cellData -> {
+            // System.out.println("setCellValueFactory + " + index.incrementAndGet());
             DataModel data = cellData.getValue();
             Money money = new Money(data.dishesPrice).with(Color.RED).with(Pos.CENTER);
             return new SimpleObjectProperty<>(money);
         });
         // 图片
         column.setCellFactory(col -> {
+            // System.out.println("setCellFactory + " + index.incrementAndGet());
             TableCell<DataModel, Money> cell = new TableCell<>();
-            cell.itemProperty().addListener((obs, o, n) -> {
-                System.out.println(obs + ", " + o + ", " + n);
-                if (n != null) {
-                    if (n.getAmount() > 50) {
+            cell.itemProperty().addListener((obs, ov, nv) -> {
+                // System.out.println(obs + ", " + ov + ", " + nv + " , " + index.incrementAndGet());
+                if (nv != null) {
+                    if (nv.getAmount() > 50) {
                         HBox graphicContainer = new HBox();
                         graphicContainer.setAlignment(Pos.CENTER);
                         ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/icon/crown.png")));
@@ -71,7 +75,7 @@ public class TableViewTest extends Application {
                         graphicContainer.getChildren().add(imageView);
                         cell.graphicProperty().set(graphicContainer);
                     } else {
-                        cell.textProperty().set(n.getAmount() + "");
+                        cell.textProperty().set(CommonUtils.formatMoney(nv.getAmount()));
                         cell.setAlignment(Pos.CENTER);
                         cell.setTextFill(Color.RED);
                     }
