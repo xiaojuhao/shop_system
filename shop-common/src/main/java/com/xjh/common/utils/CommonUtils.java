@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -488,6 +489,17 @@ public class CommonUtils {
             }
         }
         return map;
+    }
+
+    public static <T> void forEach(Collection<T> coll, Consumer<T> consumer) {
+        if (coll == null) {
+            return;
+        }
+        for (T t : coll) {
+            if (t != null) {
+                consumer.accept(t);
+            }
+        }
     }
 
     public static boolean isEmpty(Collection<?> coll) {

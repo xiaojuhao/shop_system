@@ -1,6 +1,7 @@
 package com.xjh.common.enumeration;
 
 public enum EnumPayMethod {
+    UNKNOWN(-1, "未知"),
     CASH(1, "现金"),
     BANKCARD(2, "银行卡"),
     COUPON(3, "优惠券"),
@@ -16,5 +17,17 @@ public enum EnumPayMethod {
     EnumPayMethod(int code, String name) {
         this.code = code;
         this.name = name;
+    }
+
+    public static EnumPayMethod of(Integer code) {
+        if (code == null) {
+            return UNKNOWN;
+        }
+        for (EnumPayMethod e : EnumPayMethod.values()) {
+            if (e.code == code) {
+                return e;
+            }
+        }
+        return UNKNOWN;
     }
 }

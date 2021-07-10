@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.enumeration.EnumOrderStatus;
+import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
@@ -20,10 +21,12 @@ import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
+import com.xjh.dao.dataobject.OrderPay;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.DishesPackageService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.OrderDishesService;
+import com.xjh.service.domain.OrderPayService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
@@ -45,6 +48,7 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
@@ -62,6 +66,7 @@ public class OrderDetail extends VBox {
     OrderDishesService orderDishesService;
     DishesService dishesService;
     DishesPackageService dishesPackageService;
+    OrderPayService orderPayService;
 
 
     ObjectProperty<OrderView> orderView = new SimpleObjectProperty<>();
@@ -73,6 +78,7 @@ public class OrderDetail extends VBox {
         orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
         dishesPackageService = GuiceContainer.getInstance(DishesPackageService.class);
         dishesService = GuiceContainer.getInstance(DishesService.class);
+        orderPayService = GuiceContainer.getInstance(OrderPayService.class);
         LogUtils.info("OrderDetail初始化服务耗时: " + cost.getCostAndReset());
 
 
@@ -210,7 +216,16 @@ public class OrderDetail extends VBox {
         }
         // 分割线
         this.getChildren().add(horizontalSeparator());
-
+        // 支付消息
+        {
+            TextArea textArea = new TextArea();
+            textArea.setPrefHeight(80);
+            textArea.setEditable(false);
+            orderView.addListener((x, ov, nv) -> textArea.setText(nv.payInfoRemark));
+            this.getChildren().add(textArea);
+        }
+        // 分割线
+        this.getChildren().add(horizontalSeparator());
         // 功能菜单
         {
             DeskOrderParam deskOrderParam = new DeskOrderParam();
@@ -330,6 +345,18 @@ public class OrderDetail extends VBox {
             v.orderHadpaid = o.getOrderHadpaid();
             v.totalPrice = sumTotalPrice(orderId);
             v.payStatusName = EnumOrderStatus.of(o.getOrderStatus()).remark;
+            v.deduction = o.getFullReduceDishesPrice();
+            // 支付信息
+            List<OrderPay> pays = orderPayService.selectByOrderId(orderId);
+            StringBuilder payInfo = new StringBuilder();
+            CommonUtils.forEach(pays, p -> {
+                payInfo.append(
+                        DateBuilder.base(p.getCreatetime()).format(DATETIME_PATTERN)
+                                + " 收到付款:" + CommonUtils.formatMoney(p.getAmount())
+                                + ", 来自" + EnumPayMethod.of(p.getPaymentMethod()).name
+                                + "\r\n");
+            });
+            v.payInfoRemark = payInfo.toString();
             orderView.set(v);
         }
     }
@@ -407,6 +434,8 @@ public class OrderDetail extends VBox {
         String payStatusName;
         double totalPrice;
         double orderHadpaid;
+        double deduction;
+        String payInfoRemark;
     }
 
     @Override
