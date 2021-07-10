@@ -350,11 +350,15 @@ public class OrderDetail extends VBox {
             List<OrderPay> pays = orderPayService.selectByOrderId(orderId);
             StringBuilder payInfo = new StringBuilder();
             CommonUtils.forEach(pays, p -> {
-                payInfo.append(
-                        DateBuilder.base(p.getCreatetime()).format(DATETIME_PATTERN)
-                                + " 收到付款:" + CommonUtils.formatMoney(p.getAmount())
-                                + ", 来自" + EnumPayMethod.of(p.getPaymentMethod()).name
-                                + "\r\n");
+                payInfo.append(DateBuilder.base(p.getCreatetime()).format(DATETIME_PATTERN))
+                        .append(" 收到付款:")
+                        .append(CommonUtils.formatMoney(p.getAmount()))
+                        .append(", 来自")
+                        .append(EnumPayMethod.of(p.getPaymentMethod()).name);
+                if (CommonUtils.isNotBlank(p.getCardNumber())) {
+                    payInfo.append(",交易号:").append(p.getCardNumber());
+                }
+                payInfo.append("\r\n");
             });
             v.payInfoRemark = payInfo.toString();
             orderView.set(v);
