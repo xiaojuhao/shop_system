@@ -54,8 +54,6 @@ public class CartView extends VBox {
         this.getChildren().add(tableList());
         this.getChildren().add(separator());
         this.getChildren().add(functions());
-
-
     }
 
     private HBox functions() {

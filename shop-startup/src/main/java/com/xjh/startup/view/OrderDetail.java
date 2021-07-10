@@ -1,7 +1,6 @@
 package com.xjh.startup.view;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -11,6 +10,8 @@ import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Result;
+import com.xjh.common.utils.cellvalue.Money;
+import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackage;
@@ -24,7 +25,8 @@ import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
 
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -44,12 +46,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.util.Callback;
 
 public class OrderDetail extends VBox {
     final static String DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
@@ -58,27 +58,10 @@ public class OrderDetail extends VBox {
     DeskService deskService = GuiceContainer.getInstance(DeskService.class);
     OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
 
+    ObjectProperty<Order> order = new SimpleObjectProperty<>();
+
     public OrderDetail(Desk desk) {
         Integer orderId = desk.getOrderId();
-        String orderTime = "";
-        String payStatusName = "";
-        Double paid = 0D;
-        Order order;
-        order = orderService.getOrder(orderId);
-        if (order == null) {
-            AlertBuilder.ERROR("订单不存在:" + orderId);
-            return;
-        }
-        orderTime = DateBuilder.base(order.getCreateTime()).format(DATETIME_PATTERN);
-        payStatusName = EnumOrderStatus.of(order.getOrderStatus()).remark;
-        paid = order.getOrderHadpaid();
-
-
-        double totalPrice = 0;
-        List<OrderDishes> dishes = orderDishesService.selectOrderDishes(orderId);
-        totalPrice = CommonUtils.map(dishes, OrderDishes::getOrderDishesPrice)
-                .stream().filter(Objects::nonNull).reduce(0D, Double::sum);
-
         {
             int rowIndex = 0;
             GridPane gridPane = new GridPane();
@@ -103,11 +86,11 @@ public class OrderDetail extends VBox {
 
             // 第二行
             rowIndex++;
-            int customerNum = 0;
-            if (order != null) {
-                customerNum = order.getOrderCustomerNums();
-            }
-            Label labelCustNum = new Label("就餐人数: " + customerNum);
+            Label labelCustNum = new Label("就餐人数: 0");
+            order.addListener((x, ov, nv) -> {
+                int customerNum = CommonUtils.orElse(nv.getOrderCustomerNums(), 0);
+                labelCustNum.setText("就餐人数: " + customerNum);
+            });
             labelCustNum.setMinWidth(200);
             gridPane.add(labelCustNum, 0, rowIndex);
 
@@ -115,11 +98,19 @@ public class OrderDetail extends VBox {
             labelOrder.setMinWidth(200);
             gridPane.add(labelOrder, 1, rowIndex);
 
-            Label labelOrderTime = new Label("就餐时间: " + orderTime);
+            Label labelOrderTime = new Label("就餐时间: ");
+            order.addListener((x, ov, nv) -> {
+                String orderTime = DateBuilder.base(nv.getCreateTime()).format(DATETIME_PATTERN);
+                labelOrderTime.setText("就餐时间: " + orderTime);
+            });
             labelOrderTime.setMinWidth(200);
             gridPane.add(labelOrderTime, 2, rowIndex);
 
-            Label labelPayStatus = new Label("支付状态: " + payStatusName);
+            Label labelPayStatus = new Label("支付状态: 未支付");
+            order.addListener((x, ov, nv) -> {
+                String payStatusName = EnumOrderStatus.of(nv.getOrderStatus()).remark;
+                labelPayStatus.setText("支付状态: " + payStatusName);
+            });
             labelPayStatus.setMinWidth(200);
             gridPane.add(labelPayStatus, 3, rowIndex);
         }
@@ -131,15 +122,24 @@ public class OrderDetail extends VBox {
             gridPane.setHgap(10);
             gridPane.setPadding(new Insets(10));
             /// ----------- 第一行 ---------------
-            Label l = new Label("订单总额：" + totalPrice);
+            Label l = new Label("订单总额：0");
+            order.addListener((a, b, c) -> l.setText("订单总额: " + CommonUtils.formatMoney(sumTotalPrice(c.getOrderId()))));
             l.setMinWidth(200);
             gridPane.add(l, 0, 0);
             // 第二行
-            Label labelCustNum = new Label("已支付: " + paid);
+            Label labelCustNum = new Label("已支付: ");
+            order.addListener((x, ov, nv) -> {
+                labelCustNum.setText("已支付: " + CommonUtils.formatMoney(nv.getOrderHadpaid()));
+            });
             labelCustNum.setMinWidth(200);
             gridPane.add(labelCustNum, 1, 0);
 
-            Label notPaid = new Label("还需支付: " + (totalPrice - paid));
+            Label notPaid = new Label("还需支付: 0.00");
+            order.addListener((a, b, c) -> {
+                double totalPrice = sumTotalPrice(c.getOrderId());
+                String notPaidStr = CommonUtils.formatMoney(totalPrice - c.getOrderHadpaid());
+                notPaid.setText("还需支付: " + notPaidStr);
+            });
             notPaid.setMinWidth(200);
             notPaid.setStyle("-fx-font-size: 16; -fx-text-fill: red");
             gridPane.add(notPaid, 2, 0);
@@ -178,9 +178,10 @@ public class OrderDetail extends VBox {
         // 分割线
         this.getChildren().add(horizontalSeparator());
 
-
         TableView<OrderDishesTableItemVO> tv = new TableView<>();
         Runnable refreshTableView = () -> {
+            Order qryOrder = orderService.getOrder(orderId);
+            order.set(qryOrder);
             tv.setItems(loadOrderDishes(orderId));
             tv.refresh();
         };
@@ -204,45 +205,25 @@ public class OrderDetail extends VBox {
 
         // 功能菜单
         {
-            FlowPane pane = new FlowPane();
-            pane.setHgap(20);
-            pane.setPadding(new Insets(10, 0, 10, 20));
-            Button orderBtn = createButton("点菜");
             DeskOrderParam deskOrderParam = new DeskOrderParam();
             deskOrderParam.setDeskId(desk.getDeskId());
             deskOrderParam.setDeskName(desk.getDeskName());
             deskOrderParam.setOrderId(orderId);
-            orderBtn.setOnMouseClicked(evt -> {
-                Stage orderDishesStg = new Stage();
-                orderDishesStg.initOwner(this.getScene().getWindow());
-                orderDishesStg.initModality(Modality.WINDOW_MODAL);
-                orderDishesStg.initStyle(StageStyle.DECORATED);
-                orderDishesStg.centerOnScreen();
-                orderDishesStg.setWidth(this.getScene().getWindow().getWidth());
-                orderDishesStg.setHeight(this.getScene().getWindow().getHeight());
-                orderDishesStg.setTitle("点菜[桌号:" + desk.getDeskName() + "]");
-                orderDishesStg.setScene(new Scene(new OrderDishesChoiceView(deskOrderParam)));
-                orderDishesStg.setOnCloseRequest(e -> refreshTableView.run());
-                orderDishesStg.showAndWait();
-            });
+            deskOrderParam.setCallback(refreshTableView);
+
+            FlowPane pane = new FlowPane();
+            pane.setHgap(20);
+            pane.setPadding(new Insets(10, 0, 10, 20));
+            // 按钮
+            Button orderBtn = createButton("点菜");
+            orderBtn.setOnMouseClicked(evt -> openDishesChoiceView(deskOrderParam));
             Button sendBtn = createButton("送菜");
             Button returnBtn = createButton("退菜");
             Button transferBtn = createButton("转台");
             Button splitBtn = createButton("拆台");
             Button payBillBtn = createButton("结账");
-            payBillBtn.setOnMouseClicked(evt -> {
-                Stage orderDishesStg = new Stage();
-                orderDishesStg.initOwner(this.getScene().getWindow());
-                orderDishesStg.initModality(Modality.WINDOW_MODAL);
-                orderDishesStg.initStyle(StageStyle.DECORATED);
-                orderDishesStg.centerOnScreen();
-                orderDishesStg.setWidth(this.getScene().getWindow().getWidth() / 3);
-                orderDishesStg.setHeight(this.getScene().getWindow().getHeight() / 3 * 2);
-                orderDishesStg.setTitle("结账[桌号:" + desk.getDeskName() + "]");
-                orderDishesStg.setScene(new Scene(new PayWayChoiceView(deskOrderParam)));
-                orderDishesStg.setOnCloseRequest(e -> refreshTableView.run());
-                orderDishesStg.showAndWait();
-            });
+            payBillBtn.setOnMouseClicked(evt -> openPayWayChoiceView(deskOrderParam));
+            // add all buttons
             pane.getChildren().addAll(orderBtn, sendBtn, returnBtn, transferBtn, splitBtn, payBillBtn);
             this.getChildren().add(pane);
         }
@@ -256,26 +237,40 @@ public class OrderDetail extends VBox {
         return btn;
     }
 
-    private TableColumn newCol(String name, String filed, double width) {
-        TableColumn<OrderDishesTableItemVO, SimpleStringProperty> c = new TableColumn<>(name);
+    private TableColumn<OrderDishesTableItemVO, Object> newCol(String name, String filed, double width) {
+        TableColumn<OrderDishesTableItemVO, Object> c = new TableColumn<>(name);
         c.setStyle("-fx-border-width: 0px; ");
         c.setMinWidth(width);
         c.setCellValueFactory(new PropertyValueFactory<>(filed));
-        c.setCellFactory(new Callback<TableColumn<OrderDishesTableItemVO, SimpleStringProperty>, TableCell<OrderDishesTableItemVO, SimpleStringProperty>>() {
-            public TableCell<OrderDishesTableItemVO, String> call(TableColumn param) {
-                return new TableCell<OrderDishesTableItemVO, String>() {
-                    public void updateItem(String item, boolean empty) {
-                        if (CommonUtils.isNotBlank(item)) {
-                            if (item.contains("@")) {
-                                setTextFill(Color.RED);
-                            } else {
-                                setAlignment(Pos.CENTER_RIGHT);
-                            }
-                            setText(item);
-                        }
+        c.setCellFactory(col -> {
+            TableCell<OrderDishesTableItemVO, Object> cell = new TableCell<>();
+            cell.itemProperty().addListener((obs, ov, nv) -> {
+                if (nv == null) {
+                    return;
+                }
+                if (nv instanceof RichText) {
+                    RichText val = (RichText) nv;
+                    cell.textProperty().set(CommonUtils.stringify(val.getText()));
+                    if (val.getColor() != null) {
+                        cell.setTextFill(val.getColor());
                     }
-                };
-            }
+                    if (val.getPos() != null) {
+                        cell.setAlignment(val.getPos());
+                    }
+                } else if (nv instanceof Money) {
+                    Money val = (Money) nv;
+                    cell.textProperty().set(CommonUtils.formatMoney(val.getAmount()));
+                    if (val.getColor() != null) {
+                        cell.setTextFill(val.getColor());
+                    }
+                    if (val.getPos() != null) {
+                        cell.setAlignment(val.getPos());
+                    }
+                } else {
+                    cell.textProperty().set(CommonUtils.stringify(nv));
+                }
+            });
+            return cell;
         });
         return c;
     }
@@ -317,6 +312,14 @@ public class OrderDetail extends VBox {
 
     }
 
+    private double sumTotalPrice(Integer orderId) {
+        double totalPrice = 0;
+        List<OrderDishes> dishes = orderDishesService.selectOrderDishes(orderId);
+        totalPrice = CommonUtils.map(dishes, OrderDishes::getOrderDishesPrice)
+                .stream().reduce(0D, Double::sum);
+        return totalPrice;
+    }
+
 
     private void doCloseDesk(Desk desk) {
         double notPaidBillAmount = orderService.notPaidBillAmount(desk.getOrderId());
@@ -339,6 +342,34 @@ public class OrderDetail extends VBox {
             }
             this.getScene().getWindow().hide();
         }
+    }
+
+    private void openDishesChoiceView(DeskOrderParam param) {
+        Stage orderDishesStg = new Stage();
+        orderDishesStg.initOwner(this.getScene().getWindow());
+        orderDishesStg.initModality(Modality.WINDOW_MODAL);
+        orderDishesStg.initStyle(StageStyle.DECORATED);
+        orderDishesStg.centerOnScreen();
+        orderDishesStg.setWidth(this.getScene().getWindow().getWidth());
+        orderDishesStg.setHeight(this.getScene().getWindow().getHeight());
+        orderDishesStg.setTitle("点菜[桌号:" + param.getDeskName() + "]");
+        orderDishesStg.setScene(new Scene(new OrderDishesChoiceView(param)));
+        orderDishesStg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
+        orderDishesStg.showAndWait();
+    }
+
+    private void openPayWayChoiceView(DeskOrderParam param) {
+        Stage orderDishesStg = new Stage();
+        orderDishesStg.initOwner(this.getScene().getWindow());
+        orderDishesStg.initModality(Modality.WINDOW_MODAL);
+        orderDishesStg.initStyle(StageStyle.DECORATED);
+        orderDishesStg.centerOnScreen();
+        orderDishesStg.setWidth(this.getScene().getWindow().getWidth() / 3);
+        orderDishesStg.setHeight(this.getScene().getWindow().getHeight() / 3 * 2);
+        orderDishesStg.setTitle("结账[桌号:" + param.getDeskName() + "]");
+        orderDishesStg.setScene(new Scene(new PayWayChoiceView(param)));
+        orderDishesStg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
+        orderDishesStg.showAndWait();
     }
 
     private Separator horizontalSeparator() {

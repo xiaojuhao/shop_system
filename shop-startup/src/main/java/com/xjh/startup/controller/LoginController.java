@@ -63,7 +63,7 @@ public class LoginController implements Initializable {
             mainStage.setHeight(height - 10);
             //mainStage.setMaximized(true);
             mainStage.setScene(scene);
-            mainStage.setOnCloseRequest(evt -> {
+            mainStage.setOnHidden(evt -> {
                 // 主页面关闭
                 try {
                     LoginApp.server.get().stop();

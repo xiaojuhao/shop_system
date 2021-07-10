@@ -5,6 +5,7 @@ import com.xjh.common.utils.LogUtils;
 import com.xjh.common.utils.TimeRecord;
 import com.xjh.startup.server.XjhWebSocketServer;
 import com.xjh.startup.view.FxmlView;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -30,7 +31,7 @@ public class LoginApp extends Application {
         loginScene.getStylesheets().add("/css/style.css");
         primaryStage.setMaximized(true);
         primaryStage.setScene(loginScene);
-        primaryStage.setOnCloseRequest(evt -> {
+        primaryStage.setOnHidden(evt -> {
             try {
                 server.get().stop();
             } catch (Exception e) {

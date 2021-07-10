@@ -37,6 +37,9 @@ public class CommonUtils {
 
     public static void safeRun(Runnable run) {
         try {
+            if (run == null) {
+                return;
+            }
             run.run();
         } catch (Exception ex) {
             ex.printStackTrace();

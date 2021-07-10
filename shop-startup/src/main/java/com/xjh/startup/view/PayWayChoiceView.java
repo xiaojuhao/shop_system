@@ -101,6 +101,7 @@ public class PayWayChoiceView extends VBox {
                 LogUtils.error("更新订单支付结果失败: update error >> " + payRs);
                 AlertBuilder.ERROR("更新订单支付结果失败");
             }
+            this.getScene().getWindow().hide();
         } catch (Exception ex) {
             LogUtils.error("保存支付信息失败:" + ex.getMessage());
             AlertBuilder.ERROR("保存支付信息失败:" + ex.getMessage());
