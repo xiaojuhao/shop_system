@@ -38,6 +38,9 @@ public class OrderService {
 
     public Order getOrder(Integer orderId) {
         try {
+            if (orderId == null) {
+                return null;
+            }
             return orderDAO.selectByOrderId(orderId);
         } catch (Exception ex) {
             ex.printStackTrace();

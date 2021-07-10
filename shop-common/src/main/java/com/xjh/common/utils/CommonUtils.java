@@ -202,6 +202,20 @@ public class CommonUtils {
         }
     }
 
+    public static Double parseMoney(String money, Double def) {
+        if (isBlank(money)) {
+            return def;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < money.length(); i++) {
+            char c = money.charAt(i);
+            if (Character.isDigit(c) || c == '.') {
+                sb.append(c);
+            }
+        }
+        return parseDouble(sb, def);
+    }
+
     public static Long parseLong(Object str, Long def) {
         try {
             if (str == null) {

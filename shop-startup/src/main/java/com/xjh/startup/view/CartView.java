@@ -113,6 +113,7 @@ public class CartView extends VBox {
             Result<String> createOrderRs = cartService.createOrder(req);
             if (createOrderRs.isSuccess()) {
                 AlertBuilder.INFO("下单成功");
+                this.getScene().getWindow().hide();
             } else {
                 AlertBuilder.ERROR(createOrderRs.getMsg());
             }

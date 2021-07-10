@@ -38,6 +38,7 @@ public class PaymentByCashDialog extends Dialog<PaymentResult> {
         row++;
         TextField payAmountField = new TextField();
         payAmountField.setPromptText("支付金额");
+        payAmountField.setText(CommonUtils.formatMoney(pay));
         grid.add(new Label("支付金额:"), 0, row);
         grid.add(payAmountField, 1, row);
 
@@ -55,7 +56,7 @@ public class PaymentByCashDialog extends Dialog<PaymentResult> {
             result.setPayMethod(EnumPayMethod.CASH);
             if (btn == confirmPayBtn) {
                 result.setPayAction(1);
-                result.setPayAmount(CommonUtils.parseDouble(payAmountField.getText(), 0D));
+                result.setPayAmount(CommonUtils.parseMoney(payAmountField.getText(), 0D));
                 result.setPayRemark("现金支付:" + payAmountField.getText()
                         + "\n" + remarkField.getText());
             } else {

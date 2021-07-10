@@ -52,23 +52,26 @@ import javafx.stage.StageStyle;
 import javafx.util.Callback;
 
 public class OrderDetail extends VBox {
-    public OrderDetail(Desk orderDesk) {
-        // 依赖服务
-        OrderService orderService = GuiceContainer.getInstance(OrderService.class);
-        DeskService deskService = GuiceContainer.getInstance(DeskService.class);
-        OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
+    final static String DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    // 依赖服务
+    OrderService orderService = GuiceContainer.getInstance(OrderService.class);
+    DeskService deskService = GuiceContainer.getInstance(DeskService.class);
+    OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
 
-        Integer orderId = orderDesk.getOrderId();
+    public OrderDetail(Desk desk) {
+        Integer orderId = desk.getOrderId();
         String orderTime = "";
         String payStatusName = "";
         Double paid = 0D;
-        Order order = null;
+        Order order;
         order = orderService.getOrder(orderId);
-        if (order != null) {
-            orderTime = DateBuilder.base(order.getCreateTime()).format("yyyy-MM-dd HH:mm:ss");
-            payStatusName = EnumOrderStatus.of(order.getOrderStatus()).remark;
-            paid = order.getOrderHadpaid();
+        if (order == null) {
+            AlertBuilder.ERROR("订单不存在:" + orderId);
+            return;
         }
+        orderTime = DateBuilder.base(order.getCreateTime()).format(DATETIME_PATTERN);
+        payStatusName = EnumOrderStatus.of(order.getOrderStatus()).remark;
+        paid = order.getOrderHadpaid();
 
 
         double totalPrice = 0;
@@ -77,73 +80,51 @@ public class OrderDetail extends VBox {
                 .stream().filter(Objects::nonNull).reduce(0D, Double::sum);
 
         {
+            int rowIndex = 0;
             GridPane gridPane = new GridPane();
             gridPane.setVgap(10);
             gridPane.setHgap(10);
             gridPane.setPadding(new Insets(10));
             // gridPane.setStyle("-fx-border-width: 1 1 1 1;-fx-border-style: solid;-fx-border-color: red");
-            Label l = new Label("桌号：" + orderDesk.getDeskName());
+            // 第一行
+            String tableName = "桌号：" + desk.getDeskName();
+            Label l = new Label(tableName);
             l.setMinWidth(800);
             l.setMinHeight(50);
             l.setFont(new Font(18));
             l.setAlignment(Pos.CENTER);
-            gridPane.add(l, 0, 0, 4, 1);
+            gridPane.add(l, 0, rowIndex, 4, 1);
+            // 关台按钮
+            Button button = new Button("关台");
+            button.setMinWidth(100);
+            button.setOnMouseClicked(evt -> doCloseDesk(desk));
+            gridPane.add(button, 4, rowIndex, 1, 2);
+            this.getChildren().add(gridPane);
+
             // 第二行
+            rowIndex++;
             int customerNum = 0;
             if (order != null) {
                 customerNum = order.getOrderCustomerNums();
             }
             Label labelCustNum = new Label("就餐人数: " + customerNum);
             labelCustNum.setMinWidth(200);
-            gridPane.add(labelCustNum, 0, 1);
+            gridPane.add(labelCustNum, 0, rowIndex);
 
             Label labelOrder = new Label("订单号: " + orderId);
             labelOrder.setMinWidth(200);
-            gridPane.add(labelOrder, 1, 1);
+            gridPane.add(labelOrder, 1, rowIndex);
 
             Label labelOrderTime = new Label("就餐时间: " + orderTime);
             labelOrderTime.setMinWidth(200);
-            gridPane.add(labelOrderTime, 2, 1);
+            gridPane.add(labelOrderTime, 2, rowIndex);
 
             Label labelPayStatus = new Label("支付状态: " + payStatusName);
             labelPayStatus.setMinWidth(200);
-            gridPane.add(labelPayStatus, 3, 1);
-
-            // 关台按钮
-            Button button = new Button("关台");
-            button.setMinWidth(100);
-            button.setOnMouseClicked(evt -> {
-                double notPaidBillAmount = orderService.notPaidBillAmount(orderId);
-                if (notPaidBillAmount > 0) {
-                    AlertBuilder.INFO("未支付完成，无法关台");
-                    return;
-                }
-                Alert _alert = new Alert(Alert.AlertType.CONFIRMATION,
-                        "您确定要关台吗？",
-                        new ButtonType("取消", ButtonBar.ButtonData.NO),
-                        new ButtonType("确定", ButtonBar.ButtonData.YES));
-                _alert.setTitle("关台操作");
-                _alert.setHeaderText("当前订单已结清");
-                Optional<ButtonType> _buttonType = _alert.showAndWait();
-                if (_buttonType.get().getButtonData().equals(ButtonBar.ButtonData.YES)) {
-                    Result<String> closeDeskRs = deskService.closeDesk(orderDesk.getDeskId());
-                    if (!closeDeskRs.isSuccess()) {
-                        AlertBuilder.ERROR(closeDeskRs.getMsg());
-                        return;
-                    }
-                    this.getScene().getWindow().hide();
-                }
-            });
-            gridPane.add(button, 4, 0, 1, 2);
-
-            this.getChildren().add(gridPane);
+            gridPane.add(labelPayStatus, 3, rowIndex);
         }
-        {
-            Separator separator2 = new Separator();
-            separator2.setOrientation(Orientation.HORIZONTAL);
-            // separator2.setPadding(new Insets(10));
-            this.getChildren().add(separator2);
-        }
+        // 分割线
+        this.getChildren().add(horizontalSeparator());
         {
             GridPane gridPane = new GridPane();
             gridPane.setVgap(10);
@@ -194,15 +175,15 @@ public class OrderDetail extends VBox {
 
             this.getChildren().add(gridPane);
         }
-        {
-            Separator separator2 = new Separator();
-            separator2.setOrientation(Orientation.HORIZONTAL);
-            // separator2.setPadding(new Insets(10));
-            this.getChildren().add(separator2);
-        }
+        // 分割线
+        this.getChildren().add(horizontalSeparator());
+
 
         TableView<OrderDishesTableItemVO> tv = new TableView<>();
-        Runnable refreshTableView = () -> tv.setItems(loadOrderDishes(orderId));
+        Runnable refreshTableView = () -> {
+            tv.setItems(loadOrderDishes(orderId));
+            tv.refresh();
+        };
         {
             tv.setMaxHeight(300);
             tv.setPadding(new Insets(5, 0, 0, 5));
@@ -218,12 +199,9 @@ public class OrderDetail extends VBox {
             this.getChildren().add(tv);
             refreshTableView.run();
         }
+        // 分割线
+        this.getChildren().add(horizontalSeparator());
 
-        {
-            Separator separator2 = new Separator();
-            separator2.setOrientation(Orientation.HORIZONTAL);
-            this.getChildren().add(separator2);
-        }
         // 功能菜单
         {
             FlowPane pane = new FlowPane();
@@ -231,8 +209,8 @@ public class OrderDetail extends VBox {
             pane.setPadding(new Insets(10, 0, 10, 20));
             Button orderBtn = createButton("点菜");
             DeskOrderParam deskOrderParam = new DeskOrderParam();
-            deskOrderParam.setDeskId(orderDesk.getDeskId());
-            deskOrderParam.setDeskName(orderDesk.getDeskName());
+            deskOrderParam.setDeskId(desk.getDeskId());
+            deskOrderParam.setDeskName(desk.getDeskName());
             deskOrderParam.setOrderId(orderId);
             orderBtn.setOnMouseClicked(evt -> {
                 Stage orderDishesStg = new Stage();
@@ -242,7 +220,7 @@ public class OrderDetail extends VBox {
                 orderDishesStg.centerOnScreen();
                 orderDishesStg.setWidth(this.getScene().getWindow().getWidth());
                 orderDishesStg.setHeight(this.getScene().getWindow().getHeight());
-                orderDishesStg.setTitle("点菜[桌号:" + orderDesk.getDeskName() + "]");
+                orderDishesStg.setTitle("点菜[桌号:" + desk.getDeskName() + "]");
                 orderDishesStg.setScene(new Scene(new OrderDishesChoiceView(deskOrderParam)));
                 orderDishesStg.setOnCloseRequest(e -> refreshTableView.run());
                 orderDishesStg.showAndWait();
@@ -260,7 +238,7 @@ public class OrderDetail extends VBox {
                 orderDishesStg.centerOnScreen();
                 orderDishesStg.setWidth(this.getScene().getWindow().getWidth() / 3);
                 orderDishesStg.setHeight(this.getScene().getWindow().getHeight() / 3 * 2);
-                orderDishesStg.setTitle("结账[桌号:" + orderDesk.getDeskName() + "]");
+                orderDishesStg.setTitle("结账[桌号:" + desk.getDeskName() + "]");
                 orderDishesStg.setScene(new Scene(new PayWayChoiceView(deskOrderParam)));
                 orderDishesStg.setOnCloseRequest(e -> refreshTableView.run());
                 orderDishesStg.showAndWait();
@@ -337,5 +315,41 @@ public class OrderDetail extends VBox {
         }).collect(Collectors.toList());
         return FXCollections.observableArrayList(items);
 
+    }
+
+
+    private void doCloseDesk(Desk desk) {
+        double notPaidBillAmount = orderService.notPaidBillAmount(desk.getOrderId());
+        if (notPaidBillAmount > 0) {
+            AlertBuilder.INFO("未支付完成，无法关台");
+            return;
+        }
+        Alert _alert = new Alert(Alert.AlertType.CONFIRMATION,
+                "您确定要关台吗？",
+                new ButtonType("取消", ButtonBar.ButtonData.NO),
+                new ButtonType("确定", ButtonBar.ButtonData.YES));
+        _alert.setTitle("关台操作");
+        _alert.setHeaderText("当前订单已结清");
+        Optional<ButtonType> _buttonType = _alert.showAndWait();
+        if (_buttonType.get().getButtonData().equals(ButtonBar.ButtonData.YES)) {
+            Result<String> closeDeskRs = deskService.closeDesk(desk.getDeskId());
+            if (!closeDeskRs.isSuccess()) {
+                AlertBuilder.ERROR(closeDeskRs.getMsg());
+                return;
+            }
+            this.getScene().getWindow().hide();
+        }
+    }
+
+    private Separator horizontalSeparator() {
+        Separator separator2 = new Separator();
+        separator2.setOrientation(Orientation.HORIZONTAL);
+        return separator2;
+
+    }
+
+    @Override
+    public void finalize() {
+        System.out.println("OrderDetail ........ destroyed");
     }
 }

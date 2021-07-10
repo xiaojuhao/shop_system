@@ -57,9 +57,9 @@ public class OrderDishesChoiceView extends VBox {
     DishesDAO dishesDAO = GuiceContainer.getInstance(DishesDAO.class);
     CartService cartService = GuiceContainer.getInstance(CartService.class);
 
-    private DeskOrderParam data;
-    private SimpleIntegerProperty cartSize = new SimpleIntegerProperty(0);
-    private ObjectProperty<DishesQueryCond> qryDishesCond = new SimpleObjectProperty<>();
+    private final DeskOrderParam data;
+    private final SimpleIntegerProperty cartSize = new SimpleIntegerProperty(0);
+    private final ObjectProperty<DishesQueryCond> qryDishesCond = new SimpleObjectProperty<>();
 
     public OrderDishesChoiceView(DeskOrderParam data) {
         this.data = data;
@@ -69,11 +69,7 @@ public class OrderDishesChoiceView extends VBox {
     }
 
     private HBox top() {
-        try {
-            cartSize.set(cartService.selectByDeskId(data.getDeskId()).size());
-        } catch (Exception ex) {
-            LogUtils.error(ex.getMessage());
-        }
+        refreshCartSize();
         HBox hbox = new HBox();
         hbox.setAlignment(Pos.CENTER);
         hbox.setSpacing(10);
@@ -105,6 +101,7 @@ public class OrderDishesChoiceView extends VBox {
             cartStage.setTitle("购物车[桌号:" + data.getDeskName() + "]");
             cartStage.setScene(new Scene(new CartView(data)));
             cartStage.showAndWait();
+            refreshCartSize();
         });
         Button placeOrder = new Button("直接下单");
         placeOrder.setOnMouseClicked(evt -> {
@@ -114,7 +111,7 @@ public class OrderDishesChoiceView extends VBox {
                 req.setOrderId(data.getOrderId());
                 Result<String> createOrderRs = cartService.createOrder(req);
                 if (createOrderRs.isSuccess()) {
-                    cartSize.set(0);
+                    refreshCartSize();
                     AlertBuilder.INFO("通知消息", "下单成功");
                 } else {
                     AlertBuilder.ERROR(createOrderRs.getMsg());
@@ -315,6 +312,14 @@ public class OrderDishesChoiceView extends VBox {
         });
         box.getChildren().add(canvas);
         return box;
+    }
+
+    private void refreshCartSize() {
+        try {
+            cartSize.set(cartService.selectByDeskId(data.getDeskId()).size());
+        } catch (Exception ex) {
+            LogUtils.error(ex.getMessage());
+        }
     }
 
     private ImageView getImageView(String path) {
