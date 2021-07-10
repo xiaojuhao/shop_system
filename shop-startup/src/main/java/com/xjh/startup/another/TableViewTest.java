@@ -67,13 +67,13 @@ public class TableViewTest extends Application {
                 // System.out.println(obs + ", " + ov + ", " + nv + " , " + index.incrementAndGet());
                 if (nv != null) {
                     if (nv.getAmount() > 50) {
-                        HBox graphicContainer = new HBox();
-                        graphicContainer.setAlignment(Pos.CENTER);
+                        HBox graph = new HBox();
+                        graph.setAlignment(Pos.CENTER);
                         ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/icon/crown.png")));
                         imageView.setFitHeight(25);
                         imageView.setPreserveRatio(true);
-                        graphicContainer.getChildren().add(imageView);
-                        cell.graphicProperty().set(graphicContainer);
+                        graph.getChildren().add(imageView);
+                        cell.graphicProperty().set(graph);
                     } else {
                         cell.textProperty().set(CommonUtils.formatMoney(nv.getAmount()));
                         cell.setAlignment(Pos.CENTER);
