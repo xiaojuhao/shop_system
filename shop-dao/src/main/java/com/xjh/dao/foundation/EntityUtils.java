@@ -17,6 +17,12 @@ import com.xjh.common.utils.ReflectionUtils;
 import cn.hutool.db.Entity;
 
 public class EntityUtils {
+    public static Entity pureCreate(Class<?> clz) {
+        Table table = clz.getAnnotation(Table.class);
+        String tableName = table.value();
+        return Entity.create(tableName);
+    }
+
     public static Entity create(Object dd) {
         Class<?> clz = dd.getClass();
         Table table = clz.getAnnotation(Table.class);

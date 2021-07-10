@@ -1,6 +1,7 @@
 package com.xjh.startup.view;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -9,7 +10,9 @@ import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.utils.LogUtils;
 import com.xjh.common.utils.Result;
+import com.xjh.common.utils.TimeRecord;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.dao.dataobject.Desk;
@@ -54,13 +57,25 @@ import javafx.stage.StageStyle;
 public class OrderDetail extends VBox {
     final static String DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     // 依赖服务
-    OrderService orderService = GuiceContainer.getInstance(OrderService.class);
-    DeskService deskService = GuiceContainer.getInstance(DeskService.class);
-    OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
+    OrderService orderService;
+    DeskService deskService;
+    OrderDishesService orderDishesService;
+    DishesPackageDAO dishesPackageDAO;
+    DishesDAO dishesDAO;
+
 
     ObjectProperty<OrderView> orderView = new SimpleObjectProperty<>();
 
     public OrderDetail(Desk desk) {
+        TimeRecord cost = TimeRecord.start();
+        deskService = GuiceContainer.getInstance(DeskService.class);
+        orderService = GuiceContainer.getInstance(OrderService.class);
+        orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
+        dishesPackageDAO = GuiceContainer.getInstance(DishesPackageDAO.class);
+        dishesDAO = GuiceContainer.getInstance(DishesDAO.class);
+
+
+        LogUtils.info("OrderDetail初始化服务耗时: " + cost.getCostAndReset());
         Integer orderId = desk.getOrderId();
         {
             int rowIndex = 0;
@@ -176,9 +191,13 @@ public class OrderDetail extends VBox {
 
         TableView<OrderDishesTableItemVO> tv = new TableView<>();
         Runnable refreshTableView = () -> {
+            TimeRecord start = TimeRecord.start();
             reloadOrder(orderId);
+            LogUtils.info("reloadOrder 》》" + start.getCostAndReset());
             tv.setItems(loadOrderDishes(orderId));
+            LogUtils.info("loadOrderDishes 》》" + start.getCostAndReset());
             tv.refresh();
+            LogUtils.info("refresh 》》" + start.getCostAndReset());
         };
         {
             tv.setMaxHeight(300);
@@ -193,7 +212,7 @@ public class OrderDetail extends VBox {
                     newCol("类型", "col7", 100)
             );
             this.getChildren().add(tv);
-            refreshTableView.run();
+
         }
         // 分割线
         this.getChildren().add(horizontalSeparator());
@@ -222,7 +241,10 @@ public class OrderDetail extends VBox {
             pane.getChildren().addAll(orderBtn, sendBtn, returnBtn, transferBtn, splitBtn, payBillBtn);
             this.getChildren().add(pane);
         }
-
+        LogUtils.info("OrderDetail构建页面耗时: " + cost.getCostAndReset());
+        // 刷新页面
+        refreshTableView.run();
+        LogUtils.info("OrderDetail加载数据耗时: " + cost.getCostAndReset());
     }
 
     private Button createButton(String name) {
@@ -271,13 +293,10 @@ public class OrderDetail extends VBox {
     }
 
     private ObservableList<OrderDishesTableItemVO> loadOrderDishes(Integer orderId) {
-        // 依赖服务
-        DishesPackageDAO dishesPackageDAO = GuiceContainer.getInstance(DishesPackageDAO.class);
-        DishesDAO dishesDAO = GuiceContainer.getInstance(DishesDAO.class);
-        OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
-
-
         List<OrderDishes> orderDishes = orderDishesService.selectOrderDishes(orderId);
+        List<Integer> dishesIdList = CommonUtils.map(orderDishes, OrderDishes::getDishesId);
+        List<Dishes> dishesList = dishesDAO.getByIds(dishesIdList);
+        Map<Integer, Dishes> dishesMap = CommonUtils.listToMap(dishesList, Dishes::getDishesId);
         List<OrderDishesTableItemVO> items = orderDishes.stream().map(o -> {
             String dishesName = "";
             String price = CommonUtils.formatMoney(o.getOrderDishesPrice());
@@ -290,7 +309,7 @@ public class OrderDetail extends VBox {
                     dishesName = pkg.getDishesPackageName();
                 }
             } else {
-                Dishes d = dishesDAO.getById(o.getDishesId());
+                Dishes d = dishesMap.get(o.getDishesId());
                 if (d != null) {
                     dishesName = d.getDishesName();
                 }

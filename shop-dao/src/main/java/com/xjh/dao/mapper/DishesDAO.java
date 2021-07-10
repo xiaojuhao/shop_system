@@ -37,6 +37,21 @@ public class DishesDAO {
         }
     }
 
+    public List<Dishes> getByIds(List<Integer> ids) {
+        if (CommonUtils.isEmpty(ids)) {
+            return new ArrayList<>();
+        }
+        try {
+            Entity cond = EntityUtils.pureCreate(Dishes.class);
+            cond.set("dishesId", ids.toArray());
+            List<Entity> list = Db.use(ds).findAll(cond);
+            return EntityUtils.convertList(list, Dishes.class);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
     public List<Dishes> selectList(Dishes cond) {
         try {
             List<Entity> list = Db.use(ds).find(EntityUtils.create(cond));
