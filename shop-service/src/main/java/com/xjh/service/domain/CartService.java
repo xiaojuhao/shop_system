@@ -1,5 +1,6 @@
 package com.xjh.service.domain;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -157,12 +158,16 @@ public class CartService {
 
                 orderDishesDAO.insert(d);
             }
-            cartDAO.clearCart(deskId);
+            clearCart(deskId);
             return Result.success("下单成功");
         } catch (Exception ex) {
             ex.printStackTrace();
             return Result.fail("下单失败:" + ex.getMessage());
         }
+    }
+
+    public void clearCart(Integer deskId) throws SQLException {
+        cartDAO.clearCart(deskId);
     }
 
     public Integer createNewId() {

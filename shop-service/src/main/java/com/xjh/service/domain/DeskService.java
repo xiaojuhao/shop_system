@@ -11,7 +11,6 @@ import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.mapper.DeskDAO;
-import com.xjh.dao.mapper.InfoDAO;
 import com.xjh.service.domain.model.CreateOrderParam;
 import com.xjh.service.domain.model.OpenDeskParam;
 
@@ -22,7 +21,7 @@ public class DeskService {
     @Inject
     DeskDAO deskDAO;
     @Inject
-    InfoDAO infoDAO;
+    CartService cartService;
 
     public Desk getById(Integer id) {
         try {
@@ -64,6 +63,8 @@ public class DeskService {
             if (i == 0) {
                 return Result.fail("关台失败, 更新数据库失败");
             } else {
+                // 清空购物车
+                cartService.clearCart(deskId);
                 return Result.success("关台成功");
             }
         } catch (Exception ex) {
