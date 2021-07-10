@@ -73,6 +73,8 @@ public class TableViewTest extends Application {
                         imageView.setFitHeight(25);
                         imageView.setPreserveRatio(true);
                         graph.getChildren().add(imageView);
+                        cell.setText("超值");
+                        cell.setTextFill(Color.RED);
                         cell.graphicProperty().set(graph);
                     } else {
                         cell.textProperty().set(CommonUtils.formatMoney(nv.getAmount()));
