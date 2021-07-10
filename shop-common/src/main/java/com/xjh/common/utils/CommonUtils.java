@@ -52,9 +52,9 @@ public class CommonUtils {
 
     public static String formatMoney(Number value) {
         if (value == null) {
-            return "￥0.00";
+            return "0.00";
         }
-        return new DecimalFormat("￥#.00").format(value);
+        return new DecimalFormat("0.00").format(value);
     }
 
     public static String formatSeconds(long seconds) {

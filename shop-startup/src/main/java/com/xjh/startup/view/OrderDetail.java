@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.xjh.common.enumeration.EnumOrderSaleType;
+import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
@@ -314,6 +315,7 @@ public class OrderDetail extends VBox {
             v.orderTime = DateBuilder.base(o.getCreateTime()).format(DATETIME_PATTERN);
             v.orderHadpaid = o.getOrderHadpaid();
             v.totalPrice = sumTotalPrice(orderId);
+            v.payStatusName = EnumOrderStatus.of(o.getOrderStatus()).remark;
             orderView.set(v);
         }
     }

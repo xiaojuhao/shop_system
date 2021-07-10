@@ -12,6 +12,7 @@ import javax.inject.Singleton;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.xjh.common.enumeration.EnumOrderSaleType;
+import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.store.SequenceDatabase;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
@@ -45,6 +46,8 @@ public class CartService {
     DishesDAO dishesDAO;
     @Inject
     OrderDishesDAO orderDishesDAO;
+    @Inject
+    OrderService orderService;
 
     public Result<CartVO> addItem(Integer deskId, CartItemVO item) {
         try {
@@ -158,7 +161,17 @@ public class CartService {
 
                 orderDishesDAO.insert(d);
             }
+            double notPaid = orderService.notPaidBillAmount(orderId);
+            double hadPaid = CommonUtils.orElse(order.getOrderHadpaid(), 0D);
+            if (hadPaid > 0 && notPaid > 0) {
+                order.setOrderStatus(EnumOrderStatus.PARTIAL_PAID.status);
+            } else if (hadPaid < 0.01 && notPaid > 0.01) {
+                order.setOrderStatus(EnumOrderStatus.UNPAID.status);
+            }
+            // 清空购物车
             clearCart(deskId);
+            // 更新订单状态
+            orderService.updateByOrderId(order);
             return Result.success("下单成功");
         } catch (Exception ex) {
             ex.printStackTrace();

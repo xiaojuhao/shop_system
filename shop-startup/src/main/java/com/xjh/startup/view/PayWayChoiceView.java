@@ -7,6 +7,7 @@ import com.xjh.common.enumeration.EnumPayStatus;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderPay;
 import com.xjh.dao.mapper.OrderDAO;
@@ -96,10 +97,10 @@ public class PayWayChoiceView extends VBox {
             } else {
                 order.setOrderStatus(EnumOrderStatus.PARTIAL_PAID.status);
             }
-            int updateRs = orderDAO.updateByOrderId(order);
-            if (updateRs == 0) {
-                LogUtils.error("更新订单支付结果失败: update error >> " + payRs);
-                AlertBuilder.ERROR("更新订单支付结果失败");
+            Result<Integer> updateRs = orderService.updateByOrderId(order);
+            if (!updateRs.isSuccess()) {
+                LogUtils.error("更新订单支付结果失败: update error >> " + updateRs.getMsg());
+                AlertBuilder.ERROR("更新订单支付结果失败", updateRs.getMsg());
             }
             this.getScene().getWindow().hide();
         } catch (Exception ex) {

@@ -48,6 +48,23 @@ public class OrderService {
         }
     }
 
+    public Result<Integer> updateByOrderId(Order order) {
+        if (order == null || order.getOrderId() == null) {
+            return Result.fail("更新订单失败");
+        }
+        try {
+            int u = orderDAO.updateByOrderId(order);
+            if (u > 0) {
+                return Result.success(1);
+            } else {
+                return Result.fail("保存订单失败, 更新记录0");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail("保存订单数据失败:" + ex.getMessage());
+        }
+    }
+
     public Result<Integer> countSubOrder(Integer orderId) {
         try {
             return Result.success(subOrderDAO.countSubOrders(orderId));
