@@ -1,14 +1,15 @@
 package com.xjh.startup.view.model;
 
+import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.RichText;
 
 public class CartItemBO {
     Integer dishesId;
     RichText dishesName;
     String dishesPriceId;
-    String dishesPrice;
-    String nums;
-    String totalPrice;
+    Money dishesPrice;
+    Integer nums;
+    Money totalPrice;
     String ifDishesPackage;
 
     public Integer getDishesId() {
@@ -35,19 +36,19 @@ public class CartItemBO {
         this.dishesPriceId = dishesPriceId;
     }
 
-    public String getDishesPrice() {
+    public Money getDishesPrice() {
         return dishesPrice;
     }
 
-    public void setDishesPrice(String dishesPrice) {
+    public void setDishesPrice(Money dishesPrice) {
         this.dishesPrice = dishesPrice;
     }
 
-    public String getNums() {
+    public Integer getNums() {
         return nums;
     }
 
-    public void setNums(String nums) {
+    public void setNums(Integer nums) {
         this.nums = nums;
     }
 
@@ -59,11 +60,11 @@ public class CartItemBO {
         this.ifDishesPackage = ifDishesPackage;
     }
 
-    public String getTotalPrice() {
+    public Money getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(String totalPrice) {
+    public void setTotalPrice(Money totalPrice) {
         this.totalPrice = totalPrice;
     }
 }

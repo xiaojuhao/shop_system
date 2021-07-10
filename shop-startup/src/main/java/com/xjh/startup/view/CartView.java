@@ -21,7 +21,6 @@ import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.CartItemBO;
 import com.xjh.startup.view.model.DeskOrderParam;
 
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
@@ -37,14 +36,13 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.util.Callback;
 
 public class CartView extends VBox {
     CartService cartService = GuiceContainer.getInstance(CartService.class);
     DishesDAO dishesDAO = GuiceContainer.getInstance(DishesDAO.class);
 
-    private DeskOrderParam param;
-    private TableView tv = new TableView();
+    private final DeskOrderParam param;
+    private final TableView<CartItemBO> tv = new TableView<>();
 
     public CartView(DeskOrderParam param) {
         this.param = param;
@@ -123,7 +121,7 @@ public class CartView extends VBox {
         return s;
     }
 
-    private TableView tableList() {
+    private TableView<CartItemBO> tableList() {
         try {
             tv.getColumns().addAll(
                     newCol("菜品ID", "dishesId", 100),
@@ -148,62 +146,58 @@ public class CartView extends VBox {
     private List<CartItemBO> loadCartItems() {
         try {
             List<CartItemVO> list = cartService.selectByDeskId(param.getDeskId());
-            List<CartItemBO> bolist = list.stream().map(it -> {
+            return list.stream().map(it -> {
                 Dishes dishes = dishesDAO.getById(it.getDishesId());
                 CartItemBO bo = new CartItemBO();
                 bo.setDishesId(it.getDishesId());
-                bo.setNums(it.getNums() + "");
-                bo.setTotalPrice("0.00");
+                bo.setNums(CommonUtils.orElse(it.getNums(), 1));
                 if (dishes != null) {
                     bo.setDishesName(new RichText(dishes.getDishesName()).with(Color.RED));
-                    bo.setDishesPrice(CommonUtils.formatMoney(dishes.getDishesPrice()));
-                    bo.setTotalPrice(CommonUtils.formatMoney(it.getNums() * dishes.getDishesPrice()));
+                    bo.setDishesPrice(new Money(dishes.getDishesPrice()));
+                    bo.setTotalPrice(new Money(bo.getNums() * dishes.getDishesPrice()));
                 }
-
                 return bo;
             }).collect(Collectors.toList());
-            // System.out.println(JSON.toJSONString(bolist));
-            return bolist;
         } catch (Exception ex) {
             LogUtils.error("查询购物车异常:" + param.getDeskName() + ", " + ex.getMessage());
         }
         return new ArrayList<>();
     }
 
-    private TableColumn newCol(String name, String filed, double width) {
-        TableColumn<CartItemBO, SimpleObjectProperty> c = new TableColumn<>(name);
+    private TableColumn<CartItemBO, Object> newCol(String name, String filed, double width) {
+        TableColumn<CartItemBO, Object> c = new TableColumn<>(name);
         c.setStyle("-fx-border-width: 0px; ");
         c.setMinWidth(width);
         c.setCellValueFactory(new PropertyValueFactory<>(filed));
-        c.setCellFactory(new Callback<TableColumn<CartItemBO, SimpleObjectProperty>, TableCell<CartItemBO, SimpleObjectProperty>>() {
-
-            public TableCell<CartItemBO, Object> call(TableColumn param) {
-                return new TableCell<CartItemBO, Object>() {
-                    public void updateItem(Object item, boolean empty) {
-                        if (item instanceof RichText) {
-                            RichText richText = (RichText) item;
-                            setText(CommonUtils.stringify(richText.getText()));
-                            if (richText.getColor() != null) {
-                                setTextFill(richText.getColor());
-                            }
-                            if (richText.getPos() != null) {
-                                setAlignment(richText.getPos());
-                            }
-                        } else if (item instanceof Money) {
-                            Money money = (Money) item;
-                            this.setText(item.toString());
-                            if (money.getColor() != null) {
-                                setTextFill(money.getColor());
-                            }
-                            if (money.getPos() != null) {
-                                setAlignment(money.getPos());
-                            }
-                        } else {
-                            setText(CommonUtils.stringify(item));
-                        }
+        c.setCellFactory(col -> {
+            TableCell<CartItemBO, Object> cell = new TableCell<>();
+            cell.itemProperty().addListener((obs, ov, nv) -> {
+                if (nv == null) {
+                    return;
+                }
+                if (nv instanceof RichText) {
+                    RichText val = (RichText) nv;
+                    cell.textProperty().set(CommonUtils.stringify(val.getText()));
+                    if (val.getColor() != null) {
+                        cell.setTextFill(val.getColor());
                     }
-                };
-            }
+                    if (val.getPos() != null) {
+                        cell.setAlignment(val.getPos());
+                    }
+                } else if (nv instanceof Money) {
+                    Money val = (Money) nv;
+                    cell.textProperty().set(CommonUtils.formatMoney(val.getAmount()));
+                    if (val.getColor() != null) {
+                        cell.setTextFill(val.getColor());
+                    }
+                    if (val.getPos() != null) {
+                        cell.setAlignment(val.getPos());
+                    }
+                } else {
+                    cell.textProperty().set(CommonUtils.stringify(nv));
+                }
+            });
+            return cell;
         });
         return c;
     }
