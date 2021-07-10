@@ -20,9 +20,9 @@ import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
-import com.xjh.dao.mapper.DishesDAO;
-import com.xjh.dao.mapper.DishesPackageDAO;
 import com.xjh.service.domain.DeskService;
+import com.xjh.service.domain.DishesPackageService;
+import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
@@ -60,8 +60,8 @@ public class OrderDetail extends VBox {
     OrderService orderService;
     DeskService deskService;
     OrderDishesService orderDishesService;
-    DishesPackageDAO dishesPackageDAO;
-    DishesDAO dishesDAO;
+    DishesService dishesService;
+    DishesPackageService dishesPackageService;
 
 
     ObjectProperty<OrderView> orderView = new SimpleObjectProperty<>();
@@ -71,8 +71,8 @@ public class OrderDetail extends VBox {
         deskService = GuiceContainer.getInstance(DeskService.class);
         orderService = GuiceContainer.getInstance(OrderService.class);
         orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
-        dishesPackageDAO = GuiceContainer.getInstance(DishesPackageDAO.class);
-        dishesDAO = GuiceContainer.getInstance(DishesDAO.class);
+        dishesPackageService = GuiceContainer.getInstance(DishesPackageService.class);
+        dishesService = GuiceContainer.getInstance(DishesService.class);
         LogUtils.info("OrderDetail初始化服务耗时: " + cost.getCostAndReset());
 
 
@@ -289,7 +289,7 @@ public class OrderDetail extends VBox {
     private ObservableList<OrderDishesTableItemVO> loadOrderDishes(Integer orderId) {
         List<OrderDishes> orderDishes = orderDishesService.selectOrderDishes(orderId);
         List<Integer> dishesIdList = CommonUtils.map(orderDishes, OrderDishes::getDishesId);
-        List<Dishes> dishesList = dishesDAO.getByIds(dishesIdList);
+        List<Dishes> dishesList = dishesService.getByIds(dishesIdList);
         Map<Integer, Dishes> dishesMap = CommonUtils.listToMap(dishesList, Dishes::getDishesId);
         List<OrderDishesTableItemVO> items = new ArrayList<>();
         orderDishes.forEach(o -> {
@@ -299,7 +299,7 @@ public class OrderDetail extends VBox {
             String saleType = EnumOrderSaleType.of(o.getOrderDishesSaletype()).remark;
             // 套餐
             if (o.getIfDishesPackage() == 1) {
-                DishesPackage pkg = dishesPackageDAO.getById(o.getDishesId());
+                DishesPackage pkg = dishesPackageService.getById(o.getDishesId());
                 if (pkg != null) {
                     dishesName = pkg.getDishesPackageName();
                 }

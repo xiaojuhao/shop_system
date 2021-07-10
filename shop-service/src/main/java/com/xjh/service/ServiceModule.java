@@ -8,6 +8,8 @@ import com.xjh.service.domain.AnalysisService;
 import com.xjh.service.domain.BookService;
 import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.DeskService;
+import com.xjh.service.domain.DishesPackageService;
+import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.ReaderService;
@@ -28,6 +30,8 @@ public class ServiceModule extends AbstractModule {
         bind(OrderService.class);
         bind(OrderDishesService.class);
         bind(CartService.class);
+        bind(DishesService.class);
+        bind(DishesPackageService.class);
         LogUtils.info("ServiceModule 耗时:" + timeRecord.getCost());
     }
 }
