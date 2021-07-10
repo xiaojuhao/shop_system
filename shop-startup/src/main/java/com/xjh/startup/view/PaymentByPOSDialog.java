@@ -62,7 +62,7 @@ public class PaymentByPOSDialog extends Dialog<PaymentResult> {
             result.setPayMethod(EnumPayMethod.POS);
             if (btn == confirmPayBtn) {
                 result.setPayAction(1);
-                result.setPayAmount(CommonUtils.parseDouble(payAmountField.getText(), 0D));
+                result.setPayAmount(CommonUtils.parseMoney(payAmountField.getText(), 0D));
                 result.setPayRemark("POS支付:" + payAmountField.getText()
                         + "\n" + remarkField.getText());
                 result.setCardNumber(cardNumFiled.getText());

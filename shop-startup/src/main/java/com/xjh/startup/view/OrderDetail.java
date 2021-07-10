@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.xjh.common.enumeration.EnumOrderSaleType;
-import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
@@ -58,7 +57,7 @@ public class OrderDetail extends VBox {
     DeskService deskService = GuiceContainer.getInstance(DeskService.class);
     OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
 
-    ObjectProperty<Order> order = new SimpleObjectProperty<>();
+    ObjectProperty<OrderView> orderView = new SimpleObjectProperty<>();
 
     public OrderDetail(Desk desk) {
         Integer orderId = desk.getOrderId();
@@ -87,9 +86,8 @@ public class OrderDetail extends VBox {
             // 第二行
             rowIndex++;
             Label labelCustNum = new Label("就餐人数: 0");
-            order.addListener((x, ov, nv) -> {
-                int customerNum = CommonUtils.orElse(nv.getOrderCustomerNums(), 0);
-                labelCustNum.setText("就餐人数: " + customerNum);
+            orderView.addListener((x, ov, nv) -> {
+                labelCustNum.setText("就餐人数: " + nv.customerNum);
             });
             labelCustNum.setMinWidth(200);
             gridPane.add(labelCustNum, 0, rowIndex);
@@ -99,17 +97,15 @@ public class OrderDetail extends VBox {
             gridPane.add(labelOrder, 1, rowIndex);
 
             Label labelOrderTime = new Label("就餐时间: ");
-            order.addListener((x, ov, nv) -> {
-                String orderTime = DateBuilder.base(nv.getCreateTime()).format(DATETIME_PATTERN);
-                labelOrderTime.setText("就餐时间: " + orderTime);
+            orderView.addListener((x, ov, nv) -> {
+                labelOrderTime.setText("就餐时间: " + nv.orderTime);
             });
             labelOrderTime.setMinWidth(200);
             gridPane.add(labelOrderTime, 2, rowIndex);
 
             Label labelPayStatus = new Label("支付状态: 未支付");
-            order.addListener((x, ov, nv) -> {
-                String payStatusName = EnumOrderStatus.of(nv.getOrderStatus()).remark;
-                labelPayStatus.setText("支付状态: " + payStatusName);
+            orderView.addListener((x, ov, nv) -> {
+                labelPayStatus.setText("支付状态: " + nv.payStatusName);
             });
             labelPayStatus.setMinWidth(200);
             gridPane.add(labelPayStatus, 3, rowIndex);
@@ -123,21 +119,20 @@ public class OrderDetail extends VBox {
             gridPane.setPadding(new Insets(10));
             /// ----------- 第一行 ---------------
             Label l = new Label("订单总额：0");
-            order.addListener((a, b, c) -> l.setText("订单总额: " + CommonUtils.formatMoney(sumTotalPrice(c.getOrderId()))));
+            orderView.addListener((a, b, c) -> l.setText("订单总额: " + CommonUtils.formatMoney(c.totalPrice)));
             l.setMinWidth(200);
             gridPane.add(l, 0, 0);
             // 第二行
             Label labelCustNum = new Label("已支付: ");
-            order.addListener((x, ov, nv) -> {
-                labelCustNum.setText("已支付: " + CommonUtils.formatMoney(nv.getOrderHadpaid()));
-            });
+            orderView.addListener((x, ov, nv) -> labelCustNum.setText("已支付: " + CommonUtils.formatMoney(nv.orderHadpaid)));
             labelCustNum.setMinWidth(200);
             gridPane.add(labelCustNum, 1, 0);
 
             Label notPaid = new Label("还需支付: 0.00");
-            order.addListener((a, b, c) -> {
-                double totalPrice = sumTotalPrice(c.getOrderId());
-                String notPaidStr = CommonUtils.formatMoney(totalPrice - c.getOrderHadpaid());
+            orderView.addListener((a, b, c) -> {
+                double totalPrice = c.totalPrice;
+                double paid = c.orderHadpaid;
+                String notPaidStr = CommonUtils.formatMoney(totalPrice - paid);
                 notPaid.setText("还需支付: " + notPaidStr);
             });
             notPaid.setMinWidth(200);
@@ -180,8 +175,7 @@ public class OrderDetail extends VBox {
 
         TableView<OrderDishesTableItemVO> tv = new TableView<>();
         Runnable refreshTableView = () -> {
-            Order qryOrder = orderService.getOrder(orderId);
-            order.set(qryOrder);
+            reloadOrder(orderId);
             tv.setItems(loadOrderDishes(orderId));
             tv.refresh();
         };
@@ -312,6 +306,18 @@ public class OrderDetail extends VBox {
 
     }
 
+    private void reloadOrder(Integer orderId) {
+        Order o = orderService.getOrder(orderId);
+        if (o != null) {
+            OrderView v = new OrderView();
+            v.customerNum = o.getOrderCustomerNums();
+            v.orderTime = DateBuilder.base(o.getCreateTime()).format(DATETIME_PATTERN);
+            v.orderHadpaid = o.getOrderHadpaid();
+            v.totalPrice = sumTotalPrice(orderId);
+            orderView.set(v);
+        }
+    }
+
     private double sumTotalPrice(Integer orderId) {
         double totalPrice = 0;
         List<OrderDishes> dishes = orderDishesService.selectOrderDishes(orderId);
@@ -377,6 +383,14 @@ public class OrderDetail extends VBox {
         separator2.setOrientation(Orientation.HORIZONTAL);
         return separator2;
 
+    }
+
+    public static class OrderView {
+        int customerNum;
+        String orderTime;
+        String payStatusName;
+        double totalPrice;
+        double orderHadpaid;
     }
 
     @Override
