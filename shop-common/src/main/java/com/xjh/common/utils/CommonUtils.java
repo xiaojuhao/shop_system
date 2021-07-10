@@ -47,9 +47,9 @@ public class CommonUtils {
 
     public static String formatMoney(Double value) {
         if (value == null || value <= 0) {
-            return "0.00";
+            return "￥0.00";
         }
-        return new DecimalFormat("#.00").format(value);
+        return new DecimalFormat("￥#.00").format(value);
     }
 
     public static String formatSeconds(long seconds) {
@@ -462,6 +462,25 @@ public class CommonUtils {
 
     public static boolean isNotEmpty(Collection<?> coll) {
         return !isEmpty(coll);
+    }
+
+    public static String stringify(Object value) {
+        if (value == null) {
+            return "";
+        }
+        if (value instanceof String) {
+            return (String) value;
+        }
+        if (value instanceof Date) {
+            return DateBuilder.base((Date) value).format("yyyy-MM-dd HH:mm:ss");
+        }
+        if (value instanceof LocalDateTime) {
+            return DateBuilder.base((LocalDateTime) value).format("yyyy-MM-dd HH:mm:ss");
+        }
+        if (value instanceof Number) {
+            return value.toString();
+        }
+        return JSON.toJSONString(value);
     }
 
     public static String stringJoin(Collection<String> coll, String delimiter) {

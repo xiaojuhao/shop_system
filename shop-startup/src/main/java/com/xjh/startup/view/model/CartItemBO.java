@@ -1,27 +1,29 @@
 package com.xjh.startup.view.model;
 
+import com.xjh.common.utils.cellvalue.RichText;
+
 public class CartItemBO {
-    String dishesId;
-    String dishesName;
+    Integer dishesId;
+    RichText dishesName;
     String dishesPriceId;
     String dishesPrice;
     String nums;
     String totalPrice;
     String ifDishesPackage;
 
-    public String getDishesId() {
+    public Integer getDishesId() {
         return dishesId;
     }
 
-    public void setDishesId(String dishesId) {
+    public void setDishesId(Integer dishesId) {
         this.dishesId = dishesId;
     }
 
-    public String getDishesName() {
+    public RichText getDishesName() {
         return dishesName;
     }
 
-    public void setDishesName(String dishesName) {
+    public void setDishesName(RichText dishesName) {
         this.dishesName = dishesName;
     }
 

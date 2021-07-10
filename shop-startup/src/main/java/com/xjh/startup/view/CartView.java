@@ -9,6 +9,8 @@ import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.LogUtils;
 import com.xjh.common.utils.Result;
+import com.xjh.common.utils.cellvalue.Money;
+import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.service.domain.CartService;
@@ -19,7 +21,7 @@ import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.CartItemBO;
 import com.xjh.startup.view.model.DeskOrderParam;
 
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
@@ -149,11 +151,11 @@ public class CartView extends VBox {
             List<CartItemBO> bolist = list.stream().map(it -> {
                 Dishes dishes = dishesDAO.getById(it.getDishesId());
                 CartItemBO bo = new CartItemBO();
-                bo.setDishesId(it.getDishesId().toString());
+                bo.setDishesId(it.getDishesId());
                 bo.setNums(it.getNums() + "");
                 bo.setTotalPrice("0.00");
                 if (dishes != null) {
-                    bo.setDishesName(dishes.getDishesName());
+                    bo.setDishesName(new RichText(dishes.getDishesName()).with(Color.RED));
                     bo.setDishesPrice(CommonUtils.formatMoney(dishes.getDishesPrice()));
                     bo.setTotalPrice(CommonUtils.formatMoney(it.getNums() * dishes.getDishesPrice()));
                 }
@@ -169,21 +171,35 @@ public class CartView extends VBox {
     }
 
     private TableColumn newCol(String name, String filed, double width) {
-        TableColumn<CartItemBO, SimpleStringProperty> c = new TableColumn<>(name);
+        TableColumn<CartItemBO, SimpleObjectProperty> c = new TableColumn<>(name);
         c.setStyle("-fx-border-width: 0px; ");
         c.setMinWidth(width);
         c.setCellValueFactory(new PropertyValueFactory<>(filed));
-        c.setCellFactory(new Callback<TableColumn<CartItemBO, SimpleStringProperty>, TableCell<CartItemBO, SimpleStringProperty>>() {
-            public TableCell<CartItemBO, String> call(TableColumn param) {
-                return new TableCell<CartItemBO, String>() {
-                    public void updateItem(String item, boolean empty) {
-                        if (CommonUtils.isNotBlank(item)) {
-                            if (item.contains("@")) {
-                                setTextFill(Color.RED);
-                            } else {
-                                setAlignment(Pos.CENTER_RIGHT);
+        c.setCellFactory(new Callback<TableColumn<CartItemBO, SimpleObjectProperty>, TableCell<CartItemBO, SimpleObjectProperty>>() {
+
+            public TableCell<CartItemBO, Object> call(TableColumn param) {
+                return new TableCell<CartItemBO, Object>() {
+                    public void updateItem(Object item, boolean empty) {
+                        if (item instanceof RichText) {
+                            RichText richText = (RichText) item;
+                            setText(CommonUtils.stringify(richText.getText()));
+                            if (richText.getColor() != null) {
+                                setTextFill(richText.getColor());
                             }
-                            setText(item);
+                            if (richText.getPos() != null) {
+                                setAlignment(richText.getPos());
+                            }
+                        } else if (item instanceof Money) {
+                            Money money = (Money) item;
+                            this.setText(item.toString());
+                            if (money.getColor() != null) {
+                                setTextFill(money.getColor());
+                            }
+                            if (money.getPos() != null) {
+                                setAlignment(money.getPos());
+                            }
+                        } else {
+                            setText(CommonUtils.stringify(item));
                         }
                     }
                 };
