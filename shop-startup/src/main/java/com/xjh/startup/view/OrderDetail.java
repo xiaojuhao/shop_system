@@ -1,9 +1,9 @@
 package com.xjh.startup.view;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.enumeration.EnumOrderStatus;
@@ -73,9 +73,9 @@ public class OrderDetail extends VBox {
         orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
         dishesPackageDAO = GuiceContainer.getInstance(DishesPackageDAO.class);
         dishesDAO = GuiceContainer.getInstance(DishesDAO.class);
-
-
         LogUtils.info("OrderDetail初始化服务耗时: " + cost.getCostAndReset());
+
+
         Integer orderId = desk.getOrderId();
         {
             int rowIndex = 0;
@@ -83,28 +83,25 @@ public class OrderDetail extends VBox {
             gridPane.setVgap(10);
             gridPane.setHgap(10);
             gridPane.setPadding(new Insets(10));
-            // gridPane.setStyle("-fx-border-width: 1 1 1 1;-fx-border-style: solid;-fx-border-color: red");
             // 第一行
             String tableName = "桌号：" + desk.getDeskName();
-            Label l = new Label(tableName);
-            l.setMinWidth(800);
-            l.setMinHeight(50);
-            l.setFont(new Font(18));
-            l.setAlignment(Pos.CENTER);
-            gridPane.add(l, 0, rowIndex, 4, 1);
+            Label tableNameLabel = new Label(tableName);
+            tableNameLabel.setMinWidth(800);
+            tableNameLabel.setMinHeight(50);
+            tableNameLabel.setFont(new Font(18));
+            tableNameLabel.setAlignment(Pos.CENTER);
+            gridPane.add(tableNameLabel, 0, rowIndex, 4, 1);
             // 关台按钮
-            Button button = new Button("关台");
-            button.setMinWidth(100);
-            button.setOnMouseClicked(evt -> doCloseDesk(desk));
-            gridPane.add(button, 4, rowIndex, 1, 2);
+            Button closeDeskBtn = new Button("关台");
+            closeDeskBtn.setMinWidth(100);
+            closeDeskBtn.setOnMouseClicked(evt -> doCloseDesk(desk));
+            gridPane.add(closeDeskBtn, 4, rowIndex, 1, 2);
             this.getChildren().add(gridPane);
 
             // 第二行
             rowIndex++;
             Label labelCustNum = new Label("就餐人数: 0");
-            orderView.addListener((x, ov, nv) -> {
-                labelCustNum.setText("就餐人数: " + nv.customerNum);
-            });
+            orderView.addListener((x, ov, nv) -> labelCustNum.setText("就餐人数: " + nv.customerNum));
             labelCustNum.setMinWidth(200);
             gridPane.add(labelCustNum, 0, rowIndex);
 
@@ -193,11 +190,8 @@ public class OrderDetail extends VBox {
         Runnable refreshTableView = () -> {
             TimeRecord start = TimeRecord.start();
             reloadOrder(orderId);
-            LogUtils.info("reloadOrder 》》" + start.getCostAndReset());
             tv.setItems(loadOrderDishes(orderId));
-            LogUtils.info("loadOrderDishes 》》" + start.getCostAndReset());
             tv.refresh();
-            LogUtils.info("refresh 》》" + start.getCostAndReset());
         };
         {
             tv.setMaxHeight(300);
@@ -297,7 +291,8 @@ public class OrderDetail extends VBox {
         List<Integer> dishesIdList = CommonUtils.map(orderDishes, OrderDishes::getDishesId);
         List<Dishes> dishesList = dishesDAO.getByIds(dishesIdList);
         Map<Integer, Dishes> dishesMap = CommonUtils.listToMap(dishesList, Dishes::getDishesId);
-        List<OrderDishesTableItemVO> items = orderDishes.stream().map(o -> {
+        List<OrderDishesTableItemVO> items = new ArrayList<>();
+        orderDishes.forEach(o -> {
             String dishesName = "";
             String price = CommonUtils.formatMoney(o.getOrderDishesPrice());
             String discountPrice = CommonUtils.formatMoney(o.getOrderDishesDiscountPrice());
@@ -314,14 +309,14 @@ public class OrderDetail extends VBox {
                     dishesName = d.getDishesName();
                 }
             }
-            return new OrderDishesTableItemVO(
+            items.add(new OrderDishesTableItemVO(
                     o.getOrderDishesId() + "",
                     o.getSubOrderId() + "",
                     dishesName,
                     price, discountPrice,
                     o.getOrderDishesNums() + "",
-                    saleType);
-        }).collect(Collectors.toList());
+                    saleType));
+        });
         return FXCollections.observableArrayList(items);
 
     }
