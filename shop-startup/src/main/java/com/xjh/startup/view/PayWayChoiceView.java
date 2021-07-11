@@ -2,6 +2,8 @@ package com.xjh.startup.view;
 
 import java.util.Optional;
 
+import com.xjh.common.utils.AlertBuilder;
+import com.xjh.common.utils.Result;
 import com.xjh.service.domain.OrderPayService;
 import com.xjh.service.domain.model.PaymentResult;
 import com.xjh.startup.foundation.guice.GuiceContainer;
@@ -48,7 +50,11 @@ public class PayWayChoiceView extends VBox {
     }
 
     private void addPay(PaymentResult paymentResult) {
-        orderPayService.addPay(paymentResult);
-        this.getScene().getWindow().hide();
+        Result<String> rs = orderPayService.handlePaymentResult(paymentResult);
+        if (rs.isSuccess()) {
+            this.getScene().getWindow().hide();
+        } else {
+            AlertBuilder.ERROR(rs.getMsg());
+        }
     }
 }

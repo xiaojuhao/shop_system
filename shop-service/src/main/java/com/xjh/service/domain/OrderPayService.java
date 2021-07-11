@@ -8,7 +8,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.enumeration.EnumPayStatus;
-import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.LogUtils;
@@ -28,22 +27,20 @@ public class OrderPayService {
     @Inject
     OrderService orderService;
 
-    public void addPay(PaymentResult paymentResult) {
+    public Result<String> handlePaymentResult(PaymentResult paymentResult) {
         Runnable clear = CurrentRequest.resetRequestId();
         try {
             // 取消支付
             if (paymentResult.getPayAction() == 0) {
-                return;
+                return Result.success("取消支付");
             }
             Order order = orderDAO.selectByOrderId(paymentResult.getOrderId());
             if (order == null) {
-                AlertBuilder.ERROR("订单信息不存在:" + paymentResult.getOrderId());
-                return;
+                return Result.fail("订单信息不存在:" + paymentResult.getOrderId());
             }
             double notPaidBillAmount = orderService.notPaidBillAmount(paymentResult.getOrderId());
             if (notPaidBillAmount < paymentResult.getPayAmount()) {
-                AlertBuilder.ERROR("支付金额大于订单金额");
-                return;
+                return Result.fail("支付金额大于订单金额");
             }
             OrderPay orderPay = new OrderPay();
             orderPay.setOrderId(paymentResult.getOrderId());
@@ -58,8 +55,7 @@ public class OrderPayService {
             int payRs = this.insert(orderPay);
             if (payRs == 0) {
                 LogUtils.error("保存支付信息失败: insert error >> " + payRs);
-                AlertBuilder.ERROR("保存支付明细失败");
-                return;
+                return Result.fail("保存支付明细失败");
             }
             //
             order.setOrderHadpaid(order.getOrderHadpaid() + orderPay.getAmount());
@@ -71,12 +67,12 @@ public class OrderPayService {
             Result<Integer> updateRs = orderService.updateByOrderId(order);
             if (!updateRs.isSuccess()) {
                 LogUtils.error("更新订单支付结果失败: update error >> " + updateRs.getMsg());
-                AlertBuilder.ERROR("更新订单支付结果失败", updateRs.getMsg());
+                return Result.fail("更新订单支付结果失败," + updateRs.getMsg());
             }
-
+            return Result.success("支付成功");
         } catch (Exception ex) {
             LogUtils.error("保存支付信息失败:" + ex.getMessage());
-            AlertBuilder.ERROR("保存支付信息失败:" + ex.getMessage());
+            return Result.fail("保存支付信息失败:" + ex.getMessage());
         } finally {
             clear.run();
         }
