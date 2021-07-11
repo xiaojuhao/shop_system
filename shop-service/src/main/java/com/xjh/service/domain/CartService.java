@@ -11,6 +11,7 @@ import javax.inject.Singleton;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.oracle.tools.packager.Log;
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.store.SequenceDatabase;
@@ -131,7 +132,7 @@ public class CartService {
                 return Result.fail("购物车空");
             }
             // 子订单
-            Integer subOrderId = createNewId();
+            Integer subOrderId = createSubOrderId();
             SubOrder subOrder = new SubOrder();
             subOrder.setSubOrderId(subOrderId);
             subOrder.setOrderId(orderId);
@@ -223,7 +224,7 @@ public class CartService {
         cartDAO.clearCart(deskId);
     }
 
-    public Integer createNewId() {
+    public Integer createSubOrderId() {
         LocalDateTime start = DateBuilder.base("2021-01-01 00:00:01").dateTime();
         String timeStr = DateBuilder.today().format("yyyyMMddHH");
         int diffHours = (int) DateBuilder.diffHours(start, DateBuilder.base(timeStr).dateTime());
@@ -235,7 +236,9 @@ public class CartService {
             throw new RuntimeException("循环次数已用完:" + timeStr);
         }
         // 前17位保存时间，后15位保存序列号
-        return (diffHours << 15) | nextId;
+        int id = (diffHours << 15) | nextId;
+        Log.info("创建子订单号: " + diffHours + "," + nextId + "," + id);
+        return id;
     }
 
     public synchronized int nextId(String group) {
