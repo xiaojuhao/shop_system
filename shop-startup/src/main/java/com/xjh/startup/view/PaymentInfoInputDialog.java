@@ -37,8 +37,8 @@ public class PaymentInfoInputDialog extends Dialog<PaymentResult> {
 
         row++;
         TextField cardNumFiled = new TextField();
-        cardNumFiled.setPromptText("交易编号");
-        grid.add(new Label("交易编号:"), 0, row);
+        cardNumFiled.setPromptText(method.cardNoAlias);
+        grid.add(new Label(method.cardNoAlias + ":"), 0, row);
         grid.add(cardNumFiled, 1, row);
 
         row++;
