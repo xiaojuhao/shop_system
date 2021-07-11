@@ -20,11 +20,13 @@ import com.xjh.common.utils.LogUtils;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Cart;
 import com.xjh.dao.dataobject.Dishes;
+import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.dao.dataobject.SubOrder;
 import com.xjh.dao.mapper.CartDAO;
 import com.xjh.dao.mapper.DishesDAO;
+import com.xjh.dao.mapper.DishesPackageDAO;
 import com.xjh.dao.mapper.OrderDAO;
 import com.xjh.dao.mapper.OrderDishesDAO;
 import com.xjh.dao.mapper.SubOrderDAO;
@@ -44,6 +46,8 @@ public class CartService {
     OrderDAO orderDAO;
     @Inject
     DishesDAO dishesDAO;
+    @Inject
+    DishesPackageDAO dishesPackageDAO;
     @Inject
     OrderDishesDAO orderDishesDAO;
     @Inject
@@ -126,6 +130,7 @@ public class CartService {
                 LogUtils.error("购物车空:" + JSON.toJSONString(param));
                 return Result.fail("购物车空");
             }
+            // 子订单
             Integer subOrderId = createNewId();
             SubOrder subOrder = new SubOrder();
             subOrder.setSubOrderId(subOrderId);
@@ -139,26 +144,14 @@ public class CartService {
             // order dishes
             List<OrderDishes> orderDishes = new ArrayList<>();
             for (CartItemVO item : cartVO.getContents()) {
-                Dishes dishes = dishesDAO.getById(item.getDishesId());
-                OrderDishes d = new OrderDishes();
-                orderDishes.add(d);
-                d.setOrderId(orderId);
-                d.setSubOrderId(subOrderId);
-                d.setDishesId(item.getDishesId());
-                d.setDishesPriceId(0);
-                d.setDishesTypeId(dishes.getDishesTypeId());
-                d.setOrderDishesPrice(dishes.getDishesPrice());
-                d.setOrderDishesDiscountPrice(dishes.getDishesPrice());
-                d.setCreatetime(DateBuilder.now().mills());
-                d.setIfDishesPackage(0);
-                d.setOrderDishesIfchange(0);
-                d.setOrderDishesIfrefund(0);
-                d.setOrderDishesNums(1);
-                d.setOrderDishesNums(item.getNums());
-                d.setOrderDishesSaletype(EnumOrderSaleType.NORMAL.type);
-                d.setOrderDishesOptions(Base64.encode("[]"));
-                d.setOrderDishesDiscountInfo(Base64.encode(""));
-
+                int ifPackage = CommonUtils.orElse(item.getIfDishesPackage(), 0);
+                if (ifPackage == 1) {
+                    orderDishes.add(buildPackageCartItemVO(item, orderId, subOrderId));
+                } else {
+                    orderDishes.add(buildCommonCartItemVO(item, orderId, subOrderId));
+                }
+            }
+            for (OrderDishes d : orderDishes) {
                 orderDishesDAO.insert(d);
             }
             double notPaid = orderService.notPaidBillAmount(orderId);
@@ -178,6 +171,53 @@ public class CartService {
             return Result.fail("下单失败:" + ex.getMessage());
         }
     }
+
+    private OrderDishes buildCommonCartItemVO(CartItemVO item, Integer orderId, Integer subOrderId) {
+        Dishes dishes = dishesDAO.getById(item.getDishesId());
+        OrderDishes d = new OrderDishes();
+        d.setOrderId(orderId);
+        d.setSubOrderId(subOrderId);
+        d.setDishesId(item.getDishesId());
+        d.setDishesPriceId(0);
+        d.setDishesTypeId(dishes.getDishesTypeId());
+        d.setOrderDishesPrice(dishes.getDishesPrice());
+        d.setOrderDishesDiscountPrice(dishes.getDishesPrice());
+        d.setCreatetime(DateBuilder.now().mills());
+        d.setIfDishesPackage(0);
+        d.setOrderDishesIfchange(0);
+        d.setOrderDishesIfrefund(0);
+        d.setOrderDishesNums(1);
+        d.setOrderDishesNums(item.getNums());
+        d.setOrderDishesSaletype(EnumOrderSaleType.NORMAL.type);
+        d.setOrderDishesOptions(Base64.encode("[]"));
+        d.setOrderDishesDiscountInfo(Base64.encode(""));
+
+        return d;
+    }
+
+
+    private OrderDishes buildPackageCartItemVO(CartItemVO item, Integer orderId, Integer subOrderId) {
+        DishesPackage dishes = dishesPackageDAO.getById(item.getDishesId());
+        OrderDishes d = new OrderDishes();
+        d.setOrderId(orderId);
+        d.setSubOrderId(subOrderId);
+        d.setDishesId(item.getDishesId());
+        d.setDishesPriceId(0);
+        d.setDishesTypeId(dishes.getDishesPackageType());
+        d.setOrderDishesPrice(dishes.getDishesPackagePrice());
+        d.setOrderDishesDiscountPrice(dishes.getDishesPackagePrice());
+        d.setCreatetime(DateBuilder.now().mills());
+        d.setIfDishesPackage(1);
+        d.setOrderDishesIfchange(0);
+        d.setOrderDishesIfrefund(0);
+        d.setOrderDishesNums(CommonUtils.orElse(item.getNums(), 1));
+        d.setOrderDishesSaletype(EnumOrderSaleType.NORMAL.type);
+        d.setOrderDishesOptions(Base64.encode("[]"));
+        d.setOrderDishesDiscountInfo(Base64.encode(""));
+
+        return d;
+    }
+
 
     public void clearCart(Integer deskId) throws SQLException {
         cartDAO.clearCart(deskId);

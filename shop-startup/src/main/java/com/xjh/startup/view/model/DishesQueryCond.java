@@ -2,9 +2,10 @@ package com.xjh.startup.view.model;
 
 public class DishesQueryCond {
     int pageNo = 1;
-    int pageSize = 20;
+    int pageSize = 40;
     String dishesName;
     Integer dishesTypeId;
+    Integer ifPackage;
 
     public int getPageNo() {
         return pageNo;
@@ -36,5 +37,13 @@ public class DishesQueryCond {
 
     public void setDishesTypeId(Integer dishesTypeId) {
         this.dishesTypeId = dishesTypeId;
+    }
+
+    public Integer getIfPackage() {
+        return ifPackage;
+    }
+
+    public void setIfPackage(Integer ifPackage) {
+        this.ifPackage = ifPackage;
     }
 }

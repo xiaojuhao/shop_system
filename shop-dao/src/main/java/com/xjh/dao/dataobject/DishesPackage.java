@@ -3,7 +3,7 @@ package com.xjh.dao.dataobject;
 import com.xjh.dao.foundation.Column;
 import com.xjh.dao.foundation.Table;
 
-@Table("dishes_package_list")
+@Table("dishes_package_list_new")
 public class DishesPackage {
     @Column("dishesPackageId")
     Integer dishesPackageId;
