@@ -11,7 +11,6 @@ import javax.inject.Singleton;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.oracle.tools.packager.Log;
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.store.SequenceDatabase;
@@ -247,7 +246,7 @@ public class CartService {
         }
         // 前17位保存时间，后15位保存序列号
         int id = (diffHours << 15) | nextId;
-        Log.info("创建子订单号: " + diffHours + "," + nextId + "," + id);
+        LogUtils.info("创建子订单号: " + diffHours + "," + nextId + "," + id);
         return id;
     }
 
