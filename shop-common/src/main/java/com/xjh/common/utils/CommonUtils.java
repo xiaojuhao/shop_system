@@ -47,6 +47,10 @@ public class CommonUtils {
         }
     }
 
+    public static void safeRun(Collection<Runnable> runs) {
+        forEach(runs, CommonUtils::safeRun);
+    }
+
     public static <T> T orElse(T v, T def) {
         return v != null ? v : def;
     }
@@ -97,6 +101,13 @@ public class CommonUtils {
             return ((LocalDateTime) a).isEqual((LocalDateTime) b);
         }
         return a.equals(b);
+    }
+
+    public static String trim(String str) {
+        if (str == null) {
+            return null;
+        }
+        return str.trim();
     }
 
     public static String reflectString(Object data) {

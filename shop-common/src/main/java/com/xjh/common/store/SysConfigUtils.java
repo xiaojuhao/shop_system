@@ -17,7 +17,7 @@ public class SysConfigUtils {
         }
         TimeRecord time = TimeRecord.start();
         Properties prop = loadRuntimeProperties();
-        String workDir = prop.getProperty("workDir");
+        String workDir = prop.getProperty(RtPropNames.workDirName);
         LogUtils.info("获取WorkDir耗时 : " + time.getCost());
         if (workDir == null) {
             return null;
@@ -29,11 +29,8 @@ public class SysConfigUtils {
         return workDir;
     }
 
-    public static void setWorkDir(String dir) {
-        Properties prop = loadRuntimeProperties();
-        prop.put("workDir", dir);
-        dumpRuntimeProperties(prop);
-        cache.set(null);
+    public static Properties getDbConfig() {
+        return loadRuntimeProperties();
     }
 
     public static File userHomeDir() {
@@ -47,14 +44,14 @@ public class SysConfigUtils {
         return home;
     }
 
-    private static void dumpRuntimeProperties(Properties properties) {
+    public static void dumpRuntimeProperties(Properties properties) {
         File home = userHomeDir();
         // LogUtils.info("回写配置系统目录:" + home.getAbsolutePath());
         File file = new File(home.getAbsolutePath(), "runtime.properties");
         PropertiesUtils.dumpProperties(file, properties);
     }
 
-    private static Properties loadRuntimeProperties() {
+    public static Properties loadRuntimeProperties() {
         String userHome = System.getProperty("user.home");
         File home = new File(userHome + "/ShopSystem/");
         if (!home.exists()) {
