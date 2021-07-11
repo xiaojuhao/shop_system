@@ -38,6 +38,7 @@ public class SequenceDatabase {
         } finally {
             txn.commit();
         }
+        LogUtils.info("创建序列号:" + group + ", 返回ID:" + newId);
         return newId;
     }
 
