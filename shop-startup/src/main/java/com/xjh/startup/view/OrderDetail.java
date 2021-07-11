@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.enumeration.EnumPayMethod;
@@ -375,6 +376,13 @@ public class OrderDetail extends VBox {
 
 
     private void doCloseDesk(Desk desk) {
+        Desk current = deskService.getById(desk.getDeskId());
+        // 已关台
+        if (current == null || EnumDesKStatus.of(current.getStatus()) == EnumDesKStatus.FREE) {
+            this.getScene().getWindow().hide();
+            return;
+        }
+        // 未支付金额
         double notPaidBillAmount = orderService.notPaidBillAmount(desk.getOrderId());
         if (notPaidBillAmount > 0) {
             AlertBuilder.INFO("未支付完成，无法关台");
