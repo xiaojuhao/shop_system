@@ -316,7 +316,7 @@ public class OrderDetail extends VBox {
             if (o.getIfDishesPackage() == 1) {
                 DishesPackage pkg = dishesPackageService.getById(o.getDishesId());
                 if (pkg != null) {
-                    dishesName = pkg.getDishesPackageName();
+                    dishesName = "(套餐)" + pkg.getDishesPackageName();
                 }
             } else {
                 Dishes d = dishesMap.get(o.getDishesId());
