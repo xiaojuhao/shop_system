@@ -28,6 +28,9 @@ public class LogUtils {
 
     private static void append(String level, String msg) {
         try {
+            if (logWriter == null) {
+                return;
+            }
             logWriter.append(DateBuilder.now().format("yyyy-MM-dd HH:mm:ss"));
             logWriter.append("[").append(level).append("]");
             logWriter.append(msg);
