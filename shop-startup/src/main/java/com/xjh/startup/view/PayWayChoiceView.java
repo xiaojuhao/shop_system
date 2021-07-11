@@ -2,20 +2,10 @@ package com.xjh.startup.view;
 
 import java.util.Optional;
 
-import com.xjh.common.enumeration.EnumOrderStatus;
-import com.xjh.common.enumeration.EnumPayStatus;
-import com.xjh.common.utils.AlertBuilder;
-import com.xjh.common.utils.DateBuilder;
-import com.xjh.common.utils.LogUtils;
-import com.xjh.common.utils.Result;
-import com.xjh.dao.dataobject.Order;
-import com.xjh.dao.dataobject.OrderPay;
-import com.xjh.dao.mapper.OrderDAO;
-import com.xjh.dao.mapper.OrderPayDAO;
-import com.xjh.service.domain.OrderService;
+import com.xjh.service.domain.OrderPayService;
+import com.xjh.service.domain.model.PaymentResult;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
-import com.xjh.startup.view.model.PaymentResult;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -23,6 +13,8 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 
 public class PayWayChoiceView extends VBox {
+    OrderPayService orderPayService = GuiceContainer.getInstance(OrderPayService.class);
+
     public PayWayChoiceView(DeskOrderParam param) {
         FlowPane pane = new FlowPane();
         pane.setPadding(new Insets(10));
@@ -32,19 +24,19 @@ public class PayWayChoiceView extends VBox {
         Button payByCash = new Button("现金结账");
         payByCash.setOnMouseClicked(event -> {
             Optional<PaymentResult> payResult = new PaymentByCashDialog(param).showAndWait();
-            addPay(param, payResult.get());
+            addPay(payResult.get());
         });
         pane.getChildren().add(payByCash);
         Button posBtn = new Button("银联POS机");
         posBtn.setOnMouseClicked(event -> {
             Optional<PaymentResult> payResult = new PaymentByPOSDialog(param).showAndWait();
-            addPay(param, payResult.get());
+            addPay(payResult.get());
         });
         pane.getChildren().add(posBtn);
         Button meituan = new Button("美团收单结账");
         meituan.setOnMouseClicked(event -> {
             Optional<PaymentResult> payResult = new PaymentByMeituanDialog(param).showAndWait();
-            addPay(param, payResult.get());
+            addPay(payResult.get());
         });
         pane.getChildren().add(meituan);
         pane.getChildren().add(new Button("代金券结账"));
@@ -55,57 +47,8 @@ public class PayWayChoiceView extends VBox {
         this.getChildren().add(pane);
     }
 
-    private void addPay(DeskOrderParam param, PaymentResult paymentResult) {
-        try {
-            // 取消支付
-            if (paymentResult.getPayAction() == 0) {
-                return;
-            }
-            OrderDAO orderDAO = GuiceContainer.getInstance(OrderDAO.class);
-            Order order = orderDAO.selectByOrderId(param.getOrderId());
-            OrderService orderService = GuiceContainer.getInstance(OrderService.class);
-            if (order == null) {
-                AlertBuilder.ERROR("订单信息不存在:" + param.getOrderId());
-                return;
-            }
-            double notPaidBillAmount = orderService.notPaidBillAmount(param.getOrderId());
-            if (notPaidBillAmount < paymentResult.getPayAmount()) {
-                AlertBuilder.ERROR("支付金额大于订单金额");
-                return;
-            }
-            OrderPayDAO orderPayDAO = GuiceContainer.getInstance(OrderPayDAO.class);
-            OrderPay orderPay = new OrderPay();
-            orderPay.setOrderId(param.getOrderId());
-            orderPay.setAccountId(0);
-            orderPay.setAmount(paymentResult.getPayAmount());
-            orderPay.setActualAmount(paymentResult.getPayAmount());
-            orderPay.setCardNumber(paymentResult.getCardNumber());
-            orderPay.setRemark(paymentResult.getPayRemark());
-            orderPay.setPaymentMethod(paymentResult.getPayMethod().code);
-            orderPay.setPaymentStatus(EnumPayStatus.PAID.code);
-            orderPay.setCreatetime(DateBuilder.now().mills());
-            int payRs = orderPayDAO.insert(orderPay);
-            if (payRs == 0) {
-                LogUtils.error("保存支付信息失败: insert error >> " + payRs);
-                AlertBuilder.ERROR("保存支付明细失败");
-                return;
-            }
-            //
-            order.setOrderHadpaid(order.getOrderHadpaid() + orderPay.getAmount());
-            if (Math.abs(notPaidBillAmount - paymentResult.getPayAmount()) <= 0.01) {
-                order.setOrderStatus(EnumOrderStatus.PAID.status);
-            } else {
-                order.setOrderStatus(EnumOrderStatus.PARTIAL_PAID.status);
-            }
-            Result<Integer> updateRs = orderService.updateByOrderId(order);
-            if (!updateRs.isSuccess()) {
-                LogUtils.error("更新订单支付结果失败: update error >> " + updateRs.getMsg());
-                AlertBuilder.ERROR("更新订单支付结果失败", updateRs.getMsg());
-            }
-            this.getScene().getWindow().hide();
-        } catch (Exception ex) {
-            LogUtils.error("保存支付信息失败:" + ex.getMessage());
-            AlertBuilder.ERROR("保存支付信息失败:" + ex.getMessage());
-        }
+    private void addPay(PaymentResult paymentResult) {
+        orderPayService.addPay(paymentResult);
+        this.getScene().getWindow().hide();
     }
 }

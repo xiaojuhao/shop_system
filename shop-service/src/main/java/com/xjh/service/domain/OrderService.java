@@ -15,6 +15,7 @@ import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.enumeration.EnumOrderType;
 import com.xjh.common.store.SequenceDatabase;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.LogUtils;
 import com.xjh.common.utils.Result;
@@ -138,26 +139,31 @@ public class OrderService {
     }
 
     public Order createOrder(CreateOrderParam param) throws SQLException {
-        Order order = new Order();
-        order.setOrderId(param.getOrderId());
-        order.setDeskId(param.getDeskId());
-        order.setOrderStatus(EnumOrderStatus.UNPAID.status);
-        order.setStatus(EnumOrderServeStatus.START.status);
-        order.setOrderType(EnumOrderType.NORMAL.type);
-        order.setOrderDiscountInfo(Base64.encode(JSONObject.toJSONString(new OrderDiscount())));
-        order.setMemberId(0L);
-        order.setOrderCustomerNums(param.getCustomerNum());
-        order.setAccountId(0L);
-        order.setOrderErase(0D);
-        order.setOrderRefund(0D);
-        order.setOrderReduction(0D);
-        order.setOrderHadpaid(0D);
+        Runnable clear = CurrentRequest.resetRequestId();
+        try {
+            Order order = new Order();
+            order.setOrderId(param.getOrderId());
+            order.setDeskId(param.getDeskId());
+            order.setOrderStatus(EnumOrderStatus.UNPAID.status);
+            order.setStatus(EnumOrderServeStatus.START.status);
+            order.setOrderType(EnumOrderType.NORMAL.type);
+            order.setOrderDiscountInfo(Base64.encode(JSONObject.toJSONString(new OrderDiscount())));
+            order.setMemberId(0L);
+            order.setOrderCustomerNums(param.getCustomerNum());
+            order.setAccountId(0L);
+            order.setOrderErase(0D);
+            order.setOrderRefund(0D);
+            order.setOrderReduction(0D);
+            order.setOrderHadpaid(0D);
 
-        if (order.getCreateTime() == null) {
-            order.setCreateTime(DateBuilder.now().mills());
+            if (order.getCreateTime() == null) {
+                order.setCreateTime(DateBuilder.now().mills());
+            }
+            orderDAO.insert(order);
+            return order;
+        } finally {
+            clear.run();
         }
-        orderDAO.insert(order);
-        return order;
     }
 
     public Integer createNewOrderId() {

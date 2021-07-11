@@ -1,8 +1,9 @@
-package com.xjh.startup.view.model;
+package com.xjh.service.domain.model;
 
 import com.xjh.common.enumeration.EnumPayMethod;
 
 public class PaymentResult {
+    Integer orderId;
     double payAmount;
     String payCertNo;
     String payRemark;
@@ -10,6 +11,14 @@ public class PaymentResult {
     EnumPayMethod payMethod;
     // 0--取消  1--确认
     int payAction;
+
+    public Integer getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
+    }
 
     public double getPayAmount() {
         return payAmount;

@@ -6,6 +6,7 @@ import java.util.List;
 import com.alibaba.fastjson.JSON;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.LogUtils;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Desk;
@@ -33,6 +34,7 @@ public class DeskService {
     }
 
     public Result<String> openDesk(OpenDeskParam param) {
+        Runnable clear = CurrentRequest.resetRequestId();
         try {
             int deskId = param.getDeskId();
             Desk desk = deskDAO.getById(deskId);
@@ -54,10 +56,13 @@ public class DeskService {
         } catch (Exception ex) {
             LogUtils.info("开桌失败" + ex.getMessage());
             return Result.fail("开桌失败:" + ex.getMessage());
+        } finally {
+            clear.run();
         }
     }
 
     public Result<String> closeDesk(Integer deskId) {
+        Runnable clear = CurrentRequest.resetRequestId();
         try {
             int i = deskDAO.freeDesk(deskId);
             if (i == 0) {
@@ -70,6 +75,8 @@ public class DeskService {
         } catch (Exception ex) {
             ex.printStackTrace();
             return Result.fail("关台失败," + ex.getMessage());
+        } finally {
+            clear.run();
         }
     }
 

@@ -16,6 +16,7 @@ import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.store.SequenceDatabase;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.LogUtils;
 import com.xjh.common.utils.Result;
@@ -55,6 +56,7 @@ public class CartService {
     OrderService orderService;
 
     public Result<CartVO> addItem(Integer deskId, CartItemVO item) {
+        Runnable clear = CurrentRequest.resetRequestId();
         try {
             Cart cart = new Cart();
             cart.setDeskId(deskId);
@@ -78,10 +80,13 @@ public class CartService {
         } catch (Exception ex) {
             ex.printStackTrace();
             return Result.fail("添加购物车失败," + ex.getMessage());
+        } finally {
+            clear.run();
         }
     }
 
     public Result<CartVO> updateCart(Integer deskId, CartVO vo) {
+        Runnable clear = CurrentRequest.resetRequestId();
         try {
             Cart cart = new Cart();
             cart.setDeskId(deskId);
@@ -94,6 +99,8 @@ public class CartService {
         } catch (Exception ex) {
             ex.printStackTrace();
             return Result.fail("更新购物失败," + ex.getMessage());
+        } finally {
+            clear.run();
         }
     }
 
@@ -120,6 +127,7 @@ public class CartService {
     }
 
     public Result<String> createOrder(PlaceOrderFromCartReq param) {
+        Runnable clear = CurrentRequest.resetRequestId();
         try {
             Integer deskId = param.getDeskId();
             Integer orderId = param.getOrderId();
@@ -170,6 +178,8 @@ public class CartService {
         } catch (Exception ex) {
             ex.printStackTrace();
             return Result.fail("下单失败:" + ex.getMessage());
+        } finally {
+            clear.run();
         }
     }
 

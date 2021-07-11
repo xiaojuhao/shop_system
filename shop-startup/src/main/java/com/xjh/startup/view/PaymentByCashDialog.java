@@ -3,9 +3,9 @@ package com.xjh.startup.view;
 import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.service.domain.OrderService;
+import com.xjh.service.domain.model.PaymentResult;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
-import com.xjh.startup.view.model.PaymentResult;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonBar;
@@ -53,6 +53,7 @@ public class PaymentByCashDialog extends Dialog<PaymentResult> {
         this.getDialogPane().getButtonTypes().addAll(confirmPayBtn, ButtonType.CANCEL);
         this.setResultConverter(btn -> {
             PaymentResult result = new PaymentResult();
+            result.setOrderId(param.getOrderId());
             result.setPayMethod(EnumPayMethod.CASH);
             if (btn == confirmPayBtn) {
                 result.setPayAction(1);

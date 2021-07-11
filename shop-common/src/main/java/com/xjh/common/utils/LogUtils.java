@@ -33,6 +33,9 @@ public class LogUtils {
             }
             logWriter.append(DateBuilder.now().format("yyyy-MM-dd HH:mm:ss"));
             logWriter.append("[").append(level).append("]");
+            if (CommonUtils.isNotBlank(CurrentRequest.requestId())) {
+                logWriter.append(CurrentRequest.requestId()).append(" >> ");
+            }
             logWriter.append(msg);
             logWriter.append("\r\n");
             logWriter.flush();
