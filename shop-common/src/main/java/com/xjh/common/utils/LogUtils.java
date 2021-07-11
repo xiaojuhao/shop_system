@@ -28,7 +28,7 @@ public class LogUtils {
 
     private static void append(String level, String msg) {
         try {
-            logWriter.append(DateBuilder.now().format("yyyyMMdd HH:mm:ss"));
+            logWriter.append(DateBuilder.now().format("yyyy-MM-dd HH:mm:ss"));
             logWriter.append("[").append(level).append("]");
             logWriter.append(msg);
             logWriter.append("\r\n");
