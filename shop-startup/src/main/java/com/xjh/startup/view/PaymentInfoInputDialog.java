@@ -15,11 +15,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
-public class PaymentByMeituanDialog extends Dialog<PaymentResult> {
+public class PaymentInfoInputDialog extends Dialog<PaymentResult> {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
 
-    public PaymentByMeituanDialog(DeskOrderParam param) {
-        this.setTitle("POS结账");
+    public PaymentInfoInputDialog(DeskOrderParam param, EnumPayMethod method) {
+        this.setTitle(method.name);
         this.setWidth(300);
         GridPane grid = new GridPane();
         grid.setHgap(10);
@@ -60,11 +60,11 @@ public class PaymentByMeituanDialog extends Dialog<PaymentResult> {
         this.setResultConverter(btn -> {
             PaymentResult result = new PaymentResult();
             result.setOrderId(param.getOrderId());
-            result.setPayMethod(EnumPayMethod.MEITUAN);
+            result.setPayMethod(method);
             if (btn == confirmPayBtn) {
                 result.setPayAction(1);
                 result.setPayAmount(CommonUtils.parseMoney(payAmountField.getText(), 0D));
-                result.setPayRemark("美团支付:" + payAmountField.getText()
+                result.setPayRemark(method.name + ":" + payAmountField.getText()
                         + "\n" + remarkField.getText());
                 result.setCardNumber(cardNumFiled.getText());
             } else {
