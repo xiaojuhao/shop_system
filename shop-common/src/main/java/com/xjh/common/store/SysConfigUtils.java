@@ -1,11 +1,11 @@
 package com.xjh.common.store;
 
-import java.io.File;
-import java.util.Properties;
-
 import com.xjh.common.utils.Holder;
 import com.xjh.common.utils.LogUtils;
 import com.xjh.common.utils.TimeRecord;
+
+import java.io.File;
+import java.util.Properties;
 
 public class SysConfigUtils {
 
@@ -25,7 +25,7 @@ public class SysConfigUtils {
         if (!workDir.endsWith("/")) {
             workDir = workDir + "/";
         }
-        cache.set(workDir);
+        cache.hold(workDir);
         return workDir;
     }
 

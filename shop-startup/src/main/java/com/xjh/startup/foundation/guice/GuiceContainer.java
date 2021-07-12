@@ -25,7 +25,7 @@ public class GuiceContainer {
                     new ServiceModule(),
                     new DataSourceModule()
             );
-            injector.set(ij);
+            injector.hold(ij);
             LogUtils.info("初始化Guice, 耗时:" + (System.currentTimeMillis() - start));
             return ij;
         }

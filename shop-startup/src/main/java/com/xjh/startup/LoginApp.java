@@ -34,7 +34,7 @@ public class LoginApp extends Application {
         primaryStage.setScene(loginScene);
         primaryStage.setOnHidden(evt -> server.get().stopQuietly());
         primaryStage.show();
-        loginStage.set(primaryStage);
+        loginStage.hold(primaryStage);
         LogUtils.info("主页面渲染, cost " + timeRecord.getCostAndReset());
         // 启动 webSocket服务器
         server.hold(new XjhWebSocketServer(8889)).start();

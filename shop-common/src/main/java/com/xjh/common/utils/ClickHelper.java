@@ -5,15 +5,15 @@ public class ClickHelper {
 
     public static boolean isDblClick() {
         if (lastClick.get() == null) {
-            lastClick.set(System.currentTimeMillis());
+            lastClick.hold(System.currentTimeMillis());
             return false;
         }
         long last = lastClick.get();
         if (System.currentTimeMillis() - last < 300) {
-            lastClick.set(null);
+            lastClick.hold(null);
             return true;
         }
-        lastClick.set(System.currentTimeMillis());
+        lastClick.hold(System.currentTimeMillis());
         return false;
     }
 }
