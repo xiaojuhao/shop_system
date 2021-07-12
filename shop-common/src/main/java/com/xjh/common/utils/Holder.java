@@ -10,4 +10,9 @@ public class Holder<T> {
     public T get() {
         return ref;
     }
+
+    public T hold(T t) {
+        this.ref = t;
+        return this.ref;
+    }
 }
