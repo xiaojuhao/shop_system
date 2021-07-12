@@ -31,13 +31,7 @@ public class LoginApp extends Application {
         loginScene.getStylesheets().add("/css/style.css");
         primaryStage.setMaximized(true);
         primaryStage.setScene(loginScene);
-        primaryStage.setOnHidden(evt -> {
-            try {
-                server.get().stop();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        primaryStage.setOnHidden(evt -> server.get().stopQuietly());
         primaryStage.show();
         loginStage.set(primaryStage);
         LogUtils.info("主页面渲染, cost " + timeRecord.getCostAndReset());

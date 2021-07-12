@@ -1,12 +1,8 @@
 package com.xjh.startup.controller;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.startup.LoginApp;
 import com.xjh.startup.view.SysConfigView;
-
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Rectangle2D;
@@ -20,6 +16,9 @@ import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+
+import java.net.URL;
+import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
     @FXML
@@ -35,7 +34,7 @@ public class LoginController implements Initializable {
 
     public void login() throws Exception {
         if (!SysConfigView.checkConfig()) {
-            AlertBuilder.ERROR("提示", "系统工作目录配置缺失，请先配置!");
+            AlertBuilder.ERROR("提示", "系统基础配置缺失，请先配置!");
             return;
         }
         String account = accountField.getText().trim();
@@ -60,14 +59,7 @@ public class LoginController implements Initializable {
             mainStage.setHeight(height - 10);
             //mainStage.setMaximized(true);
             mainStage.setScene(scene);
-            mainStage.setOnHidden(evt -> {
-                // 主页面关闭
-                try {
-                    LoginApp.server.get().stop();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
+            mainStage.setOnHidden(evt -> LoginApp.server.get().stopQuietly());
             mainStage.show();
             Stage loginStage = (Stage) accountField.getScene().getWindow();
             loginStage.close();
