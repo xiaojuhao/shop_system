@@ -43,6 +43,7 @@ public class PackageDishesChoiceView extends Group {
         grid.setHgap(10);
         this.getChildren().add(grid);
         List<Supplier<DishesPackageDishes>> collectDishesId = new ArrayList<>();
+        Supplier<Integer> addNumSp;
         int row = -1;
         //
         {
@@ -97,6 +98,7 @@ public class PackageDishesChoiceView extends Group {
             numInput.textProperty().addListener((x, ov, nv) -> {
                 numInput.setText(CommonUtils.parseInt(nv, 0).toString());
             });
+            addNumSp = () -> CommonUtils.parseInt(numInput.getText(), 1);
             grid.add(label, 0, row);
             grid.add(numInput, 1, row);
         }
@@ -115,7 +117,7 @@ public class PackageDishesChoiceView extends Group {
                 }
                 cartItem.setIfDishesPackage(2);
                 cartItem.setDishesPriceId(0);
-                cartItem.setNums(1);
+                cartItem.setNums(addNumSp.get());
                 cartItem.setPackagedishes(CommonUtils.map(selectedDishes, JSONBuilder::toJSON));
                 try {
                     Result<CartVO> addCartRs = cartService.addItem(bo.getDeskId(), cartItem);
