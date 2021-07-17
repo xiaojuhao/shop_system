@@ -294,14 +294,14 @@ public class OrderDishesChoiceView extends VBox {
         return bo;
     }
 
-    private VBox buildDishesView(DishesChoiceItemBO dishes) {
+    private VBox buildDishesView(DishesChoiceItemBO bo) {
         VBox box = new VBox();
         box.setPrefWidth(200);
 
-        ImageView iv = getImageView(dishes.getImg());
+        ImageView iv = getImageView(bo.getImg());
         iv.setOnMouseClicked(evt -> {
             if (ClickHelper.isDblClick()) {
-                if (dishes.getIfPackage() == 1) {
+                if (bo.getIfPackage() == 1) {
                     Stage stage = new Stage();
                     stage.initOwner(this.getScene().getWindow());
                     stage.initModality(Modality.WINDOW_MODAL);
@@ -310,17 +310,17 @@ public class OrderDishesChoiceView extends VBox {
                     stage.setWidth(this.getScene().getWindow().getWidth() / 2);
                     stage.setHeight(this.getScene().getWindow().getHeight() / 2);
                     stage.setTitle("点菜[桌号:" + data.getDeskName() + "]");
-                    stage.setScene(new Scene(new PackageDishesChoiceView(dishes)));
+                    stage.setScene(new Scene(new PackageDishesChoiceView(bo, this::addCartItem)));
                     // orderDishesStg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
                     stage.showAndWait();
                 } else {
-                    addDishesToCart(dishes);
+                    addDishesToCart(bo);
                 }
             }
         });
         box.getChildren().add(iv);
-        box.getChildren().add(new Label(dishes.getDishesName()));
-        box.getChildren().add(new Label("单价:" + CommonUtils.formatMoney(dishes.getDishesPrice()) + "元"));
+        box.getChildren().add(new Label(bo.getDishesName()));
+        box.getChildren().add(new Label("单价:" + CommonUtils.formatMoney(bo.getDishesPrice()) + "元"));
 
         return box;
     }
@@ -342,6 +342,10 @@ public class OrderDishesChoiceView extends VBox {
         cartItem.setDishesPriceId(0);
         cartItem.setNums(1);
 
+        this.addCartItem(cartItem);
+    }
+
+    private void addCartItem(CartItemVO cartItem) {
         try {
             Result<CartVO> addCartRs = cartService.addItem(data.getDeskId(), cartItem);
             LogUtils.info("购物车信息:" + JSON.toJSONString(addCartRs));

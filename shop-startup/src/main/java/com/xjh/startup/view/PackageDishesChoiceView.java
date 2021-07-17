@@ -2,15 +2,12 @@ package com.xjh.startup.view;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import com.alibaba.fastjson.JSON;
 import com.xjh.common.enumeration.EnumChoseType;
-import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.JSONBuilder;
-import com.xjh.common.utils.LogUtils;
-import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackageDishes;
 import com.xjh.dao.dataobject.DishesPackageType;
@@ -19,7 +16,6 @@ import com.xjh.dao.mapper.DishesPackageTypeDAO;
 import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.model.CartItemVO;
-import com.xjh.service.domain.model.CartVO;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.DishesChoiceItemBO;
 
@@ -38,7 +34,7 @@ public class PackageDishesChoiceView extends Group {
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
     GridPane grid = new GridPane();
 
-    public PackageDishesChoiceView(DishesChoiceItemBO bo) {
+    public PackageDishesChoiceView(DishesChoiceItemBO bo, Consumer<CartItemVO> addCartItemCb) {
         grid.setVgap(10);
         grid.setHgap(10);
         this.getChildren().add(grid);
@@ -119,17 +115,10 @@ public class PackageDishesChoiceView extends Group {
                 cartItem.setDishesPriceId(0);
                 cartItem.setNums(addNumSp.get());
                 cartItem.setPackagedishes(CommonUtils.map(selectedDishes, JSONBuilder::toJSON));
-                try {
-                    Result<CartVO> addCartRs = cartService.addItem(bo.getDeskId(), cartItem);
-                    LogUtils.info("购物车信息:" + JSON.toJSONString(addCartRs));
-                    if (addCartRs.isSuccess()) {
-                        AlertBuilder.INFO("通知消息", "添加购物车成功");
-                    } else {
-                        AlertBuilder.ERROR(addCartRs.getMsg());
-                    }
-                } catch (Exception ex) {
-                    AlertBuilder.ERROR("报错消息", "添加购物车异常," + ex.getMessage());
-                }
+
+                addCartItemCb.accept(cartItem);
+
+                this.getScene().getWindow().hide();
 
             });
         }
