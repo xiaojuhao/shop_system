@@ -311,7 +311,6 @@ public class OrderDishesChoiceView extends VBox {
                     stage.setHeight(this.getScene().getWindow().getHeight() / 2);
                     stage.setTitle("点菜[桌号:" + data.getDeskName() + "]");
                     stage.setScene(new Scene(new PackageDishesChoiceView(bo, this::addCartItem)));
-                    // orderDishesStg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
                     stage.showAndWait();
                 } else {
                     addDishesToCart(bo);

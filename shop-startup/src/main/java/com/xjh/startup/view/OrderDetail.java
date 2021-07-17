@@ -411,8 +411,8 @@ public class OrderDetail extends VBox {
         orderDishesStg.initModality(Modality.WINDOW_MODAL);
         orderDishesStg.initStyle(StageStyle.DECORATED);
         orderDishesStg.centerOnScreen();
-        orderDishesStg.setWidth(this.getScene().getWindow().getWidth());
-        orderDishesStg.setHeight(this.getScene().getWindow().getHeight());
+        orderDishesStg.setWidth(this.getScene().getWindow().getWidth() - 60);
+        orderDishesStg.setHeight(this.getScene().getWindow().getHeight() - 100);
         orderDishesStg.setTitle("点菜[桌号:" + param.getDeskName() + "]");
         orderDishesStg.setScene(new Scene(new OrderDishesChoiceView(param)));
         orderDishesStg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
