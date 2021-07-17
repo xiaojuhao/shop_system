@@ -1,18 +1,30 @@
 package com.xjh.startup.view;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
+import com.alibaba.fastjson.JSON;
 import com.xjh.common.enumeration.EnumChoseType;
+import com.xjh.common.utils.AlertBuilder;
+import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.JSONBuilder;
+import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackageDishes;
 import com.xjh.dao.dataobject.DishesPackageType;
 import com.xjh.dao.mapper.DishesPackageDishesDAO;
 import com.xjh.dao.mapper.DishesPackageTypeDAO;
+import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.DishesService;
+import com.xjh.service.domain.model.CartItemVO;
+import com.xjh.service.domain.model.CartVO;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.DishesChoiceItemBO;
 
 import javafx.scene.Group;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -20,6 +32,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 
 public class PackageDishesChoiceView extends Group {
+    CartService cartService = GuiceContainer.getInstance(CartService.class);
     DishesPackageTypeDAO typeDAO = GuiceContainer.getInstance(DishesPackageTypeDAO.class);
     DishesPackageDishesDAO packageDishesDAO = GuiceContainer.getInstance(DishesPackageDishesDAO.class);
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
@@ -29,6 +42,7 @@ public class PackageDishesChoiceView extends Group {
         grid.setVgap(10);
         grid.setHgap(10);
         this.getChildren().add(grid);
+        List<Supplier<DishesPackageDishes>> collectDishesId = new ArrayList<>();
         int row = -1;
         //
         {
@@ -69,6 +83,7 @@ public class PackageDishesChoiceView extends Group {
                         });
                     }
                     choices.getChildren().add(cb);
+                    collectDishesId.add(() -> cb.isSelected() ? pd : null);
                 }
                 grid.add(choices, 1, row);
             }
@@ -78,8 +93,43 @@ public class PackageDishesChoiceView extends Group {
             row++;
             Label label = new Label("数量:");
             TextField numInput = new TextField();
+            numInput.setMaxWidth(100);
+            numInput.textProperty().addListener((x, ov, nv) -> {
+                numInput.setText(CommonUtils.parseInt(nv, 0).toString());
+            });
             grid.add(label, 0, row);
             grid.add(numInput, 1, row);
+        }
+        //
+        {
+            row++;
+            Button saveBtn = new Button("加入购物车");
+            grid.add(saveBtn, 0, row, 2, 1);
+            saveBtn.setOnMouseClicked(evt -> {
+                List<DishesPackageDishes> selectedDishes = CommonUtils.map(collectDishesId, Supplier::get);
+                CartItemVO cartItem = new CartItemVO();
+                if (bo.getIfPackage() == 1) {
+                    cartItem.setDishesId(bo.getDishesPackageId());
+                } else {
+                    cartItem.setDishesId(bo.getDishesId());
+                }
+                cartItem.setIfDishesPackage(2);
+                cartItem.setDishesPriceId(0);
+                cartItem.setNums(1);
+                cartItem.setPackagedishes(CommonUtils.map(selectedDishes, JSONBuilder::toJSON));
+                try {
+                    Result<CartVO> addCartRs = cartService.addItem(bo.getDeskId(), cartItem);
+                    LogUtils.info("购物车信息:" + JSON.toJSONString(addCartRs));
+                    if (addCartRs.isSuccess()) {
+                        AlertBuilder.INFO("通知消息", "添加购物车成功");
+                    } else {
+                        AlertBuilder.ERROR(addCartRs.getMsg());
+                    }
+                } catch (Exception ex) {
+                    AlertBuilder.ERROR("报错消息", "添加购物车异常," + ex.getMessage());
+                }
+
+            });
         }
     }
 }
