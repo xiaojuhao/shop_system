@@ -260,6 +260,10 @@ public class OrderDishesChoiceView extends VBox {
                 img = arr.get(0).getImageSrc();
             }
         }
+        bo.setOrderId(data.getOrderId());
+        bo.setDeskId(data.getDeskId());
+        bo.setDeskName(data.getDeskName());
+
         bo.setImg(img);
         bo.setDishesId(dishes.getDishesId());
         bo.setDishesName(dishes.getDishesName());
@@ -279,6 +283,9 @@ public class OrderDishesChoiceView extends VBox {
                 img = arr.get(0).getImageSrc();
             }
         }
+        bo.setOrderId(data.getOrderId());
+        bo.setDeskId(data.getDeskId());
+        bo.setDeskName(data.getDeskName());
         bo.setImg(img);
         bo.setDishesPackageId(dishes.getDishesPackageId());
         bo.setDishesName(dishes.getDishesPackageName());
@@ -294,33 +301,20 @@ public class OrderDishesChoiceView extends VBox {
         ImageView iv = getImageView(dishes.getImg());
         iv.setOnMouseClicked(evt -> {
             if (ClickHelper.isDblClick()) {
-                LogUtils.info("添加到购物车," +
-                        "DishesId=" + dishes.getDishesId() + "," +
-                        "PackageId=" + dishes.getDishesPackageId() + "," +
-                        dishes.getDishesName() + ", " +
-                        (dishes.getIfPackage() == 0 ? "普通菜品" : "套餐")
-                        + CommonUtils.reflectString(data));
-                CartItemVO cartItem = new CartItemVO();
                 if (dishes.getIfPackage() == 1) {
-                    cartItem.setDishesId(dishes.getDishesPackageId());
+                    Stage stage = new Stage();
+                    stage.initOwner(this.getScene().getWindow());
+                    stage.initModality(Modality.WINDOW_MODAL);
+                    stage.initStyle(StageStyle.DECORATED);
+                    stage.centerOnScreen();
+                    stage.setWidth(this.getScene().getWindow().getWidth() / 2);
+                    stage.setHeight(this.getScene().getWindow().getHeight() / 2);
+                    stage.setTitle("点菜[桌号:" + data.getDeskName() + "]");
+                    stage.setScene(new Scene(new PackageDishesChoiceView(dishes)));
+                    // orderDishesStg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
+                    stage.showAndWait();
                 } else {
-                    cartItem.setDishesId(dishes.getDishesId());
-                }
-                cartItem.setIfDishesPackage(dishes.getIfPackage());
-                cartItem.setDishesPriceId(0);
-                cartItem.setNums(1);
-
-                try {
-                    Result<CartVO> addCartRs = cartService.addItem(data.getDeskId(), cartItem);
-                    LogUtils.info("购物车信息:" + JSON.toJSONString(addCartRs));
-                    if (addCartRs.isSuccess()) {
-                        AlertBuilder.INFO("通知消息", "添加购物车成功");
-                        cartSize.set(CollectionUtils.size(addCartRs.getData().getContents()));
-                    } else {
-                        AlertBuilder.ERROR(addCartRs.getMsg());
-                    }
-                } catch (Exception ex) {
-                    AlertBuilder.ERROR("报错消息", "添加购物车异常," + ex.getMessage());
+                    addDishesToCart(dishes);
                 }
             }
         });
@@ -329,6 +323,37 @@ public class OrderDishesChoiceView extends VBox {
         box.getChildren().add(new Label("单价:" + CommonUtils.formatMoney(dishes.getDishesPrice()) + "元"));
 
         return box;
+    }
+
+    private void addDishesToCart(DishesChoiceItemBO bo) {
+        LogUtils.info("添加到购物车," +
+                "DishesId=" + bo.getDishesId() + "," +
+                "PackageId=" + bo.getDishesPackageId() + "," +
+                bo.getDishesName() + ", " +
+                (bo.getIfPackage() == 0 ? "普通菜品" : "套餐")
+                + CommonUtils.reflectString(data));
+        CartItemVO cartItem = new CartItemVO();
+        if (bo.getIfPackage() == 1) {
+            cartItem.setDishesId(bo.getDishesPackageId());
+        } else {
+            cartItem.setDishesId(bo.getDishesId());
+        }
+        cartItem.setIfDishesPackage(bo.getIfPackage());
+        cartItem.setDishesPriceId(0);
+        cartItem.setNums(1);
+
+        try {
+            Result<CartVO> addCartRs = cartService.addItem(data.getDeskId(), cartItem);
+            LogUtils.info("购物车信息:" + JSON.toJSONString(addCartRs));
+            if (addCartRs.isSuccess()) {
+                AlertBuilder.INFO("通知消息", "添加购物车成功");
+                cartSize.set(CollectionUtils.size(addCartRs.getData().getContents()));
+            } else {
+                AlertBuilder.ERROR(addCartRs.getMsg());
+            }
+        } catch (Exception ex) {
+            AlertBuilder.ERROR("报错消息", "添加购物车异常," + ex.getMessage());
+        }
     }
 
     private ComboBox<DishesType> dishesTypeIdSelector() {
@@ -430,7 +455,7 @@ public class OrderDishesChoiceView extends VBox {
             iv.setFitHeight(100);
             return iv;
         } catch (Exception ex) {
-            ImageView iv = new ImageView(getImageUrl(""));
+            ImageView iv = new ImageView(getImageUrl("/img/logo.png"));
             iv.setFitWidth(180);
             iv.setFitHeight(100);
             return iv;
