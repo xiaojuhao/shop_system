@@ -16,12 +16,12 @@
       fx:controller="com.xjh.startup.controller.LoginController">
     <VBox alignment="CENTER" minWidth="450" prefWidth="500" styleClass="login-card">
         <Label styleClass="login-title" text="小句号点餐收银系统"/>
-        <VBox alignment="CENTER" prefWidth="330" spacing="15">
-            <HBox prefWidth="300">
+        <VBox alignment="CENTER" prefWidth="500" maxWidth="500" spacing="15">
+            <HBox prefWidth="500">
                 <Label prefHeight="18.0" prefWidth="44.0" text="账号:"/>
                 <TextField fx:id="accountField" focusTraversable="false" prefHeight="26.0" prefWidth="289.0" promptText="账号"/>
             </HBox>
-            <HBox prefWidth="300">
+            <HBox prefWidth="500">
                 <Label prefHeight="18.0" prefWidth="44.0" text="密码:"/>
                 <PasswordField fx:id="passwordField" focusTraversable="false" prefHeight="26.0" prefWidth="288.0" promptText="密码"/>
             </HBox>
