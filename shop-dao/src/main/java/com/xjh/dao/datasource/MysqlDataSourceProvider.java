@@ -1,7 +1,5 @@
 package com.xjh.dao.datasource;
 
-import java.util.Properties;
-
 import com.google.inject.Provider;
 import com.xjh.common.store.RtPropNames;
 import com.xjh.common.store.SysConfigUtils;
@@ -9,6 +7,8 @@ import com.xjh.common.utils.LogUtils;
 import com.xjh.common.utils.TimeRecord;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+
+import java.util.Properties;
 
 public class MysqlDataSourceProvider implements Provider<HikariDataSource> {
     private static class Inst {
