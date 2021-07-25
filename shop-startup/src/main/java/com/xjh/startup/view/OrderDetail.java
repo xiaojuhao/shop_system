@@ -304,7 +304,7 @@ public class OrderDetail extends VBox {
 
     private ObservableList<OrderDishesTableItemVO> loadOrderDishes(Integer orderId) {
         List<OrderDishes> orderDishes = orderDishesService.selectOrderDishes(orderId);
-        List<Integer> dishesIdList = CommonUtils.map(orderDishes, OrderDishes::getDishesId);
+        List<Integer> dishesIdList = CommonUtils.collect(orderDishes, OrderDishes::getDishesId);
         List<Dishes> dishesList = dishesService.getByIds(dishesIdList);
         Map<Integer, Dishes> dishesMap = CommonUtils.listToMap(dishesList, Dishes::getDishesId);
         List<OrderDishesTableItemVO> items = new ArrayList<>();
@@ -369,7 +369,7 @@ public class OrderDetail extends VBox {
     private double sumTotalPrice(Integer orderId) {
         double totalPrice = 0;
         List<OrderDishes> dishes = orderDishesService.selectOrderDishes(orderId);
-        totalPrice = CommonUtils.map(dishes, OrderDishes::getOrderDishesPrice)
+        totalPrice = CommonUtils.collect(dishes, OrderDishes::getOrderDishesPrice)
                 .stream().reduce(0D, Double::sum);
         return totalPrice;
     }

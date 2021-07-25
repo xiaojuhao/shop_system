@@ -1,6 +1,6 @@
 package com.xjh.startup.view;
 
-import static com.xjh.common.utils.CommonUtils.map;
+import static com.xjh.common.utils.CommonUtils.collect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -191,12 +191,12 @@ public class OrderDishesChoiceView extends VBox {
             List<DishesChoiceItemBO> bolist = new ArrayList<>();
             if (_new.getIfPackage() == null || _new.getIfPackage() == 0) {
                 List<Dishes> dishesList = queryList(_new);
-                bolist.addAll(map(dishesList, this::buildBO));
+                bolist.addAll(collect(dishesList, this::buildBO));
             } else if (_new.getIfPackage() == 1) {
                 List<DishesPackage> packageList = queryPackageList(_new);
-                bolist.addAll(map(packageList, this::buildBO));
+                bolist.addAll(collect(packageList, this::buildBO));
             }
-            List<VBox> list = map(bolist, this::buildDishesView);
+            List<VBox> list = collect(bolist, this::buildDishesView);
             Platform.runLater(() -> {
                 pane.getChildren().clear();
                 pane.getChildren().addAll(list);

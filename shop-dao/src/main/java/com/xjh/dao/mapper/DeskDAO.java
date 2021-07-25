@@ -41,7 +41,7 @@ public class DeskDAO {
             sql.append(" and orderId = '").append(desk.getOrderId()).append("'");
         }
         List<Entity> list = Db.use(ds).query(sql.toString());
-        return CommonUtils.map(list, this::convert);
+        return CommonUtils.collect(list, this::convert);
     }
 
     public Desk getById(Integer id) throws SQLException {

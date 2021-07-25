@@ -38,7 +38,7 @@ public class OrderPayDAO {
     public List<OrderPay> selectList(OrderPay example) {
         try {
             List<Entity> list = Db.use(ds).find(EntityUtils.create(example));
-            return CommonUtils.map(list, it -> EntityUtils.convert(it, OrderPay.class));
+            return CommonUtils.collect(list, it -> EntityUtils.convert(it, OrderPay.class));
         } catch (Exception ex) {
             ex.printStackTrace();
             return new ArrayList<>();

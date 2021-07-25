@@ -29,11 +29,11 @@ import com.alibaba.fastjson.JSON;
 
 @SuppressWarnings({"unused"})
 public class CommonUtils {
-    public static <V, R> List<R> map(List<V> list, Function<V, R> fun) {
+    public static <V, R> List<R> collect(List<V> list, Function<V, R> mapper) {
         if (list == null || list.size() == 0) {
             return new ArrayList<>();
         }
-        return list.stream().map(fun).filter(Objects::nonNull).collect(Collectors.toList());
+        return list.stream().map(mapper).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     public static void safeRun(Runnable run) {

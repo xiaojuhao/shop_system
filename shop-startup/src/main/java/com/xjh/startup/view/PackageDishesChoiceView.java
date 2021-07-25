@@ -104,7 +104,7 @@ public class PackageDishesChoiceView extends Group {
             Button saveBtn = new Button("加入购物车");
             grid.add(saveBtn, 0, row, 2, 1);
             saveBtn.setOnMouseClicked(evt -> {
-                List<DishesPackageDishes> selectedDishes = CommonUtils.map(collectDishesId, Supplier::get);
+                List<DishesPackageDishes> selectedDishes = CommonUtils.collect(collectDishesId, Supplier::get);
                 CartItemVO cartItem = new CartItemVO();
                 if (bo.getIfPackage() == 1) {
                     cartItem.setDishesId(bo.getDishesPackageId());
@@ -114,7 +114,7 @@ public class PackageDishesChoiceView extends Group {
                 cartItem.setIfDishesPackage(2);
                 cartItem.setDishesPriceId(0);
                 cartItem.setNums(addNumSp.get());
-                cartItem.setPackagedishes(CommonUtils.map(selectedDishes, JSONBuilder::toJSON));
+                cartItem.setPackagedishes(CommonUtils.collect(selectedDishes, JSONBuilder::toJSON));
 
                 addCartItemCb.accept(cartItem);
 
