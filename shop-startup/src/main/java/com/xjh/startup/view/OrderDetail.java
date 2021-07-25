@@ -3,6 +3,7 @@ package com.xjh.startup.view;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import com.xjh.common.enumeration.EnumDesKStatus;
@@ -54,6 +55,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -138,12 +140,12 @@ public class OrderDetail extends VBox {
             gridPane.setHgap(10);
             gridPane.setPadding(new Insets(10));
             /// ----------- 第一行 ---------------
-            Label l = new Label("订单总额：0");
+            Label l = new Label("订单总额：0.00");
             orderView.addListener((a, b, c) -> l.setText("订单总额: " + CommonUtils.formatMoney(c.totalPrice)));
             l.setMinWidth(200);
             gridPane.add(l, 0, 0);
             // 第二行
-            Label labelCustNum = new Label("已支付: ");
+            Label labelCustNum = new Label("已支付: 0.00");
             orderView.addListener((x, ov, nv) -> labelCustNum.setText("已支付: " + CommonUtils.formatMoney(nv.orderHadpaid)));
             labelCustNum.setMinWidth(200);
             gridPane.add(labelCustNum, 1, 0);
@@ -195,7 +197,6 @@ public class OrderDetail extends VBox {
 
         TableView<OrderDishesTableItemVO> tv = new TableView<>();
         Runnable refreshTableView = () -> {
-            TimeRecord start = TimeRecord.start();
             reloadOrder(orderId);
             tv.setItems(loadOrderDishes(orderId));
             tv.refresh();
@@ -207,7 +208,7 @@ public class OrderDetail extends VBox {
                     newCol("序号", "col1", 100),
                     newCol("子订单", "col2", 100),
                     newCol("菜名名称", "col3", 300),
-                    newCol("单价", "col4", 100),
+                    newCol("单价", "col4", 130),
                     newCol("折后价", "col5", 100),
                     newCol("数量", "col6", 100),
                     newCol("类型", "col7", 100)
@@ -308,7 +309,16 @@ public class OrderDetail extends VBox {
         List<Dishes> dishesList = dishesService.getByIds(dishesIdList);
         Map<Integer, Dishes> dishesMap = CommonUtils.listToMap(dishesList, Dishes::getDishesId);
         List<OrderDishesTableItemVO> items = new ArrayList<>();
+        List<OrderDishes> discountableList = new ArrayList<>();
+        List<OrderDishes> nonDiscountableList = new ArrayList<>();
         orderDishes.forEach(o -> {
+            if (o.getIfDishesPackage() == 1) {
+                discountableList.add(o);
+            } else {
+                nonDiscountableList.add(o);
+            }
+        });
+        discountableList.forEach(o -> {
             String dishesName = "";
             String price = CommonUtils.formatMoney(o.getOrderDishesPrice());
             String discountPrice = CommonUtils.formatMoney(o.getOrderDishesDiscountPrice());
@@ -328,11 +338,71 @@ public class OrderDetail extends VBox {
             items.add(new OrderDishesTableItemVO(
                     o.getOrderDishesId() + "",
                     o.getSubOrderId() + "",
-                    dishesName,
-                    price, discountPrice,
+                    new RichText(dishesName),
+                    new RichText(price),
+                    discountPrice,
                     o.getOrderDishesNums() + "",
                     saleType));
         });
+        if (CommonUtils.isNotEmpty(discountableList)) {
+            double discountTotalPrice = discountableList.stream()
+                    .map(OrderDishes::getOrderDishesPrice)
+                    .filter(Objects::nonNull)
+                    .reduce(0D, Double::sum);
+            items.add(new OrderDishesTableItemVO(
+                    "",
+                    "",
+                    new RichText(""),
+                    new RichText("优惠合计:" + discountTotalPrice).with(Color.RED).with(Pos.CENTER_RIGHT),
+                    "",
+                    "", ""));
+            items.add(new OrderDishesTableItemVO(
+                    "",
+                    "",
+                    new RichText("以下为不参与优惠活动菜品").with(Color.RED).with(Pos.CENTER_RIGHT),
+                    new RichText(""),
+                    "",
+                    "", ""));
+        }
+        nonDiscountableList.forEach(o -> {
+            String dishesName = "";
+            String price = CommonUtils.formatMoney(o.getOrderDishesPrice());
+            String discountPrice = CommonUtils.formatMoney(o.getOrderDishesDiscountPrice());
+            String saleType = EnumOrderSaleType.of(o.getOrderDishesSaletype()).remark;
+            // 套餐
+            if (o.getIfDishesPackage() == 1) {
+                DishesPackage pkg = dishesPackageService.getById(o.getDishesId());
+                if (pkg != null) {
+                    dishesName = "(套餐)" + pkg.getDishesPackageName();
+                }
+            } else {
+                Dishes d = dishesMap.get(o.getDishesId());
+                if (d != null) {
+                    dishesName = d.getDishesName();
+                }
+            }
+            items.add(new OrderDishesTableItemVO(
+                    o.getOrderDishesId() + "",
+                    o.getSubOrderId() + "",
+                    new RichText(dishesName).with(Color.RED),
+                    new RichText(price),
+                    discountPrice,
+                    o.getOrderDishesNums() + "",
+                    saleType));
+        });
+        if (CommonUtils.isNotEmpty(nonDiscountableList)) {
+            double nonDiscountTotalPrice = nonDiscountableList.stream()
+                    .map(OrderDishes::getOrderDishesPrice)
+                    .filter(Objects::nonNull)
+                    .reduce(0D, Double::sum);
+            items.add(new OrderDishesTableItemVO(
+                    "",
+                    "",
+                    new RichText(""),
+                    new RichText("不优惠合计:" + nonDiscountTotalPrice).with(Color.RED).with(Pos.CENTER_RIGHT),
+                    "",
+                    "", ""));
+        }
         return FXCollections.observableArrayList(items);
 
     }
@@ -406,31 +476,31 @@ public class OrderDetail extends VBox {
     }
 
     private void openDishesChoiceView(DeskOrderParam param) {
-        Stage orderDishesStg = new Stage();
-        orderDishesStg.initOwner(this.getScene().getWindow());
-        orderDishesStg.initModality(Modality.WINDOW_MODAL);
-        orderDishesStg.initStyle(StageStyle.DECORATED);
-        orderDishesStg.centerOnScreen();
-        orderDishesStg.setWidth(this.getScene().getWindow().getWidth() - 60);
-        orderDishesStg.setHeight(this.getScene().getWindow().getHeight() - 100);
-        orderDishesStg.setTitle("点菜[桌号:" + param.getDeskName() + "]");
-        orderDishesStg.setScene(new Scene(new OrderDishesChoiceView(param)));
-        orderDishesStg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
-        orderDishesStg.showAndWait();
+        Stage stg = new Stage();
+        stg.initOwner(this.getScene().getWindow());
+        stg.initModality(Modality.WINDOW_MODAL);
+        stg.initStyle(StageStyle.DECORATED);
+        stg.centerOnScreen();
+        stg.setWidth(this.getScene().getWindow().getWidth() - 60);
+        stg.setHeight(this.getScene().getWindow().getHeight() - 100);
+        stg.setTitle("点菜[桌号:" + param.getDeskName() + "]");
+        stg.setScene(new Scene(new OrderDishesChoiceView(param)));
+        stg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
+        stg.showAndWait();
     }
 
     private void openPayWayChoiceView(DeskOrderParam param) {
-        Stage orderDishesStg = new Stage();
-        orderDishesStg.initOwner(this.getScene().getWindow());
-        orderDishesStg.initModality(Modality.WINDOW_MODAL);
-        orderDishesStg.initStyle(StageStyle.DECORATED);
-        orderDishesStg.centerOnScreen();
-        orderDishesStg.setWidth(this.getScene().getWindow().getWidth() / 3);
-        orderDishesStg.setHeight(this.getScene().getWindow().getHeight() / 3 * 2);
-        orderDishesStg.setTitle("结账[桌号:" + param.getDeskName() + "]");
-        orderDishesStg.setScene(new Scene(new PayWayChoiceView(param)));
-        orderDishesStg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
-        orderDishesStg.showAndWait();
+        Stage stg = new Stage();
+        stg.initOwner(this.getScene().getWindow());
+        stg.initModality(Modality.WINDOW_MODAL);
+        stg.initStyle(StageStyle.DECORATED);
+        stg.centerOnScreen();
+        stg.setWidth(this.getScene().getWindow().getWidth() / 3);
+        stg.setHeight(this.getScene().getWindow().getHeight() / 3 * 2);
+        stg.setTitle("结账[桌号:" + param.getDeskName() + "]");
+        stg.setScene(new Scene(new PayWayChoiceView(param)));
+        stg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
+        stg.showAndWait();
     }
 
     private Separator horizontalSeparator() {

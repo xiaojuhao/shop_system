@@ -153,7 +153,7 @@ public class CartService {
             List<OrderDishes> orderDishes = new ArrayList<>();
             for (CartItemVO item : cartVO.getContents()) {
                 int ifPackage = CommonUtils.orElse(item.getIfDishesPackage(), 0);
-                if (ifPackage == 1) {
+                if (ifPackage == 1 || ifPackage == 2) {
                     orderDishes.add(buildPackageCartItemVO(item, orderId, subOrderId));
                 } else {
                     orderDishes.add(buildCommonCartItemVO(item, orderId, subOrderId));
