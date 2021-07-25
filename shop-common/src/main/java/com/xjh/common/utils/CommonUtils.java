@@ -36,6 +36,16 @@ public class CommonUtils {
         return list.stream().map(mapper).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
+    public static <T> void addList(List<T> list, List<T> src) {
+        if (list != null) {
+            forEach(src, it -> {
+                if (it != null) {
+                    list.add(it);
+                }
+            });
+        }
+    }
+
     public static void safeRun(Runnable run) {
         try {
             if (run == null) {

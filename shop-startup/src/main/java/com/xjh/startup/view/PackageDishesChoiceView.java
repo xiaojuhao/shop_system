@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import com.xjh.common.enumeration.EnumChoseType;
+import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.JSONBuilder;
 import com.xjh.dao.dataobject.Dishes;
@@ -38,7 +39,8 @@ public class PackageDishesChoiceView extends Group {
         grid.setVgap(10);
         grid.setHgap(10);
         this.getChildren().add(grid);
-        List<Supplier<DishesPackageDishes>> collectDishesId = new ArrayList<>();
+        List<Supplier<List<DishesPackageDishes>>> dishesSources = new ArrayList<>();
+        List<Supplier<String>> dishesCheckers = new ArrayList<>();
         Supplier<Integer> addNumSp;
         int row = -1;
         //
@@ -67,6 +69,7 @@ public class PackageDishesChoiceView extends Group {
                 FlowPane choices = new FlowPane();
                 choices.setVgap(5);
                 choices.setHgap(5);
+                List<Supplier<DishesPackageDishes>> typeSelected = new ArrayList<>();
                 for (DishesPackageDishes pd : packageDishes) {
                     Dishes dishes = dishesService.getById(pd.getDishesId());
                     if (dishes == null) {
@@ -80,7 +83,32 @@ public class PackageDishesChoiceView extends Group {
                         });
                     }
                     choices.getChildren().add(cb);
-                    collectDishesId.add(() -> cb.isSelected() ? pd : null);
+                    typeSelected.add(() -> cb.isSelected() ? pd : null);
+                }
+                dishesSources.add(() -> CommonUtils.collect(typeSelected, Supplier::get));
+                if (chose == EnumChoseType.ALL) {
+                    dishesCheckers.add(() -> {
+                        if (CommonUtils.collect(typeSelected, Supplier::get).size() != packageDishes.size()) {
+                            return "必选菜品未选中";
+                        }
+                        return null;
+                    });
+                } else if (chose == EnumChoseType.MAX) {
+                    dishesCheckers.add(() -> {
+                        int selectedSize = CommonUtils.collect(typeSelected, Supplier::get).size();
+                        if (selectedSize > type.getChooseNums()) {
+                            return "菜品最多可选" + type.getChooseNums() + "个,已选择" + selectedSize + "个";
+                        }
+                        return null;
+                    });
+                } else {
+                    dishesCheckers.add(() -> {
+                        int selectedSize = CommonUtils.collect(typeSelected, Supplier::get).size();
+                        if (selectedSize != type.getChooseNums()) {
+                            return "多选菜品应选" + type.getChooseNums() + "个,已选择" + selectedSize + "个";
+                        }
+                        return null;
+                    });
                 }
                 grid.add(choices, 1, row);
             }
@@ -104,7 +132,16 @@ public class PackageDishesChoiceView extends Group {
             Button saveBtn = new Button("加入购物车");
             grid.add(saveBtn, 0, row, 2, 1);
             saveBtn.setOnMouseClicked(evt -> {
-                List<DishesPackageDishes> selectedDishes = CommonUtils.collect(collectDishesId, Supplier::get);
+                for (Supplier<String> checker : dishesCheckers) {
+                    String errmsg = checker.get();
+                    if (errmsg != null) {
+                        AlertBuilder.ERROR(errmsg);
+                        return;
+                    }
+                }
+                List<DishesPackageDishes> selectedDishes = new ArrayList<>();
+                CommonUtils.forEach(dishesSources, it ->
+                        CommonUtils.addList(selectedDishes, it.get()));
                 CartItemVO cartItem = new CartItemVO();
                 if (bo.getIfPackage() == 1) {
                     cartItem.setDishesId(bo.getDishesPackageId());
