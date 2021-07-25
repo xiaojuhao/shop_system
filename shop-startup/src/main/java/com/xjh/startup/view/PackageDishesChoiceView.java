@@ -20,6 +20,8 @@ import com.xjh.service.domain.model.CartItemVO;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.DishesChoiceItemBO;
 
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -27,6 +29,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 
 public class PackageDishesChoiceView extends Group {
     CartService cartService = GuiceContainer.getInstance(CartService.class);
@@ -38,6 +41,7 @@ public class PackageDishesChoiceView extends Group {
     public PackageDishesChoiceView(DishesChoiceItemBO bo, Consumer<CartItemVO> addCartItemCb) {
         grid.setVgap(10);
         grid.setHgap(10);
+        grid.setPadding(new Insets(0, 0, 0, 10));
         this.getChildren().add(grid);
         List<Supplier<List<DishesPackageDishes>>> dishesSources = new ArrayList<>();
         List<Supplier<String>> dishesCheckers = new ArrayList<>();
@@ -89,7 +93,7 @@ public class PackageDishesChoiceView extends Group {
                 if (chose == EnumChoseType.ALL) {
                     dishesCheckers.add(() -> {
                         if (CommonUtils.collect(typeSelected, Supplier::get).size() != packageDishes.size()) {
-                            return "必选菜品未选中";
+                            return type.getDishesPackageTypeName() + " 未选中";
                         }
                         return null;
                     });
@@ -97,7 +101,7 @@ public class PackageDishesChoiceView extends Group {
                     dishesCheckers.add(() -> {
                         int selectedSize = CommonUtils.collect(typeSelected, Supplier::get).size();
                         if (selectedSize > type.getChooseNums()) {
-                            return "菜品最多可选" + type.getChooseNums() + "个,已选择" + selectedSize + "个";
+                            return type.getDishesPackageTypeName() + " 最多可选" + type.getChooseNums() + "个,已选择" + selectedSize + "个";
                         }
                         return null;
                     });
@@ -105,7 +109,7 @@ public class PackageDishesChoiceView extends Group {
                     dishesCheckers.add(() -> {
                         int selectedSize = CommonUtils.collect(typeSelected, Supplier::get).size();
                         if (selectedSize != type.getChooseNums()) {
-                            return "多选菜品应选" + type.getChooseNums() + "个,已选择" + selectedSize + "个";
+                            return type.getDishesPackageTypeName() + " 应选" + type.getChooseNums() + "个,已选择" + selectedSize + "个";
                         }
                         return null;
                     });
@@ -118,6 +122,7 @@ public class PackageDishesChoiceView extends Group {
             row++;
             Label label = new Label("数量:");
             TextField numInput = new TextField();
+            numInput.setText("1");
             numInput.setMaxWidth(100);
             numInput.textProperty().addListener((x, ov, nv) -> {
                 numInput.setText(CommonUtils.parseInt(nv, 0).toString());
@@ -130,7 +135,10 @@ public class PackageDishesChoiceView extends Group {
         {
             row++;
             Button saveBtn = new Button("加入购物车");
-            grid.add(saveBtn, 0, row, 2, 1);
+            VBox box = new VBox();
+            box.getChildren().add(saveBtn);
+            box.setAlignment(Pos.CENTER);
+            grid.add(box, 0, row, 2, 1);
             saveBtn.setOnMouseClicked(evt -> {
                 for (Supplier<String> checker : dishesCheckers) {
                     String errmsg = checker.get();
@@ -139,9 +147,12 @@ public class PackageDishesChoiceView extends Group {
                         return;
                     }
                 }
+                if (addNumSp.get() <= 0) {
+                    AlertBuilder.ERROR("请输入添加数量");
+                    return;
+                }
                 List<DishesPackageDishes> selectedDishes = new ArrayList<>();
-                CommonUtils.forEach(dishesSources, it ->
-                        CommonUtils.addList(selectedDishes, it.get()));
+                CommonUtils.forEach(dishesSources, it -> CommonUtils.addList(selectedDishes, it.get()));
                 CartItemVO cartItem = new CartItemVO();
                 if (bo.getIfPackage() == 1) {
                     cartItem.setDishesId(bo.getDishesPackageId());
