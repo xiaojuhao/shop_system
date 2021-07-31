@@ -32,6 +32,7 @@ import com.xjh.service.domain.OrderPayService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
+import com.xjh.startup.view.model.OrderViewBO;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -72,7 +73,7 @@ public class OrderDetail extends VBox {
     OrderPayService orderPayService;
 
 
-    ObjectProperty<OrderView> orderView = new SimpleObjectProperty<>();
+    ObjectProperty<OrderViewBO> orderView = new SimpleObjectProperty<>();
 
     public OrderDetail(Desk desk) {
         TimeRecord cost = TimeRecord.start();
@@ -410,7 +411,7 @@ public class OrderDetail extends VBox {
     private void reloadOrder(Integer orderId) {
         Order o = orderService.getOrder(orderId);
         if (o != null) {
-            OrderView v = new OrderView();
+            OrderViewBO v = new OrderViewBO();
             v.customerNum = o.getOrderCustomerNums();
             v.orderTime = DateBuilder.base(o.getCreateTime()).format(DATETIME_PATTERN);
             v.orderHadpaid = o.getOrderHadpaid();
@@ -508,16 +509,6 @@ public class OrderDetail extends VBox {
         separator2.setOrientation(Orientation.HORIZONTAL);
         return separator2;
 
-    }
-
-    public static class OrderView {
-        int customerNum;
-        String orderTime;
-        String payStatusName;
-        double totalPrice;
-        double orderHadpaid;
-        double deduction;
-        String payInfoRemark;
     }
 
     @Override
