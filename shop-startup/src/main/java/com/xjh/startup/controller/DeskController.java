@@ -1,5 +1,6 @@
 package com.xjh.startup.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.xjh.common.utils.CommonUtils;
@@ -45,12 +46,12 @@ public class DeskController {
 
         ThreadUtils.runInNewThread(() -> {
             // 加载所有的tables
+            double prefWidth = Math.max(pane.getWidth() / 6 - 15, 200);
             allDesks().forEach(desk -> desks.add(new SimpleObjectProperty<>(desk)));
-            // 渲染tables
-            desks.forEach(desk -> Platform.runLater(() -> {
-                double prefWidth = Math.max(pane.getWidth() / 6 - 15, 200);
-                pane.getChildren().add(new DeskView(desk, prefWidth));
-            }));
+            List<DeskView> views = new ArrayList<>();
+            desks.forEach(d -> views.add(new DeskView(d, prefWidth)));
+            // 渲染tables;
+            Platform.runLater(() -> pane.getChildren().addAll(views));
             // 监测变化
             while (instance.get() == s) {
                 desks.forEach(this::detectChange);

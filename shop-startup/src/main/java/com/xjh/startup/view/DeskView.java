@@ -47,7 +47,7 @@ public class DeskView extends VBox {
         Canvas canvas = new Canvas();
         canvas.setWidth(width);
         canvas.setHeight(height);
-        setBackground(canvas, status);
+        setBackground(this, status);
         canvas.setOnMouseClicked(evt -> this.onClickTable(desk));
         GraphicsContext gc = canvas.getGraphicsContext2D();
         // 状态
@@ -164,6 +164,7 @@ public class DeskView extends VBox {
 
     private void paintStatus(GraphicsContext gc, double width, String statusName) {
         gc.save();
+        gc.setFont(Font.font(12));
         gc.setFill(Color.PURPLE);
         gc.fillRect(width / 2, 0, width / 2, 25);
         gc.setFill(Color.WHITE);
