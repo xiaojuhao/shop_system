@@ -32,6 +32,7 @@ import com.xjh.service.domain.OrderPayService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
+import com.xjh.startup.view.model.OrderDishesTableItemVO;
 import com.xjh.startup.view.model.OrderViewBO;
 
 import javafx.beans.property.ObjectProperty;
