@@ -2,6 +2,7 @@ package com.xjh.startup.view;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.utils.AlertBuilder;
@@ -33,6 +34,7 @@ import javafx.stage.Window;
 public class DeskView extends VBox {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
     static final String TIME_FORMAT = "HH:mm:ss";
+    static AtomicBoolean openingDesk = new AtomicBoolean(false);
 
     public DeskView(SimpleObjectProperty<Desk> desk, double width) {
         double height = width / 2;
@@ -131,7 +133,7 @@ public class DeskView extends VBox {
 
     private void setBackground(Node node, EnumDesKStatus status) {
         if (status == EnumDesKStatus.USED) {
-            node.setStyle("-fx-background-color: #DC143C;");
+            node.setStyle("-fx-background-color: #CD0000;");
         } else if (status == EnumDesKStatus.PAID) {
             node.setStyle("-fx-background-color: #00bfff;");
         } else {
@@ -140,36 +142,42 @@ public class DeskView extends VBox {
     }
 
     private void onClickTable(SimpleObjectProperty<Desk> desk) {
-        DeskService deskService = GuiceContainer.getInstance(DeskService.class);
-        EnumDesKStatus runStatus = EnumDesKStatus.of(desk.get().getStatus());
-        if (runStatus == EnumDesKStatus.USED || runStatus == EnumDesKStatus.PAID) {
-            Window sceneWindow = this.getScene().getWindow();
-            Stage orderInfo = new Stage();
-            orderInfo.initOwner(sceneWindow);
-            orderInfo.initModality(Modality.WINDOW_MODAL);
-            orderInfo.initStyle(StageStyle.DECORATED);
-            orderInfo.centerOnScreen();
-            orderInfo.setWidth(sceneWindow.getWidth() / 10 * 9);
-            orderInfo.setHeight(sceneWindow.getHeight() / 10 * 9);
-            orderInfo.setTitle("订单详情");
-            orderInfo.setScene(new Scene(new OrderDetail(desk.get())));
-            orderInfo.show();
-            System.gc();
-        } else {
-            OpenDeskDialog dialog = new OpenDeskDialog(desk.get());
-            Optional<OpenDeskInputParam> result = dialog.showAndWait();
-            if (result.isPresent() && result.get().getResult() == 1) {
-                if (result.get().getCustomerNum() <= 0) {
-                    AlertBuilder.ERROR("请输入就餐人数");
-                    return;
+        if (openingDesk.compareAndSet(false, true)) {
+            try {
+                DeskService deskService = GuiceContainer.getInstance(DeskService.class);
+                EnumDesKStatus runStatus = EnumDesKStatus.of(desk.get().getStatus());
+                if (runStatus == EnumDesKStatus.USED || runStatus == EnumDesKStatus.PAID) {
+                    Window sceneWindow = this.getScene().getWindow();
+                    Stage orderInfo = new Stage();
+                    orderInfo.initOwner(sceneWindow);
+                    orderInfo.initModality(Modality.WINDOW_MODAL);
+                    orderInfo.initStyle(StageStyle.DECORATED);
+                    orderInfo.centerOnScreen();
+                    orderInfo.setWidth(sceneWindow.getWidth() / 10 * 9);
+                    orderInfo.setHeight(sceneWindow.getHeight() / 10 * 9);
+                    orderInfo.setTitle("订单详情");
+                    orderInfo.setScene(new Scene(new OrderDetail(desk.get())));
+                    orderInfo.show();
+                    System.gc();
+                } else {
+                    OpenDeskDialog dialog = new OpenDeskDialog(desk.get());
+                    Optional<OpenDeskInputParam> result = dialog.showAndWait();
+                    if (result.isPresent() && result.get().getResult() == 1) {
+                        if (result.get().getCustomerNum() <= 0) {
+                            AlertBuilder.ERROR("请输入就餐人数");
+                            return;
+                        }
+                        OpenDeskParam openDeskParam = new OpenDeskParam();
+                        openDeskParam.setDeskId(desk.get().getDeskId());
+                        openDeskParam.setCustomerNum(result.get().getCustomerNum());
+                        Result<String> openDeskRs = deskService.openDesk(openDeskParam);
+                        if (!openDeskRs.isSuccess()) {
+                            AlertBuilder.ERROR("开桌失败", openDeskRs.getMsg());
+                        }
+                    }
                 }
-                OpenDeskParam openDeskParam = new OpenDeskParam();
-                openDeskParam.setDeskId(desk.get().getDeskId());
-                openDeskParam.setCustomerNum(result.get().getCustomerNum());
-                Result<String> openDeskRs = deskService.openDesk(openDeskParam);
-                if (!openDeskRs.isSuccess()) {
-                    AlertBuilder.ERROR("开桌失败", openDeskRs.getMsg());
-                }
+            } finally {
+                openingDesk.set(false);
             }
         }
     }
