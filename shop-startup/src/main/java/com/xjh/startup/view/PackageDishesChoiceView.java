@@ -14,7 +14,6 @@ import com.xjh.dao.dataobject.DishesPackageDishes;
 import com.xjh.dao.dataobject.DishesPackageType;
 import com.xjh.dao.mapper.DishesPackageDishesDAO;
 import com.xjh.dao.mapper.DishesPackageTypeDAO;
-import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.model.CartItemVO;
 import com.xjh.startup.foundation.guice.GuiceContainer;
@@ -32,7 +31,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
 public class PackageDishesChoiceView extends Group {
-    CartService cartService = GuiceContainer.getInstance(CartService.class);
     DishesPackageTypeDAO typeDAO = GuiceContainer.getInstance(DishesPackageTypeDAO.class);
     DishesPackageDishesDAO packageDishesDAO = GuiceContainer.getInstance(DishesPackageDishesDAO.class);
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
