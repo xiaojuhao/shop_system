@@ -8,6 +8,10 @@ public class RichText {
     Pos pos;
     Object text;
 
+    public static RichText create(Object text) {
+        return new RichText(text);
+    }
+
     public RichText() {
     }
 

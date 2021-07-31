@@ -1,6 +1,7 @@
 package com.xjh.startup.view;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -315,6 +316,7 @@ public class OrderDetail extends VBox {
         List<OrderDishesTableItemVO> items = new ArrayList<>();
         List<OrderDishes> discountableList = new ArrayList<>();
         List<OrderDishes> nonDiscountableList = new ArrayList<>();
+        orderDishes.sort(Comparator.comparing(OrderDishes::getCreatetime));
         orderDishes.forEach(o -> {
             if (o.getIfDishesPackage() == 1) {
                 discountableList.add(o);
@@ -326,7 +328,11 @@ public class OrderDetail extends VBox {
             String dishesName = "";
             String price = CommonUtils.formatMoney(o.getOrderDishesPrice());
             String discountPrice = CommonUtils.formatMoney(o.getOrderDishesDiscountPrice());
-            String saleType = EnumOrderSaleType.of(o.getOrderDishesSaletype()).remark;
+            EnumOrderSaleType saleType = EnumOrderSaleType.of(o.getOrderDishesSaletype());
+            RichText saleTypeText = new RichText(saleType.remark).with(Color.BLACK);
+            if (saleType == EnumOrderSaleType.RETURN) {
+                saleTypeText.with(Color.GRAY);
+            }
             // 套餐
             if (o.getIfDishesPackage() == 1) {
                 DishesPackage pkg = dishesPackageService.getById(o.getDishesId());
@@ -346,7 +352,7 @@ public class OrderDetail extends VBox {
                     new RichText(price),
                     discountPrice,
                     o.getOrderDishesNums() + "",
-                    saleType));
+                    saleTypeText));
         });
         if (CommonUtils.isNotEmpty(discountableList)) {
             double discountTotalPrice = discountableList.stream()
@@ -359,20 +365,27 @@ public class OrderDetail extends VBox {
                     new RichText(""),
                     new RichText("优惠合计:" + discountTotalPrice).with(Color.RED).with(Pos.CENTER_RIGHT),
                     "",
-                    "", ""));
+                    "",
+                    new RichText("")));
             items.add(new OrderDishesTableItemVO(
                     "",
                     "",
                     new RichText("以下为不参与优惠活动菜品").with(Color.RED).with(Pos.CENTER_RIGHT),
                     new RichText(""),
                     "",
-                    "", ""));
+                    "",
+                    new RichText("")));
         }
         nonDiscountableList.forEach(o -> {
             String dishesName = "";
             String price = CommonUtils.formatMoney(o.getOrderDishesPrice());
             String discountPrice = CommonUtils.formatMoney(o.getOrderDishesDiscountPrice());
-            String saleType = EnumOrderSaleType.of(o.getOrderDishesSaletype()).remark;
+            EnumOrderSaleType saleType = EnumOrderSaleType.of(o.getOrderDishesSaletype());
+            RichText saleTypeText = RichText.create(saleType.remark).with(Color.BLACK);
+            if (saleType == EnumOrderSaleType.RETURN) {
+                saleTypeText.with(Color.GRAY);
+            }
+
             // 套餐
             if (o.getIfDishesPackage() == 1) {
                 DishesPackage pkg = dishesPackageService.getById(o.getDishesId());
@@ -392,7 +405,7 @@ public class OrderDetail extends VBox {
                     new RichText(price),
                     discountPrice,
                     o.getOrderDishesNums() + "",
-                    saleType));
+                    saleTypeText));
         });
         if (CommonUtils.isNotEmpty(nonDiscountableList)) {
             double nonDiscountTotalPrice = nonDiscountableList.stream()
@@ -405,7 +418,8 @@ public class OrderDetail extends VBox {
                     new RichText(""),
                     new RichText("不优惠合计:" + nonDiscountTotalPrice).with(Color.RED).with(Pos.CENTER_RIGHT),
                     "",
-                    "", ""));
+                    "",
+                    new RichText("")));
         }
         return FXCollections.observableArrayList(items);
 
