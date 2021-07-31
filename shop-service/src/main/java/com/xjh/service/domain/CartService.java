@@ -129,7 +129,6 @@ public class CartService {
     public Result<String> createSendOrder(SendOrderRequest request) {
         Runnable clear = CurrentRequest.resetRequestId();
         try {
-            Integer deskId = request.getDeskId();
             Integer orderId = request.getOrderId();
             Order order = orderDAO.selectByOrderId(orderId);
             // 子订单
@@ -156,10 +155,10 @@ public class CartService {
             } else if (hadPaid < 0.01 && notPaid > 0.01) {
                 order.setOrderStatus(EnumOrderStatus.UNPAID.status);
             }
-            // 清空购物车
-            clearCart(deskId);
             // 更新订单状态
             orderService.updateByOrderId(order);
+            LogUtils.info("赠送菜品: 订单号:" + orderId +
+                    ", 菜品:" + request.getDishesName() + "(" + request.getDishesId() + ")");
             return Result.success("下单成功");
         } catch (Exception ex) {
             ex.printStackTrace();
