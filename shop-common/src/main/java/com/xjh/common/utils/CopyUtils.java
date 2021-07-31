@@ -9,21 +9,35 @@ public class CopyUtils {
         if (obj == null) {
             return null;
         }
-        Map<String, PropertyDescriptor> pds = ReflectionUtils.resolvePD(obj.getClass());
         try {
             T _new = (T) obj.getClass().newInstance();
-            pds.forEach((field, pd) -> {
+            copy(obj, _new);
+            return _new;
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    public static Result<Object> copy(Object from, Object to) {
+        if (from == null || to == null) {
+            return Result.fail("拷贝错误");
+        }
+        Map<String, PropertyDescriptor> fromPds = ReflectionUtils.resolvePD(from.getClass());
+        Map<String, PropertyDescriptor> toPds = ReflectionUtils.resolvePD(to.getClass());
+        try {
+            fromPds.forEach((field, pd) -> {
                 try {
-                    pd.writeValue(_new, pd.readValue(obj));
+                    PropertyDescriptor toPd = toPds.get(field);
+                    if (toPd != null) {
+                        toPd.writeValue(to, pd.readValue(from));
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             });
-            return _new;
+            return Result.success(to);
         } catch (Exception ex) {
-            AlertBuilder.ERROR("系统异常", "克隆对象出现异常" + obj.getClass());
-            return null;
+            return Result.fail("拷贝异常:" + ex.getMessage());
         }
-
     }
 }

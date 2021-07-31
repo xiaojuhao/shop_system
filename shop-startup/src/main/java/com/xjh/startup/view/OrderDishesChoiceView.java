@@ -4,11 +4,13 @@ import static com.xjh.common.utils.CommonUtils.collect;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.xjh.common.enumeration.EnumChoiceAction;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.ClickHelper;
 import com.xjh.common.utils.CommonUtils;
@@ -27,6 +29,7 @@ import com.xjh.service.domain.DishesTypeService;
 import com.xjh.service.domain.model.CartItemVO;
 import com.xjh.service.domain.model.CartVO;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
+import com.xjh.service.domain.model.SendOrderRequest;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.DishesChoiceItemBO;
@@ -44,7 +47,9 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -86,17 +91,20 @@ public class OrderDishesChoiceView extends VBox {
         hbox.setAlignment(Pos.CENTER);
         hbox.setSpacing(10);
         // 套餐、普通菜品选择
-        hbox.getChildren().add(new Label("套餐:"));
+        hbox.getChildren().add(new Label("类型:"));
         ToggleGroup toggleGroup = new ToggleGroup();
         RadioButton commonType = new RadioButton("普通菜品");
         commonType.setToggleGroup(toggleGroup);
         commonType.setUserData(0);
         commonType.setSelected(true);
-        RadioButton packageType = new RadioButton("套餐");
-        packageType.setToggleGroup(toggleGroup);
-        packageType.setUserData(1);
         hbox.getChildren().add(commonType);
-        hbox.getChildren().add(packageType);
+        // 送菜不展示套餐
+        if (data.getChoiceAction() != EnumChoiceAction.SEND) {
+            RadioButton packageType = new RadioButton("套餐");
+            packageType.setToggleGroup(toggleGroup);
+            packageType.setUserData(1);
+            hbox.getChildren().add(packageType);
+        }
         toggleGroup.selectedToggleProperty().addListener((x, ov, nv) -> {
             int selectedType = (int) toggleGroup.getSelectedToggle().getUserData();
             DishesQueryCond newCond = CopyUtils.cloneObj(qryDishesCond.get());
@@ -149,26 +157,12 @@ public class OrderDishesChoiceView extends VBox {
         });
         hbox.getChildren().add(cartBtn);
 
-        // 下单按钮
-        Button placeOrder = new Button("直接下单");
-        placeOrder.setOnMouseClicked(evt -> {
-            try {
-                PlaceOrderFromCartReq req = new PlaceOrderFromCartReq();
-                req.setDeskId(data.getDeskId());
-                req.setOrderId(data.getOrderId());
-                Result<String> createOrderRs = cartService.createOrder(req);
-                if (createOrderRs.isSuccess()) {
-                    refreshCartSize();
-                    AlertBuilder.INFO("通知消息", "下单成功");
-                } else {
-                    AlertBuilder.ERROR(createOrderRs.getMsg());
-                }
-            } catch (Exception ex) {
-                LogUtils.info("下单失败:" + ex.getMessage());
-                AlertBuilder.ERROR("通知消息", "下单失败:" + ex.getMessage());
-            }
-        });
-        hbox.getChildren().add(placeOrder);
+        // 下单按钮(赠送时不展示)
+        if (data.getChoiceAction() != EnumChoiceAction.SEND) {
+            Button placeOrder = new Button("直接下单");
+            placeOrder.setOnMouseClicked(evt -> createOrderFromCart());
+            hbox.getChildren().add(placeOrder);
+        }
         return hbox;
     }
 
@@ -301,18 +295,28 @@ public class OrderDishesChoiceView extends VBox {
         ImageView iv = getImageView(bo.getImg());
         iv.setOnMouseClicked(evt -> {
             if (ClickHelper.isDblClick()) {
-                if (bo.getIfPackage() == 1) {
-                    Stage stage = new Stage();
-                    stage.initOwner(this.getScene().getWindow());
-                    stage.initModality(Modality.WINDOW_MODAL);
-                    stage.initStyle(StageStyle.DECORATED);
-                    stage.centerOnScreen();
-                    stage.setWidth(this.getScene().getWindow().getWidth() / 2);
-                    stage.setHeight(this.getScene().getWindow().getHeight() / 3 * 2);
-                    stage.setTitle("点菜[桌号:" + data.getDeskName() + "]");
-                    stage.setScene(new Scene(new PackageDishesChoiceView(bo, this::addCartItem)));
-                    stage.showAndWait();
-                } else {
+                // 赠送
+                if (data.getChoiceAction() == EnumChoiceAction.SEND) {
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("送菜");
+                    alert.setHeaderText("确定给用户送菜吗?");
+                    alert.setContentText(bo.getDishesName());
+                    Optional<ButtonType> result = alert.showAndWait();
+                    if (result.get() != ButtonType.OK) {
+                        return;
+                    }
+                    Result<String> sendRs = sendDishes(bo);
+                    if (!sendRs.isSuccess()) {
+                        AlertBuilder.ERROR(sendRs.getMsg());
+                        return;
+                    }
+                }
+                // 打开套餐
+                else if (bo.getIfPackage() == 1) {
+                    openPackageAddDialog(bo);
+                }
+                // 加入到购物车
+                else {
                     addDishesToCart(bo);
                 }
             }
@@ -322,6 +326,26 @@ public class OrderDishesChoiceView extends VBox {
         box.getChildren().add(new Label("单价:" + CommonUtils.formatMoney(bo.getDishesPrice()) + "元"));
 
         return box;
+    }
+
+    private Result<String> sendDishes(DishesChoiceItemBO bo) {
+        SendOrderRequest req = new SendOrderRequest();
+        CopyUtils.copy(bo, req);
+        cartService.createSendOrder(req);
+        return Result.success("赠送成功");
+    }
+
+    private void openPackageAddDialog(DishesChoiceItemBO bo) {
+        Stage stage = new Stage();
+        stage.initOwner(this.getScene().getWindow());
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initStyle(StageStyle.DECORATED);
+        stage.centerOnScreen();
+        stage.setWidth(this.getScene().getWindow().getWidth() / 2);
+        stage.setHeight(this.getScene().getWindow().getHeight() / 3 * 2);
+        stage.setTitle("点菜[桌号:" + data.getDeskName() + "]");
+        stage.setScene(new Scene(new PackageDishesChoiceView(bo, this::addCartItem)));
+        stage.showAndWait();
     }
 
     private void addDishesToCart(DishesChoiceItemBO bo) {
@@ -356,6 +380,24 @@ public class OrderDishesChoiceView extends VBox {
             }
         } catch (Exception ex) {
             AlertBuilder.ERROR("报错消息", "添加购物车异常," + ex.getMessage());
+        }
+    }
+
+    private void createOrderFromCart() {
+        try {
+            PlaceOrderFromCartReq req = new PlaceOrderFromCartReq();
+            req.setDeskId(data.getDeskId());
+            req.setOrderId(data.getOrderId());
+            Result<String> createOrderRs = cartService.createOrder(req);
+            if (createOrderRs.isSuccess()) {
+                refreshCartSize();
+                AlertBuilder.INFO("通知消息", "下单成功");
+            } else {
+                AlertBuilder.ERROR(createOrderRs.getMsg());
+            }
+        } catch (Exception ex) {
+            LogUtils.info("下单失败:" + ex.getMessage());
+            AlertBuilder.ERROR("通知消息", "下单失败:" + ex.getMessage());
         }
     }
 

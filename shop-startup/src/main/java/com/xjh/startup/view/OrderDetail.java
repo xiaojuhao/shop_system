@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.xjh.common.enumeration.EnumChoiceAction;
 import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.enumeration.EnumOrderStatus;
@@ -245,6 +246,7 @@ public class OrderDetail extends VBox {
             Button orderBtn = createButton("点菜");
             orderBtn.setOnMouseClicked(evt -> openDishesChoiceView(deskOrderParam));
             Button sendBtn = createButton("送菜");
+            sendBtn.setOnMouseClicked(evt -> openSendDishesChoiceView(deskOrderParam));
             Button returnBtn = createButton("退菜");
             Button transferBtn = createButton("转台");
             Button splitBtn = createButton("拆台");
@@ -486,6 +488,22 @@ public class OrderDetail extends VBox {
         stg.setWidth(this.getScene().getWindow().getWidth() - 60);
         stg.setHeight(this.getScene().getWindow().getHeight() - 100);
         stg.setTitle("点菜[桌号:" + param.getDeskName() + "]");
+        param.setChoiceAction(EnumChoiceAction.PLACE);
+        stg.setScene(new Scene(new OrderDishesChoiceView(param)));
+        stg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
+        stg.showAndWait();
+    }
+
+    private void openSendDishesChoiceView(DeskOrderParam param) {
+        Stage stg = new Stage();
+        stg.initOwner(this.getScene().getWindow());
+        stg.initModality(Modality.WINDOW_MODAL);
+        stg.initStyle(StageStyle.DECORATED);
+        stg.centerOnScreen();
+        stg.setWidth(this.getScene().getWindow().getWidth() - 60);
+        stg.setHeight(this.getScene().getWindow().getHeight() - 100);
+        stg.setTitle("点菜[桌号:" + param.getDeskName() + "]");
+        param.setChoiceAction(EnumChoiceAction.SEND);
         stg.setScene(new Scene(new OrderDishesChoiceView(param)));
         stg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
         stg.showAndWait();

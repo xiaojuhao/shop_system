@@ -34,6 +34,7 @@ import com.xjh.dao.mapper.SubOrderDAO;
 import com.xjh.service.domain.model.CartItemVO;
 import com.xjh.service.domain.model.CartVO;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
+import com.xjh.service.domain.model.SendOrderRequest;
 
 import cn.hutool.core.codec.Base64;
 
@@ -125,6 +126,49 @@ public class CartService {
         }
     }
 
+    public Result<String> createSendOrder(SendOrderRequest request) {
+        Runnable clear = CurrentRequest.resetRequestId();
+        try {
+            Integer deskId = request.getDeskId();
+            Integer orderId = request.getOrderId();
+            Order order = orderDAO.selectByOrderId(orderId);
+            // 子订单
+            Integer subOrderId = createSubOrderId();
+            SubOrder subOrder = new SubOrder();
+            subOrder.setSubOrderId(subOrderId);
+            subOrder.setOrderId(orderId);
+            subOrder.setOrderType(0);
+            subOrder.setSubOrderStatus(0);
+            subOrder.setAccountId(0);
+            subOrder.setCreatetime(DateBuilder.now().mills());
+            int subInsertRs = subOrderDAO.insert(subOrder);
+
+            // order dishes
+            List<OrderDishes> orderDishes = new ArrayList<>();
+            orderDishes.add(buildSendOrderDishes(request, orderId, subOrderId));
+            for (OrderDishes d : orderDishes) {
+                orderDishesDAO.insert(d);
+            }
+            double notPaid = orderService.notPaidBillAmount(orderId);
+            double hadPaid = CommonUtils.orElse(order.getOrderHadpaid(), 0D);
+            if (hadPaid > 0 && notPaid > 0) {
+                order.setOrderStatus(EnumOrderStatus.PARTIAL_PAID.status);
+            } else if (hadPaid < 0.01 && notPaid > 0.01) {
+                order.setOrderStatus(EnumOrderStatus.UNPAID.status);
+            }
+            // 清空购物车
+            clearCart(deskId);
+            // 更新订单状态
+            orderService.updateByOrderId(order);
+            return Result.success("下单成功");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail("下单失败:" + ex.getMessage());
+        } finally {
+            clear.run();
+        }
+    }
+
     public Result<String> createOrder(PlaceOrderFromCartReq param) {
         Runnable clear = CurrentRequest.resetRequestId();
         try {
@@ -196,9 +240,30 @@ public class CartService {
         d.setIfDishesPackage(0);
         d.setOrderDishesIfchange(0);
         d.setOrderDishesIfrefund(0);
-        d.setOrderDishesNums(1);
         d.setOrderDishesNums(item.getNums());
         d.setOrderDishesSaletype(EnumOrderSaleType.NORMAL.type);
+        d.setOrderDishesOptions(Base64.encode("[]"));
+        d.setOrderDishesDiscountInfo(Base64.encode(""));
+
+        return d;
+    }
+
+    private OrderDishes buildSendOrderDishes(SendOrderRequest item, Integer orderId, Integer subOrderId) {
+        Dishes dishes = dishesDAO.getById(item.getDishesId());
+        OrderDishes d = new OrderDishes();
+        d.setOrderId(orderId);
+        d.setSubOrderId(subOrderId);
+        d.setDishesId(item.getDishesId());
+        d.setDishesPriceId(0);
+        d.setDishesTypeId(dishes.getDishesTypeId());
+        d.setOrderDishesPrice(0D);
+        d.setOrderDishesDiscountPrice(0D);
+        d.setCreatetime(DateBuilder.now().mills());
+        d.setIfDishesPackage(0);
+        d.setOrderDishesIfchange(0);
+        d.setOrderDishesIfrefund(0);
+        d.setOrderDishesNums(1);
+        d.setOrderDishesSaletype(EnumOrderSaleType.SEND.type);
         d.setOrderDishesOptions(Base64.encode("[]"));
         d.setOrderDishesDiscountInfo(Base64.encode(""));
 
