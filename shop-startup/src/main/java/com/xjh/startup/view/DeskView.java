@@ -50,21 +50,10 @@ public class DeskView extends VBox {
         setBackground(canvas, status);
         canvas.setOnMouseClicked(evt -> this.onClickTable(desk));
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.save();
         // 状态
-        gc.setFill(Color.PURPLE);
-        gc.fillRect(width / 2, 0, width / 2, 25);
-        gc.setFill(Color.WHITE);
-        double statusOffset = width - CommonUtils.length(status.remark()) * 10 - 30;
-        gc.fillText(status.remark(), statusOffset, 16);
-        gc.restore();
+        paintStatus(gc, width, status.remark());
         // 桌号
-        gc.setFill(Color.WHITE);
-        gc.setFont(Font.font(16));
-        gc.fillText(desk.get().getDeskName(),
-                width / 2 - CommonUtils.length(desk.get().getDeskName()) * 5,
-                height / 2);
-        gc.restore();
+        paintTableNo(gc, desk.get(), width, height);
 
         this.getChildren().addAll(canvas);
 
@@ -97,22 +86,13 @@ public class DeskView extends VBox {
                 // timeLabel.setText("未点菜");
                 time = "未点菜";
             }
+            //
+            paintStatus(gc, width, desKStatus.remark());
             // 用餐时间
-            gc.save();
-            gc.clearRect(0, height - 20, width, 20);
-            gc.setFont(Font.font(12));
-            gc.setFill(Color.WHITE);
-            gc.fillText(time, 0, height - 5);
-            gc.restore();
+            paintTime(gc, width, height, time);
             // 人数
             if (order != null) {
-                gc.save();
-                gc.setFill(Color.GRAY);
-                gc.fillOval(width - 20, height - 20, 20, 20);
-                gc.setFill(Color.WHITE);
-                gc.setFont(Font.font(11));
-                gc.fillText(order.getOrderCustomerNums() + "", width - 14, height - 6);
-                gc.restore();
+                paintCustNum(gc, width, height, order.getOrderCustomerNums());
             }
         });
 
@@ -180,6 +160,44 @@ public class DeskView extends VBox {
                 openingDesk.set(false);
             }
         }
+    }
+
+    private void paintStatus(GraphicsContext gc, double width, String statusName) {
+        gc.save();
+        gc.setFill(Color.PURPLE);
+        gc.fillRect(width / 2, 0, width / 2, 25);
+        gc.setFill(Color.WHITE);
+        double statusOffset = width - CommonUtils.length(statusName) * 10 - 30;
+        gc.fillText(statusName, statusOffset, 16);
+        gc.restore();
+    }
+
+    private void paintTableNo(GraphicsContext gc, Desk desk, double width, double height) {
+        gc.setFill(Color.WHITE);
+        gc.setFont(Font.font(16));
+        gc.fillText(desk.getDeskName(),
+                width / 2 - CommonUtils.length(desk.getDeskName()) * 5,
+                height / 2);
+        gc.restore();
+    }
+
+    private void paintTime(GraphicsContext gc, double width, double height, String time) {
+        gc.save();
+        gc.clearRect(0, height - 20, width, 20);
+        gc.setFont(Font.font(12));
+        gc.setFill(Color.WHITE);
+        gc.fillText(time, 10, height - 5);
+        gc.restore();
+    }
+
+    private void paintCustNum(GraphicsContext gc, double width, double height, Integer num) {
+        gc.save();
+        gc.setFill(Color.GRAY);
+        gc.fillOval(width - 20, height - 20, 20, 20);
+        gc.setFill(Color.WHITE);
+        gc.setFont(Font.font(11));
+        gc.fillText(num + "", width - 14, height - 6);
+        gc.restore();
     }
 
     @Override
