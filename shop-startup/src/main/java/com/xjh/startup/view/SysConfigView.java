@@ -72,9 +72,9 @@ public class SysConfigView extends GridPane {
 
         row++;
         TextField dbDriver = new TextField();
-        dbDriver.setText("com.mysql.cj.jdbc.Driver");
+        dbDriver.setText("com.mysql.jdbc.Driver");
         dbDriver.setPrefWidth(450);
-        dbDriver.setEditable(false);
+        // dbDriver.setEditable(false);
         this.add(new Label("驱动："), 0, row);
         this.add(dbDriver, 1, row);
         collectData.add(() -> runtimeProp.setProperty(RtPropNames.dbDriverName, CommonUtils.trim(dbDriver.getText())));
