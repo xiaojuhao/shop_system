@@ -25,7 +25,6 @@ import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.dao.dataobject.SubOrder;
-import com.xjh.dao.mapper.CartDAO;
 import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.dao.mapper.DishesPackageDAO;
 import com.xjh.dao.mapper.OrderDAO;
@@ -35,13 +34,14 @@ import com.xjh.service.domain.model.CartItemVO;
 import com.xjh.service.domain.model.CartVO;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
 import com.xjh.service.domain.model.SendOrderRequest;
+import com.xjh.service.store.CartStore;
 
 import cn.hutool.core.codec.Base64;
 
 @Singleton
 public class CartService {
-    @Inject
-    CartDAO cartDAO;
+    //    @Inject
+    //    CartDAO cartDAO;
     @Inject
     SubOrderDAO subOrderDAO;
     @Inject
@@ -72,8 +72,8 @@ public class CartService {
                 contentItems.add(item);
             }
             cart.setContents(Base64.encode(JSON.toJSONString(contentItems)));
-            int i = cartDAO.save(cart);
-            if (i == 0) {
+            Result<String> rs = CartStore.saveCart(cart);
+            if (!rs.isSuccess()) {
                 return Result.fail("添加购物车失败,保存数据库失败");
             }
             return Result.success(CartVO.from(cart));
@@ -91,9 +91,9 @@ public class CartService {
             Cart cart = new Cart();
             cart.setDeskId(deskId);
             cart.setContents(Base64.encode(JSON.toJSONString(vo.getContents())));
-            int i = cartDAO.save(cart);
-            if (i == 0) {
-                return Result.fail("更新购物失败,保存数据库失败");
+            Result<String> rs = CartStore.saveCart(cart);
+            if (!rs.isSuccess()) {
+                return Result.fail("添加购物车失败,保存数据库失败");
             }
             return Result.success(CartVO.from(cart));
         } catch (Exception ex) {
@@ -105,7 +105,7 @@ public class CartService {
     }
 
     public List<CartItemVO> selectByDeskId(Integer deskId) throws Exception {
-        Cart cart = cartDAO.selectByDeskId(deskId);
+        Cart cart = CartStore.getCart(deskId);
         if (cart != null) {
             String contents = cart.getContents();
             if (CommonUtils.isNotBlank(contents)) {
@@ -118,7 +118,7 @@ public class CartService {
 
     public Result<CartVO> getCartOfDesk(Integer deskId) {
         try {
-            Cart cart = cartDAO.selectByDeskId(deskId);
+            Cart cart = CartStore.getCart(deskId);
             return Result.success(CartVO.from(cart));
         } catch (Exception ex) {
             LogUtils.error("getCartOfDesk:" + ex.getMessage());
@@ -173,7 +173,7 @@ public class CartService {
         try {
             Integer deskId = param.getDeskId();
             Integer orderId = param.getOrderId();
-            Cart cart = cartDAO.selectByDeskId(deskId);
+            Cart cart = CartStore.getCart(deskId);
             CartVO cartVO = CartVO.from(cart);
             Order order = orderDAO.selectByOrderId(orderId);
             if (order == null) {
@@ -297,7 +297,7 @@ public class CartService {
 
 
     public void clearCart(Integer deskId) throws SQLException {
-        cartDAO.clearCart(deskId);
+        CartStore.clearCart(deskId);
     }
 
     public Integer createSubOrderId() {
