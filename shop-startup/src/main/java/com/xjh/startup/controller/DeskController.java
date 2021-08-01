@@ -46,7 +46,7 @@ public class DeskController {
 
         ThreadUtils.runInNewThread(() -> {
             // 加载所有的tables
-            double prefWidth = Math.max(pane.getWidth() / 6 - 15, 200);
+            double prefWidth = Math.max(width / 6 - 15, 200);
             allDesks().forEach(desk -> desks.add(new SimpleObjectProperty<>(desk)));
             List<DeskView> views = new ArrayList<>();
             desks.forEach(d -> views.add(new DeskView(d, prefWidth)));
