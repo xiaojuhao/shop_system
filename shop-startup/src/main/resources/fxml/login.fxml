@@ -14,7 +14,7 @@
       xmlns="http://javafx.com/javafx/16"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.xjh.startup.controller.LoginController">
-    <VBox alignment="CENTER" minWidth="500" prefWidth="500" styleClass="login-card">
+    <VBox alignment="CENTER" minWidth="500" prefWidth="500" maxWidth="500" styleClass="login-card">
         <Label styleClass="login-title" text="小句号点餐收银系统"/>
         <VBox alignment="CENTER" prefWidth="500" maxWidth="500" spacing="15">
             <HBox prefWidth="500">
