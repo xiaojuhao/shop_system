@@ -1,5 +1,6 @@
 package com.xjh.service.domain.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.fastjson.JSONArray;
@@ -15,10 +16,11 @@ public class CartVO {
     Long createTime;
 
     public static CartVO from(Cart cart) {
-        if (cart == null) {
-            return null;
-        }
         CartVO vo = new CartVO();
+        if (cart == null) {
+            vo.setContents(new ArrayList<>());
+            return vo;
+        }
         vo.setId(cart.getId());
         vo.setDeskId(cart.getDeskId());
         vo.setCreateTime(cart.getCreateTime());

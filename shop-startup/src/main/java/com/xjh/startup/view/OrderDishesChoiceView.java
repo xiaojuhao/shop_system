@@ -293,7 +293,7 @@ public class OrderDishesChoiceView extends VBox {
         box.setPrefWidth(200);
 
         ImageView iv = getImageView(bo.getImg());
-        iv.setOnMouseClicked(evt -> {
+        box.setOnMouseClicked(evt -> {
             if (ClickHelper.isDblClick()) {
                 // 赠送
                 if (data.getChoiceAction() == EnumChoiceAction.SEND) {

@@ -176,6 +176,9 @@ public class CartService {
             Cart cart = cartDAO.selectByDeskId(deskId);
             CartVO cartVO = CartVO.from(cart);
             Order order = orderDAO.selectByOrderId(orderId);
+            if (order == null) {
+                return Result.fail("订单号不存在:" + orderId);
+            }
             // 条件校验
             if (cartVO.getContents() == null || cartVO.getContents().size() == 0) {
                 LogUtils.error("购物车空:" + JSON.toJSONString(param));
