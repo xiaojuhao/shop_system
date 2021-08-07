@@ -522,7 +522,7 @@ public class OrderDetail extends VBox {
         stg.setHeight(height);
         stg.setTitle("点菜[桌号:" + param.getDeskName() + "]");
         param.setChoiceAction(EnumChoiceAction.SEND);
-        stg.setScene(new Scene(new OrderDishesChoiceView(param, height)));
+        stg.setScene(new Scene(new OrderDishesChoiceView(param, width)));
         stg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
         stg.showAndWait();
     }
