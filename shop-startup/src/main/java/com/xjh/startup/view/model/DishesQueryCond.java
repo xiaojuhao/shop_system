@@ -2,7 +2,7 @@ package com.xjh.startup.view.model;
 
 public class DishesQueryCond {
     int pageNo = 1;
-    int pageSize = 40;
+    int pageSize = 18;
     String dishesName;
     Integer dishesTypeId;
     Integer ifPackage;
