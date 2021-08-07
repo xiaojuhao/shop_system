@@ -20,7 +20,7 @@ public class LoginApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         TimeRecord timeRecord = TimeRecord.start();
-
+        // for test
         VBox login = FxmlView.load("login");
         assert login != null;
         login.setAlignment(Pos.CENTER);
