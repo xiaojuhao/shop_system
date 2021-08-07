@@ -6,7 +6,6 @@ import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.LogUtils;
@@ -15,6 +14,7 @@ import com.xjh.ws.handler.AddCartHandler;
 import com.xjh.ws.handler.CloseDeskHandler;
 import com.xjh.ws.handler.OpenDeskHandler;
 import com.xjh.ws.handler.OrderCartHandler;
+import com.xjh.ws.handler.SocketOpenHandler;
 
 
 public class XjhWebSocketServer extends WebSocketServer {
@@ -22,6 +22,7 @@ public class XjhWebSocketServer extends WebSocketServer {
     CloseDeskHandler closeDeskHandler = GuiceContainer.getInstance(CloseDeskHandler.class);
     OpenDeskHandler openDeskHandler = GuiceContainer.getInstance(OpenDeskHandler.class);
     OrderCartHandler orderCartHandler = GuiceContainer.getInstance(OrderCartHandler.class);
+    SocketOpenHandler socketOpenHandler = GuiceContainer.getInstance(SocketOpenHandler.class);
 
     public XjhWebSocketServer(int port) {
         super(new InetSocketAddress(port));
@@ -38,16 +39,7 @@ public class XjhWebSocketServer extends WebSocketServer {
 
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
-        JSONObject content = new JSONObject();
-        content.put("Server_version", "v1.0");
-        content.put("clientIP", webSocket.getLocalSocketAddress());
-
-        JSONArray contents = new JSONArray();
-        contents.add(content);
-
-        JSONObject resp = new JSONObject();
-        resp.put("API_TYPE", "connect success");
-        resp.put("contents", contents);
+        JSONObject resp = socketOpenHandler.handle(webSocket);
         webSocket.send(resp.toJSONString());
     }
 
