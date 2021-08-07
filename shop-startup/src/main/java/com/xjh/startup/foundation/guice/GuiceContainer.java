@@ -7,6 +7,7 @@ import com.xjh.common.utils.LogUtils;
 import com.xjh.dao.DaoModule;
 import com.xjh.dao.DataSourceModule;
 import com.xjh.service.ServiceModule;
+import com.xjh.ws.WsHandlerModule;
 
 public class GuiceContainer {
     static Holder<Injector> injector = new Holder<>();
@@ -23,7 +24,8 @@ public class GuiceContainer {
             Injector ij = Guice.createInjector(
                     new DaoModule(),
                     new ServiceModule(),
-                    new DataSourceModule()
+                    new DataSourceModule(),
+                    new WsHandlerModule()
             );
             injector.hold(ij);
             LogUtils.info("初始化Guice, 耗时:" + (System.currentTimeMillis() - start));
