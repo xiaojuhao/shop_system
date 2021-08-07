@@ -1,17 +1,19 @@
 package com.xjh.startup.server;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.xjh.common.utils.CommonUtils;
-import com.xjh.startup.server.handlers.AddCartHandler;
-import com.xjh.startup.server.handlers.CloseDeskHandler;
-import com.xjh.startup.server.handlers.OpenDeskHandler;
-import com.xjh.startup.server.handlers.OrderCartHandler;
+import java.net.InetSocketAddress;
+
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
-import java.net.InetSocketAddress;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.LogUtils;
+import com.xjh.startup.server.handlers.AddCartHandler;
+import com.xjh.startup.server.handlers.CloseDeskHandler;
+import com.xjh.startup.server.handlers.OpenDeskHandler;
+import com.xjh.startup.server.handlers.OrderCartHandler;
 
 public class XjhWebSocketServer extends WebSocketServer {
     public XjhWebSocketServer(int port) {
@@ -20,6 +22,7 @@ public class XjhWebSocketServer extends WebSocketServer {
 
     public void stopQuietly() {
         try {
+            LogUtils.info("停止WebSocket服务器......");
             this.stop();
         } catch (Exception ex) {
             ex.printStackTrace();
