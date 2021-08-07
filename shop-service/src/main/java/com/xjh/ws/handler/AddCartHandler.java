@@ -1,17 +1,21 @@
-package com.xjh.startup.server.handlers;
+package com.xjh.ws.handler;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.model.CartItemVO;
 import com.xjh.service.domain.model.CartVO;
-import com.xjh.startup.foundation.guice.GuiceContainer;
 
+@Singleton
 public class AddCartHandler {
-    CartService cartService = GuiceContainer.getInstance(CartService.class);
-    DishesDAO dishesDAO = GuiceContainer.getInstance(DishesDAO.class);
+    @Inject
+    CartService cartService;
+    @Inject
+    DishesDAO dishesDAO;
 
     public JSONObject handle(JSONObject msg) {
         JSONObject resp = new JSONObject();

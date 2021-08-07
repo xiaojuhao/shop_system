@@ -1,11 +1,14 @@
-package com.xjh.startup.server.handlers;
+package com.xjh.ws.handler;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.xjh.service.domain.DeskService;
-import com.xjh.startup.foundation.guice.GuiceContainer;
 
+@Singleton
 public class GetPayCodeHandler {
-    DeskService deskService = GuiceContainer.getInstance(DeskService.class);
+    @Inject
+    DeskService deskService;
 
     public JSONObject handle(JSONObject msg) {
         int deskId = msg.getInteger("tables_id");

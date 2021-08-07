@@ -1,15 +1,20 @@
-package com.xjh.startup.server.handlers;
+package com.xjh.ws.handler;
+
+import javax.inject.Inject;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.inject.Singleton;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderService;
-import com.xjh.startup.foundation.guice.GuiceContainer;
 
+@Singleton
 public class GetPayInfoHandler {
-    DeskService deskService = GuiceContainer.getInstance(DeskService.class);
-    OrderService orderService = GuiceContainer.getInstance(OrderService.class);
+    @Inject
+    DeskService deskService;
+    @Inject
+    OrderService orderService;
 
     public JSONObject handle(JSONObject msg) {
         int deskId = msg.getInteger("tables_id");

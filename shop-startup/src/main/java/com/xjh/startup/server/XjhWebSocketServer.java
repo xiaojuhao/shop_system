@@ -10,12 +10,19 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.LogUtils;
-import com.xjh.startup.server.handlers.AddCartHandler;
-import com.xjh.startup.server.handlers.CloseDeskHandler;
-import com.xjh.startup.server.handlers.OpenDeskHandler;
-import com.xjh.startup.server.handlers.OrderCartHandler;
+import com.xjh.startup.foundation.guice.GuiceContainer;
+import com.xjh.ws.handler.AddCartHandler;
+import com.xjh.ws.handler.CloseDeskHandler;
+import com.xjh.ws.handler.OpenDeskHandler;
+import com.xjh.ws.handler.OrderCartHandler;
+
 
 public class XjhWebSocketServer extends WebSocketServer {
+    AddCartHandler addCartHandler = GuiceContainer.getInstance(AddCartHandler.class);
+    CloseDeskHandler closeDeskHandler = GuiceContainer.getInstance(CloseDeskHandler.class);
+    OpenDeskHandler openDeskHandler = GuiceContainer.getInstance(OpenDeskHandler.class);
+    OrderCartHandler orderCartHandler = GuiceContainer.getInstance(OrderCartHandler.class);
+
     public XjhWebSocketServer(int port) {
         super(new InetSocketAddress(port));
     }
@@ -55,13 +62,13 @@ public class XjhWebSocketServer extends WebSocketServer {
         JSONObject resp = null;
         String type = msg.getString("API_TYPE");
         if (CommonUtils.equals(type, "openDesk")) {
-            resp = new OpenDeskHandler().handle(msg);
+            resp = openDeskHandler.handle(msg);
         } else if (CommonUtils.eq(type, "closetable")) {
-            resp = new CloseDeskHandler().handle(msg);
+            resp = closeDeskHandler.handle(msg);
         } else if (CommonUtils.eq(type, "addDishesToCart")) {
-            resp = new AddCartHandler().handle(msg);
+            resp = addCartHandler.handle(msg);
         } else if (CommonUtils.eq(type, "orderCart")) {
-            resp = new OrderCartHandler().handle(msg);
+            resp = orderCartHandler.handle(msg);
         }
         if (resp != null) {
             ws.send(resp.toJSONString());
