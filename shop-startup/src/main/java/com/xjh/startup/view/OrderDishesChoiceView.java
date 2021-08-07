@@ -77,11 +77,11 @@ public class OrderDishesChoiceView extends VBox {
     private final SimpleIntegerProperty cartSize = new SimpleIntegerProperty(0);
     private final ObjectProperty<DishesQueryCond> qryDishesCond = new SimpleObjectProperty<>();
 
-    public OrderDishesChoiceView(DeskOrderParam data) {
+    public OrderDishesChoiceView(DeskOrderParam data, double prefWidth) {
         this.data = data;
         this.getChildren().add(topMenus());
         this.getChildren().add(separator());
-        this.getChildren().add(initDishesView());
+        this.getChildren().add(initDishesView(prefWidth));
 
         refreshCartSize();
     }
@@ -172,7 +172,7 @@ public class OrderDishesChoiceView extends VBox {
         return s;
     }
 
-    private VBox initDishesView() {
+    private VBox initDishesView(double prefWidth) {
         VBox box = new VBox();
         ScrollPane sp = new ScrollPane();
         FlowPane pane = new FlowPane();
@@ -180,7 +180,7 @@ public class OrderDishesChoiceView extends VBox {
         pane.setPadding(new Insets(10));
         pane.setHgap(5);
         pane.setVgap(5);
-        pane.setPrefWidth(1200);
+        pane.setPrefWidth(prefWidth);
         qryDishesCond.addListener((_this, _old, _new) -> {
             List<DishesChoiceItemBO> bolist = new ArrayList<>();
             if (_new.getIfPackage() == null || _new.getIfPackage() == 0) {
@@ -190,7 +190,7 @@ public class OrderDishesChoiceView extends VBox {
                 List<DishesPackage> packageList = queryPackageList(_new);
                 bolist.addAll(collect(packageList, this::buildBO));
             }
-            List<VBox> list = collect(bolist, this::buildDishesView);
+            List<VBox> list = collect(bolist, it -> this.buildDishesView(it, prefWidth / 6 - 10));
             Platform.runLater(() -> {
                 pane.getChildren().clear();
                 pane.getChildren().addAll(list);
@@ -288,11 +288,11 @@ public class OrderDishesChoiceView extends VBox {
         return bo;
     }
 
-    private VBox buildDishesView(DishesChoiceItemBO bo) {
+    private VBox buildDishesView(DishesChoiceItemBO bo, double width) {
         VBox box = new VBox();
-        box.setPrefWidth(200);
+        box.setPrefWidth(width);
 
-        ImageView iv = getImageView(bo.getImg());
+        ImageView iv = getImageView(bo.getImg(), width);
         box.setOnMouseClicked(evt -> {
             if (ClickHelper.isDblClick()) {
                 // 赠送
@@ -493,16 +493,16 @@ public class OrderDishesChoiceView extends VBox {
         }
     }
 
-    private ImageView getImageView(String path) {
+    private ImageView getImageView(String path, double width) {
         try {
             ImageView iv = new ImageView(new Image(getImageUrl(path)));
-            iv.setFitWidth(180);
-            iv.setFitHeight(100);
+            iv.setFitWidth(width);
+            iv.setFitHeight(width / 3 * 2);
             return iv;
         } catch (Exception ex) {
             ImageView iv = new ImageView(getImageUrl("/img/logo.png"));
-            iv.setFitWidth(180);
-            iv.setFitHeight(100);
+            iv.setFitWidth(width);
+            iv.setFitHeight(width / 3 * 2);
             return iv;
         }
     }

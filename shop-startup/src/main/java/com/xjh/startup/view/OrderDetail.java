@@ -495,30 +495,34 @@ public class OrderDetail extends VBox {
 
     private void openDishesChoiceView(DeskOrderParam param) {
         Stage stg = new Stage();
+        double width = this.getScene().getWindow().getWidth() - 60;
+        double height = this.getScene().getWindow().getHeight() - 100;
         stg.initOwner(this.getScene().getWindow());
         stg.initModality(Modality.WINDOW_MODAL);
         stg.initStyle(StageStyle.DECORATED);
         stg.centerOnScreen();
-        stg.setWidth(this.getScene().getWindow().getWidth() - 60);
-        stg.setHeight(this.getScene().getWindow().getHeight() - 100);
+        stg.setWidth(width);
+        stg.setHeight(height);
         stg.setTitle("点菜[桌号:" + param.getDeskName() + "]");
         param.setChoiceAction(EnumChoiceAction.PLACE);
-        stg.setScene(new Scene(new OrderDishesChoiceView(param)));
+        stg.setScene(new Scene(new OrderDishesChoiceView(param, width)));
         stg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
         stg.showAndWait();
     }
 
     private void openSendDishesChoiceView(DeskOrderParam param) {
         Stage stg = new Stage();
+        double width = this.getScene().getWindow().getWidth() - 60;
+        double height = this.getScene().getWindow().getHeight() - 100;
         stg.initOwner(this.getScene().getWindow());
         stg.initModality(Modality.WINDOW_MODAL);
         stg.initStyle(StageStyle.DECORATED);
         stg.centerOnScreen();
-        stg.setWidth(this.getScene().getWindow().getWidth() - 60);
-        stg.setHeight(this.getScene().getWindow().getHeight() - 100);
+        stg.setWidth(width);
+        stg.setHeight(height);
         stg.setTitle("点菜[桌号:" + param.getDeskName() + "]");
         param.setChoiceAction(EnumChoiceAction.SEND);
-        stg.setScene(new Scene(new OrderDishesChoiceView(param)));
+        stg.setScene(new Scene(new OrderDishesChoiceView(param, height)));
         stg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
         stg.showAndWait();
     }
