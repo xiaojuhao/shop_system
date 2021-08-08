@@ -582,6 +582,7 @@ public class OrderDetail extends VBox {
         // 标题
         Label title = new Label("退菜[桌号:" + param.getDeskName() + "]");
         title.setFont(Font.font(16));
+        title.setTextFill(Color.RED);
         title.setPadding(new Insets(0, 0, 20, 0));
         box.getChildren().add(title);
         // 退菜原因
