@@ -4,7 +4,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import com.xjh.common.utils.AlertBuilder;
-import com.xjh.startup.LoginApp;
+import com.xjh.startup.foundation.constants.MainStageHolder;
 import com.xjh.startup.view.DeskListView;
 import com.xjh.startup.view.MenuBarView;
 import com.xjh.startup.view.SysConfigView;
@@ -45,7 +45,7 @@ public class LoginController implements Initializable {
         // 调用登录功能
         if ("1".equals(account)) {
             // 创建主界面舞台
-            Stage mainStage = new Stage();
+            Stage mainStage = MainStageHolder.get();
             //读入布局
             // FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
             BorderPane main = new BorderPane();
@@ -60,12 +60,7 @@ public class LoginController implements Initializable {
             double height = screenRectangle.getHeight();
             mainStage.setWidth(width - 10);
             mainStage.setHeight(height - 10);
-            //mainStage.setMaximized(true);
             mainStage.setScene(scene);
-            mainStage.setOnHidden(evt -> LoginApp.server.get().stopQuietly());
-            mainStage.show();
-            Stage loginStage = (Stage) accountField.getScene().getWindow();
-            loginStage.close();
         } else {
             AlertBuilder.ERROR("提示", "账号或密码错误，登录失败!");
         }
