@@ -7,5 +7,6 @@ public class OrderViewBO {
     public double totalPrice;
     public double orderHadpaid;
     public double deduction;
+    public double returnAmount;
     public String payInfoRemark;
 }

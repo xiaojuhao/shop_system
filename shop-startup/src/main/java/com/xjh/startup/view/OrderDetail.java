@@ -195,6 +195,10 @@ public class OrderDetail extends VBox {
 
             Label refund = new Label("退菜金额: 0");
             refund.setMinWidth(200);
+            orderView.addListener((a, b, c) -> {
+                String returnAmtStr = CommonUtils.formatMoney(c.returnAmount);
+                refund.setText("退菜金额: " + returnAmtStr);
+            });
             gridPane.add(refund, 3, 1);
 
             Label fan = new Label("反结账金额: 0");
@@ -444,6 +448,7 @@ public class OrderDetail extends VBox {
             v.totalPrice = sumTotalPrice(orderId);
             v.payStatusName = EnumOrderStatus.of(o.getOrderStatus()).remark;
             v.deduction = o.getFullReduceDishesPrice();
+            v.returnAmount = orderService.sumReturnAmount(orderId);
             // 支付信息
             List<OrderPay> pays = orderPayService.selectByOrderId(orderId);
             StringBuilder payInfo = new StringBuilder();
