@@ -67,23 +67,28 @@ public class DishesDAO {
             int pageNo = CommonUtils.orElse(page.getPageNo(), 1);
             int pageSize = CommonUtils.orElse(page.getPageSize(), 20);
             StringBuilder where = new StringBuilder();
+            List<Object> params = new ArrayList<>();
             if (cond.getDishesId() != null) {
-                where.append(" and dishesId = ").append(cond.getDishesId());
+                where.append(" and dishesId = ?");
+                params.add(cond.getDishesId());
             }
             if (CommonUtils.isNotBlank(cond.getDishesName())) {
-                where.append(" and dishesName like '%").append(cond.getDishesName()).append("%'");
+                where.append(" and dishesName like ?");
+                params.add("%" + cond.getDishesName() + "%");
             }
             if (cond.getDishesTypeId() != null) {
-                where.append(" and dishesTypeId = ").append(cond.getDishesTypeId());
+                where.append(" and dishesTypeId = ?");
+                params.add(cond.getDishesTypeId());
             }
             if (cond.getDishesStatus() != null) {
-                where.append(" and dishesStatus = ").append(cond.getDishesStatus());
+                where.append(" and dishesStatus = ?");
+                params.add(cond.getDishesStatus());
             }
             String sql = "select * from dishes_list where 1=1 " + where
                     + " limit " + (pageNo - 1) * pageSize + "," + pageSize;
 
-            System.out.println(sql);
-            List<Entity> list = Db.use(ds).query(sql);
+            // System.out.println(sql + ", " + JSON.toJSONString(params));
+            List<Entity> list = Db.use(ds).query(sql, params.toArray(new Object[0]));
             return EntityUtils.convertList(list, Dishes.class);
         } catch (Exception ex) {
             ex.printStackTrace();

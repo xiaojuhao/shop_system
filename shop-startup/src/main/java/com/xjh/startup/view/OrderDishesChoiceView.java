@@ -174,7 +174,9 @@ public class OrderDishesChoiceView extends VBox {
 
     private VBox initDishesView(double prefWidth) {
         VBox box = new VBox();
+        // 菜品列表
         ScrollPane sp = new ScrollPane();
+        sp.setMinWidth(prefWidth * 3 + 20);
         FlowPane pane = new FlowPane();
         sp.setContent(pane);
         pane.setPadding(new Insets(10));

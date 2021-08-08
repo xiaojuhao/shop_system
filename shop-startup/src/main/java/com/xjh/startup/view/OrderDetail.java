@@ -619,7 +619,8 @@ public class OrderDetail extends VBox {
                 .collect(Collectors.toList());
         List<OrderDishes> list = orderDishesService.selectByIdList(ids);
         for (OrderDishes d : list) {
-            System.out.println("退菜结果: " + orderDishesService.returnOrderDishes(d));
+            int i = orderDishesService.returnOrderDishes(d);
+            System.out.println("退菜结果: " + i);
         }
     }
 
