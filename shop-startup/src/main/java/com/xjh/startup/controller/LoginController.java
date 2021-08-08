@@ -1,8 +1,14 @@
 package com.xjh.startup.controller;
 
+import java.net.URL;
+import java.util.ResourceBundle;
+
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.startup.LoginApp;
+import com.xjh.startup.view.DeskListView;
+import com.xjh.startup.view.MenuBarView;
 import com.xjh.startup.view.SysConfigView;
+
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Rectangle2D;
@@ -16,9 +22,6 @@ import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-
-import java.net.URL;
-import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
     @FXML
@@ -46,9 +49,9 @@ public class LoginController implements Initializable {
             //读入布局
             // FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
             BorderPane main = new BorderPane();
-            main.setTop(new MenuBarController(main).renderMenuBar());
+            main.setTop(new MenuBarView(main).renderMenuBar());
             // 主体内容
-            main.setCenter(new DeskController().view());
+            main.setCenter(new DeskListView().view());
             Scene scene = new Scene(main);
             scene.getStylesheets().add("/css/style.css");
             mainStage.setTitle("小句号点餐系统");

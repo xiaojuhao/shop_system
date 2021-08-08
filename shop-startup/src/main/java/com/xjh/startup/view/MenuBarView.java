@@ -1,4 +1,4 @@
-package com.xjh.startup.controller;
+package com.xjh.startup.view;
 
 import com.xjh.startup.LoginApp;
 
@@ -12,10 +12,10 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
-public class MenuBarController {
+public class MenuBarView {
     BorderPane root;
 
-    public MenuBarController(BorderPane root) {
+    public MenuBarView(BorderPane root) {
         this.root = root;
     }
 
@@ -49,7 +49,7 @@ public class MenuBarController {
     private Menu createIndexMenu() {
         Menu menu = new Menu();
         Label label = new Label("主页");
-        label.setOnMouseClicked(evt -> root.setCenter(new DeskController().view()));
+        label.setOnMouseClicked(evt -> root.setCenter(new DeskListView().view()));
         menu.setGraphic(label);
         return menu;
     }

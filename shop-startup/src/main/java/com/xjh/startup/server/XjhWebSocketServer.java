@@ -28,6 +28,11 @@ public class XjhWebSocketServer extends WebSocketServer {
         super(new InetSocketAddress(port));
     }
 
+    public void startWS() {
+        LogUtils.info("启动WebSocket服务器......");
+        super.start();
+    }
+
     public void stopQuietly() {
         try {
             LogUtils.info("停止WebSocket服务器......");

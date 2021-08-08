@@ -1,4 +1,4 @@
-package com.xjh.startup.controller;
+package com.xjh.startup.view;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,6 @@ import com.xjh.common.utils.ThreadUtils;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.service.domain.DeskService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
-import com.xjh.startup.view.DeskView;
 
 import cn.hutool.core.lang.Holder;
 import javafx.application.Platform;
@@ -22,7 +21,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Screen;
 
-public class DeskController {
+public class DeskListView {
 
     DeskService deskService = GuiceContainer.getInstance(DeskService.class);
     static Holder<ScrollPane> instance = new Holder<>();
@@ -48,8 +47,8 @@ public class DeskController {
             // 加载所有的tables
             double prefWidth = Math.max(width / 6 - 15, 200);
             allDesks().forEach(desk -> desks.add(new SimpleObjectProperty<>(desk)));
-            List<DeskView> views = new ArrayList<>();
-            desks.forEach(d -> views.add(new DeskView(d, prefWidth)));
+            List<DeskBox> views = new ArrayList<>();
+            desks.forEach(d -> views.add(new DeskBox(d, prefWidth)));
             // 渲染tables;
             Platform.runLater(() -> pane.getChildren().addAll(views));
             // 监测变化
@@ -57,7 +56,7 @@ public class DeskController {
                 desks.forEach(this::detectChange);
                 CommonUtils.sleep(1000);
             }
-            LogUtils.info("******* DeskController 循环退出." + Thread.currentThread().getName());
+            LogUtils.info("******* DeskListView 循环退出." + Thread.currentThread().getName());
             System.gc();
         });
         return s;
@@ -77,6 +76,6 @@ public class DeskController {
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
-        LogUtils.info("DeskController被销毁了。。。。。。。。");
+        LogUtils.info("DeskListView被销毁了。。。。。。。。");
     }
 }

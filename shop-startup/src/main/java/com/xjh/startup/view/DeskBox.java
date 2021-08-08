@@ -31,12 +31,12 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 
-public class DeskView extends VBox {
+public class DeskBox extends VBox {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
     static final String TIME_FORMAT = "HH:mm:ss";
     static AtomicBoolean openingDesk = new AtomicBoolean(false);
 
-    public DeskView(SimpleObjectProperty<Desk> desk, double width) {
+    public DeskBox(SimpleObjectProperty<Desk> desk, double width) {
         double height = width / 2;
         this.setPrefSize(width, height);
         this.getStyleClass().add("desk");

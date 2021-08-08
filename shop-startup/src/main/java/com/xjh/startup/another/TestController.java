@@ -1,4 +1,4 @@
-package com.xjh.startup.controller;
+package com.xjh.startup.another;
 
 import javafx.application.Application;
 import javafx.stage.Modality;
