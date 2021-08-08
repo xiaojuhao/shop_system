@@ -44,4 +44,36 @@ public class OrderDishesDAO {
             return new ArrayList<>();
         }
     }
+
+    public OrderDishes selectById(Integer id) {
+        if (id == null) {
+            return null;
+        }
+        OrderDishes cond = new OrderDishes();
+        cond.setOrderDishesId(id.longValue());
+        return CommonUtils.firstOf(select(cond));
+    }
+
+    public List<OrderDishes> selectByIds(List<Integer> ids) {
+        try {
+            List<OrderDishes> list = new ArrayList<>();
+            for (Integer id : ids) {
+                OrderDishes d = selectById(id);
+                if (d != null) {
+                    list.add(d);
+                }
+            }
+            return list;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    public int updateByPK(OrderDishes orderDishes) throws SQLException {
+        return Db.use(ds).update(
+                EntityUtils.create(orderDishes),
+                EntityUtils.idCond(orderDishes)
+        );
+    }
 }

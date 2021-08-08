@@ -6,7 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
+
+import com.google.common.collect.Lists;
 import com.xjh.common.enumeration.EnumChoiceAction;
 import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
@@ -49,7 +53,9 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -58,6 +64,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -206,6 +213,7 @@ public class OrderDetail extends VBox {
             tv.refresh();
         };
         {
+            tv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
             tv.setMaxHeight(300);
             tv.setPadding(new Insets(5, 0, 0, 5));
             tv.getColumns().addAll(
@@ -249,6 +257,7 @@ public class OrderDetail extends VBox {
             Button sendBtn = createButton("送菜");
             sendBtn.setOnMouseClicked(evt -> openSendDishesChoiceView(deskOrderParam));
             Button returnBtn = createButton("退菜");
+            returnBtn.setOnMouseClicked(evt -> returnDishesConfirm(deskOrderParam, tv));
             Button transferBtn = createButton("转台");
             Button splitBtn = createButton("拆台");
             Button payBillBtn = createButton("结账");
@@ -309,7 +318,7 @@ public class OrderDetail extends VBox {
     }
 
     private ObservableList<OrderDishesTableItemVO> loadOrderDishes(Integer orderId) {
-        List<OrderDishes> orderDishes = orderDishesService.selectOrderDishes(orderId);
+        List<OrderDishes> orderDishes = orderDishesService.selectByOrderId(orderId);
         List<Integer> dishesIdList = CommonUtils.collect(orderDishes, OrderDishes::getDishesId);
         List<Dishes> dishesList = dishesService.getByIds(dishesIdList);
         Map<Integer, Dishes> dishesMap = CommonUtils.listToMap(dishesList, Dishes::getDishesId);
@@ -456,7 +465,7 @@ public class OrderDetail extends VBox {
 
     private double sumTotalPrice(Integer orderId) {
         double totalPrice = 0;
-        List<OrderDishes> dishes = orderDishesService.selectOrderDishes(orderId);
+        List<OrderDishes> dishes = orderDishesService.selectByOrderId(orderId);
         totalPrice = CommonUtils.collect(dishes, OrderDishes::getOrderDishesPrice)
                 .stream().reduce(0D, Double::sum);
         return totalPrice;
@@ -525,6 +534,86 @@ public class OrderDetail extends VBox {
         stg.setScene(new Scene(new OrderDishesChoiceView(param, width)));
         stg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
         stg.showAndWait();
+    }
+
+    private void returnDishesConfirm(DeskOrderParam param, TableView<OrderDishesTableItemVO> tv) {
+        ObservableList<OrderDishesTableItemVO> list = tv.getSelectionModel().getSelectedItems();
+        if (CollectionUtils.isEmpty(list)) {
+            AlertBuilder.ERROR("请选择退菜记录");
+            return;
+        }
+        List<String> returnList = new ArrayList<>();
+        list.forEach(it -> returnList.add(it.getCol1()));
+
+        List<Integer> ids = returnList.stream()
+                .map(id -> CommonUtils.parseInt(id, null))
+                .collect(Collectors.toList());
+        List<OrderDishes> returnOrderDishes = orderDishesService.selectByIdList(ids);
+        for (OrderDishes d : returnOrderDishes) {
+            if (EnumOrderSaleType.of(d.getOrderDishesSaletype()) == EnumOrderSaleType.RETURN) {
+                AlertBuilder.ERROR("菜品已退,请检查");
+                return;
+            }
+            if (CommonUtils.orElse(d.getOrderDishesIfrefund(), 0) == 1) {
+                AlertBuilder.ERROR("菜品不可退,请检查");
+                return;
+            }
+        }
+        Stage stg = new Stage();
+        double width = this.getScene().getWindow().getWidth() / 3;
+        double height = this.getScene().getWindow().getHeight() / 4;
+        stg.initOwner(this.getScene().getWindow());
+        stg.initModality(Modality.WINDOW_MODAL);
+        stg.initStyle(StageStyle.DECORATED);
+        stg.centerOnScreen();
+        stg.setWidth(width);
+        stg.setHeight(height);
+        stg.setTitle("退菜");
+        param.setChoiceAction(EnumChoiceAction.RETURN);
+        VBox box = new VBox();
+        box.setAlignment(Pos.CENTER);
+        box.setPrefWidth(width);
+        // 标题
+        Label title = new Label("退菜[桌号:" + param.getDeskName() + "]");
+        title.setFont(Font.font(16));
+        title.setPadding(new Insets(0, 0, 20, 0));
+        box.getChildren().add(title);
+        // 退菜原因
+        ObservableList<String> options = FXCollections.observableArrayList(
+                Lists.newArrayList("客人不要了", "多点或下错单", "菜品缺货", "菜品质量问题", "上菜太慢", "测试", "其它")
+        );
+        Label reason = new Label("退菜原因: ");
+        ComboBox<String> reasonList = new ComboBox<>(options);
+        reasonList.setPrefWidth(200);
+        HBox reasonLine = new HBox();
+        reasonLine.setPrefWidth(300);
+        reasonLine.setMaxWidth(300);
+        reasonLine.getChildren().addAll(reason, reasonList);
+        reasonLine.setPadding(new Insets(0, 0, 20, 0));
+        box.getChildren().add(reasonLine);
+        // 退菜按钮
+        Button returnBtn = new Button("退菜");
+        returnBtn.setOnMouseClicked(evt -> {
+            String r = reasonList.getSelectionModel().getSelectedItem();
+            doReturnDishes(returnList, r);
+            stg.close();
+        });
+        box.getChildren().add(returnBtn);
+
+        stg.setScene(new Scene(box));
+        stg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
+        stg.showAndWait();
+    }
+
+    private void doReturnDishes(List<String> orderDishesIds, String reason) {
+        LogUtils.info("退菜:" + orderDishesIds + ", " + reason);
+        List<Integer> ids = orderDishesIds.stream()
+                .map(id -> CommonUtils.parseInt(id, null))
+                .collect(Collectors.toList());
+        List<OrderDishes> list = orderDishesService.selectByIdList(ids);
+        for (OrderDishes d : list) {
+            System.out.println("退菜结果: " + orderDishesService.returnOrderDishes(d));
+        }
     }
 
     private void openPayWayChoiceView(DeskOrderParam param) {

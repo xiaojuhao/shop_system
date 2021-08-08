@@ -46,6 +46,14 @@ public class CommonUtils {
         }
     }
 
+    public static <T> T firstOf(Collection<T> coll) {
+        if (coll == null || coll.size() == 0) {
+            return null;
+        } else {
+            return coll.stream().findFirst().orElse(null);
+        }
+    }
+
     public static void safeRun(Runnable run) {
         try {
             if (run == null) {

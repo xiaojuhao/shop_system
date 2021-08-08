@@ -109,7 +109,7 @@ public class OrderService {
     }
 
     public double sumBillAmount(Integer orderId) {
-        List<OrderDishes> orderDishes = orderDishesService.selectOrderDishes(orderId);
+        List<OrderDishes> orderDishes = orderDishesService.selectByOrderId(orderId);
         double billAmount = 0;
         for (OrderDishes od : orderDishes) {
             billAmount += od.getOrderDishesDiscountPrice() * od.getOrderDishesNums();
@@ -118,7 +118,7 @@ public class OrderService {
     }
 
     public double sumReturnAmount(Integer orderId) {
-        List<OrderDishes> orderDishes = orderDishesService.selectOrderDishes(orderId);
+        List<OrderDishes> orderDishes = orderDishesService.selectByOrderId(orderId);
         double billAmount = 0;
         for (OrderDishes od : orderDishes) {
             if (EnumOrderSaleType.of(od.getOrderDishesSaletype()) == EnumOrderSaleType.RETURN) {
