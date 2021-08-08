@@ -165,7 +165,8 @@ public class OrderDetail extends VBox {
             orderView.addListener((a, b, c) -> {
                 double totalPrice = c.totalPrice;
                 double paid = c.orderHadpaid;
-                String notPaidStr = CommonUtils.formatMoney(totalPrice - paid);
+                double returnAmt = c.returnAmount;
+                String notPaidStr = CommonUtils.formatMoney(totalPrice - paid - returnAmt);
                 notPaid.setText("还需支付: " + notPaidStr);
             });
             notPaid.setMinWidth(200);
