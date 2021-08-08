@@ -71,16 +71,18 @@ public class DishesDAO {
                 where.append(" and dishesId = ").append(cond.getDishesId());
             }
             if (CommonUtils.isNotBlank(cond.getDishesName())) {
-                where.append(" and dishesName like '%" + cond.getDishesName() + "%'");
+                where.append(" and dishesName like '%").append(cond.getDishesName()).append("%'");
             }
             if (cond.getDishesTypeId() != null) {
-                where.append(" and dishesTypeId = " + cond.getDishesTypeId());
+                where.append(" and dishesTypeId = ").append(cond.getDishesTypeId());
             }
             if (cond.getDishesStatus() != null) {
-                where.append(" and dishesStatus = " + cond.getDishesStatus());
+                where.append(" and dishesStatus = ").append(cond.getDishesStatus());
             }
             String sql = "select * from dishes_list where 1=1 " + where
-                    + " limit " + (pageNo - 1) + "," + pageSize;
+                    + " limit " + (pageNo - 1) * pageSize + "," + pageSize;
+
+            System.out.println(sql);
             List<Entity> list = Db.use(ds).query(sql);
             return EntityUtils.convertList(list, Dishes.class);
         } catch (Exception ex) {

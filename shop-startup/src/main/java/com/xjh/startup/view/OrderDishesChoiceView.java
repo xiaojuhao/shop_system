@@ -21,10 +21,10 @@ import com.xjh.common.valueobject.DishesImg;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.dao.dataobject.DishesType;
-import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.dao.mapper.DishesPackageDAO;
 import com.xjh.dao.reqmodel.PageCond;
 import com.xjh.service.domain.CartService;
+import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.DishesTypeService;
 import com.xjh.service.domain.model.CartItemVO;
 import com.xjh.service.domain.model.CartVO;
@@ -69,7 +69,7 @@ import javafx.util.StringConverter;
 
 
 public class OrderDishesChoiceView extends VBox {
-    DishesDAO dishesDAO = GuiceContainer.getInstance(DishesDAO.class);
+    DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
     DishesPackageDAO dishesPackageDAO = GuiceContainer.getInstance(DishesPackageDAO.class);
     CartService cartService = GuiceContainer.getInstance(CartService.class);
 
@@ -231,7 +231,7 @@ public class OrderDishesChoiceView extends VBox {
         Dishes cond = new Dishes();
         cond.setDishesTypeId(queryCond.getDishesTypeId());
         cond.setDishesName(queryCond.getDishesName());
-        return dishesDAO.pageQuery(cond, page);
+        return dishesService.pageQuery(cond, page);
     }
 
     private List<DishesPackage> queryPackageList(DishesQueryCond queryCond) {
