@@ -492,7 +492,7 @@ public class OrderDetail extends VBox {
         _alert.setTitle("关台操作");
         _alert.setHeaderText("当前订单已结清");
         Optional<ButtonType> _buttonType = _alert.showAndWait();
-        if (_buttonType.get().getButtonData().equals(ButtonBar.ButtonData.YES)) {
+        if (_buttonType.isPresent() && _buttonType.get().getButtonData() == ButtonBar.ButtonData.YES) {
             Result<String> closeDeskRs = deskService.closeDesk(desk.getDeskId());
             if (!closeDeskRs.isSuccess()) {
                 AlertBuilder.ERROR(closeDeskRs.getMsg());
@@ -636,7 +636,6 @@ public class OrderDetail extends VBox {
         Separator separator2 = new Separator();
         separator2.setOrientation(Orientation.HORIZONTAL);
         return separator2;
-
     }
 
     @Override
