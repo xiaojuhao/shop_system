@@ -130,16 +130,12 @@ public class OrderDetail extends VBox {
             gridPane.add(labelOrder, 1, rowIndex);
 
             Label labelOrderTime = new Label("就餐时间: ");
-            orderView.addListener((x, ov, nv) -> {
-                labelOrderTime.setText("就餐时间: " + nv.orderTime);
-            });
+            orderView.addListener((x, ov, nv) -> labelOrderTime.setText("就餐时间: " + nv.orderTime));
             labelOrderTime.setMinWidth(200);
             gridPane.add(labelOrderTime, 2, rowIndex);
 
             Label labelPayStatus = new Label("支付状态: 未支付");
-            orderView.addListener((x, ov, nv) -> {
-                labelPayStatus.setText("支付状态: " + nv.payStatusName);
-            });
+            orderView.addListener((x, ov, nv) -> labelPayStatus.setText("支付状态: " + nv.payStatusName));
             labelPayStatus.setMinWidth(200);
             gridPane.add(labelPayStatus, 3, rowIndex);
         }
@@ -470,11 +466,9 @@ public class OrderDetail extends VBox {
     }
 
     private double sumTotalPrice(Integer orderId) {
-        double totalPrice = 0;
         List<OrderDishes> dishes = orderDishesService.selectByOrderId(orderId);
-        totalPrice = CommonUtils.collect(dishes, OrderDishes::getOrderDishesPrice)
+        return CommonUtils.collect(dishes, OrderDishes::getOrderDishesPrice)
                 .stream().reduce(0D, Double::sum);
-        return totalPrice;
     }
 
 
@@ -646,7 +640,7 @@ public class OrderDetail extends VBox {
     }
 
     @Override
-    public void finalize() {
+    protected void finalize() {
         System.out.println("OrderDetail ........ destroyed");
     }
 }
