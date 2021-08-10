@@ -219,7 +219,7 @@ public class OrderDetail extends VBox {
         };
         {
             tv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-            tv.setMaxHeight(300);
+            tv.setMinHeight(300);
             tv.setPadding(new Insets(5, 0, 0, 5));
             tv.getColumns().addAll(
                     newCol("序号", "col1", 100),
