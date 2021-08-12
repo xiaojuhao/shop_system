@@ -260,8 +260,7 @@ public class OrderDetail extends VBox {
             Button returnBtn = createButton("退菜", e -> returnDishesConfirm(deskOrderParam, tv));
             Button transferBtn = createButton("转台", null);
             Button splitBtn = createButton("拆台", null);
-            Button payBillBtn = createButton("结账", null);
-            payBillBtn.setOnMouseClicked(evt -> openPayWayChoiceView(deskOrderParam));
+            Button payBillBtn = createButton("结账", evt -> openPayWayChoiceView(deskOrderParam));
             // add all buttons
             pane.getChildren().addAll(orderBtn, sendBtn, returnBtn, transferBtn, splitBtn, payBillBtn);
             this.getChildren().add(pane);
