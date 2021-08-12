@@ -1,6 +1,5 @@
 package com.xjh.startup.view;
 
-import com.xjh.startup.foundation.constants.LoginSceneHolder;
 import com.xjh.startup.foundation.constants.MainStageHolder;
 
 import javafx.fxml.FXMLLoader;
@@ -165,10 +164,10 @@ public class MenuBarView {
 
     private void logout() {
         try {
-            //关闭主界面
+            //打开登录框
             Stage primaryStage = MainStageHolder.get();
             primaryStage.setTitle("登录系统");
-            primaryStage.setScene(LoginSceneHolder.get());
+            primaryStage.setScene(LoginView.getLoginView());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
