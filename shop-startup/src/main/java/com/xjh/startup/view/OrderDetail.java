@@ -8,6 +8,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.event.EventHandler;
+import javafx.scene.input.MouseEvent;
 import org.apache.commons.collections4.CollectionUtils;
 
 import com.google.common.collect.Lists;
@@ -253,15 +255,12 @@ public class OrderDetail extends VBox {
             pane.setHgap(20);
             pane.setPadding(new Insets(10, 0, 10, 20));
             // 按钮
-            Button orderBtn = createButton("点菜");
-            orderBtn.setOnMouseClicked(evt -> openDishesChoiceView(deskOrderParam));
-            Button sendBtn = createButton("送菜");
-            sendBtn.setOnMouseClicked(evt -> openSendDishesChoiceView(deskOrderParam));
-            Button returnBtn = createButton("退菜");
-            returnBtn.setOnMouseClicked(evt -> returnDishesConfirm(deskOrderParam, tv));
-            Button transferBtn = createButton("转台");
-            Button splitBtn = createButton("拆台");
-            Button payBillBtn = createButton("结账");
+            Button orderBtn = createButton("点菜", e -> openDishesChoiceView(deskOrderParam));
+            Button sendBtn = createButton("送菜", e -> openSendDishesChoiceView(deskOrderParam));
+            Button returnBtn = createButton("退菜", e -> returnDishesConfirm(deskOrderParam, tv));
+            Button transferBtn = createButton("转台", null);
+            Button splitBtn = createButton("拆台", null);
+            Button payBillBtn = createButton("结账", null);
             payBillBtn.setOnMouseClicked(evt -> openPayWayChoiceView(deskOrderParam));
             // add all buttons
             pane.getChildren().addAll(orderBtn, sendBtn, returnBtn, transferBtn, splitBtn, payBillBtn);
@@ -273,10 +272,13 @@ public class OrderDetail extends VBox {
         LogUtils.info("OrderDetail加载数据耗时: " + cost.getCostAndReset());
     }
 
-    private Button createButton(String name) {
+    private Button createButton(String name, EventHandler<? super MouseEvent> onClick) {
         Button btn = new Button(name);
         btn.setMinWidth(66);
         btn.setMinHeight(50);
+        if(onClick != null) {
+            btn.setOnMouseClicked(onClick);
+        }
         return btn;
     }
 
