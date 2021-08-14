@@ -58,6 +58,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableCell;
@@ -187,6 +188,7 @@ public class OrderDetail extends VBox {
             Label mangerReduction = new Label("店长减免: 0");
             mangerReduction.setMinWidth(200);
             gridPane.add(mangerReduction, 1, row);
+            orderView.addListener((a, b, c) -> mangerReduction.setText("店长减免: " + formatMoney(c.orderReduction)));
 
             Label discount = new Label("折扣金额: 0");
             discount.setMinWidth(200);
@@ -264,7 +266,7 @@ public class OrderDetail extends VBox {
 
             Button orderErase = createButton("抹零", evt -> openOrderEraseStage(deskOrderParam));
             FlowPane.setMargin(orderErase, new Insets(0, 0, 0, 100));
-            Button reduction = createButton("店长减免", evt -> openPayWayChoiceView(deskOrderParam));
+            Button reduction = createButton("店长减免", evt -> openOrderReductionDialog(deskOrderParam));
             // add all buttons
             pane.getChildren().addAll(orderBtn, sendBtn, returnBtn, transferBtn, splitBtn, payBillBtn,
                     orderErase, reduction);
@@ -454,6 +456,7 @@ public class OrderDetail extends VBox {
             v.deduction = o.getFullReduceDishesPrice();
             v.returnAmount = orderService.sumReturnAmount(orderId);
             v.orderErase = CommonUtils.orElse(o.getOrderErase(), 0D);
+            v.orderReduction = CommonUtils.orElse(o.getOrderReduction(), 0D);
             // 支付信息
             List<OrderPay> pays = orderPayService.selectByOrderId(orderId);
             StringBuilder payInfo = new StringBuilder();
@@ -697,6 +700,71 @@ public class OrderDetail extends VBox {
             Order update = new Order();
             update.setOrderId(orderId);
             update.setOrderErase(eraseAmt);
+            orderService.updateByOrderId(update);
+        }
+    }
+
+    private void openOrderReductionDialog(DeskOrderParam param) {
+        Stage stg = new Stage();
+        double width = this.getScene().getWindow().getWidth() / 3;
+        double height = this.getScene().getWindow().getHeight() / 4;
+        stg.initOwner(this.getScene().getWindow());
+        stg.initModality(Modality.WINDOW_MODAL);
+        stg.initStyle(StageStyle.DECORATED);
+        stg.centerOnScreen();
+        stg.setWidth(width);
+        stg.setHeight(height);
+        stg.setTitle("店长减免");
+        param.setChoiceAction(EnumChoiceAction.NULL);
+        VBox box = new VBox();
+        box.setAlignment(Pos.CENTER);
+        box.setPrefWidth(width);
+
+        // 金额
+        HBox reasonLine = new HBox();
+        reasonLine.setPrefWidth(300);
+        reasonLine.setMaxWidth(300);
+        TextField eraseAmt = new TextField();
+        eraseAmt.setPromptText("减免金额");
+        reasonLine.getChildren().addAll(new Label("减免金额:"), eraseAmt);
+        reasonLine.setPadding(new Insets(0, 0, 10, 0));
+        box.getChildren().add(reasonLine);
+
+        // 密码
+        HBox pwdLine = new HBox();
+        pwdLine.setPrefWidth(300);
+        pwdLine.setMaxWidth(300);
+        PasswordField pwd = new PasswordField();
+        pwd.setPromptText("店长密码");
+        pwdLine.getChildren().addAll(new Label("店长密码:"), pwd);
+        pwdLine.setPadding(new Insets(0, 0, 20, 0));
+        box.getChildren().add(pwdLine);
+        // 退菜按钮
+        Button returnBtn = new Button("确认");
+        returnBtn.setOnMouseClicked(evt -> {
+            String r = eraseAmt.getText();
+            String password = pwd.getText();
+            if (!CommonUtils.eq(password, "1234")) {
+                AlertBuilder.ERROR("店长密码不符");
+                return;
+            }
+            LogUtils.info("订单:" + param.getOrderId() + ", 桌号:" + param.getDeskName() + "店长减免:" + r);
+            doOrderReduction(param.getOrderId(), CommonUtils.parseDouble(r, 0D));
+            stg.close();
+        });
+        box.getChildren().add(returnBtn);
+
+        stg.setScene(new Scene(box));
+        stg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
+        stg.showAndWait();
+    }
+
+    private void doOrderReduction(Integer orderId, double amt) {
+        Order order = orderService.getOrder(orderId);
+        if (order != null) {
+            Order update = new Order();
+            update.setOrderId(orderId);
+            update.setOrderReduction(amt);
             orderService.updateByOrderId(update);
         }
     }
