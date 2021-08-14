@@ -1,5 +1,7 @@
 package com.xjh.startup.view.model;
 
+import java.util.List;
+
 import com.xjh.common.enumeration.EnumChoiceAction;
 
 public class DeskOrderParam {
@@ -7,6 +9,8 @@ public class DeskOrderParam {
     Integer deskId;
     String deskName;
     Runnable callback;
+    // 退菜时传入退菜记录
+    List<String> returnList;
     EnumChoiceAction choiceAction;
 
     public Integer getOrderId() {
@@ -47,5 +51,13 @@ public class DeskOrderParam {
 
     public void setChoiceAction(EnumChoiceAction choiceAction) {
         this.choiceAction = choiceAction;
+    }
+
+    public List<String> getReturnList() {
+        return returnList;
+    }
+
+    public void setReturnList(List<String> returnList) {
+        this.returnList = returnList;
     }
 }
