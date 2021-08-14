@@ -6,6 +6,7 @@ import com.xjh.common.utils.TimeRecord;
 import com.xjh.dao.mapper.CartDAO;
 import com.xjh.dao.mapper.DeskDAO;
 import com.xjh.dao.mapper.DishesDAO;
+import com.xjh.dao.mapper.DishesGroupDAO;
 import com.xjh.dao.mapper.DishesPackageDAO;
 import com.xjh.dao.mapper.DishesPackageDishesDAO;
 import com.xjh.dao.mapper.DishesPackageTypeDAO;
@@ -13,6 +14,7 @@ import com.xjh.dao.mapper.DishesTypeDAO;
 import com.xjh.dao.mapper.OrderDAO;
 import com.xjh.dao.mapper.OrderDishesDAO;
 import com.xjh.dao.mapper.OrderPayDAO;
+import com.xjh.dao.mapper.StoreDAO;
 import com.xjh.dao.mapper.SubOrderDAO;
 
 public class DaoModule extends AbstractModule {
@@ -30,6 +32,8 @@ public class DaoModule extends AbstractModule {
         bind(OrderPayDAO.class);
         bind(DishesPackageTypeDAO.class);
         bind(DishesPackageDishesDAO.class);
+        bind(StoreDAO.class);
+        bind(DishesGroupDAO.class);
         LogUtils.info("DaoModule 耗时: " + timeRecord.getCost());
     }
 }

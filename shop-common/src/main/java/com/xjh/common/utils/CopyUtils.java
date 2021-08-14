@@ -29,7 +29,11 @@ public class CopyUtils {
                 try {
                     PropertyDescriptor toPd = toPds.get(field);
                     if (toPd != null) {
-                        toPd.writeValue(to, pd.readValue(from));
+                        if (toPd.getRead().getReturnType().isAssignableFrom(pd.getRead().getReturnType())) {
+                            toPd.writeValue(to, pd.readValue(from));
+                        } else {
+                            System.out.println("类型不匹配:" + toPd.getRead().getReturnType() + " >> " + pd.getRead().getReturnType());
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

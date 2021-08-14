@@ -37,6 +37,8 @@ import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderPayService;
 import com.xjh.service.domain.OrderService;
+import com.xjh.service.domain.StoreService;
+import com.xjh.service.domain.model.StoreVO;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.OrderDishesTableItemVO;
@@ -82,6 +84,7 @@ public class OrderDetailView extends VBox {
     DishesService dishesService;
     DishesPackageService dishesPackageService;
     OrderPayService orderPayService;
+    StoreService storeService;
 
 
     ObjectProperty<OrderViewBO> orderView = new SimpleObjectProperty<>();
@@ -94,6 +97,7 @@ public class OrderDetailView extends VBox {
         dishesPackageService = GuiceContainer.getInstance(DishesPackageService.class);
         dishesService = GuiceContainer.getInstance(DishesService.class);
         orderPayService = GuiceContainer.getInstance(OrderPayService.class);
+        storeService = GuiceContainer.getInstance(StoreService.class);
         LogUtils.info("OrderDetail初始化服务耗时: " + cost.getCostAndReset());
 
 
@@ -207,6 +211,7 @@ public class OrderDetailView extends VBox {
         this.getChildren().add(horizontalSeparator());
         // 订单菜单菜单明细
         TableView<OrderDishesTableItemVO> tv = new TableView<>();
+        tv.setCache(false);
         Runnable refreshTableView = () -> {
             reloadOrder(orderId);
             tv.setItems(loadOrderDishes(orderId));
@@ -220,7 +225,7 @@ public class OrderDetailView extends VBox {
                     newCol("序号", "col1", 100),
                     newCol("子订单", "col2", 100),
                     newCol("菜名名称", "col3", 300),
-                    newCol("单价", "col4", 130),
+                    newCol("单价", "col4", 160),
                     newCol("折后价", "col5", 100),
                     newCol("数量", "col6", 100),
                     newCol("类型", "col7", 100)
@@ -287,6 +292,7 @@ public class OrderDetailView extends VBox {
         TableColumn<OrderDishesTableItemVO, Object> c = new TableColumn<>(name);
         c.setStyle("-fx-border-width: 0px; ");
         c.setMinWidth(width);
+        c.setSortable(false);
         c.setCellValueFactory(new PropertyValueFactory<>(filed));
         c.setCellFactory(col -> {
             TableCell<OrderDishesTableItemVO, Object> cell = new TableCell<>();
@@ -322,6 +328,13 @@ public class OrderDetailView extends VBox {
     }
 
     private ObservableList<OrderDishesTableItemVO> loadOrderDishes(Integer orderId) {
+        List<Integer> discountableDishesIds = new ArrayList<>();
+        StoreVO store = storeService.getStore().getData();
+        CommonUtils.forEach(store.getStoreDishesGroups(), g -> {
+            if (g.getGroupIds() != null) {
+                discountableDishesIds.addAll(g.getGroupIds());
+            }
+        });
         List<OrderDishes> orderDishes = orderDishesService.selectByOrderId(orderId);
         List<Integer> dishesIdList = CommonUtils.collect(orderDishes, OrderDishes::getDishesId);
         List<Dishes> dishesList = dishesService.getByIds(dishesIdList);
@@ -331,7 +344,7 @@ public class OrderDetailView extends VBox {
         List<OrderDishes> nonDiscountableList = new ArrayList<>();
         orderDishes.sort(Comparator.comparing(OrderDishes::getCreatetime));
         orderDishes.forEach(o -> {
-            if (o.getIfDishesPackage() == 1) {
+            if (discountableDishesIds.contains(o.getDishesId()) && o.getIfDishesPackage() == 0) {
                 discountableList.add(o);
             } else {
                 nonDiscountableList.add(o);
@@ -369,6 +382,7 @@ public class OrderDetailView extends VBox {
         });
         if (CommonUtils.isNotEmpty(discountableList)) {
             double discountTotalPrice = discountableList.stream()
+                    .filter(this::notReturn)
                     .map(OrderDishes::getOrderDishesPrice)
                     .filter(Objects::nonNull)
                     .reduce(0D, Double::sum);
@@ -376,7 +390,7 @@ public class OrderDetailView extends VBox {
                     "",
                     "",
                     new RichText(""),
-                    new RichText("优惠合计:" + discountTotalPrice).with(Color.RED).with(Pos.CENTER_RIGHT),
+                    new RichText("参与优惠合计:" + discountTotalPrice).with(Color.RED).with(Pos.CENTER_RIGHT),
                     "",
                     "",
                     new RichText("")));
@@ -422,6 +436,7 @@ public class OrderDetailView extends VBox {
         });
         if (CommonUtils.isNotEmpty(nonDiscountableList)) {
             double nonDiscountTotalPrice = nonDiscountableList.stream()
+                    .filter(this::notReturn)
                     .map(OrderDishes::getOrderDishesPrice)
                     .filter(Objects::nonNull)
                     .reduce(0D, Double::sum);
@@ -429,7 +444,7 @@ public class OrderDetailView extends VBox {
                     "",
                     "",
                     new RichText(""),
-                    new RichText("不优惠合计:" + nonDiscountTotalPrice).with(Color.RED).with(Pos.CENTER_RIGHT),
+                    new RichText("不参与优惠合计:" + nonDiscountTotalPrice).with(Color.RED).with(Pos.CENTER_RIGHT),
                     "",
                     "",
                     new RichText("")));
@@ -594,6 +609,13 @@ public class OrderDetailView extends VBox {
 
     private Separator horizontalSeparator() {
         return new Separator(Orientation.HORIZONTAL);
+    }
+
+    private boolean notReturn(OrderDishes x) {
+        if (x == null) {
+            return true;
+        }
+        return EnumOrderSaleType.of(x.getOrderDishesSaletype()) != EnumOrderSaleType.RETURN;
     }
 
     @Override
