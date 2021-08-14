@@ -509,41 +509,20 @@ public class OrderDetail extends VBox {
     }
 
     private void openDishesChoiceView(DeskOrderParam param) {
-        Stage stg = new Stage();
-        double width = this.getScene().getWindow().getWidth() - 60;
-        double height = this.getScene().getWindow().getHeight() - 100;
-        stg.initOwner(this.getScene().getWindow());
-        stg.initModality(Modality.WINDOW_MODAL);
-        stg.initStyle(StageStyle.DECORATED);
-        stg.centerOnScreen();
-        stg.setWidth(width);
-        stg.setHeight(height);
-        stg.setTitle("点菜[桌号:" + param.getDeskName() + "]");
         param.setChoiceAction(EnumChoiceAction.PLACE);
-        stg.setScene(new Scene(new OrderDishesChoiceView(param, width)));
-        stg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
-        stg.showAndWait();
+        String title = "点菜[桌号:" + param.getDeskName() + "]";
+        double width = this.getScene().getWindow().getWidth() - 60;
+        openView(title, param, new OrderDishesChoiceView(param, width), false);
     }
 
     private void openSendDishesChoiceView(DeskOrderParam param) {
-        Stage stg = new Stage();
-        double width = this.getScene().getWindow().getWidth() - 60;
-        double height = this.getScene().getWindow().getHeight() - 100;
-        stg.initOwner(this.getScene().getWindow());
-        stg.initModality(Modality.WINDOW_MODAL);
-        stg.initStyle(StageStyle.DECORATED);
-        stg.centerOnScreen();
-        stg.setWidth(width);
-        stg.setHeight(height);
-        stg.setTitle("点菜[桌号:" + param.getDeskName() + "]");
         param.setChoiceAction(EnumChoiceAction.SEND);
-        stg.setScene(new Scene(new OrderDishesChoiceView(param, width)));
-        stg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
-        stg.showAndWait();
+        String title = "送菜[桌号:" + param.getDeskName() + "]";
+        double width = this.getScene().getWindow().getWidth() - 60;
+        openView(title, param, new OrderDishesChoiceView(param, width), false);
     }
 
     private void returnDishesConfirm(DeskOrderParam param, TableView<OrderDishesTableItemVO> tv) {
-        param.setChoiceAction(EnumChoiceAction.RETURN);
         ObservableList<OrderDishesTableItemVO> list = tv.getSelectionModel().getSelectedItems();
         if (CollectionUtils.isEmpty(list)) {
             AlertBuilder.ERROR("请选择退菜记录");
@@ -566,75 +545,55 @@ public class OrderDetail extends VBox {
                 return;
             }
         }
+        param.setChoiceAction(EnumChoiceAction.RETURN);
         param.setReturnList(returnList);
-        Stage stg = new Stage();
-        double width = this.getScene().getWindow().getWidth() / 3;
-        double height = this.getScene().getWindow().getHeight() / 4;
-        stg.initOwner(this.getScene().getWindow());
-        stg.initModality(Modality.WINDOW_MODAL);
-        stg.initStyle(StageStyle.DECORATED);
-        stg.centerOnScreen();
-        stg.setWidth(width);
-        stg.setHeight(height);
-        stg.setTitle("退菜");
-        stg.setScene(new Scene(new OrderReturnDishesView(param)));
-        stg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
-        stg.showAndWait();
+        String title = "退菜[桌号:" + param.getDeskName() + "]";
+        openView(title, param, new OrderReturnDishesView(param), true);
     }
 
     private void openPayWayChoiceView(DeskOrderParam param) {
-        Stage stg = new Stage();
-        stg.initOwner(this.getScene().getWindow());
-        stg.initModality(Modality.WINDOW_MODAL);
-        stg.initStyle(StageStyle.DECORATED);
-        stg.centerOnScreen();
-        stg.setWidth(this.getScene().getWindow().getWidth() / 3);
-        stg.setHeight(this.getScene().getWindow().getHeight() / 3 * 2);
-        stg.setTitle("结账[桌号:" + param.getDeskName() + "]");
-        stg.setScene(new Scene(new PayWayChoiceView(param)));
-        stg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
-        stg.showAndWait();
+        param.setChoiceAction(EnumChoiceAction.NULL);
+        String title = "结账[桌号:" + param.getDeskName() + "]";
+        openView(title, param, new PayWayChoiceView(param), true);
     }
 
     private void openOrderEraseStage(DeskOrderParam param) {
-        Stage stg = new Stage();
-        double width = this.getScene().getWindow().getWidth() / 3;
-        double height = this.getScene().getWindow().getHeight() / 4;
-        stg.initOwner(this.getScene().getWindow());
-        stg.initModality(Modality.WINDOW_MODAL);
-        stg.initStyle(StageStyle.DECORATED);
-        stg.centerOnScreen();
-        stg.setWidth(width);
-        stg.setHeight(height);
-        stg.setTitle("抹零");
         param.setChoiceAction(EnumChoiceAction.NULL);
-        stg.setScene(new Scene(new OrderEraseView(param)));
-        stg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
-        stg.showAndWait();
+        String title = "抹零[桌号:" + param.getDeskName() + "]";
+        VBox view = new OrderEraseView(param);
+        openView(title, param, view, true);
     }
 
     private void openOrderReductionDialog(DeskOrderParam param) {
+        param.setChoiceAction(EnumChoiceAction.NULL);
+        String title = "店长减免[桌号:" + param.getDeskName() + "]";
+        VBox view = new OrderReductionView(param);
+        openView(title, param, view, true);
+    }
+
+    private void openView(String title, DeskOrderParam param, VBox view, boolean small) {
         Stage stg = new Stage();
-        double width = this.getScene().getWindow().getWidth() / 3;
-        double height = this.getScene().getWindow().getHeight() / 4;
+        double width = this.getScene().getWindow().getWidth() - 60;
+        double height = this.getScene().getWindow().getHeight() - 100;
+        if (small) {
+            width = this.getScene().getWindow().getWidth() / 3;
+            height = this.getScene().getWindow().getHeight() / 4;
+        }
         stg.initOwner(this.getScene().getWindow());
         stg.initModality(Modality.WINDOW_MODAL);
         stg.initStyle(StageStyle.DECORATED);
         stg.centerOnScreen();
         stg.setWidth(width);
         stg.setHeight(height);
-        stg.setTitle("店长减免");
-        param.setChoiceAction(EnumChoiceAction.NULL);
-        stg.setScene(new Scene(new OrderReductionView(param)));
-        stg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
+        stg.setTitle(title);
+        stg.setScene(new Scene(view));
         stg.showAndWait();
+        // 窗口关闭之后执行回调函数
+        CommonUtils.safeRun(param.getCallback());
     }
 
-
     private Separator horizontalSeparator() {
-        Separator separator2 = new Separator();
-        separator2.setOrientation(Orientation.HORIZONTAL);
-        return separator2;
+        return new Separator(Orientation.HORIZONTAL);
     }
 
     @Override
