@@ -58,14 +58,12 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
@@ -655,53 +653,9 @@ public class OrderDetail extends VBox {
         stg.setHeight(height);
         stg.setTitle("抹零");
         param.setChoiceAction(EnumChoiceAction.NULL);
-        VBox box = new VBox();
-        box.setAlignment(Pos.CENTER);
-        box.setPrefWidth(width);
-        // 标题
-        Label maxAmt = new Label("9元");
-        maxAmt.setFont(Font.font(12));
-        maxAmt.setTextFill(Color.RED);
-        maxAmt.setPadding(new Insets(0, 0, 20, 0));
-        HBox title = new HBox();
-        title.setPrefWidth(300);
-        title.setMaxWidth(300);
-        title.getChildren().addAll(new Label("最大抹零金额:"), maxAmt);
-        box.getChildren().add(title);
-
-        // 金额
-        HBox reasonLine = new HBox();
-        reasonLine.setPrefWidth(300);
-        reasonLine.setMaxWidth(300);
-        TextField eraseAmt = new TextField();
-        eraseAmt.setPromptText("抹零金额");
-        box.getChildren().add(eraseAmt);
-        reasonLine.getChildren().addAll(new Label("设置抹零金额:"), eraseAmt);
-        reasonLine.setPadding(new Insets(0, 0, 20, 0));
-        box.getChildren().add(reasonLine);
-        // 退菜按钮
-        Button returnBtn = new Button("确认");
-        returnBtn.setOnMouseClicked(evt -> {
-            String r = eraseAmt.getText();
-            LogUtils.info("订单:" + param.getOrderId() + ", 桌号:" + param.getDeskName() + "抹零金额:" + r);
-            doOrderErase(param.getOrderId(), CommonUtils.parseDouble(r, 0D));
-            stg.close();
-        });
-        box.getChildren().add(returnBtn);
-
-        stg.setScene(new Scene(box));
+        stg.setScene(new Scene(new OrderEraseView(param)));
         stg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
         stg.showAndWait();
-    }
-
-    private void doOrderErase(Integer orderId, double eraseAmt) {
-        Order order = orderService.getOrder(orderId);
-        if (order != null) {
-            Order update = new Order();
-            update.setOrderId(orderId);
-            update.setOrderErase(eraseAmt);
-            orderService.updateByOrderId(update);
-        }
     }
 
     private void openOrderReductionDialog(DeskOrderParam param) {
@@ -716,58 +670,11 @@ public class OrderDetail extends VBox {
         stg.setHeight(height);
         stg.setTitle("店长减免");
         param.setChoiceAction(EnumChoiceAction.NULL);
-        VBox box = new VBox();
-        box.setAlignment(Pos.CENTER);
-        box.setPrefWidth(width);
-
-        // 金额
-        HBox reasonLine = new HBox();
-        reasonLine.setPrefWidth(300);
-        reasonLine.setMaxWidth(300);
-        TextField eraseAmt = new TextField();
-        eraseAmt.setPromptText("减免金额");
-        reasonLine.getChildren().addAll(new Label("减免金额:"), eraseAmt);
-        reasonLine.setPadding(new Insets(0, 0, 10, 0));
-        box.getChildren().add(reasonLine);
-
-        // 密码
-        HBox pwdLine = new HBox();
-        pwdLine.setPrefWidth(300);
-        pwdLine.setMaxWidth(300);
-        PasswordField pwd = new PasswordField();
-        pwd.setPromptText("店长密码");
-        pwdLine.getChildren().addAll(new Label("店长密码:"), pwd);
-        pwdLine.setPadding(new Insets(0, 0, 20, 0));
-        box.getChildren().add(pwdLine);
-        // 退菜按钮
-        Button returnBtn = new Button("确认");
-        returnBtn.setOnMouseClicked(evt -> {
-            String r = eraseAmt.getText();
-            String password = pwd.getText();
-            if (!CommonUtils.eq(password, "1234")) {
-                AlertBuilder.ERROR("店长密码不符");
-                return;
-            }
-            LogUtils.info("订单:" + param.getOrderId() + ", 桌号:" + param.getDeskName() + "店长减免:" + r);
-            doOrderReduction(param.getOrderId(), CommonUtils.parseDouble(r, 0D));
-            stg.close();
-        });
-        box.getChildren().add(returnBtn);
-
-        stg.setScene(new Scene(box));
+        stg.setScene(new Scene(new OrderReductionView(param)));
         stg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
         stg.showAndWait();
     }
 
-    private void doOrderReduction(Integer orderId, double amt) {
-        Order order = orderService.getOrder(orderId);
-        if (order != null) {
-            Order update = new Order();
-            update.setOrderId(orderId);
-            update.setOrderReduction(amt);
-            orderService.updateByOrderId(update);
-        }
-    }
 
     private Separator horizontalSeparator() {
         Separator separator2 = new Separator();
