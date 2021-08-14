@@ -1,5 +1,7 @@
 package com.xjh.startup.view;
 
+import static com.xjh.common.utils.CommonUtils.formatMoney;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -8,8 +10,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javafx.event.EventHandler;
-import javafx.scene.input.MouseEvent;
 import org.apache.commons.collections4.CollectionUtils;
 
 import com.google.common.collect.Lists;
@@ -47,6 +47,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -63,7 +64,9 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -149,48 +152,45 @@ public class OrderDetail extends VBox {
             gridPane.setHgap(10);
             gridPane.setPadding(new Insets(10));
             /// ----------- 第一行 ---------------
+            int row = 0;
             Label l = new Label("订单总额：0.00");
-            orderView.addListener((a, b, c) -> l.setText("订单总额: " + CommonUtils.formatMoney(c.totalPrice)));
+            orderView.addListener((a, b, c) -> l.setText("订单总额: " + formatMoney(c.totalPrice)));
             l.setMinWidth(200);
-            gridPane.add(l, 0, 0);
+            gridPane.add(l, 0, row);
             // 第二行
             Label labelCustNum = new Label("已支付: 0.00");
-            orderView.addListener((x, ov, nv) -> labelCustNum.setText("已支付: " + CommonUtils.formatMoney(nv.orderHadpaid)));
+            orderView.addListener((x, ov, nv) -> labelCustNum.setText("已支付: " + formatMoney(nv.orderHadpaid)));
             labelCustNum.setMinWidth(200);
-            gridPane.add(labelCustNum, 1, 0);
+            gridPane.add(labelCustNum, 1, row);
 
             Label notPaid = new Label("还需支付: 0.00");
-            orderView.addListener((a, b, c) -> {
-                double totalPrice = c.totalPrice;
-                double paid = c.orderHadpaid;
-                double returnAmt = c.returnAmount;
-                String notPaidStr = CommonUtils.formatMoney(totalPrice - paid - returnAmt);
-                notPaid.setText("还需支付: " + notPaidStr);
-            });
+            orderView.addListener((a, b, c) -> notPaid.setText("还需支付: " + formatMoney(c.orderNeedPay)));
             notPaid.setMinWidth(200);
             notPaid.setStyle("-fx-font-size: 16; -fx-text-fill: red");
-            gridPane.add(notPaid, 2, 0);
+            gridPane.add(notPaid, 2, row);
 
             Label labelOrderTime = new Label("当前折扣: 无");
             labelOrderTime.setMinWidth(200);
-            gridPane.add(labelOrderTime, 3, 0);
+            gridPane.add(labelOrderTime, 3, row);
 
             Label labelPayStatus = new Label("优惠金额: 0");
             labelPayStatus.setMinWidth(200);
-            gridPane.add(labelPayStatus, 4, 0);
+            gridPane.add(labelPayStatus, 4, row);
 
             /// ----------- 第二行 ---------------
-            Label reduction = new Label("抹零金额: 0");
-            reduction.setMinWidth(200);
-            gridPane.add(reduction, 0, 1);
+            row++;
+            Label orderErase = new Label("抹零金额: 0");
+            orderErase.setMinWidth(200);
+            gridPane.add(orderErase, 0, row);
+            orderView.addListener((a, b, c) -> orderErase.setText("抹零金额: " + formatMoney(c.orderErase)));
 
             Label mangerReduction = new Label("店长减免: 0");
             mangerReduction.setMinWidth(200);
-            gridPane.add(mangerReduction, 1, 1);
+            gridPane.add(mangerReduction, 1, row);
 
             Label discount = new Label("折扣金额: 0");
             discount.setMinWidth(200);
-            gridPane.add(discount, 2, 1);
+            gridPane.add(discount, 2, row);
 
             Label refund = new Label("退菜金额: 0");
             refund.setMinWidth(200);
@@ -198,17 +198,17 @@ public class OrderDetail extends VBox {
                 String returnAmtStr = CommonUtils.formatMoney(c.returnAmount);
                 refund.setText("退菜金额: " + returnAmtStr);
             });
-            gridPane.add(refund, 3, 1);
+            gridPane.add(refund, 3, row);
 
             Label fan = new Label("反结账金额: 0");
             fan.setMinWidth(200);
-            gridPane.add(fan, 4, 1);
+            gridPane.add(fan, 4, row);
 
             this.getChildren().add(gridPane);
         }
         // 分割线
         this.getChildren().add(horizontalSeparator());
-
+        // 订单菜单菜单明细
         TableView<OrderDishesTableItemVO> tv = new TableView<>();
         Runnable refreshTableView = () -> {
             reloadOrder(orderId);
@@ -261,8 +261,13 @@ public class OrderDetail extends VBox {
             Button transferBtn = createButton("转台", null);
             Button splitBtn = createButton("拆台", null);
             Button payBillBtn = createButton("结账", evt -> openPayWayChoiceView(deskOrderParam));
+
+            Button orderErase = createButton("抹零", evt -> openOrderEraseStage(deskOrderParam));
+            FlowPane.setMargin(orderErase, new Insets(0, 0, 0, 100));
+            Button reduction = createButton("店长减免", evt -> openPayWayChoiceView(deskOrderParam));
             // add all buttons
-            pane.getChildren().addAll(orderBtn, sendBtn, returnBtn, transferBtn, splitBtn, payBillBtn);
+            pane.getChildren().addAll(orderBtn, sendBtn, returnBtn, transferBtn, splitBtn, payBillBtn,
+                    orderErase, reduction);
             this.getChildren().add(pane);
         }
         LogUtils.info("OrderDetail构建页面耗时: " + cost.getCostAndReset());
@@ -274,8 +279,8 @@ public class OrderDetail extends VBox {
     private Button createButton(String name, EventHandler<? super MouseEvent> onClick) {
         Button btn = new Button(name);
         btn.setMinWidth(66);
-        btn.setMinHeight(50);
-        if(onClick != null) {
+        btn.setMinHeight(35);
+        if (onClick != null) {
             btn.setOnMouseClicked(onClick);
         }
         return btn;
@@ -442,11 +447,13 @@ public class OrderDetail extends VBox {
             OrderViewBO v = new OrderViewBO();
             v.customerNum = o.getOrderCustomerNums();
             v.orderTime = DateBuilder.base(o.getCreateTime()).format(DATETIME_PATTERN);
+            v.orderNeedPay = orderService.notPaidBillAmount(orderId);
             v.orderHadpaid = o.getOrderHadpaid();
             v.totalPrice = sumTotalPrice(orderId);
             v.payStatusName = EnumOrderStatus.of(o.getOrderStatus()).remark;
             v.deduction = o.getFullReduceDishesPrice();
             v.returnAmount = orderService.sumReturnAmount(orderId);
+            v.orderErase = CommonUtils.orElse(o.getOrderErase(), 0D);
             // 支付信息
             List<OrderPay> pays = orderPayService.selectByOrderId(orderId);
             StringBuilder payInfo = new StringBuilder();
@@ -631,6 +638,67 @@ public class OrderDetail extends VBox {
         stg.setScene(new Scene(new PayWayChoiceView(param)));
         stg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
         stg.showAndWait();
+    }
+
+    private void openOrderEraseStage(DeskOrderParam param) {
+        Stage stg = new Stage();
+        double width = this.getScene().getWindow().getWidth() / 3;
+        double height = this.getScene().getWindow().getHeight() / 4;
+        stg.initOwner(this.getScene().getWindow());
+        stg.initModality(Modality.WINDOW_MODAL);
+        stg.initStyle(StageStyle.DECORATED);
+        stg.centerOnScreen();
+        stg.setWidth(width);
+        stg.setHeight(height);
+        stg.setTitle("抹零");
+        param.setChoiceAction(EnumChoiceAction.NULL);
+        VBox box = new VBox();
+        box.setAlignment(Pos.CENTER);
+        box.setPrefWidth(width);
+        // 标题
+        Label maxAmt = new Label("9元");
+        maxAmt.setFont(Font.font(12));
+        maxAmt.setTextFill(Color.RED);
+        maxAmt.setPadding(new Insets(0, 0, 20, 0));
+        HBox title = new HBox();
+        title.setPrefWidth(300);
+        title.setMaxWidth(300);
+        title.getChildren().addAll(new Label("最大抹零金额:"), maxAmt);
+        box.getChildren().add(title);
+
+        // 金额
+        HBox reasonLine = new HBox();
+        reasonLine.setPrefWidth(300);
+        reasonLine.setMaxWidth(300);
+        TextField eraseAmt = new TextField();
+        eraseAmt.setPromptText("抹零金额");
+        box.getChildren().add(eraseAmt);
+        reasonLine.getChildren().addAll(new Label("设置抹零金额:"), eraseAmt);
+        reasonLine.setPadding(new Insets(0, 0, 20, 0));
+        box.getChildren().add(reasonLine);
+        // 退菜按钮
+        Button returnBtn = new Button("确认");
+        returnBtn.setOnMouseClicked(evt -> {
+            String r = eraseAmt.getText();
+            LogUtils.info("订单:" + param.getOrderId() + ", 桌号:" + param.getDeskName() + "抹零金额:" + r);
+            doOrderErase(param.getOrderId(), CommonUtils.parseDouble(r, 0D));
+            stg.close();
+        });
+        box.getChildren().add(returnBtn);
+
+        stg.setScene(new Scene(box));
+        stg.setOnHidden(e -> CommonUtils.safeRun(param.getCallback()));
+        stg.showAndWait();
+    }
+
+    private void doOrderErase(Integer orderId, double eraseAmt) {
+        Order order = orderService.getOrder(orderId);
+        if (order != null) {
+            Order update = new Order();
+            update.setOrderId(orderId);
+            update.setOrderErase(eraseAmt);
+            orderService.updateByOrderId(update);
+        }
     }
 
     private Separator horizontalSeparator() {
