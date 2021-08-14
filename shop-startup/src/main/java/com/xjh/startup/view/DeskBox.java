@@ -128,15 +128,17 @@ public class DeskBox extends VBox {
                 EnumDesKStatus runStatus = EnumDesKStatus.of(desk.get().getStatus());
                 if (runStatus == EnumDesKStatus.USED || runStatus == EnumDesKStatus.PAID) {
                     Window sceneWindow = this.getScene().getWindow();
+                    double width = sceneWindow.getWidth() / 10 * 9;
+                    double height = sceneWindow.getHeight() / 10 * 9;
                     Stage orderInfo = new Stage();
                     orderInfo.initOwner(sceneWindow);
                     orderInfo.initModality(Modality.WINDOW_MODAL);
                     orderInfo.initStyle(StageStyle.DECORATED);
                     orderInfo.centerOnScreen();
-                    orderInfo.setWidth(sceneWindow.getWidth() / 10 * 9);
-                    orderInfo.setHeight(sceneWindow.getHeight() / 10 * 9);
+                    orderInfo.setWidth(width);
+                    orderInfo.setHeight(height);
                     orderInfo.setTitle("订单详情");
-                    orderInfo.setScene(new Scene(new OrderDetailView(desk.get())));
+                    orderInfo.setScene(new Scene(new OrderDetailView(desk.get(), height)));
                     orderInfo.show();
                     System.gc();
                 } else {
@@ -156,7 +158,9 @@ public class DeskBox extends VBox {
                         }
                     }
                 }
-            } finally {
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }finally {
                 openingDesk.set(false);
             }
         }

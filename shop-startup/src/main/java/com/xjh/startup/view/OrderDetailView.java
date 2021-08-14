@@ -89,7 +89,7 @@ public class OrderDetailView extends VBox {
 
     ObjectProperty<OrderViewBO> orderView = new SimpleObjectProperty<>();
 
-    public OrderDetailView(Desk desk) {
+    public OrderDetailView(Desk desk, double height) {
         TimeRecord cost = TimeRecord.start();
         deskService = GuiceContainer.getInstance(DeskService.class);
         orderService = GuiceContainer.getInstance(OrderService.class);
@@ -220,6 +220,9 @@ public class OrderDetailView extends VBox {
         {
             tv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
             tv.setMinHeight(300);
+            if(height > 800){
+                tv.setMinHeight(height - 450);
+            }
             tv.setPadding(new Insets(5, 0, 0, 5));
             tv.getColumns().addAll(
                     newCol("序号", "col1", 100),
@@ -330,11 +333,13 @@ public class OrderDetailView extends VBox {
     private ObservableList<OrderDishesTableItemVO> loadOrderDishes(Integer orderId) {
         List<Integer> discountableDishesIds = new ArrayList<>();
         StoreVO store = storeService.getStore().getData();
-        CommonUtils.forEach(store.getStoreDishesGroups(), g -> {
-            if (g.getGroupIds() != null) {
-                discountableDishesIds.addAll(g.getGroupIds());
-            }
-        });
+        if(store != null){
+            CommonUtils.forEach(store.getStoreDishesGroups(), g -> {
+                if (g.getGroupIds() != null) {
+                    discountableDishesIds.addAll(g.getGroupIds());
+                }
+            });
+        }
         List<OrderDishes> orderDishes = orderDishesService.selectByOrderId(orderId);
         List<Integer> dishesIdList = CommonUtils.collect(orderDishes, OrderDishes::getDishesId);
         List<Dishes> dishesList = dishesService.getByIds(dishesIdList);
