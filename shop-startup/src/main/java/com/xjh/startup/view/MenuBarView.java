@@ -25,23 +25,13 @@ public class MenuBarView {
         bar.getMenus().add(createIndexMenu());
         // 菜品管理
         bar.getMenus().add(createDishesMenu());
-        // 餐桌管理
-        bar.getMenus().add(createTableMenu());
-        // 会员管理
-        // bar.getMenus().add(createMemberMenu());
         // 打印管理
         bar.getMenus().add(createPrintMenu());
-        // 卡券管理
-        // bar.getMenus().add(createCouponMenu());
         // 订单管理
         bar.getMenus().add(createOrderMenu());
-        // 门店管理
-        // bar.getMenus().add(createShopMenu());
-        // 设备管理
-        // bar.getMenus().add(createDeviceMenu());
         // 预约点菜
         bar.getMenus().add(createPreserveMenu());
-        // 账号管理
+        // 登录
         bar.getMenus().add(createAccountMenu());
         return bar;
     }
@@ -55,14 +45,10 @@ public class MenuBarView {
     }
 
     private Menu createAccountMenu() {
-        Menu menu = new Menu("账号管理");
-        MenuItem updatePassword = new MenuItem("修改密码");
-        MenuItem updateName = new MenuItem("修改名称");
-        MenuItem subAccountItem = new MenuItem("子账号管理");
+        Menu menu = new Menu("登录管理");
         MenuItem exitMenuItem = new MenuItem("退出");
         exitMenuItem.setOnAction(actionEvent -> logout());
-        menu.getItems().addAll(updatePassword, updateName, subAccountItem,
-                new SeparatorMenuItem(), exitMenuItem);
+        menu.getItems().addAll(exitMenuItem);
         return menu;
     }
 
