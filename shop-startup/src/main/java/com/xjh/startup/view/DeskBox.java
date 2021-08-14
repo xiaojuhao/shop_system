@@ -136,7 +136,7 @@ public class DeskBox extends VBox {
                     orderInfo.setWidth(sceneWindow.getWidth() / 10 * 9);
                     orderInfo.setHeight(sceneWindow.getHeight() / 10 * 9);
                     orderInfo.setTitle("订单详情");
-                    orderInfo.setScene(new Scene(new OrderDetail(desk.get())));
+                    orderInfo.setScene(new Scene(new OrderDetailView(desk.get())));
                     orderInfo.show();
                     System.gc();
                 } else {

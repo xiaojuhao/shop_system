@@ -73,7 +73,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-public class OrderDetail extends VBox {
+public class OrderDetailView extends VBox {
     final static String DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     // 依赖服务
     OrderService orderService;
@@ -86,7 +86,7 @@ public class OrderDetail extends VBox {
 
     ObjectProperty<OrderViewBO> orderView = new SimpleObjectProperty<>();
 
-    public OrderDetail(Desk desk) {
+    public OrderDetailView(Desk desk) {
         TimeRecord cost = TimeRecord.start();
         deskService = GuiceContainer.getInstance(DeskService.class);
         orderService = GuiceContainer.getInstance(OrderService.class);
