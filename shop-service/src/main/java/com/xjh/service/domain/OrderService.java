@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Inject;
@@ -71,25 +72,26 @@ public class OrderService {
         }
     }
 
-    public Result<OrderBillVO> calcOrderBill(Integer orderId) {
-        Order o = this.getOrder(orderId);
-        if (o != null) {
+    public Result<OrderBillVO> calcOrderBill(Order order, List<OrderDishes> orderDishesList) {
+        if (order != null) {
             OrderBillVO v = new OrderBillVO();
-            v.customerNum = o.getOrderCustomerNums();
-            v.orderTime = DateBuilder.base(o.getCreateTime()).format(DateBuilder.DATETIME_PATTERN);
-            v.orderNeedPay = this.notPaidBillAmount(o);
-            v.orderHadpaid = o.getOrderHadpaid();
-            v.totalPrice = sumTotalPrice(orderId);
-            v.payStatusName = EnumOrderStatus.of(o.getOrderStatus()).remark;
-            v.deduction = o.getFullReduceDishesPrice();
-            v.returnAmount = this.sumReturnAmount(orderId);
-            v.orderErase = CommonUtils.orElse(o.getOrderErase(), 0D);
-            v.orderReduction = CommonUtils.orElse(o.getOrderReduction(), 0D);
+            v.orderId = order.getOrderId().toString();
+            v.customerNum = order.getOrderCustomerNums();
+            v.orderTime = DateBuilder.base(order.getCreateTime()).timeStr();
+            v.orderNeedPay = this.notPaidBillAmount(order, orderDishesList);
+            v.orderHadpaid = order.getOrderHadpaid();
+            v.totalPrice = sumTotalPrice(order, orderDishesList);
+            v.discountAmount = calcDiscountAmount(order, orderDishesList);
+            v.payStatusName = EnumOrderStatus.of(order.getOrderStatus()).remark;
+            v.deduction = order.getFullReduceDishesPrice();
+            v.returnAmount = this.sumReturnAmount(orderDishesList);
+            v.orderErase = CommonUtils.orElse(order.getOrderErase(), 0D);
+            v.orderReduction = CommonUtils.orElse(order.getOrderReduction(), 0D);
             // 支付信息
-            List<OrderPay> pays = orderPayService.selectByOrderId(orderId);
+            List<OrderPay> pays = orderPayService.selectByOrderId(order.getOrderId());
             StringBuilder payInfo = new StringBuilder();
             CommonUtils.forEach(pays, p -> {
-                payInfo.append(DateBuilder.base(p.getCreatetime()).format(DateBuilder.DATETIME_PATTERN))
+                payInfo.append(DateBuilder.base(p.getCreatetime()).timeStr())
                         .append(" 收到付款:")
                         .append(CommonUtils.formatMoney(p.getAmount()))
                         .append(", 来自")
@@ -105,10 +107,20 @@ public class OrderService {
         return Result.fail("订单不存在");
     }
 
-    private double sumTotalPrice(Integer orderId) {
-        List<OrderDishes> dishes = orderDishesService.selectByOrderId(orderId);
-        return CommonUtils.collect(dishes, OrderDishes::getOrderDishesPrice)
-                .stream().reduce(0D, Double::sum);
+    private double sumTotalPrice(Order order, List<OrderDishes> orderDishesList) {
+        return CommonUtils.collect(orderDishesList, OrderDishes::getOrderDishesPrice)
+                .stream().filter(Objects::nonNull)
+                .reduce(0D, Double::sum);
+    }
+
+    private double calcDiscountAmount(Order order, List<OrderDishes> orderDishesList) {
+        double total = CommonUtils.collect(orderDishesList, OrderDishes::getOrderDishesPrice)
+                .stream().filter(Objects::nonNull)
+                .reduce(0D, Double::sum);
+        double discountedPrice = CommonUtils.collect(orderDishesList, OrderDishes::getOrderDishesDiscountPrice)
+                .stream().filter(Objects::nonNull)
+                .reduce(0D, Double::sum);
+        return Math.max(0, total - discountedPrice);
     }
 
     public Result<Integer> countSubOrder(Integer orderId) {
@@ -153,24 +165,32 @@ public class OrderService {
         }
     }
 
-    public double sumBillAmount(Integer orderId) {
-        List<OrderDishes> orderDishes = orderDishesService.selectByOrderId(orderId);
+    public double sumBillAmount(List<OrderDishes> orderDishes) {
+        if (CommonUtils.isEmpty(orderDishes)) {
+            return 0;
+        }
         double billAmount = 0;
         for (OrderDishes od : orderDishes) {
-            billAmount += od.getOrderDishesDiscountPrice() * od.getOrderDishesNums();
+            double price = CommonUtils.orElse(od.getOrderDishesDiscountPrice(), 0D);
+            int num = CommonUtils.orElse(od.getOrderDishesNums(), 1);
+            billAmount += price * num;
         }
         return billAmount;
     }
 
-    public double sumReturnAmount(Integer orderId) {
-        List<OrderDishes> orderDishes = orderDishesService.selectByOrderId(orderId);
-        double billAmount = 0;
+    public double sumReturnAmount(List<OrderDishes> orderDishes) {
+        if (CommonUtils.isEmpty(orderDishes)) {
+            return 0;
+        }
+        double returnAmt = 0;
         for (OrderDishes od : orderDishes) {
             if (EnumOrderSaleType.of(od.getOrderDishesSaletype()) == EnumOrderSaleType.RETURN) {
-                billAmount += od.getOrderDishesDiscountPrice() * od.getOrderDishesNums();
+                double price = CommonUtils.orElse(od.getOrderDishesDiscountPrice(), 0D);
+                int num = CommonUtils.orElse(od.getOrderDishesNums(), 1);
+                returnAmt += price * num;
             }
         }
-        return billAmount;
+        return returnAmt;
     }
 
     public double notPaidBillAmount(Integer orderId) {
@@ -181,8 +201,19 @@ public class OrderService {
         if (order == null) {
             return 0;
         }
-        double totalAmount = sumBillAmount(order.getOrderId()) - sumReturnAmount(order.getOrderId());
-        return totalAmount - order.getOrderErase() - order.getOrderReduction() - order.getOrderHadpaid();
+        List<OrderDishes> orderDishes = orderDishesService.selectByOrderId(order.getOrderId());
+        return notPaidBillAmount(order, orderDishes);
+    }
+
+    public double notPaidBillAmount(Order order, List<OrderDishes> orderDishes) {
+        if (order == null) {
+            return 0;
+        }
+        double totalBillAmt = sumBillAmount(orderDishes) - sumReturnAmount(orderDishes);
+        double orderErase = CommonUtils.orElse(order.getOrderErase(), 0D);
+        double orderReduction = CommonUtils.orElse(order.getOrderReduction(), 0D);
+        double paidAmt = CommonUtils.orElse(order.getOrderHadpaid(), 0D);
+        return totalBillAmt - orderErase - orderReduction - paidAmt;
     }
 
     public Order createOrder(CreateOrderParam param) throws SQLException {

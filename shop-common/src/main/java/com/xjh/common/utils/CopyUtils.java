@@ -25,14 +25,21 @@ public class CopyUtils {
         Map<String, PropertyDescriptor> fromPds = ReflectionUtils.resolvePD(from.getClass());
         Map<String, PropertyDescriptor> toPds = ReflectionUtils.resolvePD(to.getClass());
         try {
-            fromPds.forEach((field, pd) -> {
+            fromPds.forEach((field, fromPd) -> {
                 try {
                     PropertyDescriptor toPd = toPds.get(field);
                     if (toPd != null) {
-                        if (toPd.getRead().getReturnType().isAssignableFrom(pd.getRead().getReturnType())) {
-                            toPd.writeValue(to, pd.readValue(from));
+                        Class<?> toType = toPd.getRead().getReturnType();
+                        Class<?> fromType = fromPd.getRead().getReturnType();
+                        if (toType.isPrimitive() || toType.isAssignableFrom(fromType)) {
+                            Object v = fromPd.readValue(from);
+                            if (v != null || !toType.isPrimitive()) {
+                                toPd.writeValue(to, v);
+                            }
                         } else {
-                            System.out.println("类型不匹配:" + toPd.getRead().getReturnType() + " >> " + pd.getRead().getReturnType());
+                            LogUtils.info("类型不匹配:"
+                                    + to.getClass() + "(" + toPd.getRead().getReturnType() + ") >> "
+                                    + from.getClass() + "(" + fromPd.getRead().getReturnType() + ")");
                         }
                     }
                 } catch (Exception e) {

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -27,6 +28,7 @@ import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackage;
+import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.DishesPackageService;
@@ -74,29 +76,19 @@ import javafx.stage.StageStyle;
 public class OrderDetailView extends VBox {
     final static String DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     // 依赖服务
-    OrderService orderService;
-    DeskService deskService;
-    OrderDishesService orderDishesService;
-    DishesService dishesService;
-    DishesPackageService dishesPackageService;
-    OrderPayService orderPayService;
-    StoreService storeService;
+    OrderService orderService = GuiceContainer.getInstance(OrderService.class);
+    DeskService deskService = GuiceContainer.getInstance(DeskService.class);
+    OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
+    DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
+    DishesPackageService dishesPackageService = GuiceContainer.getInstance(DishesPackageService.class);
+    OrderPayService orderPayService = GuiceContainer.getInstance(OrderPayService.class);
+    StoreService storeService = GuiceContainer.getInstance(StoreService.class);
 
 
     ObjectProperty<OrderBillVO> orderView = new SimpleObjectProperty<>();
 
     public OrderDetailView(Desk desk, double height) {
         TimeRecord cost = TimeRecord.start();
-        deskService = GuiceContainer.getInstance(DeskService.class);
-        orderService = GuiceContainer.getInstance(OrderService.class);
-        orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
-        dishesPackageService = GuiceContainer.getInstance(DishesPackageService.class);
-        dishesService = GuiceContainer.getInstance(DishesService.class);
-        orderPayService = GuiceContainer.getInstance(OrderPayService.class);
-        storeService = GuiceContainer.getInstance(StoreService.class);
-        LogUtils.info("OrderDetail初始化服务耗时: " + cost.getCostAndReset());
-
-
         Integer orderId = desk.getOrderId();
         {
             int rowIndex = 0;
@@ -121,23 +113,16 @@ public class OrderDetailView extends VBox {
 
             // 第二行
             rowIndex++;
-            Label labelCustNum = new Label("就餐人数: 0");
-            orderView.addListener((x, ov, nv) -> labelCustNum.setText("就餐人数: " + nv.customerNum));
-            labelCustNum.setMinWidth(200);
-            gridPane.add(labelCustNum, 0, rowIndex);
+            Label customerNumLabel = createLabel("就餐人数", c -> c.customerNum + "");
+            gridPane.add(customerNumLabel, 0, rowIndex);
 
-            Label labelOrder = new Label("订单号: " + orderId);
-            labelOrder.setMinWidth(200);
+            Label labelOrder = createLabel("订单号", c -> c.orderId);
             gridPane.add(labelOrder, 1, rowIndex);
 
-            Label labelOrderTime = new Label("就餐时间: ");
-            orderView.addListener((x, ov, nv) -> labelOrderTime.setText("就餐时间: " + nv.orderTime));
-            labelOrderTime.setMinWidth(200);
+            Label labelOrderTime = createLabel("就餐时间", c -> c.orderTime);
             gridPane.add(labelOrderTime, 2, rowIndex);
 
-            Label labelPayStatus = new Label("支付状态: 未支付");
-            orderView.addListener((x, ov, nv) -> labelPayStatus.setText("支付状态: " + nv.payStatusName));
-            labelPayStatus.setMinWidth(200);
+            Label labelPayStatus = createLabel("支付状态", c -> c.payStatusName);
             gridPane.add(labelPayStatus, 3, rowIndex);
         }
         // 分割线
@@ -149,56 +134,37 @@ public class OrderDetailView extends VBox {
             gridPane.setPadding(new Insets(10));
             /// ----------- 第一行 ---------------
             int row = 0;
-            Label l = new Label("订单总额：0.00");
-            orderView.addListener((a, b, c) -> l.setText("订单总额: " + formatMoney(c.totalPrice)));
-            l.setMinWidth(200);
-            gridPane.add(l, 0, row);
+            Label totalPriceLabel = createLabel("订单总额", c -> formatMoney(c.totalPrice));
+            gridPane.add(totalPriceLabel, 0, row);
             // 第二行
-            Label labelCustNum = new Label("已支付: 0.00");
-            orderView.addListener((x, ov, nv) -> labelCustNum.setText("已支付: " + formatMoney(nv.orderHadpaid)));
-            labelCustNum.setMinWidth(200);
-            gridPane.add(labelCustNum, 1, row);
+            Label paidAmtLabel = createLabel("已支付", c -> formatMoney(c.orderHadpaid));
+            gridPane.add(paidAmtLabel, 1, row);
 
-            Label notPaid = new Label("还需支付: 0.00");
-            orderView.addListener((a, b, c) -> notPaid.setText("还需支付: " + formatMoney(c.orderNeedPay)));
-            notPaid.setMinWidth(200);
+            Label notPaid = createLabel("还需支付", c -> formatMoney(c.orderNeedPay));
             notPaid.setStyle("-fx-font-size: 16; -fx-text-fill: red");
             gridPane.add(notPaid, 2, row);
 
-            Label labelOrderTime = new Label("当前折扣: 无");
-            labelOrderTime.setMinWidth(200);
+            Label labelOrderTime = createLabel("当前折扣", c -> "无");
             gridPane.add(labelOrderTime, 3, row);
 
-            Label labelPayStatus = new Label("优惠金额: 0");
-            labelPayStatus.setMinWidth(200);
+            Label labelPayStatus = createLabel("参与优惠金额", c -> "0.00");
             gridPane.add(labelPayStatus, 4, row);
 
             /// ----------- 第二行 ---------------
             row++;
-            Label orderErase = new Label("抹零金额: 0");
-            orderErase.setMinWidth(200);
+            Label orderErase = createLabel("抹零金额", c -> formatMoney(c.orderErase));
             gridPane.add(orderErase, 0, row);
-            orderView.addListener((a, b, c) -> orderErase.setText("抹零金额: " + formatMoney(c.orderErase)));
 
-            Label mangerReduction = new Label("店长减免: 0");
-            mangerReduction.setMinWidth(200);
+            Label mangerReduction = createLabel("店长折扣", c -> formatMoney(c.orderReduction));
             gridPane.add(mangerReduction, 1, row);
-            orderView.addListener((a, b, c) -> mangerReduction.setText("店长减免: " + formatMoney(c.orderReduction)));
 
-            Label discount = new Label("折扣金额: 0");
-            discount.setMinWidth(200);
+            Label discount = createLabel("折扣金额", c -> formatMoney(c.discountAmount));
             gridPane.add(discount, 2, row);
 
-            Label refund = new Label("退菜金额: 0");
-            refund.setMinWidth(200);
-            orderView.addListener((a, b, c) -> {
-                String returnAmtStr = CommonUtils.formatMoney(c.returnAmount);
-                refund.setText("退菜金额: " + returnAmtStr);
-            });
+            Label refund = createLabel("退菜金额", c -> formatMoney(c.returnAmount));
             gridPane.add(refund, 3, row);
 
-            Label fan = new Label("反结账金额: 0");
-            fan.setMinWidth(200);
+            Label fan = createLabel("反结账金额", c -> "0.00");
             gridPane.add(fan, 4, row);
 
             this.getChildren().add(gridPane);
@@ -209,8 +175,13 @@ public class OrderDetailView extends VBox {
         TableView<OrderDishesTableItemVO> tv = new TableView<>();
         tv.setCache(false);
         Runnable refreshTableView = () -> {
-            reloadOrderBill(orderId);
-            tv.setItems(loadOrderDishes(orderId));
+            Order order = orderService.getOrder(orderId);
+            List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(orderId);
+            // 账单数据
+            loadAndRefreshOrderBill(order, orderDishesList);
+            // 菜品明细
+            tv.setItems(buildTableItemList(orderDishesList));
+            // 刷新列表
             tv.refresh();
         };
         {
@@ -277,6 +248,15 @@ public class OrderDetailView extends VBox {
         LogUtils.info("OrderDetail加载数据耗时: " + cost.getCostAndReset());
     }
 
+    private Label createLabel(String name, Function<OrderBillVO, String> onChage) {
+        Label label = new Label(name);
+        label.setMinWidth(200);
+        if (onChage != null) {
+            orderView.addListener((a, b, c) -> label.setText(name + ": " + onChage.apply(c)));
+        }
+        return label;
+    }
+
     private Button createButton(String name, EventHandler<? super MouseEvent> onClick) {
         Button btn = new Button(name);
         btn.setMinWidth(66);
@@ -326,11 +306,10 @@ public class OrderDetailView extends VBox {
         return c;
     }
 
-    private ObservableList<OrderDishesTableItemVO> loadOrderDishes(Integer orderId) {
+    private ObservableList<OrderDishesTableItemVO> buildTableItemList(List<OrderDishes> orderDishes) {
         // 可折扣的菜品信息
         Predicate<OrderDishes> discountableChecker = this.discountableChecker();
         // 订单菜品明细
-        List<OrderDishes> orderDishes = orderDishesService.selectByOrderId(orderId);
         orderDishes.sort(Comparator.comparing(OrderDishes::getCreatetime));
 
         List<Integer> dishesIdList = CommonUtils.collect(orderDishes, OrderDishes::getDishesId);
@@ -385,8 +364,8 @@ public class OrderDetailView extends VBox {
 
     }
 
-    private void reloadOrderBill(Integer orderId) {
-        Result<OrderBillVO> billRs = orderService.calcOrderBill(orderId);
+    private void loadAndRefreshOrderBill(Order order, List<OrderDishes> orderDishesList) {
+        Result<OrderBillVO> billRs = orderService.calcOrderBill(order, orderDishesList);
         if (billRs.isSuccess()) {
             orderView.set(billRs.getData());
         } else {

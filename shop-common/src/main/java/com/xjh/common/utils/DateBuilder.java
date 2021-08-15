@@ -24,10 +24,10 @@ public class DateBuilder {
         return today().plusDays(1);
     }
 
-    public static DateBuilder base(Long milliSeconds) {
+    public static DateBuilder base(Long mills) {
         DateBuilder builder = new DateBuilder();
-        if (milliSeconds != null && milliSeconds > 0) {
-            builder.localDateTime = base(new Date(milliSeconds)).dateTime();
+        if (mills != null && mills > 0) {
+            builder.localDateTime = base(new Date(mills)).dateTime();
         }
         return builder;
     }
@@ -164,6 +164,10 @@ public class DateBuilder {
             return null;
         }
         return localDateTime.format(DateTimeFormatter.ofPattern(pattern));
+    }
+
+    public String timeStr() {
+        return format(DATETIME_PATTERN);
     }
 
     public DateBuilder zeroAM() {
