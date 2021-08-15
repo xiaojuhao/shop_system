@@ -3,77 +3,77 @@ package com.xjh.startup.view.model;
 import com.xjh.common.utils.cellvalue.RichText;
 
 public class OrderDishesTableItemVO {
-    String col1;
-    String col2;
-    RichText col3;
-    RichText col4;
-    RichText col5;
-    String col6;
-    RichText col7;
+    String orderDishesId;
+    String subOrderId;
+    RichText dishesName;
+    RichText price;
+    RichText discountPrice;
+    String orderDishesNum;
+    RichText saleType;
 
-    public OrderDishesTableItemVO(String col1, String col2, RichText col3, RichText col4, RichText col5, String col6, RichText col7) {
-        this.col1 = col1;
-        this.col2 = col2;
-        this.col3 = col3;
-        this.col4 = col4;
-        this.col5 = col5;
-        this.col6 = col6;
-        this.col7 = col7;
+    public OrderDishesTableItemVO(String orderDishesId, String subOrderId, RichText dishesName, RichText price, RichText discountPrice, String orderDishesNum, RichText saleType) {
+        this.orderDishesId = orderDishesId;
+        this.subOrderId = subOrderId;
+        this.dishesName = dishesName;
+        this.price = price;
+        this.discountPrice = discountPrice;
+        this.orderDishesNum = orderDishesNum;
+        this.saleType = saleType;
     }
 
-    public String getCol1() {
-        return col1;
+    public String getOrderDishesId() {
+        return orderDishesId;
     }
 
-    public void setCol1(String col1) {
-        this.col1 = col1;
+    public void setOrderDishesId(String orderDishesId) {
+        this.orderDishesId = orderDishesId;
     }
 
-    public String getCol2() {
-        return col2;
+    public String getSubOrderId() {
+        return subOrderId;
     }
 
-    public void setCol2(String col2) {
-        this.col2 = col2;
+    public void setSubOrderId(String subOrderId) {
+        this.subOrderId = subOrderId;
     }
 
-    public RichText getCol3() {
-        return col3;
+    public RichText getDishesName() {
+        return dishesName;
     }
 
-    public void setCol3(RichText col3) {
-        this.col3 = col3;
+    public void setDishesName(RichText dishesName) {
+        this.dishesName = dishesName;
     }
 
-    public RichText getCol4() {
-        return col4;
+    public RichText getPrice() {
+        return price;
     }
 
-    public void setCol4(RichText col4) {
-        this.col4 = col4;
+    public void setPrice(RichText price) {
+        this.price = price;
     }
 
-    public RichText getCol5() {
-        return col5;
+    public RichText getDiscountPrice() {
+        return discountPrice;
     }
 
-    public void setCol5(RichText col5) {
-        this.col5 = col5;
+    public void setDiscountPrice(RichText discountPrice) {
+        this.discountPrice = discountPrice;
     }
 
-    public String getCol6() {
-        return col6;
+    public String getOrderDishesNum() {
+        return orderDishesNum;
     }
 
-    public void setCol6(String col6) {
-        this.col6 = col6;
+    public void setOrderDishesNum(String orderDishesNum) {
+        this.orderDishesNum = orderDishesNum;
     }
 
-    public RichText getCol7() {
-        return col7;
+    public RichText getSaleType() {
+        return saleType;
     }
 
-    public void setCol7(RichText col7) {
-        this.col7 = col7;
+    public void setSaleType(RichText saleType) {
+        this.saleType = saleType;
     }
 }

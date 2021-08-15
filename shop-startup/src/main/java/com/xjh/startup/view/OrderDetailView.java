@@ -221,13 +221,13 @@ public class OrderDetailView extends VBox {
             }
             tv.setPadding(new Insets(5, 0, 0, 5));
             tv.getColumns().addAll(
-                    newCol("序号", "col1", 100),
-                    newCol("子订单", "col2", 100),
-                    newCol("菜名名称", "col3", 300),
-                    newCol("单价", "col4", 160),
-                    newCol("折后价", "col5", 100),
-                    newCol("数量", "col6", 100),
-                    newCol("类型", "col7", 100)
+                    newCol("序号", "orderDishesId", 100),
+                    newCol("子订单", "subOrderId", 100),
+                    newCol("菜名名称", "dishesName", 300),
+                    newCol("单价", "price", 160),
+                    newCol("折后价", "discountPrice", 100),
+                    newCol("数量", "orderDishesNum", 100),
+                    newCol("类型", "saleType", 100)
             );
             this.getChildren().add(tv);
 
@@ -366,9 +366,9 @@ public class OrderDetailView extends VBox {
             nonDiscountableList.forEach(o -> {
                 // 构建菜品展示明细
                 OrderDishesTableItemVO vo = buildTableItem(dishesMap.get(o.getDishesId()), o);
-                vo.getCol3().with(Color.RED);
-                vo.getCol4().with(Color.RED);
-                vo.getCol5().with(Color.RED);
+                vo.getDishesName().with(Color.RED);
+                vo.getPrice().with(Color.RED);
+                vo.getDiscountPrice().with(Color.RED);
                 items.add(vo);
             });
             // 不可参与优惠的价格合计
@@ -446,7 +446,7 @@ public class OrderDetailView extends VBox {
             return;
         }
         List<String> returnList = new ArrayList<>();
-        list.forEach(it -> returnList.add(it.getCol1()));
+        list.forEach(it -> returnList.add(it.getOrderDishesId()));
 
         List<Integer> ids = returnList.stream()
                 .map(id -> CommonUtils.parseInt(id, null))
@@ -546,9 +546,6 @@ public class OrderDetailView extends VBox {
     }
 
     private OrderDishesTableItemVO buildTableItem(Dishes dishes, OrderDishes orderDishes) {
-        String dishesName = buildDishesName(dishes, orderDishes);
-        String price = CommonUtils.formatMoney(orderDishes.getOrderDishesPrice());
-        String discountPrice = CommonUtils.formatMoney(orderDishes.getOrderDishesDiscountPrice());
         EnumOrderSaleType saleType = EnumOrderSaleType.of(orderDishes.getOrderDishesSaletype());
         RichText saleTypeText = new RichText(saleType.remark).with(Color.BLACK);
         if (saleType == EnumOrderSaleType.RETURN) {
@@ -557,9 +554,9 @@ public class OrderDetailView extends VBox {
         return new OrderDishesTableItemVO(
                 orderDishes.getOrderDishesId() + "",
                 orderDishes.getSubOrderId() + "",
-                new RichText(dishesName),
-                new RichText(price),
-                new RichText(discountPrice),
+                new RichText(buildDishesName(dishes, orderDishes)),
+                new RichText(CommonUtils.formatMoney(orderDishes.getOrderDishesPrice())),
+                new RichText(CommonUtils.formatMoney(orderDishes.getOrderDishesDiscountPrice())),
                 orderDishes.getOrderDishesNums() + "",
                 saleTypeText);
     }
