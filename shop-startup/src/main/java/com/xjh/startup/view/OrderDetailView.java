@@ -34,7 +34,6 @@ import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.DishesPackageService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.OrderDishesService;
-import com.xjh.service.domain.OrderPayService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.StoreService;
 import com.xjh.service.domain.model.OrderBillVO;
@@ -74,14 +73,12 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 public class OrderDetailView extends VBox {
-    final static String DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     // 依赖服务
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
     DeskService deskService = GuiceContainer.getInstance(DeskService.class);
     OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
     DishesPackageService dishesPackageService = GuiceContainer.getInstance(DishesPackageService.class);
-    OrderPayService orderPayService = GuiceContainer.getInstance(OrderPayService.class);
     StoreService storeService = GuiceContainer.getInstance(StoreService.class);
 
 
