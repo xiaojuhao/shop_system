@@ -344,51 +344,43 @@ public class OrderDetailView extends VBox {
                 nonDiscountableList.add(o);
             }
         });
-        discountableList.forEach(o -> {
-            // 构建菜品展示明细
-            items.add(buildTableItem(dishesMap.get(o.getDishesId()), o));
-        });
         if (CommonUtils.isNotEmpty(discountableList)) {
-            double discountTotalPrice = discountableList.stream()
-                    .filter(this::notReturn)
-                    .map(OrderDishes::getOrderDishesPrice)
-                    .filter(Objects::nonNull)
-                    .reduce(0D, Double::sum);
+            // 构建菜品展示明细
+            discountableList.forEach(o -> {
+                items.add(buildTableItem(dishesMap.get(o.getDishesId()), o));
+            });
+            // 可参与优惠价格
             items.add(new OrderDishesTableItemVO(
                     "",
                     "",
-                    new RichText(""),
-                    new RichText("参与优惠合计:" + discountTotalPrice).with(Color.RED).with(Pos.CENTER_RIGHT),
+                    RichText.EMPTY,
+                    new RichText("参与优惠合计:" + sumDishesPrice(discountableList)).with(Color.RED).with(Pos.CENTER_RIGHT),
                     "",
                     "",
-                    new RichText("")));
+                    RichText.EMPTY));
             items.add(new OrderDishesTableItemVO(
                     "",
                     "",
                     new RichText("以下为不参与优惠活动菜品").with(Color.RED).with(Pos.CENTER_RIGHT),
-                    new RichText(""),
+                    RichText.EMPTY,
                     "",
                     "",
-                    new RichText("")));
+                    RichText.EMPTY));
         }
-        nonDiscountableList.forEach(o -> {
-            // 构建菜品展示明细
-            items.add(buildTableItem(dishesMap.get(o.getDishesId()), o));
-        });
         if (CommonUtils.isNotEmpty(nonDiscountableList)) {
-            double nonDiscountTotalPrice = nonDiscountableList.stream()
-                    .filter(this::notReturn)
-                    .map(OrderDishes::getOrderDishesPrice)
-                    .filter(Objects::nonNull)
-                    .reduce(0D, Double::sum);
+            nonDiscountableList.forEach(o -> {
+                // 构建菜品展示明细
+                items.add(buildTableItem(dishesMap.get(o.getDishesId()), o));
+            });
+            // 不可参与优惠的价格合计
             items.add(new OrderDishesTableItemVO(
                     "",
                     "",
-                    new RichText(""),
-                    new RichText("不参与优惠合计:" + nonDiscountTotalPrice).with(Color.RED).with(Pos.CENTER_RIGHT),
+                    RichText.EMPTY,
+                    new RichText("不参与优惠合计:" + sumDishesPrice(nonDiscountableList)).with(Color.RED).with(Pos.CENTER_RIGHT),
                     "",
                     "",
-                    new RichText("")));
+                    RichText.EMPTY));
         }
         return FXCollections.observableArrayList(items);
 
@@ -527,6 +519,14 @@ public class OrderDetailView extends VBox {
             return true;
         }
         return EnumOrderSaleType.of(x.getOrderDishesSaletype()) != EnumOrderSaleType.RETURN;
+    }
+
+    private double sumDishesPrice(List<OrderDishes> orderDishes) {
+        return orderDishes.stream()
+                .filter(this::notReturn)
+                .map(OrderDishes::getOrderDishesPrice)
+                .filter(Objects::nonNull)
+                .reduce(0D, Double::sum);
     }
 
     private String buildDishesName(Dishes dishes, OrderDishes orderDishes) {
