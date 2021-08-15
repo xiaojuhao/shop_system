@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -34,7 +35,6 @@ import com.xjh.service.domain.OrderPayService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.StoreService;
 import com.xjh.service.domain.model.OrderBillVO;
-import com.xjh.service.domain.model.StoreVO;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.OrderDishesTableItemVO;
@@ -326,15 +326,7 @@ public class OrderDetailView extends VBox {
     }
 
     private ObservableList<OrderDishesTableItemVO> loadOrderDishes(Integer orderId) {
-        List<Integer> discountableDishesIds = new ArrayList<>();
-        StoreVO store = storeService.getStore().getData();
-        if (store != null) {
-            CommonUtils.forEach(store.getStoreDishesGroups(), g -> {
-                if (g.getGroupIds() != null) {
-                    discountableDishesIds.addAll(g.getGroupIds());
-                }
-            });
-        }
+        Set<Integer> discountableDishesIds = storeService.getStoreDiscountableDishesIds();
         List<OrderDishes> orderDishes = orderDishesService.selectByOrderId(orderId);
         List<Integer> dishesIdList = CommonUtils.collect(orderDishes, OrderDishes::getDishesId);
         List<Dishes> dishesList = dishesService.getByIds(dishesIdList);

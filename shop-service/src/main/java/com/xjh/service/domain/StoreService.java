@@ -1,7 +1,9 @@
 package com.xjh.service.domain;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -38,6 +40,19 @@ public class StoreService {
             LogUtils.error("查询store异常:" + ex.getMessage());
             return Result.fail("查询store异常:" + ex.getMessage());
         }
+    }
+
+    public Set<Integer> getStoreDiscountableDishesIds() {
+        Set<Integer> discountableDishesIds = new HashSet<>();
+        StoreVO store = this.getStore().getData();
+        if (store != null) {
+            CommonUtils.forEach(store.getStoreDishesGroups(), g -> {
+                if (g.getGroupIds() != null) {
+                    discountableDishesIds.addAll(g.getGroupIds());
+                }
+            });
+        }
+        return discountableDishesIds;
     }
 
     public StoreVO toVO(Store store) throws Exception {
