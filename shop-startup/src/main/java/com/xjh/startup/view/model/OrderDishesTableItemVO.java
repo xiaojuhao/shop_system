@@ -7,11 +7,11 @@ public class OrderDishesTableItemVO {
     String col2;
     RichText col3;
     RichText col4;
-    String col5;
+    RichText col5;
     String col6;
     RichText col7;
 
-    public OrderDishesTableItemVO(String col1, String col2, RichText col3, RichText col4, String col5, String col6, RichText col7) {
+    public OrderDishesTableItemVO(String col1, String col2, RichText col3, RichText col4, RichText col5, String col6, RichText col7) {
         this.col1 = col1;
         this.col2 = col2;
         this.col3 = col3;
@@ -53,11 +53,11 @@ public class OrderDishesTableItemVO {
         this.col4 = col4;
     }
 
-    public String getCol5() {
+    public RichText getCol5() {
         return col5;
     }
 
-    public void setCol5(String col5) {
+    public void setCol5(RichText col5) {
         this.col5 = col5;
     }
 

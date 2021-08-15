@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.JSON;
@@ -34,6 +35,13 @@ public class CommonUtils {
             return new ArrayList<>();
         }
         return list.stream().map(mapper).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+    public static <V> List<V> filter(List<V> list, Predicate<V> test) {
+        if (list == null || list.size() == 0) {
+            return new ArrayList<>();
+        }
+        return list.stream().filter(Objects::nonNull).filter(test).collect(Collectors.toList());
     }
 
     public static <T> void addList(List<T> list, List<T> src) {

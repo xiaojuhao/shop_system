@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -327,23 +328,17 @@ public class OrderDetailView extends VBox {
 
     private ObservableList<OrderDishesTableItemVO> loadOrderDishes(Integer orderId) {
         // 可折扣的菜品信息
-        Set<Integer> discountableDishesIds = storeService.getStoreDiscountableDishesIds();
+        Predicate<OrderDishes> discountableChecker = this.discountableChecker();
         // 订单菜品明细
         List<OrderDishes> orderDishes = orderDishesService.selectByOrderId(orderId);
+        orderDishes.sort(Comparator.comparing(OrderDishes::getCreatetime));
+
         List<Integer> dishesIdList = CommonUtils.collect(orderDishes, OrderDishes::getDishesId);
         // 菜品明细
         Map<Integer, Dishes> dishesMap = dishesService.getByIdsAsMap(dishesIdList);
         List<OrderDishesTableItemVO> items = new ArrayList<>();
-        List<OrderDishes> discountableList = new ArrayList<>();
-        List<OrderDishes> nonDiscountableList = new ArrayList<>();
-        orderDishes.sort(Comparator.comparing(OrderDishes::getCreatetime));
-        orderDishes.forEach(o -> {
-            if (discountableDishesIds.contains(o.getDishesId()) && o.getIfDishesPackage() == 0) {
-                discountableList.add(o);
-            } else {
-                nonDiscountableList.add(o);
-            }
-        });
+        List<OrderDishes> discountableList = CommonUtils.filter(orderDishes, discountableChecker);
+        List<OrderDishes> nonDiscountableList = CommonUtils.filter(orderDishes, discountableChecker.negate());
         if (CommonUtils.isNotEmpty(discountableList)) {
             // 构建菜品展示明细
             discountableList.forEach(o -> {
@@ -355,7 +350,7 @@ public class OrderDetailView extends VBox {
                     "",
                     RichText.EMPTY,
                     new RichText("参与优惠合计:" + sumDishesPrice(discountableList)).with(Color.RED).with(Pos.CENTER_RIGHT),
-                    "",
+                    RichText.EMPTY,
                     "",
                     RichText.EMPTY));
             items.add(new OrderDishesTableItemVO(
@@ -363,14 +358,18 @@ public class OrderDetailView extends VBox {
                     "",
                     new RichText("以下为不参与优惠活动菜品").with(Color.RED).with(Pos.CENTER_RIGHT),
                     RichText.EMPTY,
-                    "",
+                    RichText.EMPTY,
                     "",
                     RichText.EMPTY));
         }
         if (CommonUtils.isNotEmpty(nonDiscountableList)) {
             nonDiscountableList.forEach(o -> {
                 // 构建菜品展示明细
-                items.add(buildTableItem(dishesMap.get(o.getDishesId()), o));
+                OrderDishesTableItemVO vo = buildTableItem(dishesMap.get(o.getDishesId()), o);
+                vo.getCol3().with(Color.RED);
+                vo.getCol4().with(Color.RED);
+                vo.getCol5().with(Color.RED);
+                items.add(vo);
             });
             // 不可参与优惠的价格合计
             items.add(new OrderDishesTableItemVO(
@@ -378,7 +377,7 @@ public class OrderDetailView extends VBox {
                     "",
                     RichText.EMPTY,
                     new RichText("不参与优惠合计:" + sumDishesPrice(nonDiscountableList)).with(Color.RED).with(Pos.CENTER_RIGHT),
-                    "",
+                    RichText.EMPTY,
                     "",
                     RichText.EMPTY));
         }
@@ -521,6 +520,11 @@ public class OrderDetailView extends VBox {
         return EnumOrderSaleType.of(x.getOrderDishesSaletype()) != EnumOrderSaleType.RETURN;
     }
 
+    private Predicate<OrderDishes> discountableChecker() {
+        Set<Integer> discountableDishesIds = storeService.getStoreDiscountableDishesIds();
+        return o -> discountableDishesIds.contains(o.getDishesId()) && o.getIfDishesPackage() == 0;
+    }
+
     private double sumDishesPrice(List<OrderDishes> orderDishes) {
         return orderDishes.stream()
                 .filter(this::notReturn)
@@ -555,7 +559,7 @@ public class OrderDetailView extends VBox {
                 orderDishes.getSubOrderId() + "",
                 new RichText(dishesName),
                 new RichText(price),
-                discountPrice,
+                new RichText(discountPrice),
                 orderDishes.getOrderDishesNums() + "",
                 saleTypeText);
     }
