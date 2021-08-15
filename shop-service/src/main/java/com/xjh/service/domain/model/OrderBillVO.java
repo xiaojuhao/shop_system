@@ -1,7 +1,6 @@
-package com.xjh.startup.view.model;
+package com.xjh.service.domain.model;
 
-public class OrderViewBO {
-
+public class OrderBillVO {
     public int customerNum;
     public String orderTime;
     public String payStatusName;

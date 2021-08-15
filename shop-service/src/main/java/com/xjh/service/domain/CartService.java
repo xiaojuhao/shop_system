@@ -148,7 +148,7 @@ public class CartService {
             for (OrderDishes d : orderDishes) {
                 orderDishesDAO.insert(d);
             }
-            double notPaid = orderService.notPaidBillAmount(orderId);
+            double notPaid = orderService.notPaidBillAmount(order);
             double hadPaid = CommonUtils.orElse(order.getOrderHadpaid(), 0D);
             if (hadPaid > 0 && notPaid > 0) {
                 order.setOrderStatus(EnumOrderStatus.PARTIAL_PAID.status);
@@ -208,7 +208,7 @@ public class CartService {
             for (OrderDishes d : orderDishes) {
                 orderDishesDAO.insert(d);
             }
-            double notPaid = orderService.notPaidBillAmount(orderId);
+            double notPaid = orderService.notPaidBillAmount(order);
             double hadPaid = CommonUtils.orElse(order.getOrderHadpaid(), 0D);
             if (hadPaid > 0 && notPaid > 0) {
                 order.setOrderStatus(EnumOrderStatus.PARTIAL_PAID.status);

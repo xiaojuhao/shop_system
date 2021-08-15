@@ -7,6 +7,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 public class DateBuilder {
+    public final static String DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     private LocalDateTime localDateTime = null;
     private static final double SECONDS_OF_HOUR = 3600;
     private static final double SECONDS_OF_DAY = SECONDS_OF_HOUR * 24;

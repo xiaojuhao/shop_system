@@ -27,7 +27,7 @@ public class GetPayInfoHandler {
         try {
             Desk desk = deskService.getById(deskId);
             Order order = orderService.getOrder(desk.getOrderId());
-            double amount = orderService.notPaidBillAmount(order.getOrderId());
+            double amount = orderService.notPaidBillAmount(order);
             boolean storeReduceifCanUse = false;//this.orderManager.getIfCanUseStoreReduce(order);
             double fullReducePrice = 0.0D;
             boolean wechatCouponCanUse = false; //this.orderManager.checkWechatCouponCanUse(order);

@@ -12,6 +12,7 @@ import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.enumeration.EnumOrderServeStatus;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.enumeration.EnumOrderType;
+import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.store.SequenceDatabase;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.CurrentRequest;
@@ -21,10 +22,12 @@ import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.OrderDiscount;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
+import com.xjh.dao.dataobject.OrderPay;
 import com.xjh.dao.dataobject.SubOrder;
 import com.xjh.dao.mapper.OrderDAO;
 import com.xjh.dao.mapper.SubOrderDAO;
 import com.xjh.service.domain.model.CreateOrderParam;
+import com.xjh.service.domain.model.OrderBillVO;
 
 import cn.hutool.core.codec.Base64;
 
@@ -36,6 +39,8 @@ public class OrderService {
     SubOrderDAO subOrderDAO;
     @Inject
     OrderDishesService orderDishesService;
+    @Inject
+    OrderPayService orderPayService;
 
     public Order getOrder(Integer orderId) {
         try {
@@ -64,6 +69,46 @@ public class OrderService {
             ex.printStackTrace();
             return Result.fail("保存订单数据失败:" + ex.getMessage());
         }
+    }
+
+    public Result<OrderBillVO> calcOrderBill(Integer orderId) {
+        Order o = this.getOrder(orderId);
+        if (o != null) {
+            OrderBillVO v = new OrderBillVO();
+            v.customerNum = o.getOrderCustomerNums();
+            v.orderTime = DateBuilder.base(o.getCreateTime()).format(DateBuilder.DATETIME_PATTERN);
+            v.orderNeedPay = this.notPaidBillAmount(o);
+            v.orderHadpaid = o.getOrderHadpaid();
+            v.totalPrice = sumTotalPrice(orderId);
+            v.payStatusName = EnumOrderStatus.of(o.getOrderStatus()).remark;
+            v.deduction = o.getFullReduceDishesPrice();
+            v.returnAmount = this.sumReturnAmount(orderId);
+            v.orderErase = CommonUtils.orElse(o.getOrderErase(), 0D);
+            v.orderReduction = CommonUtils.orElse(o.getOrderReduction(), 0D);
+            // 支付信息
+            List<OrderPay> pays = orderPayService.selectByOrderId(orderId);
+            StringBuilder payInfo = new StringBuilder();
+            CommonUtils.forEach(pays, p -> {
+                payInfo.append(DateBuilder.base(p.getCreatetime()).format(DateBuilder.DATETIME_PATTERN))
+                        .append(" 收到付款:")
+                        .append(CommonUtils.formatMoney(p.getAmount()))
+                        .append(", 来自")
+                        .append(EnumPayMethod.of(p.getPaymentMethod()).name);
+                if (CommonUtils.isNotBlank(p.getCardNumber())) {
+                    payInfo.append(",交易号:").append(p.getCardNumber());
+                }
+                payInfo.append("\r\n");
+            });
+            v.payInfoRemark = payInfo.toString();
+            return Result.success(v);
+        }
+        return Result.fail("订单不存在");
+    }
+
+    private double sumTotalPrice(Integer orderId) {
+        List<OrderDishes> dishes = orderDishesService.selectByOrderId(orderId);
+        return CommonUtils.collect(dishes, OrderDishes::getOrderDishesPrice)
+                .stream().reduce(0D, Double::sum);
     }
 
     public Result<Integer> countSubOrder(Integer orderId) {
@@ -129,11 +174,14 @@ public class OrderService {
     }
 
     public double notPaidBillAmount(Integer orderId) {
-        Order order = getOrder(orderId);
+        return notPaidBillAmount(getOrder(orderId));
+    }
+
+    public double notPaidBillAmount(Order order) {
         if (order == null) {
             return 0;
         }
-        double totalAmount = sumBillAmount(orderId) - sumReturnAmount(orderId);
+        double totalAmount = sumBillAmount(order.getOrderId()) - sumReturnAmount(order.getOrderId());
         return totalAmount - order.getOrderErase() - order.getOrderReduction() - order.getOrderHadpaid();
     }
 

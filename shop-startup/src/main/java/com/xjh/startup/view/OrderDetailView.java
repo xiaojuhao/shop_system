@@ -15,11 +15,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import com.xjh.common.enumeration.EnumChoiceAction;
 import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
-import com.xjh.common.enumeration.EnumOrderStatus;
-import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.LogUtils;
 import com.xjh.common.utils.Result;
 import com.xjh.common.utils.TimeRecord;
@@ -28,9 +25,7 @@ import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackage;
-import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
-import com.xjh.dao.dataobject.OrderPay;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.DishesPackageService;
 import com.xjh.service.domain.DishesService;
@@ -38,11 +33,11 @@ import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderPayService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.StoreService;
+import com.xjh.service.domain.model.OrderBillVO;
 import com.xjh.service.domain.model.StoreVO;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.OrderDishesTableItemVO;
-import com.xjh.startup.view.model.OrderViewBO;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -87,7 +82,7 @@ public class OrderDetailView extends VBox {
     StoreService storeService;
 
 
-    ObjectProperty<OrderViewBO> orderView = new SimpleObjectProperty<>();
+    ObjectProperty<OrderBillVO> orderView = new SimpleObjectProperty<>();
 
     public OrderDetailView(Desk desk, double height) {
         TimeRecord cost = TimeRecord.start();
@@ -213,14 +208,14 @@ public class OrderDetailView extends VBox {
         TableView<OrderDishesTableItemVO> tv = new TableView<>();
         tv.setCache(false);
         Runnable refreshTableView = () -> {
-            reloadOrder(orderId);
+            reloadOrderBill(orderId);
             tv.setItems(loadOrderDishes(orderId));
             tv.refresh();
         };
         {
             tv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
             tv.setMinHeight(300);
-            if(height > 800){
+            if (height > 800) {
                 tv.setMinHeight(height - 450);
             }
             tv.setPadding(new Insets(5, 0, 0, 5));
@@ -333,7 +328,7 @@ public class OrderDetailView extends VBox {
     private ObservableList<OrderDishesTableItemVO> loadOrderDishes(Integer orderId) {
         List<Integer> discountableDishesIds = new ArrayList<>();
         StoreVO store = storeService.getStore().getData();
-        if(store != null){
+        if (store != null) {
             CommonUtils.forEach(store.getStoreDishesGroups(), g -> {
                 if (g.getGroupIds() != null) {
                     discountableDishesIds.addAll(g.getGroupIds());
@@ -458,43 +453,13 @@ public class OrderDetailView extends VBox {
 
     }
 
-    private void reloadOrder(Integer orderId) {
-        Order o = orderService.getOrder(orderId);
-        if (o != null) {
-            OrderViewBO v = new OrderViewBO();
-            v.customerNum = o.getOrderCustomerNums();
-            v.orderTime = DateBuilder.base(o.getCreateTime()).format(DATETIME_PATTERN);
-            v.orderNeedPay = orderService.notPaidBillAmount(orderId);
-            v.orderHadpaid = o.getOrderHadpaid();
-            v.totalPrice = sumTotalPrice(orderId);
-            v.payStatusName = EnumOrderStatus.of(o.getOrderStatus()).remark;
-            v.deduction = o.getFullReduceDishesPrice();
-            v.returnAmount = orderService.sumReturnAmount(orderId);
-            v.orderErase = CommonUtils.orElse(o.getOrderErase(), 0D);
-            v.orderReduction = CommonUtils.orElse(o.getOrderReduction(), 0D);
-            // 支付信息
-            List<OrderPay> pays = orderPayService.selectByOrderId(orderId);
-            StringBuilder payInfo = new StringBuilder();
-            CommonUtils.forEach(pays, p -> {
-                payInfo.append(DateBuilder.base(p.getCreatetime()).format(DATETIME_PATTERN))
-                        .append(" 收到付款:")
-                        .append(CommonUtils.formatMoney(p.getAmount()))
-                        .append(", 来自")
-                        .append(EnumPayMethod.of(p.getPaymentMethod()).name);
-                if (CommonUtils.isNotBlank(p.getCardNumber())) {
-                    payInfo.append(",交易号:").append(p.getCardNumber());
-                }
-                payInfo.append("\r\n");
-            });
-            v.payInfoRemark = payInfo.toString();
-            orderView.set(v);
+    private void reloadOrderBill(Integer orderId) {
+        Result<OrderBillVO> billRs = orderService.calcOrderBill(orderId);
+        if (billRs.isSuccess()) {
+            orderView.set(billRs.getData());
+        } else {
+            AlertBuilder.ERROR(billRs.getMsg());
         }
-    }
-
-    private double sumTotalPrice(Integer orderId) {
-        List<OrderDishes> dishes = orderDishesService.selectByOrderId(orderId);
-        return CommonUtils.collect(dishes, OrderDishes::getOrderDishesPrice)
-                .stream().reduce(0D, Double::sum);
     }
 
 
