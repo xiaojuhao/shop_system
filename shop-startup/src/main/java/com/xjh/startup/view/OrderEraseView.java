@@ -1,5 +1,6 @@
 package com.xjh.startup.view;
 
+import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.LogUtils;
 import com.xjh.dao.dataobject.Order;
@@ -47,9 +48,17 @@ public class OrderEraseView extends VBox {
         // 退菜按钮
         Button returnBtn = new Button("确认");
         returnBtn.setOnMouseClicked(evt -> {
-            String r = eraseAmt.getText();
+            double r = CommonUtils.parseDouble(eraseAmt.getText(), 0D);
+            if (r < 0) {
+                AlertBuilder.ERROR("抹零金额错误");
+                return;
+            }
+            if (r >= 10) {
+                AlertBuilder.ERROR("抹零金额不能大于10");
+                return;
+            }
             LogUtils.info("订单:" + param.getOrderId() + ", 桌号:" + param.getDeskName() + "抹零金额:" + r);
-            doOrderErase(param.getOrderId(), CommonUtils.parseDouble(r, 0D));
+            doOrderErase(param.getOrderId(), r);
             this.getScene().getWindow().hide();
         });
         box.getChildren().add(returnBtn);

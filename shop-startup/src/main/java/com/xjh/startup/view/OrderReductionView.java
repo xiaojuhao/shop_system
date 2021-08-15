@@ -61,6 +61,11 @@ public class OrderReductionView extends VBox {
     private void doOrderReduction(Integer orderId, double amt) {
         Order order = orderService.getOrder(orderId);
         if (order != null) {
+            double bill = orderService.notPaidBillAmount(order);
+            if (amt > bill) {
+                AlertBuilder.ERROR("减免金额不能大于可支付金额");
+                return;
+            }
             Order update = new Order();
             update.setOrderId(orderId);
             update.setOrderReduction(amt);
