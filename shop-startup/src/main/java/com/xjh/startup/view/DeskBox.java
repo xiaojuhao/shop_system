@@ -22,7 +22,6 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -33,15 +32,12 @@ import javafx.stage.Window;
 
 public class DeskBox extends VBox {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
-    static final String TIME_FORMAT = "HH:mm:ss";
     static AtomicBoolean openingDesk = new AtomicBoolean(false);
 
     public DeskBox(SimpleObjectProperty<Desk> desk, double width) {
         double height = width / 2;
         this.setPrefSize(width, height);
         this.getStyleClass().add("desk");
-        // this.setSpacing(10);
-        // this.setAlignment(Pos.CENTER);
         EnumDesKStatus status = EnumDesKStatus.of(desk.get().getStatus());
 
         Canvas canvas = new Canvas();
@@ -57,18 +53,9 @@ public class DeskBox extends VBox {
 
         this.getChildren().addAll(canvas);
 
-        //        Label tableName = buildTableName(desk.get());
-        //        Label statusLabel = new Label(status.remark());
-        //        Label timeLabel = buildTimeLabel(desk.get());
-        //        setBackground(this, status);
-
-        // this.getChildren().addAll(tableName, statusLabel, timeLabel);
-
         desk.addListener((cc, _old, _new) -> {
             EnumDesKStatus desKStatus = EnumDesKStatus.of(_new.getStatus());
             setBackground(this, desKStatus);
-            // statusLabel.setText(desKStatus.remark());
-
             Order order = orderService.getOrder(_new.getOrderId());
 
             Result<LocalDateTime> firstSubOrderTimeRs = orderService.firstSubOrderTime(_new.getOrderId());
@@ -80,10 +67,8 @@ public class DeskBox extends VBox {
             LocalDateTime firstSubOrderTime = firstSubOrderTimeRs.getData();
             if (firstSubOrderTime != null && desKStatus != EnumDesKStatus.FREE) {
                 long usedSeconds = DateBuilder.intervalSeconds(firstSubOrderTime, LocalDateTime.now());
-                // timeLabel.setText("已用" + CommonUtils.formatSeconds(usedSeconds));
                 time = CommonUtils.formatSeconds(usedSeconds);
             } else if (firstSubOrderTime == null) {
-                // timeLabel.setText("未点菜");
                 time = "未点菜";
             }
             //
@@ -95,20 +80,6 @@ public class DeskBox extends VBox {
                 paintCustNum(gc, width, height, order.getOrderCustomerNums());
             }
         });
-
-        // this.setOnMouseClicked(evt -> this.onClickTable(desk));
-    }
-
-    private Label buildTableName(Desk desk) {
-        Label label = new Label(desk.getDeskName());
-        label.setFont(new javafx.scene.text.Font("微软雅黑", 15));
-        return label;
-    }
-
-    private Label buildTimeLabel(Desk desk) {
-        Label timeLabel = new Label();
-        timeLabel.setText(DateBuilder.base(desk.getOrderCreateTime()).format(TIME_FORMAT));
-        return timeLabel;
     }
 
     private void setBackground(Node node, EnumDesKStatus status) {
@@ -158,9 +129,9 @@ public class DeskBox extends VBox {
                         }
                     }
                 }
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
-            }finally {
+            } finally {
                 openingDesk.set(false);
             }
         }
