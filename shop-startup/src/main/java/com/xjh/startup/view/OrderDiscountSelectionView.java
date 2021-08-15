@@ -35,18 +35,15 @@ public class OrderDiscountSelectionView extends VBox {
                 if (select == 1) {
                     Logger.info("优惠券");
                     Label voucherLabel = new Label("折扣券:");
-                    HBox.setMargin(voucherLabel, new Insets(0, 20, 0, 0));
                     TextField voucher = new TextField();
                     HBox voucherLine = new HBox();
                     voucherLine.setAlignment(Pos.CENTER);
                     voucherLine.getChildren().addAll(voucherLabel, voucher);
 
                     Label cardLabel = new Label("折扣卡:");
-                    HBox.setMargin(cardLabel, new Insets(0, 20, 0, 0));
                     TextField card = new TextField();
                     HBox cardLine = new HBox();
                     cardLine.setAlignment(Pos.CENTER);
-                    HBox.setMargin(cardLine, new Insets(20, 0, 0, 0));
                     cardLine.getChildren().addAll(cardLabel, card);
 
                     discountContentGroup.getChildren().clear();
@@ -61,23 +58,23 @@ public class OrderDiscountSelectionView extends VBox {
                                     "7.8折活动", "8.8折活动", "68元秒杀", "其它")
                     );
                     ComboBox<String> optList = new ComboBox<>(options);
+                    optList.setPrefWidth(160);
                     Label label = new Label("折扣类型:");
-                    HBox.setMargin(label, new Insets(20, 0, 0, 0));
 
-                    HBox line = new HBox();
-                    line.setAlignment(Pos.CENTER);
-                    line.getChildren().addAll(label, optList);
+                    HBox typeLine = new HBox();
+                    typeLine.setAlignment(Pos.CENTER);
+                    typeLine.getChildren().addAll(label, optList);
 
                     Label pwdLabel = new Label("确认密码:");
-                    HBox.setMargin(pwdLabel, new Insets(20, 0, 0, 0));
                     PasswordField pwd = new PasswordField();
+                    pwd.setPrefWidth(160);
                     HBox pwdLine = new HBox();
                     pwdLine.setAlignment(Pos.CENTER);
                     pwdLine.getChildren().addAll(pwdLabel, pwd);
 
                     discountContentGroup.getChildren().clear();
                     VBox xxx = new VBox();
-                    xxx.getChildren().addAll(line, pwdLine);
+                    xxx.getChildren().addAll(typeLine, pwdLine);
                     discountContentGroup.getChildren().addAll(xxx);
                 } else {
                     Logger.info("未知类型");
