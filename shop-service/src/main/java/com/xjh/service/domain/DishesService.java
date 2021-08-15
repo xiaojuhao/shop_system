@@ -2,6 +2,7 @@ package com.xjh.service.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -24,6 +25,10 @@ public class DishesService {
             return new ArrayList<>();
         }
         return dishesDAO.getByIds(ids);
+    }
+
+    public Map<Integer, Dishes> getByIdsAsMap(List<Integer> ids) {
+        return CommonUtils.listToMap(getByIds(ids), Dishes::getDishesId);
     }
 
     public List<Dishes> selectList(Dishes cond) {

@@ -326,11 +326,13 @@ public class OrderDetailView extends VBox {
     }
 
     private ObservableList<OrderDishesTableItemVO> loadOrderDishes(Integer orderId) {
+        // 可折扣的菜品信息
         Set<Integer> discountableDishesIds = storeService.getStoreDiscountableDishesIds();
+        // 订单菜品明细
         List<OrderDishes> orderDishes = orderDishesService.selectByOrderId(orderId);
         List<Integer> dishesIdList = CommonUtils.collect(orderDishes, OrderDishes::getDishesId);
-        List<Dishes> dishesList = dishesService.getByIds(dishesIdList);
-        Map<Integer, Dishes> dishesMap = CommonUtils.listToMap(dishesList, Dishes::getDishesId);
+        // 菜品明细
+        Map<Integer, Dishes> dishesMap = dishesService.getByIdsAsMap(dishesIdList);
         List<OrderDishesTableItemVO> items = new ArrayList<>();
         List<OrderDishes> discountableList = new ArrayList<>();
         List<OrderDishes> nonDiscountableList = new ArrayList<>();
@@ -343,34 +345,8 @@ public class OrderDetailView extends VBox {
             }
         });
         discountableList.forEach(o -> {
-            String dishesName = "";
-            String price = CommonUtils.formatMoney(o.getOrderDishesPrice());
-            String discountPrice = CommonUtils.formatMoney(o.getOrderDishesDiscountPrice());
-            EnumOrderSaleType saleType = EnumOrderSaleType.of(o.getOrderDishesSaletype());
-            RichText saleTypeText = new RichText(saleType.remark).with(Color.BLACK);
-            if (saleType == EnumOrderSaleType.RETURN) {
-                saleTypeText.with(Color.GRAY);
-            }
-            // 套餐
-            if (o.getIfDishesPackage() == 1) {
-                DishesPackage pkg = dishesPackageService.getById(o.getDishesId());
-                if (pkg != null) {
-                    dishesName = "(套餐)" + pkg.getDishesPackageName();
-                }
-            } else {
-                Dishes d = dishesMap.get(o.getDishesId());
-                if (d != null) {
-                    dishesName = d.getDishesName();
-                }
-            }
-            items.add(new OrderDishesTableItemVO(
-                    o.getOrderDishesId() + "",
-                    o.getSubOrderId() + "",
-                    new RichText(dishesName),
-                    new RichText(price),
-                    discountPrice,
-                    o.getOrderDishesNums() + "",
-                    saleTypeText));
+            // 构建菜品展示明细
+            items.add(buildTableItem(dishesMap.get(o.getDishesId()), o));
         });
         if (CommonUtils.isNotEmpty(discountableList)) {
             double discountTotalPrice = discountableList.stream()
@@ -396,35 +372,8 @@ public class OrderDetailView extends VBox {
                     new RichText("")));
         }
         nonDiscountableList.forEach(o -> {
-            String dishesName = "";
-            String price = CommonUtils.formatMoney(o.getOrderDishesPrice());
-            String discountPrice = CommonUtils.formatMoney(o.getOrderDishesDiscountPrice());
-            EnumOrderSaleType saleType = EnumOrderSaleType.of(o.getOrderDishesSaletype());
-            RichText saleTypeText = RichText.create(saleType.remark).with(Color.BLACK);
-            if (saleType == EnumOrderSaleType.RETURN) {
-                saleTypeText.with(Color.GRAY);
-            }
-
-            // 套餐
-            if (o.getIfDishesPackage() == 1) {
-                DishesPackage pkg = dishesPackageService.getById(o.getDishesId());
-                if (pkg != null) {
-                    dishesName = "(套餐)" + pkg.getDishesPackageName();
-                }
-            } else {
-                Dishes d = dishesMap.get(o.getDishesId());
-                if (d != null) {
-                    dishesName = d.getDishesName();
-                }
-            }
-            items.add(new OrderDishesTableItemVO(
-                    o.getOrderDishesId() + "",
-                    o.getSubOrderId() + "",
-                    new RichText(dishesName).with(Color.RED),
-                    new RichText(price),
-                    discountPrice,
-                    o.getOrderDishesNums() + "",
-                    saleTypeText));
+            // 构建菜品展示明细
+            items.add(buildTableItem(dishesMap.get(o.getDishesId()), o));
         });
         if (CommonUtils.isNotEmpty(nonDiscountableList)) {
             double nonDiscountTotalPrice = nonDiscountableList.stream()
@@ -578,6 +527,37 @@ public class OrderDetailView extends VBox {
             return true;
         }
         return EnumOrderSaleType.of(x.getOrderDishesSaletype()) != EnumOrderSaleType.RETURN;
+    }
+
+    private String buildDishesName(Dishes dishes, OrderDishes orderDishes) {
+        if (orderDishes.getIfDishesPackage() == 1) {
+            DishesPackage pkg = dishesPackageService.getById(orderDishes.getDishesId());
+            if (pkg != null) {
+                return "(套餐)" + pkg.getDishesPackageName();
+            }
+        } else if (dishes != null) {
+            return dishes.getDishesName();
+        }
+        return null;
+    }
+
+    private OrderDishesTableItemVO buildTableItem(Dishes dishes, OrderDishes orderDishes) {
+        String dishesName = buildDishesName(dishes, orderDishes);
+        String price = CommonUtils.formatMoney(orderDishes.getOrderDishesPrice());
+        String discountPrice = CommonUtils.formatMoney(orderDishes.getOrderDishesDiscountPrice());
+        EnumOrderSaleType saleType = EnumOrderSaleType.of(orderDishes.getOrderDishesSaletype());
+        RichText saleTypeText = new RichText(saleType.remark).with(Color.BLACK);
+        if (saleType == EnumOrderSaleType.RETURN) {
+            saleTypeText.with(Color.GRAY);
+        }
+        return new OrderDishesTableItemVO(
+                orderDishes.getOrderDishesId() + "",
+                orderDishes.getSubOrderId() + "",
+                new RichText(dishesName),
+                new RichText(price),
+                discountPrice,
+                orderDishes.getOrderDishesNums() + "",
+                saleTypeText);
     }
 
     @Override
