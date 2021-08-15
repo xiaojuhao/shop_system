@@ -6,13 +6,13 @@ import org.rocksdb.Options;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.TtlDB;
 
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 
 public class RocksDbUtilization {
     public static TtlDB getDB(String dbname) throws RocksDBException {
         String workDir = SysConfigUtils.getWorkDir();
         File home = new File(workDir + "database/kv/rocksdb/" + dbname);
-        LogUtils.info("根目录:" + home.getAbsolutePath());
+        Logger.info("根目录:" + home.getAbsolutePath());
         if (!home.exists()) {
             if (!home.mkdirs()) {
                 throw new RocksDBException("创建数据库失败:" + home.getAbsolutePath());

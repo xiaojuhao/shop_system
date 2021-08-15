@@ -13,7 +13,7 @@ import com.sleepycat.je.TransactionConfig;
 import com.xjh.common.store.BerkeleyDBUtils;
 import com.xjh.common.store.SequenceDatabase;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Cart;
 
@@ -35,7 +35,7 @@ public class CartStore {
                 }
             }
         } catch (Exception ex) {
-            LogUtils.error("获取购物车失败:" + deskId + "," + ex.getMessage());
+            Logger.error("获取购物车失败:" + deskId + "," + ex.getMessage());
             throw new RuntimeException("获取购物车失败");
         } finally {
             txn.commit();
@@ -58,7 +58,7 @@ public class CartStore {
             db.put(txn, theKey, newData);
             return Result.success(null);
         } catch (Exception ex) {
-            LogUtils.error("保存购物车失败:" + ex.getMessage());
+            Logger.error("保存购物车失败:" + ex.getMessage());
             return Result.fail("保存购物车失败:" + ex.getMessage());
         } finally {
             txn.commit();
@@ -79,7 +79,7 @@ public class CartStore {
             db.delete(txn, theKey);
             return Result.success(null);
         } catch (Exception ex) {
-            LogUtils.error("清空购物车失败:" + ex.getMessage());
+            Logger.error("清空购物车失败:" + ex.getMessage());
             return Result.fail("清空购物车失败:" + ex.getMessage());
         } finally {
             txn.commit();

@@ -20,7 +20,7 @@ import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
 import com.xjh.common.utils.TimeRecord;
 import com.xjh.common.utils.cellvalue.Money;
@@ -234,15 +234,16 @@ public class OrderDetailView extends VBox {
             Button orderErase = createButton("抹零", evt -> openOrderEraseStage(deskOrderParam));
             FlowPane.setMargin(orderErase, new Insets(0, 0, 0, 100));
             Button reduction = createButton("店长减免", evt -> openOrderReductionDialog(deskOrderParam));
+            Button discount = createButton("选择折扣", evt -> openDiscountSelectionDialog(deskOrderParam));
             // add all buttons
             pane.getChildren().addAll(orderBtn, sendBtn, returnBtn, transferBtn, splitBtn, payBillBtn,
-                    orderErase, reduction);
+                    orderErase, reduction, discount);
             this.getChildren().add(pane);
         }
-        LogUtils.info("OrderDetail构建页面耗时: " + cost.getCostAndReset());
+        Logger.info("OrderDetail构建页面耗时: " + cost.getCostAndReset());
         // 刷新页面
         refreshTableView.run();
-        LogUtils.info("OrderDetail加载数据耗时: " + cost.getCostAndReset());
+        Logger.info("OrderDetail加载数据耗时: " + cost.getCostAndReset());
     }
 
     private Label createLabel(String name, Function<OrderBillVO, String> onChage) {
@@ -405,14 +406,14 @@ public class OrderDetailView extends VBox {
         param.setChoiceAction(EnumChoiceAction.PLACE);
         String title = "点菜[桌号:" + param.getDeskName() + "]";
         double width = this.getScene().getWindow().getWidth() - 60;
-        openView(title, param, new OrderDishesChoiceView(param, width), false);
+        openView(title, param, new OrderDishesChoiceView(param, width), 1);
     }
 
     private void openSendDishesChoiceView(DeskOrderParam param) {
         param.setChoiceAction(EnumChoiceAction.SEND);
         String title = "送菜[桌号:" + param.getDeskName() + "]";
         double width = this.getScene().getWindow().getWidth() - 60;
-        openView(title, param, new OrderDishesChoiceView(param, width), false);
+        openView(title, param, new OrderDishesChoiceView(param, width), 1);
     }
 
     private void returnDishesConfirm(DeskOrderParam param, TableView<OrderDishesTableItemVO> tv) {
@@ -441,34 +442,44 @@ public class OrderDetailView extends VBox {
         param.setChoiceAction(EnumChoiceAction.RETURN);
         param.setReturnList(returnList);
         String title = "退菜[桌号:" + param.getDeskName() + "]";
-        openView(title, param, new OrderReturnDishesView(param), true);
+        openView(title, param, new OrderReturnDishesView(param), 3);
     }
 
     private void openPayWayChoiceView(DeskOrderParam param) {
         param.setChoiceAction(EnumChoiceAction.NULL);
         String title = "结账[桌号:" + param.getDeskName() + "]";
-        openView(title, param, new PayWayChoiceView(param), true);
+        openView(title, param, new PayWayChoiceView(param), 3);
     }
 
     private void openOrderEraseStage(DeskOrderParam param) {
         param.setChoiceAction(EnumChoiceAction.NULL);
         String title = "抹零[桌号:" + param.getDeskName() + "]";
         VBox view = new OrderEraseView(param);
-        openView(title, param, view, true);
+        openView(title, param, view, 3);
     }
 
     private void openOrderReductionDialog(DeskOrderParam param) {
         param.setChoiceAction(EnumChoiceAction.NULL);
         String title = "店长减免[桌号:" + param.getDeskName() + "]";
         VBox view = new OrderReductionView(param);
-        openView(title, param, view, true);
+        openView(title, param, view, 3);
     }
 
-    private void openView(String title, DeskOrderParam param, VBox view, boolean small) {
+    private void openDiscountSelectionDialog(DeskOrderParam param) {
+        param.setChoiceAction(EnumChoiceAction.NULL);
+        String title = "选择折扣[桌号:" + param.getDeskName() + "]";
+        VBox view = new OrderDiscountSelectionView(param);
+        openView(title, param, view, 2);
+    }
+
+    private void openView(String title, DeskOrderParam param, VBox view, int size) {
         Stage stg = new Stage();
         double width = this.getScene().getWindow().getWidth() - 60;
         double height = this.getScene().getWindow().getHeight() - 100;
-        if (small) {
+        if (size == 2) {
+            width = this.getScene().getWindow().getWidth() / 2;
+            height = this.getScene().getWindow().getHeight() / 2;
+        } else if (size == 3) {
             width = this.getScene().getWindow().getWidth() / 3;
             height = this.getScene().getWindow().getHeight() / 4;
         }

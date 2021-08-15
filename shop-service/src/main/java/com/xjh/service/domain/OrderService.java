@@ -18,7 +18,7 @@ import com.xjh.common.store.SequenceDatabase;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.DateBuilder;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.OrderDiscount;
 import com.xjh.dao.dataobject.Order;
@@ -127,7 +127,7 @@ public class OrderService {
         try {
             return Result.success(subOrderDAO.countSubOrders(orderId));
         } catch (Exception ex) {
-            LogUtils.error("countSubOrder ::" + ex.getMessage());
+            Logger.error("countSubOrder ::" + ex.getMessage());
             return Result.fail(ex.getMessage());
         }
     }
@@ -141,7 +141,7 @@ public class OrderService {
                 return Result.success(null);
             }
         } catch (Exception ex) {
-            LogUtils.info("查询数据失败" + ex.getMessage());
+            Logger.info("查询数据失败" + ex.getMessage());
             return Result.fail("查询数据失败" + ex.getMessage());
         }
     }
@@ -159,7 +159,7 @@ public class OrderService {
             }
             return Result.success(subOrders);
         } catch (Exception ex) {
-            LogUtils.error("查询子订单异常:" + ex.getMessage());
+            Logger.error("查询子订单异常:" + ex.getMessage());
             // AlertBuilder.ERROR("查询子订单异常");
             return Result.fail("查询子订单异常:" + ex.getMessage());
         }
@@ -257,7 +257,7 @@ public class OrderService {
         }
         // 前17位保存时间，后15位保存序列号
         int id = diffHours << 15 | nextId;
-        LogUtils.info("创建订单号: " + diffHours + "," + nextId + "," + id);
+        Logger.info("创建订单号: " + diffHours + "," + nextId + "," + id);
         return id;
     }
 

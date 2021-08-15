@@ -1,8 +1,9 @@
 package com.xjh.startup.view;
 
 import com.xjh.common.utils.Holder;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.TimeRecord;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -27,7 +28,7 @@ public class LoginView {
             Scene loginScene = new Scene(login);
             loginScene.getStylesheets().add("/css/style.css");
             holder.hold(loginScene);
-            LogUtils.info("加载登录界面, cost " + timeRecord.getCostAndReset());
+            Logger.info("加载登录界面, cost " + timeRecord.getCostAndReset());
             return loginScene;
         }
     }

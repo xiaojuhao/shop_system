@@ -2,7 +2,7 @@ package com.xjh.startup.view;
 
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
@@ -57,7 +57,7 @@ public class OrderEraseView extends VBox {
                 AlertBuilder.ERROR("抹零金额不能大于10");
                 return;
             }
-            LogUtils.info("订单:" + param.getOrderId() + ", 桌号:" + param.getDeskName() + "抹零金额:" + r);
+            Logger.info("订单:" + param.getOrderId() + ", 桌号:" + param.getDeskName() + "抹零金额:" + r);
             doOrderErase(param.getOrderId(), r);
             this.getScene().getWindow().hide();
         });

@@ -146,7 +146,7 @@ public class CommonUtils {
             }
             return JSON.toJSONString(data);
         } catch (Exception ex) {
-            LogUtils.error("序列化对象失败:" + ex.getMessage());
+            Logger.error("序列化对象失败:" + ex.getMessage());
             return "error:" + ex.getMessage();
         }
     }

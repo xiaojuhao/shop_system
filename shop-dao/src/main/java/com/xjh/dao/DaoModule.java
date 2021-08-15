@@ -1,7 +1,7 @@
 package com.xjh.dao;
 
 import com.google.inject.AbstractModule;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.TimeRecord;
 import com.xjh.dao.mapper.CartDAO;
 import com.xjh.dao.mapper.DeskDAO;
@@ -34,6 +34,6 @@ public class DaoModule extends AbstractModule {
         bind(DishesPackageDishesDAO.class);
         bind(StoreDAO.class);
         bind(DishesGroupDAO.class);
-        LogUtils.info("DaoModule 耗时: " + timeRecord.getCost());
+        Logger.info("DaoModule 耗时: " + timeRecord.getCost());
     }
 }

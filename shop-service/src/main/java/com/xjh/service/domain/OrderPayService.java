@@ -10,7 +10,7 @@ import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.enumeration.EnumPayStatus;
 import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.DateBuilder;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderPay;
@@ -54,7 +54,7 @@ public class OrderPayService {
             orderPay.setCreatetime(DateBuilder.now().mills());
             int payRs = this.insert(orderPay);
             if (payRs == 0) {
-                LogUtils.error("保存支付信息失败: insert error >> " + payRs);
+                Logger.error("保存支付信息失败: insert error >> " + payRs);
                 return Result.fail("保存支付明细失败");
             }
             //
@@ -66,12 +66,12 @@ public class OrderPayService {
             }
             Result<Integer> updateRs = orderService.updateByOrderId(order);
             if (!updateRs.isSuccess()) {
-                LogUtils.error("更新订单支付结果失败: update error >> " + updateRs.getMsg());
+                Logger.error("更新订单支付结果失败: update error >> " + updateRs.getMsg());
                 return Result.fail("更新订单支付结果失败," + updateRs.getMsg());
             }
             return Result.success("支付成功");
         } catch (Exception ex) {
-            LogUtils.error("保存支付信息失败:" + ex.getMessage());
+            Logger.error("保存支付信息失败:" + ex.getMessage());
             return Result.fail("保存支付信息失败:" + ex.getMessage());
         } finally {
             clear.run();

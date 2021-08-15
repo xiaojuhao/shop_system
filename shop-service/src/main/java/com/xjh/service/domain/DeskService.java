@@ -7,7 +7,7 @@ import com.alibaba.fastjson.JSON;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.common.utils.CurrentRequest;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Order;
@@ -51,10 +51,10 @@ public class DeskService {
             createOrderParam.setDeskId(deskId);
             createOrderParam.setCustomerNum(param.getCustomerNum());
             Order order = orderService.createOrder(createOrderParam);
-            LogUtils.info("下单成功: " + JSON.toJSONString(order));
+            Logger.info("下单成功: " + JSON.toJSONString(order));
             return Result.success("下单成功");
         } catch (Exception ex) {
-            LogUtils.info("开桌失败" + ex.getMessage());
+            Logger.info("开桌失败" + ex.getMessage());
             return Result.fail("开桌失败:" + ex.getMessage());
         } finally {
             clear.run();

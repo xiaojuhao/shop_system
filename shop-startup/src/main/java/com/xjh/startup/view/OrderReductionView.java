@@ -2,7 +2,7 @@ package com.xjh.startup.view;
 
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
@@ -51,7 +51,7 @@ public class OrderReductionView extends VBox {
                 AlertBuilder.ERROR("店长密码不符");
                 return;
             }
-            LogUtils.info("订单:" + param.getOrderId() + ", 桌号:" + param.getDeskName() + "店长减免:" + r);
+            Logger.info("订单:" + param.getOrderId() + ", 桌号:" + param.getDeskName() + "店长减免:" + r);
             doOrderReduction(param.getOrderId(), CommonUtils.parseDouble(r, 0D));
             this.getScene().getWindow().hide();
         });

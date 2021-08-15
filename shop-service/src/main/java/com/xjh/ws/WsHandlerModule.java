@@ -1,7 +1,7 @@
 package com.xjh.ws;
 
 import com.google.inject.AbstractModule;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.TimeRecord;
 import com.xjh.ws.handler.AddCartHandler;
 import com.xjh.ws.handler.CloseDeskHandler;
@@ -22,6 +22,6 @@ public class WsHandlerModule extends AbstractModule {
         bind(OpenDeskHandler.class);
         bind(OrderCartHandler.class);
         bind(SocketOpenHandler.class);
-        LogUtils.info("WebService模块注入 耗时:" + timeRecord.getCost());
+        Logger.info("WebService模块注入 耗时:" + timeRecord.getCost());
     }
 }

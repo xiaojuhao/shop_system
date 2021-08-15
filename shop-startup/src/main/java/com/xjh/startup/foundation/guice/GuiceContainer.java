@@ -3,7 +3,7 @@ package com.xjh.startup.foundation.guice;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.xjh.common.utils.Holder;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.dao.DaoModule;
 import com.xjh.dao.DataSourceModule;
 import com.xjh.service.ServiceModule;
@@ -28,7 +28,7 @@ public class GuiceContainer {
                     new WsHandlerModule()
             );
             injector.hold(ij);
-            LogUtils.info("初始化Guice, 耗时:" + (System.currentTimeMillis() - start));
+            Logger.info("初始化Guice, 耗时:" + (System.currentTimeMillis() - start));
             return ij;
         }
     }

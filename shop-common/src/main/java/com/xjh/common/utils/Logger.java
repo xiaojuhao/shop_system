@@ -5,7 +5,7 @@ import java.io.FileWriter;
 
 import com.xjh.common.store.SysConfigUtils;
 
-public class LogUtils {
+public class Logger {
     public static void info(String msg) {
         System.out.println("INFO:" + msg);
         append("INFO", msg);

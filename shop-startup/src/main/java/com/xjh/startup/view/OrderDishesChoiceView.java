@@ -15,7 +15,7 @@ import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.ClickHelper;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.CopyUtils;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.DishesImg;
 import com.xjh.dao.dataobject.Dishes;
@@ -351,7 +351,7 @@ public class OrderDishesChoiceView extends VBox {
     }
 
     private void addDishesToCart(DishesChoiceItemBO bo) {
-        LogUtils.info("添加到购物车," +
+        Logger.info("添加到购物车," +
                 "DishesId=" + bo.getDishesId() + "," +
                 "PackageId=" + bo.getDishesPackageId() + "," +
                 bo.getDishesName() + ", " +
@@ -373,7 +373,7 @@ public class OrderDishesChoiceView extends VBox {
     private void addCartItem(CartItemVO cartItem) {
         try {
             Result<CartVO> addCartRs = cartService.addItem(data.getDeskId(), cartItem);
-            LogUtils.info("购物车信息:" + JSON.toJSONString(addCartRs));
+            Logger.info("购物车信息:" + JSON.toJSONString(addCartRs));
             if (addCartRs.isSuccess()) {
                 AlertBuilder.INFO("通知消息", "添加购物车成功");
                 cartSize.set(CollectionUtils.size(addCartRs.getData().getContents()));
@@ -398,7 +398,7 @@ public class OrderDishesChoiceView extends VBox {
                 AlertBuilder.ERROR(createOrderRs.getMsg());
             }
         } catch (Exception ex) {
-            LogUtils.info("下单失败:" + ex.getMessage());
+            Logger.info("下单失败:" + ex.getMessage());
             AlertBuilder.ERROR("通知消息", "下单失败:" + ex.getMessage());
         }
     }
@@ -460,7 +460,7 @@ public class OrderDishesChoiceView extends VBox {
         canvas.getGraphicsContext2D().fillText("单价:" + dishes.getDishesPrice(), 10, 200);
         canvas.setOnMouseClicked(evt -> {
             if (ClickHelper.isDblClick()) {
-                LogUtils.info("添加到购物车, DishesId=" +
+                Logger.info("添加到购物车, DishesId=" +
                         dishes.getDishesId() + "," +
                         dishes.getDishesName() + ", "
                         + CommonUtils.reflectString(data));
@@ -471,7 +471,7 @@ public class OrderDishesChoiceView extends VBox {
                 cartItem.setIfDishesPackage(0);
                 try {
                     Result<CartVO> addCartRs = cartService.addItem(data.getDeskId(), cartItem);
-                    LogUtils.info("购物车信息:" + JSON.toJSONString(addCartRs));
+                    Logger.info("购物车信息:" + JSON.toJSONString(addCartRs));
                     if (addCartRs.isSuccess()) {
                         AlertBuilder.INFO("通知消息", "添加购物车成功");
                         cartSize.set(CollectionUtils.size(addCartRs.getData().getContents()));
@@ -491,7 +491,7 @@ public class OrderDishesChoiceView extends VBox {
         try {
             cartSize.set(cartService.selectByDeskId(data.getDeskId()).size());
         } catch (Exception ex) {
-            LogUtils.error(ex.getMessage());
+            Logger.error(ex.getMessage());
         }
     }
 

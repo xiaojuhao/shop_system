@@ -1,11 +1,11 @@
 package com.xjh.common.store;
 
-import com.xjh.common.utils.Holder;
-import com.xjh.common.utils.LogUtils;
-import com.xjh.common.utils.TimeRecord;
-
 import java.io.File;
 import java.util.Properties;
+
+import com.xjh.common.utils.Holder;
+import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.TimeRecord;
 
 public class SysConfigUtils {
 
@@ -18,7 +18,7 @@ public class SysConfigUtils {
         TimeRecord time = TimeRecord.start();
         Properties prop = loadRuntimeProperties();
         String workDir = prop.getProperty(RtPropNames.workDirName);
-        LogUtils.info("获取WorkDir耗时 : " + time.getCost());
+        Logger.info("获取WorkDir耗时 : " + time.getCost());
         if (workDir == null) {
             return null;
         }

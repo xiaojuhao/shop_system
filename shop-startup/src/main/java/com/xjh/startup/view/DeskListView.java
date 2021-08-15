@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.ThreadUtils;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.service.domain.DeskService;
@@ -56,7 +56,7 @@ public class DeskListView {
                 desks.forEach(this::detectChange);
                 CommonUtils.sleep(1000);
             }
-            LogUtils.info("******* DeskListView 循环退出." + Thread.currentThread().getName());
+            Logger.info("******* DeskListView 循环退出." + Thread.currentThread().getName());
             System.gc();
         });
         return s;
@@ -76,6 +76,6 @@ public class DeskListView {
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
-        LogUtils.info("DeskListView被销毁了。。。。。。。。");
+        Logger.info("DeskListView被销毁了。。。。。。。。");
     }
 }

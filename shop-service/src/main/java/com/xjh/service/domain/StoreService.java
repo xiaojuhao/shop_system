@@ -11,7 +11,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.google.inject.Singleton;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.CopyUtils;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.DishesGroup;
 import com.xjh.dao.dataobject.Store;
@@ -37,7 +37,7 @@ public class StoreService {
             }
             return Result.success(toVO(list.get(0)));
         } catch (Exception ex) {
-            LogUtils.error("查询store异常:" + ex.getMessage());
+            Logger.error("查询store异常:" + ex.getMessage());
             return Result.fail("查询store异常:" + ex.getMessage());
         }
     }

@@ -4,7 +4,7 @@ import java.io.File;
 
 import com.google.inject.Provider;
 import com.xjh.common.store.SysConfigUtils;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.TimeRecord;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -23,7 +23,7 @@ public class LocalSqliteDataSourceProvider implements Provider<HikariDataSource>
         TimeRecord record = TimeRecord.start();
         String workDir = SysConfigUtils.getWorkDir();
         File home = new File(workDir + "database/sqlite");
-        LogUtils.info("数据库目录：" + home.getAbsolutePath());
+        Logger.info("数据库目录：" + home.getAbsolutePath());
         if (!home.exists()) {
             home.mkdirs();
         }
@@ -42,7 +42,7 @@ public class LocalSqliteDataSourceProvider implements Provider<HikariDataSource>
         hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
         hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
         HikariDataSource ds = new HikariDataSource(hikariConfig);
-        LogUtils.info("初始化Sqlite数据源: cost " + record.getCost());
+        Logger.info("初始化Sqlite数据源: cost " + record.getCost());
         return ds;
     }
 }

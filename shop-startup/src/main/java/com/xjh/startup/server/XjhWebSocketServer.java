@@ -8,7 +8,7 @@ import org.java_websocket.server.WebSocketServer;
 
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.ws.handler.AddCartHandler;
 import com.xjh.ws.handler.CloseDeskHandler;
@@ -29,13 +29,13 @@ public class XjhWebSocketServer extends WebSocketServer {
     }
 
     public void startWS() {
-        LogUtils.info("启动WebSocket服务器......");
+        Logger.info("启动WebSocket服务器......");
         super.start();
     }
 
     public void stopQuietly() {
         try {
-            LogUtils.info("停止WebSocket服务器......");
+            Logger.info("停止WebSocket服务器......");
             this.stop();
         } catch (Exception ex) {
             ex.printStackTrace();

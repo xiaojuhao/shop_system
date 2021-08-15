@@ -17,7 +17,7 @@ import com.xjh.common.store.SequenceDatabase;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.DateBuilder;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Cart;
 import com.xjh.dao.dataobject.Dishes;
@@ -121,7 +121,7 @@ public class CartService {
             Cart cart = CartStore.getCart(deskId);
             return Result.success(CartVO.from(cart));
         } catch (Exception ex) {
-            LogUtils.error("getCartOfDesk:" + ex.getMessage());
+            Logger.error("getCartOfDesk:" + ex.getMessage());
             return Result.fail(ex.getMessage());
         }
     }
@@ -157,7 +157,7 @@ public class CartService {
             }
             // 更新订单状态
             orderService.updateByOrderId(order);
-            LogUtils.info("赠送菜品: 订单号:" + orderId +
+            Logger.info("赠送菜品: 订单号:" + orderId +
                     ", 菜品:" + request.getDishesName() + "(" + request.getDishesId() + ")");
             return Result.success("下单成功");
         } catch (Exception ex) {
@@ -181,7 +181,7 @@ public class CartService {
             }
             // 条件校验
             if (cartVO.getContents() == null || cartVO.getContents().size() == 0) {
-                LogUtils.error("购物车空:" + JSON.toJSONString(param));
+                Logger.error("购物车空:" + JSON.toJSONString(param));
                 return Result.fail("购物车空");
             }
             // 子订单
@@ -313,7 +313,7 @@ public class CartService {
         }
         // 前17位保存时间，后15位保存序列号
         int id = (diffHours << 15) | nextId;
-        LogUtils.info("创建子订单号: " + diffHours + "," + nextId + "," + id);
+        Logger.info("创建子订单号: " + diffHours + "," + nextId + "," + id);
         return id;
     }
 

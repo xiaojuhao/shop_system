@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.startup.foundation.guice.GuiceContainer;
@@ -60,7 +60,7 @@ public class OrderReturnDishesView extends VBox {
     }
 
     private void doReturnDishes(List<String> orderDishesIds, String reason) {
-        LogUtils.info("退菜:" + orderDishesIds + ", " + reason);
+        Logger.info("退菜:" + orderDishesIds + ", " + reason);
         List<Integer> ids = orderDishesIds.stream()
                 .map(id -> CommonUtils.parseInt(id, null))
                 .collect(Collectors.toList());

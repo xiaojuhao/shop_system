@@ -1,7 +1,7 @@
 package com.xjh.service;
 
 import com.google.inject.AbstractModule;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.TimeRecord;
 import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.DeskService;
@@ -20,6 +20,6 @@ public class ServiceModule extends AbstractModule {
         bind(CartService.class);
         bind(DishesService.class);
         bind(DishesPackageService.class);
-        LogUtils.info("ServiceModule 耗时:" + timeRecord.getCost());
+        Logger.info("ServiceModule 耗时:" + timeRecord.getCost());
     }
 }

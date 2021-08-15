@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.ReflectionUtils;
 
 import cn.hutool.db.Entity;
@@ -141,7 +141,7 @@ public class EntityUtils {
                 return val;
             }
         }
-        LogUtils.info("不支持的类型：" + columnName + ", " + targetClass);
+        Logger.info("不支持的类型：" + columnName + ", " + targetClass);
         return null;
     }
 

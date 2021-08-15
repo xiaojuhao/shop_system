@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.RichText;
@@ -137,7 +137,7 @@ public class CartView extends VBox {
             );
             reloadData();
         } catch (Exception ex) {
-            LogUtils.error("查询购物车异常:" + param.getDeskName() + ", " + ex.getMessage());
+            Logger.error("查询购物车异常:" + param.getDeskName() + ", " + ex.getMessage());
         }
         return tv;
     }
@@ -171,7 +171,7 @@ public class CartView extends VBox {
                 return bo;
             }).collect(Collectors.toList());
         } catch (Exception ex) {
-            LogUtils.error("查询购物车异常:" + param.getDeskName() + ", " + ex.getMessage());
+            Logger.error("查询购物车异常:" + param.getDeskName() + ", " + ex.getMessage());
         }
         return new ArrayList<>();
     }

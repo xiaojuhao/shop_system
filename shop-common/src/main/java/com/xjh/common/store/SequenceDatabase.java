@@ -10,7 +10,7 @@ import com.sleepycat.je.OperationStatus;
 import com.sleepycat.je.Transaction;
 import com.sleepycat.je.TransactionConfig;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 
 public class SequenceDatabase {
     public static synchronized int nextId(String group) {
@@ -33,12 +33,12 @@ public class SequenceDatabase {
             DatabaseEntry newData = new DatabaseEntry(String.valueOf(newId + 1).getBytes(StandardCharsets.UTF_8));
             db.put(txn, theKey, newData);
         } catch (Exception ex) {
-            LogUtils.error("获取订单ID失败:" + group + "," + ex.getMessage());
+            Logger.error("获取订单ID失败:" + group + "," + ex.getMessage());
             throw new RuntimeException("获取订单ID序列失败");
         } finally {
             txn.commit();
         }
-        LogUtils.info("创建序列号:" + group + ", 返回ID:" + newId);
+        Logger.info("创建序列号:" + group + ", 返回ID:" + newId);
         return newId;
     }
 

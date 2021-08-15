@@ -37,7 +37,7 @@ public class CopyUtils {
                                 toPd.writeValue(to, v);
                             }
                         } else {
-                            LogUtils.info("类型不匹配:"
+                            Logger.info("类型不匹配:"
                                     + to.getClass() + "(" + toPd.getRead().getReturnType() + ") >> "
                                     + from.getClass() + "(" + fromPd.getRead().getReturnType() + ")");
                         }

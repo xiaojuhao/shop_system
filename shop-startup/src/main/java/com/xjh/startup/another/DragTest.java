@@ -3,7 +3,7 @@ package com.xjh.startup.another;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 
 import javafx.application.Application;
 import javafx.event.EventHandler;
@@ -76,7 +76,7 @@ public class DragTest extends Application {
             node.setOnMousePressed(pressedEvent);
             node.setOnMouseDragged(dragEvent);
             node.setOnMouseClicked(evt -> {
-                LogUtils.info("on click " + evt.getTarget());
+                Logger.info("on click " + evt.getTarget());
             });
         }
 

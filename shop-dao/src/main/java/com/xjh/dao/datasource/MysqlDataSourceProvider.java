@@ -1,14 +1,14 @@
 package com.xjh.dao.datasource;
 
+import java.util.Properties;
+
 import com.google.inject.Provider;
 import com.xjh.common.store.RtPropNames;
 import com.xjh.common.store.SysConfigUtils;
-import com.xjh.common.utils.LogUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.TimeRecord;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-
-import java.util.Properties;
 
 public class MysqlDataSourceProvider implements Provider<HikariDataSource> {
     private static class Inst {
@@ -36,7 +36,7 @@ public class MysqlDataSourceProvider implements Provider<HikariDataSource> {
         hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
         hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
         HikariDataSource ds = new HikariDataSource(hikariConfig);
-        LogUtils.info("初始化MySql数据源: cost " + record.getCost());
+        Logger.info("初始化MySql数据源: cost " + record.getCost());
         return ds;
     }
 }
