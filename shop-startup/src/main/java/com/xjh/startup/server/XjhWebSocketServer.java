@@ -69,7 +69,10 @@ public class XjhWebSocketServer extends WebSocketServer {
             resp = orderCartHandler.handle(msg);
         }
         if (resp != null) {
+            Logger.info(uuid + " >> 响应结果:" + resp);
             ws.send(resp.toJSONString());
+        }else {
+            Logger.info(uuid + " >> 无法响应内容");
         }
     }
 
