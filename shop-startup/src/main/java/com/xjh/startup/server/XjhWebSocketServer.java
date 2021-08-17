@@ -1,20 +1,15 @@
 package com.xjh.startup.server;
 
-import java.net.InetSocketAddress;
-
-import org.java_websocket.WebSocket;
-import org.java_websocket.handshake.ClientHandshake;
-import org.java_websocket.server.WebSocketServer;
-
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
 import com.xjh.startup.foundation.guice.GuiceContainer;
-import com.xjh.ws.handler.AddCartHandler;
-import com.xjh.ws.handler.CloseDeskHandler;
-import com.xjh.ws.handler.OpenDeskHandler;
-import com.xjh.ws.handler.OrderCartHandler;
-import com.xjh.ws.handler.SocketOpenHandler;
+import com.xjh.ws.handler.*;
+import org.java_websocket.WebSocket;
+import org.java_websocket.handshake.ClientHandshake;
+import org.java_websocket.server.WebSocketServer;
+
+import java.net.InetSocketAddress;
 
 
 public class XjhWebSocketServer extends WebSocketServer {
@@ -45,16 +40,22 @@ public class XjhWebSocketServer extends WebSocketServer {
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
         JSONObject resp = socketOpenHandler.handle(webSocket);
+        String uuid = CommonUtils.randomStr(10);
+        webSocket.setAttachment(uuid);
+        Logger.info(uuid + " >> WS链接打开: " + resp);
         webSocket.send(resp.toJSONString());
     }
 
     @Override
     public void onClose(WebSocket webSocket, int i, String s, boolean b) {
-
+        String uuid = webSocket.getAttachment();
+        Logger.info(uuid + " >> WS链接关闭");
     }
 
     @Override
     public void onMessage(WebSocket ws, String message) {
+        String uuid = ws.getAttachment();
+        Logger.info(uuid + " >> 收到了消息:" + message);
         JSONObject msg = JSONObject.parseObject(message);
         JSONObject resp = null;
         String type = msg.getString("API_TYPE");
@@ -70,12 +71,13 @@ public class XjhWebSocketServer extends WebSocketServer {
         if (resp != null) {
             ws.send(resp.toJSONString());
         }
-        ws.close();
     }
 
     @Override
     public void onError(WebSocket webSocket, Exception e) {
-
+        String uuid = webSocket.getAttachment();
+        Logger.info(uuid + " >> socket出现了异常, 关闭链接" + e);
+        webSocket.close();
     }
 
     @Override
