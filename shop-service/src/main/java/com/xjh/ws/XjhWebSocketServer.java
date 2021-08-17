@@ -1,26 +1,32 @@
-package com.xjh.startup.server;
+package com.xjh.ws;
 
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
-import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.ws.handler.*;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.net.InetSocketAddress;
 
-
+@Singleton
 public class XjhWebSocketServer extends WebSocketServer {
-    AddCartHandler addCartHandler = GuiceContainer.getInstance(AddCartHandler.class);
-    CloseDeskHandler closeDeskHandler = GuiceContainer.getInstance(CloseDeskHandler.class);
-    OpenDeskHandler openDeskHandler = GuiceContainer.getInstance(OpenDeskHandler.class);
-    OrderCartHandler orderCartHandler = GuiceContainer.getInstance(OrderCartHandler.class);
-    SocketOpenHandler socketOpenHandler = GuiceContainer.getInstance(SocketOpenHandler.class);
+    @Inject
+    AddCartHandler addCartHandler;
+    @Inject
+    CloseDeskHandler closeDeskHandler;
+    @Inject
+    OpenDeskHandler openDeskHandler;
+    @Inject
+    OrderCartHandler orderCartHandler;
+    @Inject
+    SocketOpenHandler socketOpenHandler;
 
-    public XjhWebSocketServer(int port) {
-        super(new InetSocketAddress(port));
+    public XjhWebSocketServer() {
+        super(new InetSocketAddress(8889));
     }
 
     public void startWS() {

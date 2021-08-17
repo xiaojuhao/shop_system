@@ -22,6 +22,7 @@ public class WsHandlerModule extends AbstractModule {
         bind(OpenDeskHandler.class);
         bind(OrderCartHandler.class);
         bind(SocketOpenHandler.class);
+        bind(XjhWebSocketServer.class).toInstance(new XjhWebSocketServer());
         Logger.info("WebService模块注入 耗时:" + timeRecord.getCost());
     }
 }
