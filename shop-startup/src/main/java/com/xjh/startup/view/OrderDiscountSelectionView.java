@@ -29,8 +29,8 @@ public class OrderDiscountSelectionView extends VBox {
             Label discountTypeLabel = new Label("折扣方式:");
             HBox.setMargin(discountTypeLabel, new Insets(0, 20, 0, 0));
 
-            ToggleGroup group = new ToggleGroup();
-            group.selectedToggleProperty().addListener((x, o, n) -> {
+            ToggleGroup toggleGroup = new ToggleGroup();
+            toggleGroup.selectedToggleProperty().addListener((x, o, n) -> {
                 int select = (int) n.getUserData();
                 if (select == 1) {
                     Logger.info("优惠券");
@@ -82,11 +82,11 @@ public class OrderDiscountSelectionView extends VBox {
             });
 
             RadioButton coupon = new RadioButton("卡券优惠");
-            coupon.setToggleGroup(group);
+            coupon.setToggleGroup(toggleGroup);
             coupon.setUserData(1);
 
             RadioButton manager = new RadioButton("店长折扣");
-            manager.setToggleGroup(group);
+            manager.setToggleGroup(toggleGroup);
             manager.setUserData(2);
             manager.setSelected(true);
 
