@@ -19,9 +19,6 @@ public class OrderDiscountSelectionView extends VBox {
         VBox discountContentGroup = new VBox();
         // 折扣方式选择
         {
-            Label discountTypeLabel = new Label("折扣方式:");
-            HBox.setMargin(discountTypeLabel, new Insets(0, 20, 0, 0));
-
             ToggleGroup toggleGroup = new ToggleGroup();
             toggleGroup.selectedToggleProperty().addListener((x, o, n) -> {
                 int select = (int) n.getUserData();
@@ -39,12 +36,7 @@ public class OrderDiscountSelectionView extends VBox {
                     discountContentGroup.getChildren().addAll(voucherLine, cardLine);
                 } else if (select == 2) {
                     Logger.info("店长折扣");
-                    ObservableList<String> options = FXCollections.observableArrayList(
-                            Lists.newArrayList(
-                                    "员工折扣(7折)", "朋友折扣(8.5折)", "员工补单折扣(6折)",
-                                    "7.8折活动", "8.8折活动", "68元秒杀", "其它")
-                    );
-                    ComboBox<String> optList = new ComboBox<>(options);
+                    ComboBox<String> optList = new ComboBox<>(getDiscountOptions());
                     optList.setPrefWidth(160);
                     Label label = new Label("折扣类型:");
 
@@ -61,6 +53,9 @@ public class OrderDiscountSelectionView extends VBox {
                     Logger.info("未知类型");
                 }
             });
+
+            Label discountTypeLabel = new Label("折扣方式:");
+            HBox.setMargin(discountTypeLabel, new Insets(0, 20, 0, 0));
 
             RadioButton coupon = new RadioButton("卡券优惠");
             coupon.setToggleGroup(toggleGroup);
@@ -87,11 +82,19 @@ public class OrderDiscountSelectionView extends VBox {
         }
     }
 
-    private HBox newLine(Node title, Node node){
+    private HBox newLine(Node title, Node node) {
         HBox line = new HBox();
         line.setAlignment(Pos.CENTER);
         line.getChildren().addAll(title, node);
         return line;
+    }
+
+    private ObservableList<String> getDiscountOptions() {
+        return FXCollections.observableArrayList(
+                Lists.newArrayList(
+                        "员工折扣(7折)", "朋友折扣(8.5折)", "员工补单折扣(6折)",
+                        "7.8折活动", "8.8折活动", "68元秒杀", "其它")
+        );
     }
 
 }
