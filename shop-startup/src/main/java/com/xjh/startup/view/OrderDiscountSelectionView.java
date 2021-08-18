@@ -56,9 +56,7 @@ public class OrderDiscountSelectionView extends VBox {
                     ComboBox<DiscountTypeBO> optList = getDiscountOptions();
                     optList.setPrefWidth(160);
                     Label label = new Label("折扣类型:");
-                    discountHolder.hold(() -> {
-                        return optList.getSelectionModel().getSelectedItem();
-                    });
+                    discountHolder.hold(() -> optList.getSelectionModel().getSelectedItem());
 
                     Label pwdLabel = new Label("确认密码:");
                     PasswordField pwd = new PasswordField();
