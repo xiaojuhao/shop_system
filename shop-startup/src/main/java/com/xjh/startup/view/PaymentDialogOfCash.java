@@ -10,11 +10,11 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 
-public class PaymentInfoInputDialog extends Dialog<PaymentResult> {
+public class PaymentDialogOfCash extends Dialog<PaymentResult> {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
 
-    public PaymentInfoInputDialog(DeskOrderParam param, EnumPayMethod method) {
-        this.setTitle(method.name);
+    public PaymentDialogOfCash(DeskOrderParam param) {
+        this.setTitle("现金结账");
         this.setWidth(300);
         GridPane grid = new GridPane();
         grid.setHgap(10);
@@ -29,12 +29,6 @@ public class PaymentInfoInputDialog extends Dialog<PaymentResult> {
         double pay = orderService.notPaidBillAmount(param.getOrderId());
         grid.add(new Label("待支付:"), 0, row);
         grid.add(new Label(CommonUtils.formatMoney(pay) + " 元"), 1, row);
-
-        row++;
-        TextField cardNumFiled = new TextField();
-        cardNumFiled.setPromptText(method.cardNoAlias);
-        grid.add(new Label(method.cardNoAlias + ":"), 0, row);
-        grid.add(cardNumFiled, 1, row);
 
         row++;
         TextField payAmountField = new TextField();
@@ -55,13 +49,12 @@ public class PaymentInfoInputDialog extends Dialog<PaymentResult> {
         this.setResultConverter(btn -> {
             PaymentResult result = new PaymentResult();
             result.setOrderId(param.getOrderId());
-            result.setPayMethod(method);
+            result.setPayMethod(EnumPayMethod.CASH);
             if (btn == confirmPayBtn) {
                 result.setPayAction(1);
                 result.setPayAmount(CommonUtils.parseMoney(payAmountField.getText(), 0D));
-                result.setPayRemark(method.name + ":" + payAmountField.getText()
+                result.setPayRemark("现金支付:" + payAmountField.getText()
                         + "\n" + remarkField.getText());
-                result.setCardNumber(cardNumFiled.getText());
             } else {
                 result.setPayAction(0);
                 result.setPayAmount(0D);

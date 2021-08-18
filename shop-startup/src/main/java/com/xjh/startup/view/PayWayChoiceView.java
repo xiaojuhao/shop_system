@@ -52,7 +52,7 @@ public class PayWayChoiceView extends VBox {
         button.setMinWidth(100);
         button.setMaxWidth(100);
         button.setOnMouseClicked(event -> {
-            Optional<PaymentResult> payResult = new PaymentInfoInputDialog(param, payMethod).showAndWait();
+            Optional<PaymentResult> payResult = new PaymentDialogOfCommon(param, payMethod).showAndWait();
             addPay(payResult.get());
         });
         return button;
@@ -63,7 +63,7 @@ public class PayWayChoiceView extends VBox {
         button.setMinWidth(100);
         button.setMaxWidth(100);
         button.setOnMouseClicked(event -> {
-            Optional<PaymentResult> payResult = new PaymentByCashDialog(param).showAndWait();
+            Optional<PaymentResult> payResult = new PaymentDialogOfCash(param).showAndWait();
             addPay(payResult.get());
         });
         return button;
