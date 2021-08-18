@@ -9,10 +9,8 @@ import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
-import javax.inject.Singleton;
 import java.net.InetSocketAddress;
 
-@Singleton
 public class XjhWebSocketServer extends WebSocketServer {
     public XjhWebSocketServer() {
         super(new InetSocketAddress(8889));
