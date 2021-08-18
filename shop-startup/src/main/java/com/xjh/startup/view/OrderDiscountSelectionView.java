@@ -16,7 +16,7 @@ public class OrderDiscountSelectionView extends VBox {
     public OrderDiscountSelectionView(DeskOrderParam param) {
         VBox box = this;
         box.setAlignment(Pos.CENTER);
-        VBox discountContentGroup = new VBox();
+        VBox discountContentLine = new VBox();
         // 折扣方式选择
         {
             ToggleGroup toggleGroup = new ToggleGroup();
@@ -32,8 +32,8 @@ public class OrderDiscountSelectionView extends VBox {
                     TextField card = new TextField();
                     HBox cardLine = newLine(cardLabel, card);
 
-                    discountContentGroup.getChildren().clear();
-                    discountContentGroup.getChildren().addAll(voucherLine, cardLine);
+                    discountContentLine.getChildren().clear();
+                    discountContentLine.getChildren().addAll(voucherLine, cardLine);
                 } else if (select == 2) {
                     Logger.info("店长折扣");
                     ComboBox<String> optList = new ComboBox<>(getDiscountOptions());
@@ -47,8 +47,8 @@ public class OrderDiscountSelectionView extends VBox {
                     pwd.setPrefWidth(160);
                     HBox pwdLine = newLine(pwdLabel, pwd);
 
-                    discountContentGroup.getChildren().clear();
-                    discountContentGroup.getChildren().addAll(typeLine, pwdLine);
+                    discountContentLine.getChildren().clear();
+                    discountContentLine.getChildren().addAll(typeLine, pwdLine);
                 } else {
                     Logger.info("未知类型");
                 }
@@ -66,14 +66,14 @@ public class OrderDiscountSelectionView extends VBox {
             manager.setUserData(2);
             manager.setSelected(true);
 
-            HBox discountTypeSelection = new HBox();
-            discountTypeSelection.setAlignment(Pos.CENTER);
-            discountTypeSelection.getChildren().addAll(discountTypeLabel, coupon, manager);
-            box.getChildren().add(discountTypeSelection);
+            HBox typeSelectionLine = new HBox();
+            typeSelectionLine.setAlignment(Pos.CENTER);
+            typeSelectionLine.getChildren().addAll(discountTypeLabel, coupon, manager);
+            box.getChildren().add(typeSelectionLine);
         }
         {
-            VBox.setMargin(discountContentGroup, new Insets(20, 0, 0, 0));
-            box.getChildren().add(discountContentGroup);
+            VBox.setMargin(discountContentLine, new Insets(20, 0, 0, 0));
+            box.getChildren().add(discountContentLine);
         }
         {
             Button button = new Button("使用优惠");
