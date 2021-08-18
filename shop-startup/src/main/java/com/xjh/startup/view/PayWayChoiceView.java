@@ -1,20 +1,17 @@
 package com.xjh.startup.view;
 
-import java.util.Optional;
-
 import com.xjh.common.enumeration.EnumOrderServeStatus;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Order;
+import com.xjh.guice.GuiceContainer;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderPayService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.model.PaymentResult;
-import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
-
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -23,6 +20,8 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
+
+import java.util.Optional;
 
 public class PayWayChoiceView extends VBox {
     OrderPayService orderPayService = GuiceContainer.getInstance(OrderPayService.class);

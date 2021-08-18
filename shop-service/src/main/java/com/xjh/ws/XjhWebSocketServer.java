@@ -3,28 +3,17 @@ package com.xjh.ws;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
+import com.xjh.guice.GuiceContainer;
 import com.xjh.ws.handler.*;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.net.InetSocketAddress;
 
 @Singleton
 public class XjhWebSocketServer extends WebSocketServer {
-    @Inject
-    AddCartHandler addCartHandler;
-    @Inject
-    CloseDeskHandler closeDeskHandler;
-    @Inject
-    OpenDeskHandler openDeskHandler;
-    @Inject
-    OrderCartHandler orderCartHandler;
-    @Inject
-    SocketOpenHandler socketOpenHandler;
-
     public XjhWebSocketServer() {
         super(new InetSocketAddress(8889));
     }
@@ -45,6 +34,7 @@ public class XjhWebSocketServer extends WebSocketServer {
 
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
+        SocketOpenHandler socketOpenHandler = GuiceContainer.getInstance(SocketOpenHandler.class);
         JSONObject resp = socketOpenHandler.handle(webSocket);
         String uuid = CommonUtils.randomStr(10);
         webSocket.setAttachment(uuid);
@@ -60,6 +50,10 @@ public class XjhWebSocketServer extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket ws, String message) {
+        OpenDeskHandler openDeskHandler = GuiceContainer.getInstance(OpenDeskHandler.class);
+        CloseDeskHandler closeDeskHandler = GuiceContainer.getInstance(CloseDeskHandler.class);
+        AddCartHandler addCartHandler = GuiceContainer.getInstance(AddCartHandler.class);
+        OrderCartHandler orderCartHandler = GuiceContainer.getInstance(OrderCartHandler.class);
         String uuid = ws.getAttachment();
         Logger.info(uuid + " >> 收到了消息:" + message);
         JSONObject msg = JSONObject.parseObject(message);

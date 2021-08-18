@@ -1,4 +1,4 @@
-package com.xjh.startup.foundation.guice;
+package com.xjh.guice;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;

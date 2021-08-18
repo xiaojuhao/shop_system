@@ -1,16 +1,12 @@
 package com.xjh.startup.view;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import cn.hutool.core.lang.Holder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.ThreadUtils;
 import com.xjh.dao.dataobject.Desk;
+import com.xjh.guice.GuiceContainer;
 import com.xjh.service.domain.DeskService;
-import com.xjh.startup.foundation.guice.GuiceContainer;
-
-import cn.hutool.core.lang.Holder;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -20,6 +16,9 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Screen;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DeskListView {
 

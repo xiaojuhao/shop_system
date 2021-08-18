@@ -1,16 +1,12 @@
 package com.xjh.startup.view;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.google.common.collect.Lists;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
 import com.xjh.dao.dataobject.OrderDishes;
+import com.xjh.guice.GuiceContainer;
 import com.xjh.service.domain.OrderDishesService;
-import com.xjh.startup.foundation.guice.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -22,6 +18,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class OrderReturnDishesView extends VBox {
     OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
