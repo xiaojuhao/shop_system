@@ -4,6 +4,7 @@ public class DiscountTypeBO {
     private String discountType;
     private String discountName;
     private double discountRate;
+    private String serialNo;
 
     public DiscountTypeBO(String discountType, String discountName, double discountRate) {
         this.discountType = discountType;
@@ -33,5 +34,13 @@ public class DiscountTypeBO {
 
     public void setDiscountRate(double discountRate) {
         this.discountRate = discountRate;
+    }
+
+    public String getSerialNo() {
+        return serialNo;
+    }
+
+    public void setSerialNo(String serialNo) {
+        this.serialNo = serialNo;
     }
 }

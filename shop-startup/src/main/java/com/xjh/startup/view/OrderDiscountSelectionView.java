@@ -4,6 +4,8 @@ import java.util.function.Supplier;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
+import com.xjh.common.utils.AlertBuilder;
+import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Holder;
 import com.xjh.common.utils.Logger;
 import com.xjh.startup.view.model.DeskOrderParam;
@@ -45,7 +47,27 @@ public class OrderDiscountSelectionView extends VBox {
 
                     Label cardLabel = new Label("折扣卡:");
                     TextField card = new TextField();
-                    discountHolder.hold(null);
+                    discountHolder.hold(() -> {
+                        String voucherValue = voucher.getText();
+                        String cardValue = card.getText();
+                        if (CommonUtils.isNotBlank(voucherValue) && CommonUtils.isNotBlank(cardValue)) {
+                            AlertBuilder.ERROR("折扣券和卡折扣只能使用一种");
+                            return null;
+                        }
+                        if (CommonUtils.isBlank(voucherValue) && CommonUtils.isBlank(cardValue)) {
+                            AlertBuilder.ERROR("请输入折扣信息");
+                            return null;
+                        }
+                        if (CommonUtils.isNotBlank(voucherValue)) {
+                            DiscountTypeBO bo = new DiscountTypeBO("voucher", "折扣券", 0);
+                            bo.setSerialNo(voucherValue);
+                            return bo;
+                        } else {
+                            DiscountTypeBO bo = new DiscountTypeBO("card", "折扣卡", 0);
+                            bo.setSerialNo(cardValue);
+                            return bo;
+                        }
+                    });
 
                     discountContentLine.getChildren().clear();
                     discountContentLine.getChildren().addAll(
