@@ -29,11 +29,11 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class DeskBox extends VBox {
+public class DeskRectView extends VBox {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
     static AtomicBoolean openingDesk = new AtomicBoolean(false);
 
-    public DeskBox(SimpleObjectProperty<Desk> desk, double width) {
+    public DeskRectView(SimpleObjectProperty<Desk> desk, double width) {
         double height = width / 2;
         this.setPrefSize(width, height);
         this.getStyleClass().add("desk");

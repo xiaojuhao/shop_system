@@ -46,8 +46,8 @@ public class DeskListView {
             // 加载所有的tables
             double prefWidth = Math.max(width / 6 - 15, 200);
             allDesks().forEach(desk -> desks.add(new SimpleObjectProperty<>(desk)));
-            List<DeskBox> views = new ArrayList<>();
-            desks.forEach(d -> views.add(new DeskBox(d, prefWidth)));
+            List<DeskRectView> views = new ArrayList<>();
+            desks.forEach(d -> views.add(new DeskRectView(d, prefWidth)));
             // 渲染tables;
             Platform.runLater(() -> pane.getChildren().addAll(views));
             // 监测变化
