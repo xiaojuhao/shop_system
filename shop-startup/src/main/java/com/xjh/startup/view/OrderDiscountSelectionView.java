@@ -3,19 +3,12 @@ package com.xjh.startup.view;
 import com.google.common.collect.Lists;
 import com.xjh.common.utils.Logger;
 import com.xjh.startup.view.model.DeskOrderParam;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.Node;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -23,7 +16,7 @@ public class OrderDiscountSelectionView extends VBox {
     public OrderDiscountSelectionView(DeskOrderParam param) {
         VBox box = this;
         box.setAlignment(Pos.CENTER);
-        Group discountContentGroup = new Group();
+        VBox discountContentGroup = new VBox();
         // 折扣方式选择
         {
             Label discountTypeLabel = new Label("折扣方式:");
@@ -36,20 +29,14 @@ public class OrderDiscountSelectionView extends VBox {
                     Logger.info("优惠券");
                     Label voucherLabel = new Label("折扣券:");
                     TextField voucher = new TextField();
-                    HBox voucherLine = new HBox();
-                    voucherLine.setAlignment(Pos.CENTER);
-                    voucherLine.getChildren().addAll(voucherLabel, voucher);
+                    HBox voucherLine = newLine(voucherLabel, voucher);
 
                     Label cardLabel = new Label("折扣卡:");
                     TextField card = new TextField();
-                    HBox cardLine = new HBox();
-                    cardLine.setAlignment(Pos.CENTER);
-                    cardLine.getChildren().addAll(cardLabel, card);
+                    HBox cardLine = newLine(cardLabel, card);
 
                     discountContentGroup.getChildren().clear();
-                    VBox xxx = new VBox();
-                    xxx.getChildren().addAll(voucherLine, cardLine);
-                    discountContentGroup.getChildren().addAll(xxx);
+                    discountContentGroup.getChildren().addAll(voucherLine, cardLine);
                 } else if (select == 2) {
                     Logger.info("店长折扣");
                     ObservableList<String> options = FXCollections.observableArrayList(
@@ -61,21 +48,15 @@ public class OrderDiscountSelectionView extends VBox {
                     optList.setPrefWidth(160);
                     Label label = new Label("折扣类型:");
 
-                    HBox typeLine = new HBox();
-                    typeLine.setAlignment(Pos.CENTER);
-                    typeLine.getChildren().addAll(label, optList);
+                    HBox typeLine = newLine(label, optList);
 
                     Label pwdLabel = new Label("确认密码:");
                     PasswordField pwd = new PasswordField();
                     pwd.setPrefWidth(160);
-                    HBox pwdLine = new HBox();
-                    pwdLine.setAlignment(Pos.CENTER);
-                    pwdLine.getChildren().addAll(pwdLabel, pwd);
+                    HBox pwdLine = newLine(pwdLabel, pwd);
 
                     discountContentGroup.getChildren().clear();
-                    VBox xxx = new VBox();
-                    xxx.getChildren().addAll(typeLine, pwdLine);
-                    discountContentGroup.getChildren().addAll(xxx);
+                    discountContentGroup.getChildren().addAll(typeLine, pwdLine);
                 } else {
                     Logger.info("未知类型");
                 }
@@ -104,6 +85,13 @@ public class OrderDiscountSelectionView extends VBox {
             VBox.setMargin(button, new Insets(20, 0, 0, 0));
             box.getChildren().add(button);
         }
+    }
+
+    private HBox newLine(Node title, Node node){
+        HBox line = new HBox();
+        line.setAlignment(Pos.CENTER);
+        line.getChildren().addAll(title, node);
+        return line;
     }
 
 }
