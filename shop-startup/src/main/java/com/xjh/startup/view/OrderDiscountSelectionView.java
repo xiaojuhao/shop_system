@@ -3,12 +3,19 @@ package com.xjh.startup.view;
 import com.google.common.collect.Lists;
 import com.xjh.common.utils.Logger;
 import com.xjh.startup.view.model.DeskOrderParam;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -17,6 +24,7 @@ public class OrderDiscountSelectionView extends VBox {
         VBox box = this;
         box.setAlignment(Pos.CENTER);
         VBox discountContentLine = new VBox();
+        discountContentLine.setSpacing(10);
         // 折扣方式选择
         {
             ToggleGroup toggleGroup = new ToggleGroup();
