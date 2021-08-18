@@ -26,29 +26,28 @@ public class OrderDiscountSelectionView extends VBox {
                     Logger.info("优惠券");
                     Label voucherLabel = new Label("折扣券:");
                     TextField voucher = new TextField();
-                    HBox voucherLine = newLine(voucherLabel, voucher);
 
                     Label cardLabel = new Label("折扣卡:");
                     TextField card = new TextField();
-                    HBox cardLine = newLine(cardLabel, card);
 
                     discountContentLine.getChildren().clear();
-                    discountContentLine.getChildren().addAll(voucherLine, cardLine);
+                    discountContentLine.getChildren().addAll(
+                            newLine(voucherLabel, voucher),
+                            newLine(cardLabel, card));
                 } else if (select == 2) {
                     Logger.info("店长折扣");
                     ComboBox<String> optList = new ComboBox<>(getDiscountOptions());
                     optList.setPrefWidth(160);
                     Label label = new Label("折扣类型:");
 
-                    HBox typeLine = newLine(label, optList);
-
                     Label pwdLabel = new Label("确认密码:");
                     PasswordField pwd = new PasswordField();
                     pwd.setPrefWidth(160);
-                    HBox pwdLine = newLine(pwdLabel, pwd);
 
                     discountContentLine.getChildren().clear();
-                    discountContentLine.getChildren().addAll(typeLine, pwdLine);
+                    discountContentLine.getChildren().addAll(
+                            newLine(label, optList),
+                            newLine(pwdLabel, pwd));
                 } else {
                     Logger.info("未知类型");
                 }
