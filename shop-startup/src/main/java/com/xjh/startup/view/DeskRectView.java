@@ -55,15 +55,10 @@ public class DeskRectView extends VBox {
         desk.addListener((cc, _old, _new) -> {
             EnumDesKStatus desKStatus = EnumDesKStatus.of(_new.getStatus());
             setBackground(this, desKStatus);
-            Order order = orderService.getOrder(_new.getOrderId());
+            Integer orderId = _new.getOrderId();
 
-            Result<LocalDateTime> firstSubOrderTimeRs = orderService.firstSubOrderTime(_new.getOrderId());
-            if (!firstSubOrderTimeRs.isSuccess()) {
-                AlertBuilder.ERROR(firstSubOrderTimeRs.getMsg());
-                return;
-            }
             String time = "";
-            LocalDateTime firstSubOrderTime = firstSubOrderTimeRs.getData();
+            LocalDateTime firstSubOrderTime = orderService.firstSubOrderTime(orderId).getData();
             if (firstSubOrderTime != null && desKStatus != EnumDesKStatus.FREE) {
                 long usedSeconds = DateBuilder.intervalSeconds(firstSubOrderTime, LocalDateTime.now());
                 time = CommonUtils.formatSeconds(usedSeconds);
@@ -75,6 +70,7 @@ public class DeskRectView extends VBox {
             // 用餐时间
             paintTime(gc, width, height, time);
             // 人数
+            Order order = orderService.getOrder(orderId);
             if (order != null) {
                 paintCustNum(gc, width, height, order.getOrderCustomerNums());
             }
