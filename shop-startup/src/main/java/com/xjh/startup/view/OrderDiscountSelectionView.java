@@ -1,13 +1,15 @@
 package com.xjh.startup.view;
 
+import java.util.List;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
-import com.xjh.common.utils.AlertBuilder;
-import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.Holder;
-import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.*;
+import com.xjh.dao.dataobject.OrderDishes;
+import com.xjh.guice.GuiceContainer;
+import com.xjh.service.domain.OrderDishesService;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.DiscountTypeBO;
 
@@ -119,8 +121,11 @@ public class OrderDiscountSelectionView extends VBox {
             button.setOnMouseClicked(evt -> {
                 if (discountHolder.get() != null) {
                     DiscountTypeBO bo = discountHolder.get().get();
-                    if (bo != null) {
+                    if (bo != null && bo.getDiscountRate() >= 0) {
                         Logger.info(JSON.toJSONString(bo));
+                        this.handleDiscount(param, bo);
+                    } else {
+                        AlertBuilder.ERROR("折扣信息错误");
                     }
                 }
             });
@@ -137,13 +142,13 @@ public class OrderDiscountSelectionView extends VBox {
 
     private ComboBox<DiscountTypeBO> getDiscountOptions() {
         ObservableList<DiscountTypeBO> list = FXCollections.observableArrayList(Lists.newArrayList(
-                new DiscountTypeBO("d01", "员工折扣(7折)", 0.7),
-                new DiscountTypeBO("d02", "朋友折扣(8.5折)", 0.85),
-                new DiscountTypeBO("d03", "员工补单折扣(6折)", 0.6),
-                new DiscountTypeBO("d04", "7.8折活动", 0.78),
-                new DiscountTypeBO("d05", "8.8折活动", 0.88),
-                new DiscountTypeBO("d06", "68元秒杀", 0.6),
-                new DiscountTypeBO("d07", "5折活动", 0.5)
+                new DiscountTypeBO("ZK01", "员工折扣(7折)", 0.7),
+                new DiscountTypeBO("ZK02", "朋友折扣(8.5折)", 0.85),
+                new DiscountTypeBO("ZK03", "员工补单折扣(6折)", 0.6),
+                new DiscountTypeBO("ZK04", "7.8折活动", 0.78),
+                new DiscountTypeBO("ZK05", "8.8折活动", 0.88),
+                new DiscountTypeBO("ZK06", "68元秒杀", 0.6),
+                new DiscountTypeBO("ZK07", "5折活动", 0.5)
         ));
         ComboBox<DiscountTypeBO> optList = new ComboBox<>(list);
         optList.setConverter(new StringConverter<DiscountTypeBO>() {
@@ -158,6 +163,31 @@ public class OrderDiscountSelectionView extends VBox {
             }
         });
         return optList;
+    }
+
+    private void handleDiscount(DeskOrderParam param, DiscountTypeBO discount){
+        if(param == null || discount == null){
+            return;
+        }
+        Integer orderId = param.getOrderId();
+        OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
+        // 加载orderDishes
+        List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(orderId);
+        // 加载discount Checker
+        Predicate<OrderDishes> discountChecker = orderDishesService.discountableChecker();
+        // 可以参加折扣的菜品
+        List<OrderDishes> discountableOrderDishes = CommonUtils.filter(orderDishesList, discountChecker.negate());
+        //
+        for(OrderDishes od : discountableOrderDishes){
+            OrderDishes update = new OrderDishes();
+            update.setOrderDishesId(od.getOrderDishesId());
+            update.setOrderDishesDiscountPrice(od.getOrderDishesPrice() * discount.getDiscountRate());
+            Result<Integer> rs = orderDishesService.updatePrimaryKey(update);
+            if(!rs.isSuccess()){
+                AlertBuilder.ERROR(rs.getMsg());
+                return;
+            }
+        }
     }
 
 }

@@ -275,7 +275,7 @@ public class OrderDetailView extends VBox {
 
     private ObservableList<OrderDishesTableItemVO> buildTableItemList(List<OrderDishes> orderDishes) {
         // 可折扣的菜品信息
-        Predicate<OrderDishes> discountableChecker = this.discountableChecker();
+        Predicate<OrderDishes> discountableChecker = orderDishesService.discountableChecker();
         // 订单菜品明细
         orderDishes.sort(Comparator.comparing(OrderDishes::getCreatetime));
 
@@ -476,10 +476,7 @@ public class OrderDetailView extends VBox {
         return EnumOrderSaleType.of(x.getOrderDishesSaletype()) != EnumOrderSaleType.RETURN;
     }
 
-    private Predicate<OrderDishes> discountableChecker() {
-        Set<Integer> discountableDishesIds = storeService.getStoreDiscountableDishesIds();
-        return o -> discountableDishesIds.contains(o.getDishesId()) && o.getIfDishesPackage() == 0;
-    }
+
 
     private double sumDishesPrice(List<OrderDishes> orderDishes) {
         return orderDishes.stream()
