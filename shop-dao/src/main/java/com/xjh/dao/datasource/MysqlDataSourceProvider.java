@@ -17,7 +17,6 @@ public class MysqlDataSourceProvider implements Provider<HikariDataSource> {
 
     @Override
     public HikariDataSource get() {
-        Logger.info("获取MySql链接");
         return Inst.ds;
     }
 

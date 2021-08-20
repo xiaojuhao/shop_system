@@ -1,22 +1,40 @@
 package com.xjh.startup.view;
 
+import java.util.function.Supplier;
+
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
+import com.xjh.common.utils.AlertBuilder;
+import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.Holder;
 import com.xjh.common.utils.Logger;
 import com.xjh.startup.view.model.DeskOrderParam;
+import com.xjh.startup.view.model.DiscountTypeBO;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 
 public class OrderDiscountSelectionView extends VBox {
     public OrderDiscountSelectionView(DeskOrderParam param) {
         VBox box = this;
         box.setAlignment(Pos.CENTER);
+        box.setSpacing(10);
         VBox discountContentLine = new VBox();
+        discountContentLine.setSpacing(10);
+        Holder<Supplier<DiscountTypeBO>> discountHolder = new Holder<>();
         // 折扣方式选择
         {
             ToggleGroup toggleGroup = new ToggleGroup();
@@ -29,6 +47,27 @@ public class OrderDiscountSelectionView extends VBox {
 
                     Label cardLabel = new Label("折扣卡:");
                     TextField card = new TextField();
+                    discountHolder.hold(() -> {
+                        String voucherValue = voucher.getText();
+                        String cardValue = card.getText();
+                        if (CommonUtils.isNotBlank(voucherValue) && CommonUtils.isNotBlank(cardValue)) {
+                            AlertBuilder.ERROR("折扣券和卡折扣只能使用一种");
+                            return null;
+                        }
+                        if (CommonUtils.isBlank(voucherValue) && CommonUtils.isBlank(cardValue)) {
+                            AlertBuilder.ERROR("请输入折扣信息");
+                            return null;
+                        }
+                        if (CommonUtils.isNotBlank(voucherValue)) {
+                            DiscountTypeBO bo = new DiscountTypeBO("voucher", "折扣券", 0);
+                            bo.setSerialNo(voucherValue);
+                            return bo;
+                        } else {
+                            DiscountTypeBO bo = new DiscountTypeBO("card", "折扣卡", 0);
+                            bo.setSerialNo(cardValue);
+                            return bo;
+                        }
+                    });
 
                     discountContentLine.getChildren().clear();
                     discountContentLine.getChildren().addAll(
@@ -36,13 +75,15 @@ public class OrderDiscountSelectionView extends VBox {
                             newLine(cardLabel, card));
                 } else if (select == 2) {
                     Logger.info("店长折扣");
-                    ComboBox<String> optList = new ComboBox<>(getDiscountOptions());
+                    ComboBox<DiscountTypeBO> optList = getDiscountOptions();
                     optList.setPrefWidth(160);
                     Label label = new Label("折扣类型:");
+                    discountHolder.hold(() -> optList.getSelectionModel().getSelectedItem());
 
                     Label pwdLabel = new Label("确认密码:");
                     PasswordField pwd = new PasswordField();
                     pwd.setPrefWidth(160);
+
 
                     discountContentLine.getChildren().clear();
                     discountContentLine.getChildren().addAll(
@@ -71,12 +112,18 @@ public class OrderDiscountSelectionView extends VBox {
             box.getChildren().add(typeSelectionLine);
         }
         {
-            VBox.setMargin(discountContentLine, new Insets(20, 0, 0, 0));
             box.getChildren().add(discountContentLine);
         }
         {
             Button button = new Button("使用优惠");
-            VBox.setMargin(button, new Insets(20, 0, 0, 0));
+            button.setOnMouseClicked(evt -> {
+                if (discountHolder.get() != null) {
+                    DiscountTypeBO bo = discountHolder.get().get();
+                    if (bo != null) {
+                        Logger.info(JSON.toJSONString(bo));
+                    }
+                }
+            });
             box.getChildren().add(button);
         }
     }
@@ -88,12 +135,29 @@ public class OrderDiscountSelectionView extends VBox {
         return line;
     }
 
-    private ObservableList<String> getDiscountOptions() {
-        return FXCollections.observableArrayList(
-                Lists.newArrayList(
-                        "员工折扣(7折)", "朋友折扣(8.5折)", "员工补单折扣(6折)",
-                        "7.8折活动", "8.8折活动", "68元秒杀", "其它")
-        );
+    private ComboBox<DiscountTypeBO> getDiscountOptions() {
+        ObservableList<DiscountTypeBO> list = FXCollections.observableArrayList(Lists.newArrayList(
+                new DiscountTypeBO("d01", "员工折扣(7折)", 0.7),
+                new DiscountTypeBO("d02", "朋友折扣(8.5折)", 0.85),
+                new DiscountTypeBO("d03", "员工补单折扣(6折)", 0.6),
+                new DiscountTypeBO("d04", "7.8折活动", 0.78),
+                new DiscountTypeBO("d05", "8.8折活动", 0.88),
+                new DiscountTypeBO("d06", "68元秒杀", 0.6),
+                new DiscountTypeBO("d07", "5折活动", 0.5)
+        ));
+        ComboBox<DiscountTypeBO> optList = new ComboBox<>(list);
+        optList.setConverter(new StringConverter<DiscountTypeBO>() {
+            @Override
+            public String toString(DiscountTypeBO object) {
+                return object.getDiscountName();
+            }
+
+            @Override
+            public DiscountTypeBO fromString(String string) {
+                return null;
+            }
+        });
+        return optList;
     }
 
 }
