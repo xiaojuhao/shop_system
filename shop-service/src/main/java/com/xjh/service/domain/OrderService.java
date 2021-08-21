@@ -213,7 +213,7 @@ public class OrderService {
         double orderErase = CommonUtils.orElse(order.getOrderErase(), 0D);
         double orderReduction = CommonUtils.orElse(order.getOrderReduction(), 0D);
         double paidAmt = CommonUtils.orElse(order.getOrderHadpaid(), 0D);
-        double notPaid = totalBillAmt - orderErase - orderReduction - paidAmt;
+        double notPaid = Math.max(0, totalBillAmt - orderErase - orderReduction - paidAmt);
         return CommonUtils.parseMoney(notPaid + "", 0D);
     }
 
