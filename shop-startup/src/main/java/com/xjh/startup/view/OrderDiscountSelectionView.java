@@ -6,7 +6,11 @@ import java.util.function.Supplier;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
-import com.xjh.common.utils.*;
+import com.xjh.common.utils.AlertBuilder;
+import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.Holder;
+import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.guice.GuiceContainer;
 import com.xjh.service.domain.OrderDishesService;
@@ -165,8 +169,8 @@ public class OrderDiscountSelectionView extends VBox {
         return optList;
     }
 
-    private void handleDiscount(DeskOrderParam param, DiscountTypeBO discount){
-        if(param == null || discount == null){
+    private void handleDiscount(DeskOrderParam param, DiscountTypeBO discount) {
+        if (param == null || discount == null) {
             return;
         }
         Integer orderId = param.getOrderId();
@@ -176,14 +180,14 @@ public class OrderDiscountSelectionView extends VBox {
         // 加载discount Checker
         Predicate<OrderDishes> discountChecker = orderDishesService.discountableChecker();
         // 可以参加折扣的菜品
-        List<OrderDishes> discountableOrderDishes = CommonUtils.filter(orderDishesList, discountChecker.negate());
+        List<OrderDishes> discountableOrderDishes = CommonUtils.filter(orderDishesList, discountChecker);
         //
-        for(OrderDishes od : discountableOrderDishes){
+        for (OrderDishes od : discountableOrderDishes) {
             OrderDishes update = new OrderDishes();
             update.setOrderDishesId(od.getOrderDishesId());
             update.setOrderDishesDiscountPrice(od.getOrderDishesPrice() * discount.getDiscountRate());
             Result<Integer> rs = orderDishesService.updatePrimaryKey(update);
-            if(!rs.isSuccess()){
+            if (!rs.isSuccess()) {
                 AlertBuilder.ERROR(rs.getMsg());
                 return;
             }
