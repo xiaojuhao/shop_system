@@ -234,10 +234,8 @@ public class OrderService {
             order.setOrderRefund(0D);
             order.setOrderReduction(0D);
             order.setOrderHadpaid(0D);
+            order.setCreateTime(DateBuilder.now().mills());
 
-            if (order.getCreateTime() == null) {
-                order.setCreateTime(DateBuilder.now().mills());
-            }
             orderDAO.insert(order);
             return order;
         } finally {
