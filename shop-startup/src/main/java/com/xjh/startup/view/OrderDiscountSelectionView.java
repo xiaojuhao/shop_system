@@ -19,7 +19,6 @@ import com.xjh.startup.view.model.DiscountTypeBO;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -103,7 +102,6 @@ public class OrderDiscountSelectionView extends VBox {
             });
 
             Label discountTypeLabel = new Label("折扣方式:");
-            HBox.setMargin(discountTypeLabel, new Insets(0, 20, 0, 0));
 
             RadioButton coupon = new RadioButton("卡券优惠");
             coupon.setToggleGroup(toggleGroup);
@@ -114,10 +112,7 @@ public class OrderDiscountSelectionView extends VBox {
             manager.setUserData(2);
             manager.setSelected(true);
 
-            HBox typeSelectionLine = new HBox();
-            typeSelectionLine.setAlignment(Pos.CENTER);
-            typeSelectionLine.getChildren().addAll(discountTypeLabel, coupon, manager);
-            box.getChildren().add(typeSelectionLine);
+            box.getChildren().add(newLine(discountTypeLabel, coupon, manager));
         }
         {
             box.getChildren().add(discountContentLine);
@@ -139,10 +134,13 @@ public class OrderDiscountSelectionView extends VBox {
         }
     }
 
-    private HBox newLine(Node title, Node node) {
+    private HBox newLine(Node... nodes) {
         HBox line = new HBox();
         line.setAlignment(Pos.CENTER);
-        line.getChildren().addAll(title, node);
+        line.setSpacing(10);
+        for (Node n : nodes) {
+            line.getChildren().add(n);
+        }
         return line;
     }
 
