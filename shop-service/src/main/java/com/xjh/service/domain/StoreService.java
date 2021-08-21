@@ -103,6 +103,10 @@ public class StoreService {
     }
 
     public boolean checkManagerPwd(String pwd) {
-        return CommonUtils.eq(pwd, "1234");
+        StoreVO store = getStore().getData();
+        if (store == null) {
+            return false;
+        }
+        return CommonUtils.eq(pwd, store.getOwnerPassword());
     }
 }
