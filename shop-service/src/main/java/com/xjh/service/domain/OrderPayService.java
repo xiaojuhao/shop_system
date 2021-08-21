@@ -39,7 +39,7 @@ public class OrderPayService {
                 return Result.fail("订单信息不存在:" + paymentResult.getOrderId());
             }
             double notPaidBillAmount = orderService.notPaidBillAmount(order);
-            if (Math.abs(notPaidBillAmount - paymentResult.getPayAmount()) < 0.01) {
+            if (Math.abs(notPaidBillAmount - paymentResult.getPayAmount()) < 0.009) {
                 paymentResult.setPayAmount(notPaidBillAmount);
             }
             if (notPaidBillAmount < paymentResult.getPayAmount()) {

@@ -255,7 +255,13 @@ public class CommonUtils {
                 sb.append(c);
             }
         }
-        return parseDouble(sb, def);
+        Double val = parseDouble(sb, def);
+        if (val != null) {
+            DecimalFormat decimalFormat = new DecimalFormat("##.00");
+            String formattedVal = decimalFormat.format(val);
+            return parseDouble(formattedVal, def);
+        }
+        return def;
     }
 
     public static Long parseLong(Object str, Long def) {
