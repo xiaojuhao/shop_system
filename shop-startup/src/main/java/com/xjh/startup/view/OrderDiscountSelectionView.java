@@ -14,7 +14,9 @@ import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.guice.GuiceContainer;
 import com.xjh.service.domain.OrderDishesService;
+import com.xjh.service.domain.StoreService;
 import com.xjh.startup.view.model.DeskOrderParam;
+import com.xjh.startup.view.model.DiscountApplyReq;
 import com.xjh.startup.view.model.DiscountTypeBO;
 
 import javafx.collections.FXCollections;
@@ -34,6 +36,7 @@ import javafx.util.StringConverter;
 
 public class OrderDiscountSelectionView extends VBox {
     OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
+    StoreService storeService = GuiceContainer.getInstance(StoreService.class);
 
     public OrderDiscountSelectionView(DeskOrderParam param) {
         VBox box = this;
@@ -41,7 +44,7 @@ public class OrderDiscountSelectionView extends VBox {
         box.setSpacing(10);
         VBox discountContentLine = new VBox();
         discountContentLine.setSpacing(10);
-        Holder<Supplier<DiscountTypeBO>> discountHolder = new Holder<>();
+        Holder<Supplier<DiscountApplyReq>> discountHolder = new Holder<>();
         // 折扣方式选择
         {
             ToggleGroup toggleGroup = new ToggleGroup();
@@ -55,24 +58,27 @@ public class OrderDiscountSelectionView extends VBox {
                     Label cardLabel = new Label("折扣卡:");
                     TextField card = new TextField();
                     discountHolder.hold(() -> {
-                        String voucherValue = voucher.getText();
-                        String cardValue = card.getText();
-                        if (CommonUtils.isNotBlank(voucherValue) && CommonUtils.isNotBlank(cardValue)) {
+                        String voucherNo = voucher.getText();
+                        String cardNo = card.getText();
+                        if (CommonUtils.isNotBlank(voucherNo) && CommonUtils.isNotBlank(cardNo)) {
                             AlertBuilder.ERROR("折扣券和卡折扣只能使用一种");
                             return null;
                         }
-                        if (CommonUtils.isBlank(voucherValue) && CommonUtils.isBlank(cardValue)) {
-                            AlertBuilder.ERROR("请输入折扣信息");
+                        if (CommonUtils.isBlank(voucherNo) && CommonUtils.isBlank(cardNo)) {
                             return null;
                         }
-                        if (CommonUtils.isNotBlank(voucherValue)) {
-                            DiscountTypeBO bo = new DiscountTypeBO("voucher", "折扣券", 0);
-                            bo.setSerialNo(voucherValue);
-                            return bo;
+                        if (CommonUtils.isNotBlank(voucherNo)) {
+                            DiscountApplyReq req = new DiscountApplyReq();
+                            req.setDiscountType("voucher");
+                            req.setDiscountName("优惠券");
+                            req.setVoucherNo(voucherNo);
+                            return req;
                         } else {
-                            DiscountTypeBO bo = new DiscountTypeBO("card", "折扣卡", 0);
-                            bo.setSerialNo(cardValue);
-                            return bo;
+                            DiscountApplyReq req = new DiscountApplyReq();
+                            req.setDiscountType("card");
+                            req.setDiscountName("折扣卡");
+                            req.setCardNo(cardNo);
+                            return req;
                         }
                     });
 
@@ -85,12 +91,23 @@ public class OrderDiscountSelectionView extends VBox {
                     ComboBox<DiscountTypeBO> optList = getDiscountOptions();
                     optList.setPrefWidth(160);
                     Label label = new Label("折扣类型:");
-                    discountHolder.hold(() -> optList.getSelectionModel().getSelectedItem());
 
                     Label pwdLabel = new Label("确认密码:");
                     PasswordField pwd = new PasswordField();
                     pwd.setPrefWidth(160);
 
+                    discountHolder.hold(() -> {
+                        DiscountTypeBO bo = optList.getSelectionModel().getSelectedItem();
+                        if (bo == null) {
+                            return null;
+                        }
+                        DiscountApplyReq req = new DiscountApplyReq();
+                        req.setDiscountType("manager");
+                        req.setDiscountName(bo.getDiscountName());
+                        req.setDiscountRate(bo.getDiscountRate());
+                        req.setManagerPwd(CommonUtils.trim(pwd.getText()));
+                        return req;
+                    });
 
                     discountContentLine.getChildren().clear();
                     discountContentLine.getChildren().addAll(
@@ -121,13 +138,22 @@ public class OrderDiscountSelectionView extends VBox {
             Button button = new Button("使用优惠");
             button.setOnMouseClicked(evt -> {
                 if (discountHolder.get() != null) {
-                    DiscountTypeBO bo = discountHolder.get().get();
-                    if (bo != null && bo.getDiscountRate() >= 0) {
-                        Logger.info(JSON.toJSONString(bo));
-                        this.handleDiscount(param, bo);
-                    } else {
-                        AlertBuilder.ERROR("折扣信息错误");
+                    DiscountApplyReq req = discountHolder.get().get();
+                    if (req == null) {
+                        AlertBuilder.ERROR("请选择折扣信息");
+                        return;
                     }
+                    if ("manager".equals(req.getDiscountType())
+                            && !storeService.checkManagerPwd(req.getManagerPwd())) {
+                        AlertBuilder.ERROR("店长密码错误");
+                        return;
+                    }
+                    if (req.getDiscountRate() <= 0.001 || req.getDiscountRate() >= 0.999) {
+                        AlertBuilder.ERROR("折扣信息错误");
+                        return;
+                    }
+                    Logger.info(JSON.toJSONString(req));
+                    this.handleDiscount(param, req);
                 }
             });
             box.getChildren().add(button);
@@ -146,13 +172,13 @@ public class OrderDiscountSelectionView extends VBox {
 
     private ComboBox<DiscountTypeBO> getDiscountOptions() {
         ObservableList<DiscountTypeBO> list = FXCollections.observableArrayList(Lists.newArrayList(
-                new DiscountTypeBO("ZK01", "员工折扣(7折)", 0.7),
-                new DiscountTypeBO("ZK02", "朋友折扣(8.5折)", 0.85),
-                new DiscountTypeBO("ZK03", "员工补单折扣(6折)", 0.6),
-                new DiscountTypeBO("ZK04", "7.8折活动", 0.78),
-                new DiscountTypeBO("ZK05", "8.8折活动", 0.88),
-                new DiscountTypeBO("ZK06", "68元秒杀", 0.6),
-                new DiscountTypeBO("ZK07", "5折活动", 0.5)
+                new DiscountTypeBO("员工折扣(7折)", 0.7),
+                new DiscountTypeBO("朋友折扣(8.5折)", 0.85),
+                new DiscountTypeBO("员工补单折扣(6折)", 0.6),
+                new DiscountTypeBO("7.8折活动", 0.78),
+                new DiscountTypeBO("8.8折活动", 0.88),
+                new DiscountTypeBO("68元秒杀", 0.6),
+                new DiscountTypeBO("5折活动", 0.5)
         ));
         ComboBox<DiscountTypeBO> optList = new ComboBox<>(list);
         optList.setConverter(new StringConverter<DiscountTypeBO>() {
@@ -169,8 +195,8 @@ public class OrderDiscountSelectionView extends VBox {
         return optList;
     }
 
-    private void handleDiscount(DeskOrderParam param, DiscountTypeBO discount) {
-        if (param == null || discount == null) {
+    private void handleDiscount(DeskOrderParam param, DiscountApplyReq req) {
+        if (param == null || req == null) {
             return;
         }
         Integer orderId = param.getOrderId();
@@ -184,13 +210,14 @@ public class OrderDiscountSelectionView extends VBox {
         for (OrderDishes od : discountableOrderDishes) {
             OrderDishes update = new OrderDishes();
             update.setOrderDishesId(od.getOrderDishesId());
-            update.setOrderDishesDiscountPrice(od.getOrderDishesPrice() * discount.getDiscountRate());
+            update.setOrderDishesDiscountPrice(od.getOrderDishesPrice() * req.getDiscountRate());
             Result<Integer> rs = orderDishesService.updatePrimaryKey(update);
             if (!rs.isSuccess()) {
                 AlertBuilder.ERROR(rs.getMsg());
                 return;
             }
         }
+        AlertBuilder.INFO("优惠使用成功");
     }
 
 }

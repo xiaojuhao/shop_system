@@ -6,7 +6,9 @@ import com.xjh.common.utils.Logger;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.guice.GuiceContainer;
 import com.xjh.service.domain.OrderService;
+import com.xjh.service.domain.StoreService;
 import com.xjh.startup.view.model.DeskOrderParam;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -18,6 +20,7 @@ import javafx.scene.layout.VBox;
 
 public class OrderReductionView extends VBox {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
+    StoreService storeService = GuiceContainer.getInstance(StoreService.class);
 
     public OrderReductionView(DeskOrderParam param) {
         VBox box = this;
@@ -46,7 +49,7 @@ public class OrderReductionView extends VBox {
         returnBtn.setOnMouseClicked(evt -> {
             String r = eraseAmt.getText();
             String password = pwd.getText();
-            if (!CommonUtils.eq(password, "1234")) {
+            if (!storeService.checkManagerPwd(password)) {
                 AlertBuilder.ERROR("店长密码不符");
                 return;
             }

@@ -101,4 +101,8 @@ public class StoreService {
         }
         return vo;
     }
+
+    public boolean checkManagerPwd(String pwd) {
+        return CommonUtils.eq(pwd, "1234");
+    }
 }
