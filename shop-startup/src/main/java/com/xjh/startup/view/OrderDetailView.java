@@ -1,17 +1,45 @@
 package com.xjh.startup.view;
 
+import static com.xjh.common.utils.CommonUtils.formatMoney;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
+
 import com.xjh.common.enumeration.EnumChoiceAction;
 import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
-import com.xjh.common.utils.*;
+import com.xjh.common.utils.AlertBuilder;
+import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.Result;
+import com.xjh.common.utils.TimeRecord;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.RichText;
-import com.xjh.dao.dataobject.*;
+import com.xjh.dao.dataobject.Desk;
+import com.xjh.dao.dataobject.Dishes;
+import com.xjh.dao.dataobject.DishesPackage;
+import com.xjh.dao.dataobject.Order;
+import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.guice.GuiceContainer;
-import com.xjh.service.domain.*;
+import com.xjh.service.domain.DeskService;
+import com.xjh.service.domain.DishesPackageService;
+import com.xjh.service.domain.DishesService;
+import com.xjh.service.domain.OrderDishesService;
+import com.xjh.service.domain.OrderService;
+import com.xjh.service.domain.StoreService;
 import com.xjh.service.domain.model.OrderBillVO;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.OrderDishesTableItemVO;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -21,7 +49,17 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
@@ -32,14 +70,6 @@ import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import org.apache.commons.collections4.CollectionUtils;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import static com.xjh.common.utils.CommonUtils.formatMoney;
 
 public class OrderDetailView extends VBox {
     // 依赖服务
@@ -350,7 +380,7 @@ public class OrderDetailView extends VBox {
         }
         // 未支付金额
         double notPaidBillAmount = orderService.notPaidBillAmount(desk.getOrderId());
-        if (notPaidBillAmount > 0) {
+        if (notPaidBillAmount > 0.01) {
             AlertBuilder.INFO("未支付完成，无法关台");
             return;
         }
