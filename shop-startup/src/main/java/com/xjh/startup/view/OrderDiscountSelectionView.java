@@ -34,6 +34,8 @@ import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 
 public class OrderDiscountSelectionView extends VBox {
+    OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
+
     public OrderDiscountSelectionView(DeskOrderParam param) {
         VBox box = this;
         box.setAlignment(Pos.CENTER);
@@ -174,7 +176,6 @@ public class OrderDiscountSelectionView extends VBox {
             return;
         }
         Integer orderId = param.getOrderId();
-        OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
         // 加载orderDishes
         List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(orderId);
         // 加载discount Checker
