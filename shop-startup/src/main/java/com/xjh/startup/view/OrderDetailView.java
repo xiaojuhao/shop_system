@@ -19,6 +19,7 @@ import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.CopyUtils;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
 import com.xjh.common.utils.TimeRecord;
@@ -143,7 +144,7 @@ public class OrderDetailView extends VBox {
             Label labelOrderTime = createLabel("当前折扣", c -> "无");
             gridPane.add(labelOrderTime, 3, row);
 
-            Label labelPayStatus = createLabel("参与优惠金额", c -> "0.00");
+            Label labelPayStatus = createLabel("参与优惠金额", c -> formatMoney(c.discountableAmount));
             gridPane.add(labelPayStatus, 4, row);
 
             /// ----------- 第二行 ---------------
@@ -321,11 +322,14 @@ public class OrderDetailView extends VBox {
                 items.add(buildTableItem(dishesMap.get(o.getDishesId()), o));
             });
             // 可参与优惠价格
+            double discountableAmount = sumDishesPrice(discountableList);
+            orderView.get().discountableAmount = discountableAmount;
+            orderView.set(CopyUtils.cloneObj(orderView.get()));
             items.add(new OrderDishesTableItemVO(
                     "",
                     "",
                     RichText.EMPTY,
-                    new RichText("参与优惠合计:" + sumDishesPrice(discountableList)).with(Color.RED).with(Pos.CENTER_RIGHT),
+                    new RichText("参与优惠合计:" + discountableAmount).with(Color.RED).with(Pos.CENTER_RIGHT),
                     RichText.EMPTY,
                     "",
                     RichText.EMPTY));
