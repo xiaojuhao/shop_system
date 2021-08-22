@@ -231,7 +231,7 @@ public class OrderDetailView extends VBox {
             Button splitBtn = createButton("拆台", null);
             Button payBillBtn = createButton("结账", evt -> openPayWayChoiceView(deskOrderParam));
 
-            Button orderErase = createButton("抹零", evt -> openOrderEraseStage(deskOrderParam));
+            Button orderErase = createButton("抹零", evt -> openOrderEraseView(deskOrderParam));
             FlowPane.setMargin(orderErase, new Insets(0, 0, 0, 100));
             Button reduction = createButton("店长减免", evt -> openOrderReductionDialog(deskOrderParam));
             Button discount = createButton("选择折扣", evt -> openDiscountSelectionDialog(deskOrderParam));
@@ -454,8 +454,8 @@ public class OrderDetailView extends VBox {
         openView(title, param, new PayWayChoiceView(param), 3);
     }
 
-    private void openOrderEraseStage(DeskOrderParam param) {
-        param.setChoiceAction(EnumChoiceAction.NULL);
+    private void openOrderEraseView(DeskOrderParam param) {
+        param.setChoiceAction(EnumChoiceAction.ERASE);
         String title = "抹零[桌号:" + param.getDeskName() + "]";
         VBox view = new OrderEraseView(param);
         openView(title, param, view, 3);

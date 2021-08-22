@@ -15,6 +15,7 @@ import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.guice.GuiceContainer;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.StoreService;
+import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.DiscountApplyReq;
 import com.xjh.startup.view.model.DiscountTypeBO;
@@ -34,14 +35,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 
-public class OrderDiscountSelectionView extends VBox {
+public class OrderDiscountSelectionView extends SmallForm {
     OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
     StoreService storeService = GuiceContainer.getInstance(StoreService.class);
 
     public OrderDiscountSelectionView(DeskOrderParam param) {
-        VBox box = this;
-        box.setAlignment(Pos.CENTER);
-        box.setSpacing(10);
         VBox discountContentLine = new VBox();
         discountContentLine.setSpacing(10);
         Holder<Supplier<DiscountApplyReq>> discountHolder = new Holder<>();
@@ -129,10 +127,10 @@ public class OrderDiscountSelectionView extends VBox {
             manager.setUserData(2);
             manager.setSelected(true);
 
-            box.getChildren().add(newLine(discountTypeLabel, coupon, manager));
+            addLine(newLine(discountTypeLabel, coupon, manager));
         }
         {
-            box.getChildren().add(discountContentLine);
+            addLine(discountContentLine);
         }
         {
             Button button = new Button("使用优惠");
@@ -156,18 +154,8 @@ public class OrderDiscountSelectionView extends VBox {
                     this.handleDiscount(param, req);
                 }
             });
-            box.getChildren().add(button);
+            addLine(button);
         }
-    }
-
-    private HBox newLine(Node... nodes) {
-        HBox line = new HBox();
-        line.setAlignment(Pos.CENTER);
-        line.setSpacing(10);
-        for (Node n : nodes) {
-            line.getChildren().add(n);
-        }
-        return line;
     }
 
     private ComboBox<DiscountTypeBO> getDiscountOptions() {
