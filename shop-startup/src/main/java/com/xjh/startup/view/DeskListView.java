@@ -21,6 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DeskListView {
+    private final static double padding = 10;
+    private final static double gap = 5;
+    private final static int size_per_line = 6;
 
     DeskService deskService = GuiceContainer.getInstance(DeskService.class);
     static Holder<ScrollPane> instance = new Holder<>();
@@ -33,21 +36,19 @@ public class DeskListView {
         double width = screenRectangle.getWidth();
         double height = screenRectangle.getHeight();
         FlowPane pane = new FlowPane();
-        pane.setPadding(new Insets(10));
-        pane.setHgap(5);
-        pane.setVgap(5);
+        pane.setPadding(new Insets(padding));
+        pane.setHgap(gap);
+        pane.setVgap(gap);
         pane.setPrefWidth(width);
         pane.setPrefHeight(height);
-        // LogUtils.info("screen width:" + width + ",height:" + height);
-        //s.setFitToWidth(true);
         s.setContent(pane);
 
         ThreadUtils.runInNewThread(() -> {
+            double tableWidth = (width * 0.96 - gap * 2 * size_per_line) / size_per_line ;
             // 加载所有的tables
-            double prefWidth = Math.max(width / 6 - 15, 200);
             allDesks().forEach(desk -> desks.add(new SimpleObjectProperty<>(desk)));
             List<DeskRectView> views = new ArrayList<>();
-            desks.forEach(d -> views.add(new DeskRectView(d, prefWidth)));
+            desks.forEach(d -> views.add(new DeskRectView(d, Math.max(tableWidth, 200))));
             // 渲染tables;
             Platform.runLater(() -> pane.getChildren().addAll(views));
             // 监测变化
