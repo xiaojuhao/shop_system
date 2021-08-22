@@ -1,10 +1,12 @@
 package com.xjh.startup.view;
 
-import java.util.ArrayList;
+import static com.xjh.common.utils.CommonUtils.collect;
+import static com.xjh.common.utils.CommonUtils.listToMap;
+import static com.xjh.common.utils.CommonUtils.sleep;
+
 import java.util.List;
 import java.util.Map;
 
-import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.ThreadUtils;
 import com.xjh.common.utils.TimeRecord;
@@ -50,21 +52,20 @@ public class DeskListView {
             double tableWidth = Math.max(width * 0.92 / size_per_line, 200) ;
             // 加载所有的tables
             allDesks().forEach(desk -> desks.add(new SimpleObjectProperty<>(desk)));
-            List<DeskRectView> views = new ArrayList<>();
-            desks.forEach(d -> views.add(new DeskRectView(d, tableWidth)));
+            List<DeskRectView> views = collect(desks, it -> new DeskRectView(it, tableWidth));
             // 渲染tables;
             Platform.runLater(() -> pane.getChildren().addAll(views));
             // 监测变化
             while (instance.get() == s) {
                 TimeRecord cost = TimeRecord.start();
-                Map<Integer, Desk> deskMap = CommonUtils.listToMap(allDesks(), Desk::getDeskId);
+                Map<Integer, Desk> deskMap = listToMap(allDesks(), Desk::getDeskId);
                 desks.forEach(it -> {
                     Desk dd = deskMap.get(it.get().getDeskId());
                     if (dd != null) {
                         Platform.runLater(() -> it.set(dd));
                     }
                 });
-                CommonUtils.sleep(1000 - cost.getCost());
+                sleep(1000 - cost.getCost());
                 // System.out.println("cost2 = " + cost.getCost());
             }
             Logger.info("******* DeskListView 循环退出." + Thread.currentThread().getName());

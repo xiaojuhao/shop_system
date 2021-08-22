@@ -35,7 +35,14 @@ public class CommonUtils {
         if (list == null || list.size() == 0) {
             return new ArrayList<>();
         }
-        return list.stream().map(mapper).filter(Objects::nonNull).collect(Collectors.toList());
+        List<R> retList = new ArrayList<>();
+        for (V v : list) {
+            R r = mapper.apply(v);
+            if (r != null) {
+                retList.add(r);
+            }
+        }
+        return retList;
     }
 
     public static <V> List<V> filter(List<V> list, Predicate<V> test) {
