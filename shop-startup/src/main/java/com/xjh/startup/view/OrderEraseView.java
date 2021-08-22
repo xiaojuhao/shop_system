@@ -8,13 +8,10 @@ import com.xjh.guice.GuiceContainer;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
@@ -33,8 +30,10 @@ public class OrderEraseView extends SmallForm {
         TextField eraseAmt = createTextField("抹零金额");
         addLine(newLine(createLabel("抹零金额:"), eraseAmt));
         // 退菜按钮
-        Button returnBtn = new Button("确认");
-        returnBtn.setOnMouseClicked(evt -> {
+        Button cancel = new Button("取消");
+        cancel.setOnMouseClicked(evt -> this.getScene().getWindow().hide());
+        Button ok = new Button("确认");
+        ok.setOnMouseClicked(evt -> {
             double r = CommonUtils.parseDouble(eraseAmt.getText(), -1D);
             if (r < 0) {
                 AlertBuilder.ERROR("抹零金额错误");
@@ -48,7 +47,7 @@ public class OrderEraseView extends SmallForm {
             doOrderErase(param.getOrderId(), r);
             this.getScene().getWindow().hide();
         });
-        addLine(returnBtn);
+        addLine(newLine(cancel, ok));
     }
 
     private void doOrderErase(Integer orderId, double eraseAmt) {

@@ -10,14 +10,10 @@ import com.xjh.service.domain.StoreService;
 import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
 
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 
 public class OrderReductionView extends SmallForm {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
@@ -34,8 +30,10 @@ public class OrderReductionView extends SmallForm {
         pwd.setPromptText("店长密码");
         addLine(newLine(new Label("店长密码:"), pwd));
         // 退菜按钮
-        Button returnBtn = new Button("确认");
-        returnBtn.setOnMouseClicked(evt -> {
+        Button cancel = new Button("取消");
+        cancel.setOnMouseClicked(evt -> this.getScene().getWindow().hide());
+        Button okBtn = new Button("确认");
+        okBtn.setOnMouseClicked(evt -> {
             String r = reductionAmt.getText();
             String password = pwd.getText();
             if (!storeService.checkManagerPwd(password)) {
@@ -46,7 +44,7 @@ public class OrderReductionView extends SmallForm {
             doOrderReduction(param.getOrderId(), CommonUtils.parseDouble(r, 0D));
             this.getScene().getWindow().hide();
         });
-        addLine(returnBtn);
+        addLine(newLine(cancel, okBtn));
     }
 
     private void doOrderReduction(Integer orderId, double amt) {

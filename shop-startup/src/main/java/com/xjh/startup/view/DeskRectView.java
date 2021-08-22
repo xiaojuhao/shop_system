@@ -112,6 +112,7 @@ public class DeskRectView extends VBox {
                     orderInfo.setTitle("订单详情");
                     orderInfo.setScene(new Scene(new OrderDetailView(desk.get(), width, height)));
                     orderInfo.showAndWait();
+                    refreshTable(desk);
                     System.gc();
                 } else {
                     OpenDeskDialog dialog = new OpenDeskDialog(desk.get());
@@ -128,10 +129,7 @@ public class DeskRectView extends VBox {
                         if (!openDeskRs.isSuccess()) {
                             AlertBuilder.ERROR("开桌失败", openDeskRs.getMsg());
                         } else {
-                            Desk d = deskService.getById(desk.get().getDeskId());
-                            if (d != null) {
-                                desk.set(d);
-                            }
+                            refreshTable(desk);
                         }
                     }
                 }
@@ -140,6 +138,13 @@ public class DeskRectView extends VBox {
             } finally {
                 openingDesk.set(false);
             }
+        }
+    }
+
+    private void refreshTable(SimpleObjectProperty<Desk> desk) {
+        Desk d = deskService.getById(desk.get().getDeskId());
+        if (d != null) {
+            desk.set(d);
         }
     }
 

@@ -137,6 +137,9 @@ public class OrderDiscountSelectionView extends SmallForm {
             addLine(discountContentLine);
         }
         {
+            Button cancel = new Button("取消");
+            cancel.setOnMouseClicked(evt -> this.getScene().getWindow().hide());
+
             Button button = new Button("使用优惠");
             button.setOnMouseClicked(evt -> {
                 if (discountHolder.get() != null) {
@@ -158,7 +161,7 @@ public class OrderDiscountSelectionView extends SmallForm {
                     this.handleDiscount(param, req);
                 }
             });
-            addLine(button);
+            addLine(newLine(cancel, button));
         }
     }
 

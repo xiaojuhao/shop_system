@@ -406,7 +406,7 @@ public class OrderDetailView extends VBox {
         Alert _alert = new Alert(Alert.AlertType.CONFIRMATION,
                 "您确定要关台吗？",
                 new ButtonType("取消", ButtonBar.ButtonData.NO),
-                new ButtonType("确定", ButtonBar.ButtonData.YES));
+                new ButtonType("关台", ButtonBar.ButtonData.YES));
         _alert.setTitle("关台操作");
         _alert.setHeaderText("当前订单已结清");
         Optional<ButtonType> _buttonType = _alert.showAndWait();
