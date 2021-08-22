@@ -215,6 +215,8 @@ public class OrderDiscountSelectionView extends SmallForm {
         orderDiscount.setRate(new Double(req.getDiscountRate()).floatValue());
         orderDiscount.setType(req.getType().code());
         orderDiscount.setDiscountCode(req.getDiscountCode());
+        orderDiscount.setDiscountId(0);
+
         Order orderUpdate = new Order();
         orderUpdate.setOrderId(param.getOrderId());
         orderUpdate.setOrderDiscountInfo(Base64.encode(JSON.toJSONString(orderDiscount)));
