@@ -3,6 +3,7 @@ package com.xjh.common.valueobject;
 public class OrderDiscount {
     private float rate;
     private String discountName = "N";
+    // com.xjh.common.enumeration.EnumDiscountType
     private int type;
     private int discountId;
     private String discountCode = "N";

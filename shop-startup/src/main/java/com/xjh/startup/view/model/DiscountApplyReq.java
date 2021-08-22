@@ -1,12 +1,13 @@
 package com.xjh.startup.view.model;
 
+import com.xjh.common.enumeration.EnumDiscountType;
+
 public class DiscountApplyReq {
     private String managerPwd;
-    private String discountType;
+    private EnumDiscountType type;
     private String discountName;
     private double discountRate;
-    private String voucherNo;
-    private String cardNo;
+    private String discountCode;
 
     public String getManagerPwd() {
         return managerPwd;
@@ -16,12 +17,12 @@ public class DiscountApplyReq {
         this.managerPwd = managerPwd;
     }
 
-    public String getDiscountType() {
-        return discountType;
+    public EnumDiscountType getType() {
+        return type;
     }
 
-    public void setDiscountType(String discountType) {
-        this.discountType = discountType;
+    public void setType(EnumDiscountType type) {
+        this.type = type;
     }
 
     public String getDiscountName() {
@@ -40,19 +41,11 @@ public class DiscountApplyReq {
         this.discountRate = discountRate;
     }
 
-    public String getVoucherNo() {
-        return voucherNo;
+    public String getDiscountCode() {
+        return discountCode;
     }
 
-    public void setVoucherNo(String voucherNo) {
-        this.voucherNo = voucherNo;
-    }
-
-    public String getCardNo() {
-        return cardNo;
-    }
-
-    public void setCardNo(String cardNo) {
-        this.cardNo = cardNo;
+    public void setDiscountCode(String discountCode) {
+        this.discountCode = discountCode;
     }
 }

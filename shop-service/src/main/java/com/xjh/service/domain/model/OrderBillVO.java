@@ -7,6 +7,7 @@ public class OrderBillVO {
     public String payStatusName;
     public double orderNeedPay;
     public double totalPrice;
+    public String discountName;
     public double discountAmount;
     public double discountableAmount;
     public double orderHadpaid;
@@ -16,6 +17,14 @@ public class OrderBillVO {
     public double returnAmount;
     public String payInfoRemark;
 
+
+    public String getDiscountName() {
+        return discountName;
+    }
+
+    public void setDiscountName(String discountName) {
+        this.discountName = discountName;
+    }
 
     public String getOrderId() {
         return orderId;

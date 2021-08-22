@@ -12,7 +12,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import javafx.scene.Node;
 import org.apache.commons.collections4.CollectionUtils;
 
 import com.xjh.common.enumeration.EnumChoiceAction;
@@ -37,7 +36,6 @@ import com.xjh.service.domain.DishesPackageService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
-import com.xjh.service.domain.StoreService;
 import com.xjh.service.domain.model.OrderBillVO;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.OrderDishesTableItemVO;
@@ -50,6 +48,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -142,7 +141,7 @@ public class OrderDetailView extends VBox {
             notPaid.setStyle("-fx-font-size: 16; -fx-text-fill: red");
             gridPane.add(notPaid, 2, row);
 
-            Label labelOrderTime = createLabel("当前折扣", c -> "无");
+            Label labelOrderTime = createLabel("当前折扣", c -> c.discountName);
             gridPane.add(labelOrderTime, 3, row);
 
             Label labelPayStatus = createLabel("参与优惠金额", c -> formatMoney(c.discountableAmount));
@@ -261,7 +260,7 @@ public class OrderDetailView extends VBox {
     }
 
     private Button createButton(String name, double width, EventHandler<? super MouseEvent> onClick) {
-        width = Math.max(66, width / 11);
+        width = Math.max(66, (width - 11 * 20) / 11);
         if(width > 100){
             width = 100;
         }

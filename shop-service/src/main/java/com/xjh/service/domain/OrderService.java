@@ -87,6 +87,7 @@ public class OrderService {
             v.returnAmount = this.sumReturnAmount(orderDishesList);
             v.orderErase = CommonUtils.orElse(order.getOrderErase(), 0D);
             v.orderReduction = CommonUtils.orElse(order.getOrderReduction(), 0D);
+            v.discountName = order.getDiscountReason();
             // 支付信息
             List<OrderPay> pays = orderPayService.selectByOrderId(order.getOrderId());
             StringBuilder payInfo = new StringBuilder();
