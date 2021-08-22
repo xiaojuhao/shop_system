@@ -106,6 +106,7 @@ public class OrderDiscountSelectionView extends SmallForm {
                         req.setType(EnumDiscountType.MANAGER);
                         req.setDiscountName(bo.getDiscountName());
                         req.setDiscountRate(bo.getDiscountRate());
+                        req.setDiscountCode(EnumDiscountType.MANAGER.name());
                         req.setManagerPwd(CommonUtils.trim(pwd.getText()));
                         return req;
                     });
