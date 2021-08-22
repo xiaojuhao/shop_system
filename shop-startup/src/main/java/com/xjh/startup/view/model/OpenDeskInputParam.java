@@ -1,14 +1,16 @@
 package com.xjh.startup.view.model;
 
+import com.xjh.common.enumeration.OpenDeskResult;
+
 public class OpenDeskInputParam {
-    int result;
+    OpenDeskResult result;
     int customerNum;
 
-    public int getResult() {
+    public OpenDeskResult getResult() {
         return result;
     }
 
-    public void setResult(int result) {
+    public void setResult(OpenDeskResult result) {
         this.result = result;
     }
 

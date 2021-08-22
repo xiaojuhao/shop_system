@@ -1,6 +1,7 @@
 package com.xjh.startup.view;
 
 import com.xjh.common.enumeration.EnumDesKStatus;
+import com.xjh.common.enumeration.OpenDeskResult;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
@@ -114,7 +115,7 @@ public class DeskRectView extends VBox {
                 } else {
                     OpenDeskDialog dialog = new OpenDeskDialog(desk.get());
                     Optional<OpenDeskInputParam> result = dialog.showAndWait();
-                    if (result.isPresent() && result.get().getResult() == 1) {
+                    if (result.isPresent() && result.get().getResult() == OpenDeskResult.OPEN) {
                         if (result.get().getCustomerNum() <= 0) {
                             AlertBuilder.ERROR("请输入就餐人数");
                             return;

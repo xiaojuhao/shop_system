@@ -1,5 +1,6 @@
 package com.xjh.startup.view;
 
+import com.xjh.common.enumeration.OpenDeskResult;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.startup.view.model.OpenDeskInputParam;
@@ -16,7 +17,6 @@ public class OpenDeskDialog extends Dialog<OpenDeskInputParam> {
     public OpenDeskDialog(Desk table) {
         this.setTitle("开台");
         this.setWidth(300);
-        // dialog.setHeaderText("Look, a Custom Login Dialog");
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
@@ -30,18 +30,11 @@ public class OpenDeskDialog extends Dialog<OpenDeskInputParam> {
         grid.add(customerNumFiled, 1, 1);
         this.getDialogPane().setContent(grid);
         ButtonType openDesk = new ButtonType("开台", ButtonBar.ButtonData.OK_DONE);
-        ButtonType closeDesk = new ButtonType("关台", ButtonBar.ButtonData.OK_DONE);
         this.getDialogPane().getButtonTypes().addAll(openDesk, ButtonType.CANCEL);
         this.setResultConverter(btn -> {
             OpenDeskInputParam rs = new OpenDeskInputParam();
             rs.setCustomerNum(CommonUtils.parseInt(customerNumFiled.getText(), 0));
-            if (openDesk == btn) {
-                rs.setResult(1);
-            } else if (closeDesk == btn) {
-                rs.setResult(2);
-            } else {
-                rs.setResult(0);
-            }
+            rs.setResult(openDesk == btn ? OpenDeskResult.OPEN : OpenDeskResult.CANCEL);
             return rs;
         });
     }
