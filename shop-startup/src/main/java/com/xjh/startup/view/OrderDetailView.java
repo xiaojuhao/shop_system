@@ -12,6 +12,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import javafx.scene.Node;
 import org.apache.commons.collections4.CollectionUtils;
 
 import com.xjh.common.enumeration.EnumChoiceAction;
@@ -79,8 +80,6 @@ public class OrderDetailView extends VBox {
     OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
     DishesPackageService dishesPackageService = GuiceContainer.getInstance(DishesPackageService.class);
-    StoreService storeService = GuiceContainer.getInstance(StoreService.class);
-
 
     ObjectProperty<OrderBillVO> orderView = new SimpleObjectProperty<>();
 
@@ -106,7 +105,7 @@ public class OrderDetailView extends VBox {
             closeDeskBtn.setMinWidth(100);
             closeDeskBtn.setOnMouseClicked(evt -> doCloseDesk(desk));
             gridPane.add(closeDeskBtn, 4, rowIndex, 1, 2);
-            this.getChildren().add(gridPane);
+
 
             // 第二行
             rowIndex++;
@@ -121,9 +120,11 @@ public class OrderDetailView extends VBox {
 
             Label labelPayStatus = createLabel("支付状态", c -> c.payStatusName);
             gridPane.add(labelPayStatus, 3, rowIndex);
+
+            addLine(gridPane);
         }
         // 分割线
-        this.getChildren().add(horizontalSeparator());
+        addHorizontalSeparator();
         {
             GridPane gridPane = new GridPane();
             gridPane.setVgap(10);
@@ -164,10 +165,10 @@ public class OrderDetailView extends VBox {
             Label fan = createLabel("反结账金额", c -> "0.00");
             gridPane.add(fan, 4, row);
 
-            this.getChildren().add(gridPane);
+            addLine(gridPane);
         }
         // 分割线
-        this.getChildren().add(horizontalSeparator());
+        addHorizontalSeparator();
         // 订单菜单菜单明细
         TableView<OrderDishesTableItemVO> tv = new TableView<>();
         tv.setCache(false);
@@ -197,21 +198,20 @@ public class OrderDetailView extends VBox {
                     newCol("数量", "orderDishesNum", 100),
                     newCol("类型", "saleType", 100)
             );
-            this.getChildren().add(tv);
-
+            addLine(tv);
         }
         // 分割线
-        this.getChildren().add(horizontalSeparator());
+        addHorizontalSeparator();
         // 支付消息
         {
             TextArea textArea = new TextArea();
             textArea.setPrefHeight(80);
             textArea.setEditable(false);
             orderView.addListener((x, ov, nv) -> textArea.setText(nv.payInfoRemark));
-            this.getChildren().add(textArea);
+            addLine(textArea);
         }
         // 分割线
-        this.getChildren().add(horizontalSeparator());
+        addHorizontalSeparator();
         // 功能菜单
         {
             DeskOrderParam deskOrderParam = new DeskOrderParam();
@@ -238,12 +238,16 @@ public class OrderDetailView extends VBox {
             // add all buttons
             pane.getChildren().addAll(orderBtn, sendBtn, returnBtn, transferBtn, splitBtn, payBillBtn,
                     orderErase, reduction, discount);
-            this.getChildren().add(pane);
+            addLine(pane);
         }
         Logger.info("OrderDetail构建页面耗时: " + cost.getCostAndReset());
         // 刷新页面
         refreshTableView.run();
         Logger.info("OrderDetail加载数据耗时: " + cost.getCostAndReset());
+    }
+
+    private void addLine(Node line){
+        this.getChildren().add(line);
     }
 
     private Label createLabel(String name, Function<OrderBillVO, String> onChage) {
@@ -322,9 +326,7 @@ public class OrderDetailView extends VBox {
         List<OrderDishes> nonDiscountableList = CommonUtils.filter(orderDishes, discountableChecker.negate());
         if (CommonUtils.isNotEmpty(discountableList)) {
             // 构建菜品展示明细
-            discountableList.forEach(o -> {
-                items.add(buildTableItem(dishesMap.get(o.getDishesId()), o));
-            });
+            discountableList.forEach(o -> items.add(buildTableItem(dishesMap.get(o.getDishesId()), o)));
             // 可参与优惠价格
             double discountableAmount = sumDishesPrice(discountableList);
             orderView.get().discountableAmount = discountableAmount;
@@ -503,8 +505,8 @@ public class OrderDetailView extends VBox {
         CommonUtils.safeRun(param.getCallback());
     }
 
-    private Separator horizontalSeparator() {
-        return new Separator(Orientation.HORIZONTAL);
+    private void addHorizontalSeparator() {
+        addLine(new Separator(Orientation.HORIZONTAL));
     }
 
     private boolean notReturn(OrderDishes x) {
