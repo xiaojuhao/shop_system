@@ -33,6 +33,7 @@ import javafx.stage.Window;
 
 public class DeskRectView extends VBox {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
+    DeskService deskService = GuiceContainer.getInstance(DeskService.class);
     static AtomicBoolean openingDesk = new AtomicBoolean(false);
 
     public DeskRectView(SimpleObjectProperty<Desk> desk, double deskWidth) {
@@ -96,7 +97,6 @@ public class DeskRectView extends VBox {
     private void onClickTable(SimpleObjectProperty<Desk> desk) {
         if (openingDesk.compareAndSet(false, true)) {
             try {
-                DeskService deskService = GuiceContainer.getInstance(DeskService.class);
                 EnumDesKStatus runStatus = EnumDesKStatus.of(desk.get().getStatus());
                 if (runStatus == EnumDesKStatus.USED || runStatus == EnumDesKStatus.PAID) {
                     Window sceneWindow = this.getScene().getWindow();
