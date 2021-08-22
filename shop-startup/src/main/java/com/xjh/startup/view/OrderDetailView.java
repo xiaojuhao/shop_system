@@ -94,7 +94,7 @@ public class OrderDetailView extends VBox {
             // 第一行
             String tableName = "桌号：" + desk.getDeskName();
             Label tableNameLabel = new Label(tableName);
-            tableNameLabel.setMinWidth(width - 150);
+            tableNameLabel.setMinWidth(width / 5 * 4);
             tableNameLabel.setMinHeight(50);
             tableNameLabel.setFont(new Font(18));
             tableNameLabel.setAlignment(Pos.CENTER);
