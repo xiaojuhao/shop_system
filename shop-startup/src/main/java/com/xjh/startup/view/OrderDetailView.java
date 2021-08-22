@@ -85,6 +85,18 @@ public class OrderDetailView extends VBox {
     public OrderDetailView(Desk desk, double width, double height) {
         TimeRecord cost = TimeRecord.start();
         Integer orderId = desk.getOrderId();
+        TableView<OrderDishesTableItemVO> tableView = new TableView<>();
+        Runnable refreshView = () -> {
+            Order order = orderService.getOrder(orderId);
+            List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(orderId);
+            // 账单数据
+            loadAndRefreshOrderBill(order, orderDishesList);
+            // 菜品明细
+            tableView.setItems(buildTableItemList(orderDishesList));
+            // 刷新列表
+            tableView.refresh();
+        };
+
         {
             int rowIndex = 0;
             GridPane gridPane = new GridPane();
@@ -102,6 +114,7 @@ public class OrderDetailView extends VBox {
             // 关台按钮
             Button closeDeskBtn = new Button("关台");
             closeDeskBtn.setMinWidth(100);
+            GridPane.setMargin(closeDeskBtn, new Insets(0, 0, 30, 0));
             closeDeskBtn.setOnMouseClicked(evt -> doCloseDesk(desk));
             gridPane.add(closeDeskBtn, 4, rowIndex, 1, 2);
 
@@ -120,6 +133,10 @@ public class OrderDetailView extends VBox {
             Label labelPayStatus = createLabel("支付状态", width, c -> c.payStatusName);
             gridPane.add(labelPayStatus, 3, rowIndex);
 
+            Button checkPayStatus = new Button("检测支付结果");
+            checkPayStatus.setMinWidth(100);
+            checkPayStatus.setOnMouseClicked(evt -> refreshView.run());
+            gridPane.add(checkPayStatus, 4, rowIndex);
             addLine(gridPane);
         }
         // 分割线
@@ -169,26 +186,15 @@ public class OrderDetailView extends VBox {
         // 分割线
         addHorizontalSeparator();
         // 订单菜单菜单明细
-        TableView<OrderDishesTableItemVO> tv = new TableView<>();
-        tv.setCache(false);
-        Runnable refreshTableView = () -> {
-            Order order = orderService.getOrder(orderId);
-            List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(orderId);
-            // 账单数据
-            loadAndRefreshOrderBill(order, orderDishesList);
-            // 菜品明细
-            tv.setItems(buildTableItemList(orderDishesList));
-            // 刷新列表
-            tv.refresh();
-        };
         {
-            tv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-            tv.setMinHeight(300);
+            tableView.setCache(false);
+            tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            tableView.setMinHeight(300);
             if (height > 800) {
-                tv.setMinHeight(height - 450);
+                tableView.setMinHeight(height - 450);
             }
-            tv.setPadding(new Insets(5, 0, 0, 5));
-            tv.getColumns().addAll(
+            tableView.setPadding(new Insets(5, 0, 0, 5));
+            tableView.getColumns().addAll(
                     newCol("序号", "orderDishesId", 100),
                     newCol("子订单", "subOrderId", 100),
                     newCol("菜名名称", "dishesName", 300),
@@ -197,7 +203,7 @@ public class OrderDetailView extends VBox {
                     newCol("数量", "orderDishesNum", 100),
                     newCol("类型", "saleType", 100)
             );
-            addLine(tv);
+            addLine(tableView);
         }
         // 分割线
         addHorizontalSeparator();
@@ -217,7 +223,7 @@ public class OrderDetailView extends VBox {
             deskOrderParam.setDeskId(desk.getDeskId());
             deskOrderParam.setDeskName(desk.getDeskName());
             deskOrderParam.setOrderId(orderId);
-            deskOrderParam.setCallback(refreshTableView);
+            deskOrderParam.setCallback(refreshView);
 
             FlowPane operationButtonPane = new FlowPane();
             // 按钮一栏上下左右间隔
@@ -226,15 +232,15 @@ public class OrderDetailView extends VBox {
             operationButtonPane.setHgap(20);
             // 功能按钮
             Button orderBtn = createButton("点菜", width, e -> openDishesChoiceView(deskOrderParam));
-            Button sendBtn = createButton("送菜", width,e -> openSendDishesChoiceView(deskOrderParam));
-            Button returnBtn = createButton("退菜",width, e -> returnDishesConfirm(deskOrderParam, tv));
-            Button transferBtn = createButton("转台",width, null);
-            Button splitBtn = createButton("拆台",width, null);
-            Button payBillBtn = createButton("结账", width,evt -> openPayWayChoiceView(deskOrderParam));
-            Button orderErase = createButton("抹零",width, evt -> openOrderEraseView(deskOrderParam));
+            Button sendBtn = createButton("送菜", width, e -> openSendDishesChoiceView(deskOrderParam));
+            Button returnBtn = createButton("退菜", width, e -> returnDishesConfirm(deskOrderParam, tableView));
+            Button transferBtn = createButton("转台", width, null);
+            Button splitBtn = createButton("拆台", width, null);
+            Button payBillBtn = createButton("结账", width, evt -> openPayWayChoiceView(deskOrderParam));
+            Button orderErase = createButton("抹零", width, evt -> openOrderEraseView(deskOrderParam));
             FlowPane.setMargin(orderErase, new Insets(0, 0, 0, 100));
-            Button reduction = createButton("店长减免",width, evt -> openOrderReductionDialog(deskOrderParam));
-            Button discount = createButton("选择折扣", width,evt -> openDiscountSelectionDialog(deskOrderParam));
+            Button reduction = createButton("店长减免", width, evt -> openOrderReductionDialog(deskOrderParam));
+            Button discount = createButton("选择折扣", width, evt -> openDiscountSelectionDialog(deskOrderParam));
             // add all buttons
             operationButtonPane.getChildren().addAll(orderBtn, sendBtn, returnBtn, transferBtn, splitBtn, payBillBtn,
                     orderErase, reduction, discount);
@@ -242,7 +248,7 @@ public class OrderDetailView extends VBox {
         }
         Logger.info("OrderDetail构建页面耗时: " + cost.getCostAndReset());
         // 刷新页面
-        refreshTableView.run();
+        refreshView.run();
         Logger.info("OrderDetail加载数据耗时: " + cost.getCostAndReset());
     }
 
@@ -263,7 +269,7 @@ public class OrderDetailView extends VBox {
 
     private Button createButton(String name, double width, EventHandler<? super MouseEvent> onClick) {
         width = Math.max(66, (width - 11 * 20) / 11);
-        if(width > 100){
+        if (width > 100) {
             width = 100;
         }
         Button btn = new Button(name);
@@ -341,6 +347,8 @@ public class OrderDetailView extends VBox {
                     RichText.EMPTY,
                     "",
                     RichText.EMPTY));
+        }
+        if (CommonUtils.isNotEmpty(nonDiscountableList)) {
             items.add(new OrderDishesTableItemVO(
                     "",
                     "",
@@ -349,8 +357,7 @@ public class OrderDetailView extends VBox {
                     RichText.EMPTY,
                     "",
                     RichText.EMPTY));
-        }
-        if (CommonUtils.isNotEmpty(nonDiscountableList)) {
+            // 不参加优惠的菜品
             nonDiscountableList.forEach(o -> {
                 // 构建菜品展示明细
                 OrderDishesTableItemVO vo = buildTableItem(dishesMap.get(o.getDishesId()), o);
@@ -517,7 +524,6 @@ public class OrderDetailView extends VBox {
         }
         return EnumOrderSaleType.of(x.getOrderDishesSaletype()) != EnumOrderSaleType.RETURN;
     }
-
 
 
     private double sumDishesPrice(List<OrderDishes> orderDishes) {
