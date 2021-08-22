@@ -1,5 +1,9 @@
 package com.xjh.startup.view;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.enumeration.OpenDeskResult;
 import com.xjh.common.utils.AlertBuilder;
@@ -13,6 +17,7 @@ import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.model.OpenDeskParam;
 import com.xjh.startup.view.model.OpenDeskInputParam;
+
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -25,10 +30,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DeskRectView extends VBox {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
@@ -110,7 +111,7 @@ public class DeskRectView extends VBox {
                     orderInfo.setHeight(height);
                     orderInfo.setTitle("订单详情");
                     orderInfo.setScene(new Scene(new OrderDetailView(desk.get(), width, height)));
-                    orderInfo.show();
+                    orderInfo.showAndWait();
                     System.gc();
                 } else {
                     OpenDeskDialog dialog = new OpenDeskDialog(desk.get());
@@ -126,6 +127,11 @@ public class DeskRectView extends VBox {
                         Result<String> openDeskRs = deskService.openDesk(openDeskParam);
                         if (!openDeskRs.isSuccess()) {
                             AlertBuilder.ERROR("开桌失败", openDeskRs.getMsg());
+                        } else {
+                            Desk d = deskService.getById(desk.get().getDeskId());
+                            if (d != null) {
+                                desk.set(d);
+                            }
                         }
                     }
                 }
