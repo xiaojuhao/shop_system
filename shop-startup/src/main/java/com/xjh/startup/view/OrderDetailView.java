@@ -84,7 +84,7 @@ public class OrderDetailView extends VBox {
 
     ObjectProperty<OrderBillVO> orderView = new SimpleObjectProperty<>();
 
-    public OrderDetailView(Desk desk, double height) {
+    public OrderDetailView(Desk desk, double width, double height) {
         TimeRecord cost = TimeRecord.start();
         Integer orderId = desk.getOrderId();
         {
@@ -224,17 +224,17 @@ public class OrderDetailView extends VBox {
             pane.setHgap(20);
             pane.setPadding(new Insets(10, 0, 10, 20));
             // 按钮
-            Button orderBtn = createButton("点菜", e -> openDishesChoiceView(deskOrderParam));
-            Button sendBtn = createButton("送菜", e -> openSendDishesChoiceView(deskOrderParam));
-            Button returnBtn = createButton("退菜", e -> returnDishesConfirm(deskOrderParam, tv));
-            Button transferBtn = createButton("转台", null);
-            Button splitBtn = createButton("拆台", null);
-            Button payBillBtn = createButton("结账", evt -> openPayWayChoiceView(deskOrderParam));
+            Button orderBtn = createButton("点菜", width, e -> openDishesChoiceView(deskOrderParam));
+            Button sendBtn = createButton("送菜", width,e -> openSendDishesChoiceView(deskOrderParam));
+            Button returnBtn = createButton("退菜",width, e -> returnDishesConfirm(deskOrderParam, tv));
+            Button transferBtn = createButton("转台",width, null);
+            Button splitBtn = createButton("拆台",width, null);
+            Button payBillBtn = createButton("结账", width,evt -> openPayWayChoiceView(deskOrderParam));
 
-            Button orderErase = createButton("抹零", evt -> openOrderEraseView(deskOrderParam));
+            Button orderErase = createButton("抹零",width, evt -> openOrderEraseView(deskOrderParam));
             FlowPane.setMargin(orderErase, new Insets(0, 0, 0, 100));
-            Button reduction = createButton("店长减免", evt -> openOrderReductionDialog(deskOrderParam));
-            Button discount = createButton("选择折扣", evt -> openDiscountSelectionDialog(deskOrderParam));
+            Button reduction = createButton("店长减免",width, evt -> openOrderReductionDialog(deskOrderParam));
+            Button discount = createButton("选择折扣", width,evt -> openDiscountSelectionDialog(deskOrderParam));
             // add all buttons
             pane.getChildren().addAll(orderBtn, sendBtn, returnBtn, transferBtn, splitBtn, payBillBtn,
                     orderErase, reduction, discount);
@@ -255,10 +255,14 @@ public class OrderDetailView extends VBox {
         return label;
     }
 
-    private Button createButton(String name, EventHandler<? super MouseEvent> onClick) {
+    private Button createButton(String name, double width, EventHandler<? super MouseEvent> onClick) {
+        width = Math.max(66, width / 11);
+        if(width > 100){
+            width = 100;
+        }
         Button btn = new Button(name);
-        btn.setMinWidth(66);
-        btn.setMinHeight(35);
+        btn.setMinWidth(width);
+        btn.setMinHeight(width / 5 * 3);
         if (onClick != null) {
             btn.setOnMouseClicked(onClick);
         }

@@ -108,7 +108,7 @@ public class DeskRectView extends VBox {
                     orderInfo.setWidth(width);
                     orderInfo.setHeight(height);
                     orderInfo.setTitle("订单详情");
-                    orderInfo.setScene(new Scene(new OrderDetailView(desk.get(), height)));
+                    orderInfo.setScene(new Scene(new OrderDetailView(desk.get(), width, height)));
                     orderInfo.show();
                     System.gc();
                 } else {
