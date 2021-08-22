@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -88,6 +89,13 @@ public class OrderService {
             v.orderErase = CommonUtils.orElse(order.getOrderErase(), 0D);
             v.orderReduction = CommonUtils.orElse(order.getOrderReduction(), 0D);
             v.discountName = order.getDiscountReason();
+            if(CommonUtils.isNotBlank(order.getOrderDiscountInfo())){
+                OrderDiscount d = JSON.parseObject(Base64.decodeStr(order.getOrderDiscountInfo()), OrderDiscount.class);
+                if(d != null){
+                    v.discountName = d.getDiscountName();
+                }
+            }
+
             // 支付信息
             List<OrderPay> pays = orderPayService.selectByOrderId(order.getOrderId());
             StringBuilder payInfo = new StringBuilder();

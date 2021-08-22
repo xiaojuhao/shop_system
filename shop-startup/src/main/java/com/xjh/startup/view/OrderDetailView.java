@@ -94,7 +94,7 @@ public class OrderDetailView extends VBox {
             // 第一行
             String tableName = "桌号：" + desk.getDeskName();
             Label tableNameLabel = new Label(tableName);
-            tableNameLabel.setMinWidth(800);
+            tableNameLabel.setMinWidth(1000);
             tableNameLabel.setMinHeight(50);
             tableNameLabel.setFont(new Font(18));
             tableNameLabel.setAlignment(Pos.CENTER);
@@ -252,7 +252,7 @@ public class OrderDetailView extends VBox {
 
     private Label createLabel(String name, Function<OrderBillVO, String> onChage) {
         Label label = new Label(name);
-        label.setMinWidth(200);
+        label.setMinWidth(250);
         if (onChage != null) {
             orderView.addListener((a, b, c) -> label.setText(name + ": " + onChage.apply(c)));
         }

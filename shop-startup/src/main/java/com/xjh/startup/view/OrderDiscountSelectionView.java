@@ -220,6 +220,7 @@ public class OrderDiscountSelectionView extends SmallForm {
         orderUpdate.setDiscountReason(req.getDiscountName());
         orderService.updateByOrderId(orderUpdate);
         AlertBuilder.INFO("优惠使用成功");
+        this.getScene().getWindow().hide();
     }
 
 }
