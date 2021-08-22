@@ -94,7 +94,7 @@ public class OrderDetailView extends VBox {
             // 第一行
             String tableName = "桌号：" + desk.getDeskName();
             Label tableNameLabel = new Label(tableName);
-            tableNameLabel.setMinWidth(1000);
+            tableNameLabel.setMinWidth(width - 150);
             tableNameLabel.setMinHeight(50);
             tableNameLabel.setFont(new Font(18));
             tableNameLabel.setAlignment(Pos.CENTER);
@@ -108,16 +108,16 @@ public class OrderDetailView extends VBox {
 
             // 第二行
             rowIndex++;
-            Label customerNumLabel = createLabel("就餐人数", c -> c.customerNum + "");
+            Label customerNumLabel = createLabel("就餐人数", width, c -> c.customerNum + "");
             gridPane.add(customerNumLabel, 0, rowIndex);
 
-            Label labelOrder = createLabel("订单号", c -> c.orderId);
+            Label labelOrder = createLabel("订单号", width, c -> c.orderId);
             gridPane.add(labelOrder, 1, rowIndex);
 
-            Label labelOrderTime = createLabel("就餐时间", c -> c.orderTime);
+            Label labelOrderTime = createLabel("就餐时间", width, c -> c.orderTime);
             gridPane.add(labelOrderTime, 2, rowIndex);
 
-            Label labelPayStatus = createLabel("支付状态", c -> c.payStatusName);
+            Label labelPayStatus = createLabel("支付状态", width, c -> c.payStatusName);
             gridPane.add(labelPayStatus, 3, rowIndex);
 
             addLine(gridPane);
@@ -131,37 +131,37 @@ public class OrderDetailView extends VBox {
             gridPane.setPadding(new Insets(10));
             /// ----------- 第一行 ---------------
             int row = 0;
-            Label totalPriceLabel = createLabel("订单总额", c -> formatMoney(c.totalPrice));
+            Label totalPriceLabel = createLabel("订单总额", width, c -> formatMoney(c.totalPrice));
             gridPane.add(totalPriceLabel, 0, row);
             // 第二行
-            Label paidAmtLabel = createLabel("已支付", c -> formatMoney(c.orderHadpaid));
+            Label paidAmtLabel = createLabel("已支付", width, c -> formatMoney(c.orderHadpaid));
             gridPane.add(paidAmtLabel, 1, row);
 
-            Label notPaid = createLabel("还需支付", c -> formatMoney(c.orderNeedPay));
+            Label notPaid = createLabel("还需支付", width, c -> formatMoney(c.orderNeedPay));
             notPaid.setStyle("-fx-font-size: 16; -fx-text-fill: red");
             gridPane.add(notPaid, 2, row);
 
-            Label labelOrderTime = createLabel("当前折扣", c -> c.discountName);
+            Label labelOrderTime = createLabel("当前折扣", width, c -> c.discountName);
             gridPane.add(labelOrderTime, 3, row);
 
-            Label labelPayStatus = createLabel("参与优惠金额", c -> formatMoney(c.discountableAmount));
+            Label labelPayStatus = createLabel("参与优惠金额", width, c -> formatMoney(c.discountableAmount));
             gridPane.add(labelPayStatus, 4, row);
 
             /// ----------- 第二行 ---------------
             row++;
-            Label orderErase = createLabel("抹零金额", c -> formatMoney(c.orderErase));
+            Label orderErase = createLabel("抹零金额", width, c -> formatMoney(c.orderErase));
             gridPane.add(orderErase, 0, row);
 
-            Label mangerReduction = createLabel("店长折扣", c -> formatMoney(c.orderReduction));
+            Label mangerReduction = createLabel("店长折扣", width, c -> formatMoney(c.orderReduction));
             gridPane.add(mangerReduction, 1, row);
 
-            Label discount = createLabel("折扣金额", c -> formatMoney(c.discountAmount));
+            Label discount = createLabel("折扣金额", width, c -> formatMoney(c.discountAmount));
             gridPane.add(discount, 2, row);
 
-            Label refund = createLabel("退菜金额", c -> formatMoney(c.returnAmount));
+            Label refund = createLabel("退菜金额", width, c -> formatMoney(c.returnAmount));
             gridPane.add(refund, 3, row);
 
-            Label fan = createLabel("反结账金额", c -> "0.00");
+            Label fan = createLabel("反结账金额", width, c -> "0.00");
             gridPane.add(fan, 4, row);
 
             addLine(gridPane);
@@ -246,13 +246,15 @@ public class OrderDetailView extends VBox {
         Logger.info("OrderDetail加载数据耗时: " + cost.getCostAndReset());
     }
 
-    private void addLine(Node line){
+    private void addLine(Node line) {
         this.getChildren().add(line);
     }
 
-    private Label createLabel(String name, Function<OrderBillVO, String> onChage) {
+    private Label createLabel(String name, double width, Function<OrderBillVO, String> onChage) {
+        double swdith = Math.max(200, width / 5 - 20);
+
         Label label = new Label(name);
-        label.setMinWidth(250);
+        label.setMinWidth(swdith);
         if (onChage != null) {
             orderView.addListener((a, b, c) -> label.setText(name + ": " + onChage.apply(c)));
         }
