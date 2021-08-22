@@ -34,22 +34,22 @@ public class DeskRectView extends VBox {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
     static AtomicBoolean openingDesk = new AtomicBoolean(false);
 
-    public DeskRectView(SimpleObjectProperty<Desk> desk, double width) {
-        double height = width / 2;
-        this.setPrefSize(width, height);
+    public DeskRectView(SimpleObjectProperty<Desk> desk, double deskWidth) {
+        double height = deskWidth / 2;
+        this.setPrefSize(deskWidth, height);
         this.getStyleClass().add("desk");
         EnumDesKStatus status = EnumDesKStatus.of(desk.get().getStatus());
 
         Canvas canvas = new Canvas();
-        canvas.setWidth(width);
+        canvas.setWidth(deskWidth);
         canvas.setHeight(height);
         setBackground(this, status);
         canvas.setOnMouseClicked(evt -> this.onClickTable(desk));
         GraphicsContext gc = canvas.getGraphicsContext2D();
         // 状态
-        paintStatus(gc, width, status.remark());
+        paintStatus(gc, deskWidth, status.remark());
         // 桌号
-        paintTableNo(gc, desk.get(), width, height);
+        paintTableNo(gc, desk.get(), deskWidth, height);
 
         this.getChildren().addAll(canvas);
 
@@ -72,12 +72,12 @@ public class DeskRectView extends VBox {
                 time = "未点菜";
             }
             //
-            paintStatus(gc, width, desKStatus.remark());
+            paintStatus(gc, deskWidth, desKStatus.remark());
             // 用餐时间
-            paintTime(gc, width, height, time);
+            paintTime(gc, deskWidth, height, time);
             // 人数
             if (order != null) {
-                paintCustNum(gc, width, height, order.getOrderCustomerNums());
+                paintCustNum(gc, deskWidth, height, order.getOrderCustomerNums());
             }
         });
     }

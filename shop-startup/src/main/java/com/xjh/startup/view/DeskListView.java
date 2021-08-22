@@ -44,11 +44,11 @@ public class DeskListView {
         s.setContent(pane);
 
         ThreadUtils.runInNewThread(() -> {
-            double tableWidth = (width * 0.96 - gap * 2 * size_per_line) / size_per_line ;
+            double tableWidth = Math.max(width * 0.92 / size_per_line, 200) ;
             // 加载所有的tables
             allDesks().forEach(desk -> desks.add(new SimpleObjectProperty<>(desk)));
             List<DeskRectView> views = new ArrayList<>();
-            desks.forEach(d -> views.add(new DeskRectView(d, Math.max(tableWidth, 200))));
+            desks.forEach(d -> views.add(new DeskRectView(d, tableWidth)));
             // 渲染tables;
             Platform.runLater(() -> pane.getChildren().addAll(views));
             // 监测变化
