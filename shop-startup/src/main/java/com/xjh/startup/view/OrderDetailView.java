@@ -478,7 +478,7 @@ public class OrderDetailView extends VBox {
         param.setChoiceAction(EnumChoiceAction.NULL);
         String title = "选择折扣[桌号:" + param.getDeskName() + "]";
         VBox view = new OrderDiscountSelectionView(param);
-        openView(title, param, view, 2);
+        openView(title, param, view, 3);
     }
 
     private void openView(String title, DeskOrderParam param, VBox view, int size) {
@@ -490,7 +490,7 @@ public class OrderDetailView extends VBox {
             height = this.getScene().getWindow().getHeight() / 2;
         } else if (size == 3) {
             width = this.getScene().getWindow().getWidth() / 3;
-            height = this.getScene().getWindow().getHeight() / 4;
+            height = this.getScene().getWindow().getHeight() / 3;
         }
         stg.initOwner(this.getScene().getWindow());
         stg.initModality(Modality.WINDOW_MODAL);
