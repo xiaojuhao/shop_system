@@ -1,12 +1,18 @@
 package com.xjh.startup.view;
 
-import cn.hutool.core.lang.Holder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.ThreadUtils;
+import com.xjh.common.utils.TimeRecord;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.guice.GuiceContainer;
 import com.xjh.service.domain.DeskService;
+
+import cn.hutool.core.lang.Holder;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -16,9 +22,6 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Screen;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class DeskListView {
     private final static double padding = 10;
@@ -53,20 +56,21 @@ public class DeskListView {
             Platform.runLater(() -> pane.getChildren().addAll(views));
             // 监测变化
             while (instance.get() == s) {
-                desks.forEach(this::detectChange);
-                CommonUtils.sleep(1000);
+                TimeRecord cost = TimeRecord.start();
+                Map<Integer, Desk> deskMap = CommonUtils.listToMap(allDesks(), Desk::getDeskId);
+                desks.forEach(it -> {
+                    Desk dd = deskMap.get(it.get().getDeskId());
+                    if (dd != null) {
+                        Platform.runLater(() -> it.set(dd));
+                    }
+                });
+                CommonUtils.sleep(1000 - cost.getCost());
+                // System.out.println("cost2 = " + cost.getCost());
             }
             Logger.info("******* DeskListView 循环退出." + Thread.currentThread().getName());
             System.gc();
         });
         return s;
-    }
-
-    void detectChange(SimpleObjectProperty<Desk> desk) {
-        Desk dd = deskService.getById(desk.get().getDeskId());
-        if (dd != null) {
-            Platform.runLater(() -> desk.set(dd));
-        }
     }
 
     List<Desk> allDesks() {
