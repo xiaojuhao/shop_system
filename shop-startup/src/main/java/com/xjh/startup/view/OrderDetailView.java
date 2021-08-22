@@ -220,25 +220,26 @@ public class OrderDetailView extends VBox {
             deskOrderParam.setOrderId(orderId);
             deskOrderParam.setCallback(refreshTableView);
 
-            FlowPane pane = new FlowPane();
-            pane.setHgap(20);
-            pane.setPadding(new Insets(10, 0, 10, 20));
-            // 按钮
+            FlowPane operationButtonPane = new FlowPane();
+            // 按钮一栏上下左右间隔
+            operationButtonPane.setPadding(new Insets(10, 0, 10, 20));
+            // 按钮之间的间隔
+            operationButtonPane.setHgap(20);
+            // 功能按钮
             Button orderBtn = createButton("点菜", width, e -> openDishesChoiceView(deskOrderParam));
             Button sendBtn = createButton("送菜", width,e -> openSendDishesChoiceView(deskOrderParam));
             Button returnBtn = createButton("退菜",width, e -> returnDishesConfirm(deskOrderParam, tv));
             Button transferBtn = createButton("转台",width, null);
             Button splitBtn = createButton("拆台",width, null);
             Button payBillBtn = createButton("结账", width,evt -> openPayWayChoiceView(deskOrderParam));
-
             Button orderErase = createButton("抹零",width, evt -> openOrderEraseView(deskOrderParam));
             FlowPane.setMargin(orderErase, new Insets(0, 0, 0, 100));
             Button reduction = createButton("店长减免",width, evt -> openOrderReductionDialog(deskOrderParam));
             Button discount = createButton("选择折扣", width,evt -> openDiscountSelectionDialog(deskOrderParam));
             // add all buttons
-            pane.getChildren().addAll(orderBtn, sendBtn, returnBtn, transferBtn, splitBtn, payBillBtn,
+            operationButtonPane.getChildren().addAll(orderBtn, sendBtn, returnBtn, transferBtn, splitBtn, payBillBtn,
                     orderErase, reduction, discount);
-            addLine(pane);
+            addLine(operationButtonPane);
         }
         Logger.info("OrderDetail构建页面耗时: " + cost.getCostAndReset());
         // 刷新页面
