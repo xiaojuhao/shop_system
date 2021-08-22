@@ -26,7 +26,6 @@ import javafx.stage.Screen;
 public class DeskListView {
     private final static double padding = 10;
     private final static double gap = 5;
-    private final static int size_per_line = 6;
 
     DeskService deskService = GuiceContainer.getInstance(DeskService.class);
     static Holder<ScrollPane> instance = new Holder<>();
@@ -43,10 +42,19 @@ public class DeskListView {
         pane.setHgap(gap);
         pane.setVgap(gap);
         pane.setPrefWidth(width);
-        pane.setPrefHeight(height);
+        pane.setPrefHeight(height * 0.90);
         s.setContent(pane);
 
         ThreadUtils.runInNewThread(() -> {
+            List<Desk> allDeskList = allDesks();
+            int size_per_line;
+            if(allDeskList.size() > 60){
+                size_per_line = 8;
+            } else if(allDeskList.size() > 40) {
+                size_per_line = 7;
+            } else {
+                size_per_line = 6;
+            }
             double tableWidth = Math.max(width * 0.92 / size_per_line, 200);
             // 加载所有的tables
             allDesks().forEach(desk -> desks.add(new SimpleObjectProperty<>(desk)));
