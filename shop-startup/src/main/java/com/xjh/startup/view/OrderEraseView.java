@@ -6,48 +6,35 @@ import com.xjh.common.utils.Logger;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.guice.GuiceContainer;
 import com.xjh.service.domain.OrderService;
+import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
-public class OrderEraseView extends VBox {
+public class OrderEraseView extends SmallForm {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
 
     public OrderEraseView(DeskOrderParam param) {
-        VBox box = this;
-        box.setAlignment(Pos.CENTER);
         // 标题
         Label maxAmt = new Label("9元");
         maxAmt.setFont(Font.font(12));
         maxAmt.setTextFill(Color.RED);
-        maxAmt.setPadding(new Insets(0, 0, 20, 0));
-        HBox title = new HBox();
-        title.setPrefWidth(300);
-        title.setMaxWidth(300);
-        title.getChildren().addAll(new Label("最大抹零金额:"), maxAmt);
-        box.getChildren().add(title);
+        maxAmt.setPrefWidth(200);
+        addLine(newLine(createLabel("最大抹零金额:"), maxAmt));
 
         // 金额
-        HBox reasonLine = new HBox();
-        reasonLine.setPrefWidth(300);
-        reasonLine.setMaxWidth(300);
-        TextField eraseAmt = new TextField();
-        eraseAmt.setPromptText("抹零金额");
-        box.getChildren().add(eraseAmt);
-        reasonLine.getChildren().addAll(new Label("设置抹零金额:"), eraseAmt);
-        reasonLine.setPadding(new Insets(0, 0, 20, 0));
-        box.getChildren().add(reasonLine);
+        TextField eraseAmt = createTextField("抹零金额");
+        addLine(newLine(createLabel("抹零金额:"), eraseAmt));
         // 退菜按钮
-        Button returnBtn = new Button("确认");
-        returnBtn.setOnMouseClicked(evt -> {
-            double r = CommonUtils.parseDouble(eraseAmt.getText(), 0D);
+        Button cancel = new Button("取消");
+        cancel.setOnMouseClicked(evt -> this.getScene().getWindow().hide());
+        Button ok = new Button("确认");
+        ok.setOnMouseClicked(evt -> {
+            double r = CommonUtils.parseDouble(eraseAmt.getText(), -1D);
             if (r < 0) {
                 AlertBuilder.ERROR("抹零金额错误");
                 return;
@@ -60,7 +47,7 @@ public class OrderEraseView extends VBox {
             doOrderErase(param.getOrderId(), r);
             this.getScene().getWindow().hide();
         });
-        box.getChildren().add(returnBtn);
+        addLine(newLine(cancel, ok));
     }
 
     private void doOrderErase(Integer orderId, double eraseAmt) {

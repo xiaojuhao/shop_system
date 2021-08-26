@@ -4,6 +4,11 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import com.xjh.common.utils.AlertBuilder;
+import com.xjh.common.utils.Result;
+import com.xjh.dao.dataobject.Account;
+import com.xjh.guice.GuiceContainer;
+import com.xjh.service.domain.AccountService;
+import com.xjh.startup.foundation.constants.CurrentAccount;
 import com.xjh.startup.foundation.constants.MainStageHolder;
 import com.xjh.startup.view.DeskListView;
 import com.xjh.startup.view.MenuBarView;
@@ -40,10 +45,13 @@ public class LoginController implements Initializable {
             AlertBuilder.ERROR("提示", "系统基础配置缺失，请先配置!");
             return;
         }
+        AccountService accountService = GuiceContainer.getInstance(AccountService.class);
         String account = accountField.getText().trim();
         String password = passwordField.getText().trim();
         // 调用登录功能
-        if ("1".equals(account)) {
+        Result<Account> accountCheck = accountService.checkPwd(account, password);
+        if (accountCheck.isSuccess()) {
+            CurrentAccount.hold(accountCheck.getData());
             // 创建主界面舞台
             Stage mainStage = MainStageHolder.get();
             //读入布局
@@ -62,7 +70,7 @@ public class LoginController implements Initializable {
             mainStage.setHeight(height - 10);
             mainStage.setScene(scene);
         } else {
-            AlertBuilder.ERROR("提示", "账号或密码错误，登录失败!");
+            AlertBuilder.ERROR("提示", accountCheck.getMsg());
         }
     }
 

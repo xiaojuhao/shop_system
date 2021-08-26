@@ -7,5 +7,9 @@ public enum EnumChoiceAction {
 
     SEND,
 
-    RETURN
+    RETURN,
+
+    ERASE,
+
+
 }

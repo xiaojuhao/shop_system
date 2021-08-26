@@ -101,4 +101,12 @@ public class StoreService {
         }
         return vo;
     }
+
+    public boolean checkManagerPwd(String pwd) {
+        StoreVO store = getStore().getData();
+        if (store == null) {
+            return false;
+        }
+        return CommonUtils.eq(pwd, store.getOwnerPassword());
+    }
 }

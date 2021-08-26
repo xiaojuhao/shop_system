@@ -1,17 +1,45 @@
 package com.xjh.startup.view;
 
+import static com.xjh.common.utils.CommonUtils.formatMoney;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
+
 import com.xjh.common.enumeration.EnumChoiceAction;
 import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
-import com.xjh.common.utils.*;
+import com.xjh.common.utils.AlertBuilder;
+import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.CopyUtils;
+import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.Result;
+import com.xjh.common.utils.TimeRecord;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.RichText;
-import com.xjh.dao.dataobject.*;
+import com.xjh.dao.dataobject.Desk;
+import com.xjh.dao.dataobject.Dishes;
+import com.xjh.dao.dataobject.DishesPackage;
+import com.xjh.dao.dataobject.Order;
+import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.guice.GuiceContainer;
-import com.xjh.service.domain.*;
+import com.xjh.service.domain.DeskService;
+import com.xjh.service.domain.DishesPackageService;
+import com.xjh.service.domain.DishesService;
+import com.xjh.service.domain.OrderDishesService;
+import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.model.OrderBillVO;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.OrderDishesTableItemVO;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -20,8 +48,19 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
@@ -32,14 +71,6 @@ import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import org.apache.commons.collections4.CollectionUtils;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import static com.xjh.common.utils.CommonUtils.formatMoney;
 
 public class OrderDetailView extends VBox {
     // 依赖服务
@@ -48,14 +79,24 @@ public class OrderDetailView extends VBox {
     OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
     DishesPackageService dishesPackageService = GuiceContainer.getInstance(DishesPackageService.class);
-    StoreService storeService = GuiceContainer.getInstance(StoreService.class);
-
 
     ObjectProperty<OrderBillVO> orderView = new SimpleObjectProperty<>();
 
-    public OrderDetailView(Desk desk, double height) {
+    public OrderDetailView(Desk desk, double width, double height) {
         TimeRecord cost = TimeRecord.start();
         Integer orderId = desk.getOrderId();
+        TableView<OrderDishesTableItemVO> tableView = new TableView<>();
+        Runnable refreshView = () -> {
+            Order order = orderService.getOrder(orderId);
+            List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(orderId);
+            // 账单数据
+            loadAndRefreshOrderBill(order, orderDishesList);
+            // 菜品明细
+            tableView.setItems(buildTableItemList(orderDishesList));
+            // 刷新列表
+            tableView.refresh();
+        };
+
         {
             int rowIndex = 0;
             GridPane gridPane = new GridPane();
@@ -65,7 +106,7 @@ public class OrderDetailView extends VBox {
             // 第一行
             String tableName = "桌号：" + desk.getDeskName();
             Label tableNameLabel = new Label(tableName);
-            tableNameLabel.setMinWidth(800);
+            tableNameLabel.setMinWidth(width / 5 * 4);
             tableNameLabel.setMinHeight(50);
             tableNameLabel.setFont(new Font(18));
             tableNameLabel.setAlignment(Pos.CENTER);
@@ -73,26 +114,33 @@ public class OrderDetailView extends VBox {
             // 关台按钮
             Button closeDeskBtn = new Button("关台");
             closeDeskBtn.setMinWidth(100);
+            GridPane.setMargin(closeDeskBtn, new Insets(0, 0, 30, 0));
             closeDeskBtn.setOnMouseClicked(evt -> doCloseDesk(desk));
             gridPane.add(closeDeskBtn, 4, rowIndex, 1, 2);
-            this.getChildren().add(gridPane);
+
 
             // 第二行
             rowIndex++;
-            Label customerNumLabel = createLabel("就餐人数", c -> c.customerNum + "");
+            Label customerNumLabel = createLabel("就餐人数", width, c -> c.customerNum + "");
             gridPane.add(customerNumLabel, 0, rowIndex);
 
-            Label labelOrder = createLabel("订单号", c -> c.orderId);
+            Label labelOrder = createLabel("订单号", width, c -> c.orderId);
             gridPane.add(labelOrder, 1, rowIndex);
 
-            Label labelOrderTime = createLabel("就餐时间", c -> c.orderTime);
+            Label labelOrderTime = createLabel("就餐时间", width, c -> c.orderTime);
             gridPane.add(labelOrderTime, 2, rowIndex);
 
-            Label labelPayStatus = createLabel("支付状态", c -> c.payStatusName);
+            Label labelPayStatus = createLabel("支付状态", width, c -> c.payStatusName);
             gridPane.add(labelPayStatus, 3, rowIndex);
+
+            Button checkPayStatus = new Button("检测支付结果");
+            checkPayStatus.setMinWidth(100);
+            checkPayStatus.setOnMouseClicked(evt -> refreshView.run());
+            gridPane.add(checkPayStatus, 4, rowIndex);
+            addLine(gridPane);
         }
         // 分割线
-        this.getChildren().add(horizontalSeparator());
+        addHorizontalSeparator();
         {
             GridPane gridPane = new GridPane();
             gridPane.setVgap(10);
@@ -100,64 +148,53 @@ public class OrderDetailView extends VBox {
             gridPane.setPadding(new Insets(10));
             /// ----------- 第一行 ---------------
             int row = 0;
-            Label totalPriceLabel = createLabel("订单总额", c -> formatMoney(c.totalPrice));
+            Label totalPriceLabel = createLabel("订单总额", width, c -> formatMoney(c.totalPrice));
             gridPane.add(totalPriceLabel, 0, row);
             // 第二行
-            Label paidAmtLabel = createLabel("已支付", c -> formatMoney(c.orderHadpaid));
+            Label paidAmtLabel = createLabel("已支付", width, c -> formatMoney(c.orderHadpaid));
             gridPane.add(paidAmtLabel, 1, row);
 
-            Label notPaid = createLabel("还需支付", c -> formatMoney(c.orderNeedPay));
+            Label notPaid = createLabel("还需支付", width, c -> formatMoney(c.orderNeedPay));
             notPaid.setStyle("-fx-font-size: 16; -fx-text-fill: red");
             gridPane.add(notPaid, 2, row);
 
-            Label labelOrderTime = createLabel("当前折扣", c -> "无");
+            Label labelOrderTime = createLabel("当前折扣", width, c -> c.discountName);
             gridPane.add(labelOrderTime, 3, row);
 
-            Label labelPayStatus = createLabel("参与优惠金额", c -> "0.00");
+            Label labelPayStatus = createLabel("参与优惠金额", width, c -> formatMoney(c.discountableAmount));
             gridPane.add(labelPayStatus, 4, row);
 
             /// ----------- 第二行 ---------------
             row++;
-            Label orderErase = createLabel("抹零金额", c -> formatMoney(c.orderErase));
+            Label orderErase = createLabel("抹零金额", width, c -> formatMoney(c.orderErase));
             gridPane.add(orderErase, 0, row);
 
-            Label mangerReduction = createLabel("店长折扣", c -> formatMoney(c.orderReduction));
+            Label mangerReduction = createLabel("店长折扣", width, c -> formatMoney(c.orderReduction));
             gridPane.add(mangerReduction, 1, row);
 
-            Label discount = createLabel("折扣金额", c -> formatMoney(c.discountAmount));
+            Label discount = createLabel("折扣金额", width, c -> formatMoney(c.discountAmount));
             gridPane.add(discount, 2, row);
 
-            Label refund = createLabel("退菜金额", c -> formatMoney(c.returnAmount));
+            Label refund = createLabel("退菜金额", width, c -> formatMoney(c.returnAmount));
             gridPane.add(refund, 3, row);
 
-            Label fan = createLabel("反结账金额", c -> "0.00");
+            Label fan = createLabel("反结账金额", width, c -> "0.00");
             gridPane.add(fan, 4, row);
 
-            this.getChildren().add(gridPane);
+            addLine(gridPane);
         }
         // 分割线
-        this.getChildren().add(horizontalSeparator());
+        addHorizontalSeparator();
         // 订单菜单菜单明细
-        TableView<OrderDishesTableItemVO> tv = new TableView<>();
-        tv.setCache(false);
-        Runnable refreshTableView = () -> {
-            Order order = orderService.getOrder(orderId);
-            List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(orderId);
-            // 账单数据
-            loadAndRefreshOrderBill(order, orderDishesList);
-            // 菜品明细
-            tv.setItems(buildTableItemList(orderDishesList));
-            // 刷新列表
-            tv.refresh();
-        };
         {
-            tv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-            tv.setMinHeight(300);
+            tableView.setCache(false);
+            tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            tableView.setMinHeight(300);
             if (height > 800) {
-                tv.setMinHeight(height - 450);
+                tableView.setMinHeight(height - 450);
             }
-            tv.setPadding(new Insets(5, 0, 0, 5));
-            tv.getColumns().addAll(
+            tableView.setPadding(new Insets(5, 0, 0, 5));
+            tableView.getColumns().addAll(
                     newCol("序号", "orderDishesId", 100),
                     newCol("子订单", "subOrderId", 100),
                     newCol("菜名名称", "dishesName", 300),
@@ -166,68 +203,78 @@ public class OrderDetailView extends VBox {
                     newCol("数量", "orderDishesNum", 100),
                     newCol("类型", "saleType", 100)
             );
-            this.getChildren().add(tv);
-
+            addLine(tableView);
         }
         // 分割线
-        this.getChildren().add(horizontalSeparator());
+        addHorizontalSeparator();
         // 支付消息
         {
             TextArea textArea = new TextArea();
             textArea.setPrefHeight(80);
             textArea.setEditable(false);
             orderView.addListener((x, ov, nv) -> textArea.setText(nv.payInfoRemark));
-            this.getChildren().add(textArea);
+            addLine(textArea);
         }
         // 分割线
-        this.getChildren().add(horizontalSeparator());
+        addHorizontalSeparator();
         // 功能菜单
         {
             DeskOrderParam deskOrderParam = new DeskOrderParam();
             deskOrderParam.setDeskId(desk.getDeskId());
             deskOrderParam.setDeskName(desk.getDeskName());
             deskOrderParam.setOrderId(orderId);
-            deskOrderParam.setCallback(refreshTableView);
+            deskOrderParam.setCallback(refreshView);
 
-            FlowPane pane = new FlowPane();
-            pane.setHgap(20);
-            pane.setPadding(new Insets(10, 0, 10, 20));
-            // 按钮
-            Button orderBtn = createButton("点菜", e -> openDishesChoiceView(deskOrderParam));
-            Button sendBtn = createButton("送菜", e -> openSendDishesChoiceView(deskOrderParam));
-            Button returnBtn = createButton("退菜", e -> returnDishesConfirm(deskOrderParam, tv));
-            Button transferBtn = createButton("转台", null);
-            Button splitBtn = createButton("拆台", null);
-            Button payBillBtn = createButton("结账", evt -> openPayWayChoiceView(deskOrderParam));
-
-            Button orderErase = createButton("抹零", evt -> openOrderEraseStage(deskOrderParam));
+            FlowPane operationButtonPane = new FlowPane();
+            // 按钮一栏上下左右间隔
+            operationButtonPane.setPadding(new Insets(10, 0, 10, 20));
+            // 按钮之间的间隔
+            operationButtonPane.setHgap(20);
+            // 功能按钮
+            Button orderBtn = createButton("点菜", width, e -> openDishesChoiceView(deskOrderParam));
+            Button sendBtn = createButton("送菜", width, e -> openSendDishesChoiceView(deskOrderParam));
+            Button returnBtn = createButton("退菜", width, e -> returnDishesConfirm(deskOrderParam, tableView));
+            Button transferBtn = createButton("转台", width, null);
+            Button splitBtn = createButton("拆台", width, null);
+            Button payBillBtn = createButton("结账", width, evt -> openPayWayChoiceView(deskOrderParam));
+            Button orderErase = createButton("抹零", width, evt -> openOrderEraseView(deskOrderParam));
             FlowPane.setMargin(orderErase, new Insets(0, 0, 0, 100));
-            Button reduction = createButton("店长减免", evt -> openOrderReductionDialog(deskOrderParam));
-            Button discount = createButton("选择折扣", evt -> openDiscountSelectionDialog(deskOrderParam));
+            Button reduction = createButton("店长减免", width, evt -> openOrderReductionDialog(deskOrderParam));
+            Button discount = createButton("选择折扣", width, evt -> openDiscountSelectionDialog(deskOrderParam));
             // add all buttons
-            pane.getChildren().addAll(orderBtn, sendBtn, returnBtn, transferBtn, splitBtn, payBillBtn,
+            operationButtonPane.getChildren().addAll(orderBtn, sendBtn, returnBtn, transferBtn, splitBtn, payBillBtn,
                     orderErase, reduction, discount);
-            this.getChildren().add(pane);
+            addLine(operationButtonPane);
         }
         Logger.info("OrderDetail构建页面耗时: " + cost.getCostAndReset());
         // 刷新页面
-        refreshTableView.run();
+        refreshView.run();
         Logger.info("OrderDetail加载数据耗时: " + cost.getCostAndReset());
     }
 
-    private Label createLabel(String name, Function<OrderBillVO, String> onChage) {
+    private void addLine(Node line) {
+        this.getChildren().add(line);
+    }
+
+    private Label createLabel(String name, double width, Function<OrderBillVO, String> onChage) {
+        double swdith = Math.max(200, width / 5 - 20);
+
         Label label = new Label(name);
-        label.setMinWidth(200);
+        label.setMinWidth(swdith);
         if (onChage != null) {
             orderView.addListener((a, b, c) -> label.setText(name + ": " + onChage.apply(c)));
         }
         return label;
     }
 
-    private Button createButton(String name, EventHandler<? super MouseEvent> onClick) {
+    private Button createButton(String name, double width, EventHandler<? super MouseEvent> onClick) {
+        width = Math.max(66, (width - 11 * 20) / 11);
+        if (width > 100) {
+            width = 100;
+        }
         Button btn = new Button(name);
-        btn.setMinWidth(66);
-        btn.setMinHeight(35);
+        btn.setMinWidth(width);
+        btn.setMinHeight(width / 5 * 3);
         if (onClick != null) {
             btn.setOnMouseClicked(onClick);
         }
@@ -275,7 +322,7 @@ public class OrderDetailView extends VBox {
 
     private ObservableList<OrderDishesTableItemVO> buildTableItemList(List<OrderDishes> orderDishes) {
         // 可折扣的菜品信息
-        Predicate<OrderDishes> discountableChecker = this.discountableChecker();
+        Predicate<OrderDishes> discountableChecker = orderDishesService.discountableChecker();
         // 订单菜品明细
         orderDishes.sort(Comparator.comparing(OrderDishes::getCreatetime));
 
@@ -287,18 +334,21 @@ public class OrderDetailView extends VBox {
         List<OrderDishes> nonDiscountableList = CommonUtils.filter(orderDishes, discountableChecker.negate());
         if (CommonUtils.isNotEmpty(discountableList)) {
             // 构建菜品展示明细
-            discountableList.forEach(o -> {
-                items.add(buildTableItem(dishesMap.get(o.getDishesId()), o));
-            });
+            discountableList.forEach(o -> items.add(buildTableItem(dishesMap.get(o.getDishesId()), o)));
             // 可参与优惠价格
+            double discountableAmount = sumDishesPrice(discountableList);
+            orderView.get().discountableAmount = discountableAmount;
+            orderView.set(CopyUtils.cloneObj(orderView.get()));
             items.add(new OrderDishesTableItemVO(
                     "",
                     "",
                     RichText.EMPTY,
-                    new RichText("参与优惠合计:" + sumDishesPrice(discountableList)).with(Color.RED).with(Pos.CENTER_RIGHT),
+                    new RichText("参与优惠合计:" + discountableAmount).with(Color.RED).with(Pos.CENTER_RIGHT),
                     RichText.EMPTY,
                     "",
                     RichText.EMPTY));
+        }
+        if (CommonUtils.isNotEmpty(nonDiscountableList)) {
             items.add(new OrderDishesTableItemVO(
                     "",
                     "",
@@ -307,8 +357,7 @@ public class OrderDetailView extends VBox {
                     RichText.EMPTY,
                     "",
                     RichText.EMPTY));
-        }
-        if (CommonUtils.isNotEmpty(nonDiscountableList)) {
+            // 不参加优惠的菜品
             nonDiscountableList.forEach(o -> {
                 // 构建菜品展示明细
                 OrderDishesTableItemVO vo = buildTableItem(dishesMap.get(o.getDishesId()), o);
@@ -350,14 +399,14 @@ public class OrderDetailView extends VBox {
         }
         // 未支付金额
         double notPaidBillAmount = orderService.notPaidBillAmount(desk.getOrderId());
-        if (notPaidBillAmount > 0) {
+        if (notPaidBillAmount > 0.01) {
             AlertBuilder.INFO("未支付完成，无法关台");
             return;
         }
         Alert _alert = new Alert(Alert.AlertType.CONFIRMATION,
                 "您确定要关台吗？",
-                new ButtonType("取消", ButtonBar.ButtonData.NO),
-                new ButtonType("确定", ButtonBar.ButtonData.YES));
+                new ButtonType("关台", ButtonBar.ButtonData.YES),
+                new ButtonType("取消", ButtonBar.ButtonData.NO));
         _alert.setTitle("关台操作");
         _alert.setHeaderText("当前订单已结清");
         Optional<ButtonType> _buttonType = _alert.showAndWait();
@@ -420,8 +469,8 @@ public class OrderDetailView extends VBox {
         openView(title, param, new PayWayChoiceView(param), 3);
     }
 
-    private void openOrderEraseStage(DeskOrderParam param) {
-        param.setChoiceAction(EnumChoiceAction.NULL);
+    private void openOrderEraseView(DeskOrderParam param) {
+        param.setChoiceAction(EnumChoiceAction.ERASE);
         String title = "抹零[桌号:" + param.getDeskName() + "]";
         VBox view = new OrderEraseView(param);
         openView(title, param, view, 3);
@@ -438,7 +487,7 @@ public class OrderDetailView extends VBox {
         param.setChoiceAction(EnumChoiceAction.NULL);
         String title = "选择折扣[桌号:" + param.getDeskName() + "]";
         VBox view = new OrderDiscountSelectionView(param);
-        openView(title, param, view, 2);
+        openView(title, param, view, 3);
     }
 
     private void openView(String title, DeskOrderParam param, VBox view, int size) {
@@ -450,7 +499,7 @@ public class OrderDetailView extends VBox {
             height = this.getScene().getWindow().getHeight() / 2;
         } else if (size == 3) {
             width = this.getScene().getWindow().getWidth() / 3;
-            height = this.getScene().getWindow().getHeight() / 4;
+            height = this.getScene().getWindow().getHeight() / 3;
         }
         stg.initOwner(this.getScene().getWindow());
         stg.initModality(Modality.WINDOW_MODAL);
@@ -465,8 +514,8 @@ public class OrderDetailView extends VBox {
         CommonUtils.safeRun(param.getCallback());
     }
 
-    private Separator horizontalSeparator() {
-        return new Separator(Orientation.HORIZONTAL);
+    private void addHorizontalSeparator() {
+        addLine(new Separator(Orientation.HORIZONTAL));
     }
 
     private boolean notReturn(OrderDishes x) {
@@ -476,10 +525,6 @@ public class OrderDetailView extends VBox {
         return EnumOrderSaleType.of(x.getOrderDishesSaletype()) != EnumOrderSaleType.RETURN;
     }
 
-    private Predicate<OrderDishes> discountableChecker() {
-        Set<Integer> discountableDishesIds = storeService.getStoreDiscountableDishesIds();
-        return o -> discountableDishesIds.contains(o.getDishesId()) && o.getIfDishesPackage() == 0;
-    }
 
     private double sumDishesPrice(List<OrderDishes> orderDishes) {
         return orderDishes.stream()

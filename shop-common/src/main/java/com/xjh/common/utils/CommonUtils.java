@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -34,7 +35,14 @@ public class CommonUtils {
         if (list == null || list.size() == 0) {
             return new ArrayList<>();
         }
-        return list.stream().map(mapper).filter(Objects::nonNull).collect(Collectors.toList());
+        List<R> retList = new ArrayList<>();
+        for (V v : list) {
+            R r = mapper.apply(v);
+            if (r != null) {
+                retList.add(r);
+            }
+        }
+        return retList;
     }
 
     public static <V> List<V> filter(List<V> list, Predicate<V> test) {
@@ -254,7 +262,13 @@ public class CommonUtils {
                 sb.append(c);
             }
         }
-        return parseDouble(sb, def);
+        Double val = parseDouble(sb, def);
+        if (val != null) {
+            DecimalFormat decimalFormat = new DecimalFormat("##.00");
+            String formattedVal = decimalFormat.format(val);
+            return parseDouble(formattedVal, def);
+        }
+        return def;
     }
 
     public static Long parseLong(Object str, Long def) {
@@ -679,11 +693,39 @@ public class CommonUtils {
         return rs;
     }
 
+    public static String md5hex(String str) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+            byte[] bytes = digest.digest(str.getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : bytes) {
+                sb.append(byteHEX(b));
+            }
+            return sb.toString();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    public static String byteHEX(byte ib) {
+        char[] Digit = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+        char[] ob = new char[]{Digit[ib >>> 4 & 15], Digit[ib & 15]};
+        return new String(ob);
+    }
+
     public static boolean equals(String str1, String str2) {
         if (str1 == null || str2 == null) {
             return false;
         }
         return str1.equals(str2);
+    }
+
+    public static boolean equalsIgnoreCase(String str1, String str2) {
+        if (str1 == null || str2 == null) {
+            return false;
+        }
+        return str1.equalsIgnoreCase(str2);
     }
 
     public static boolean isBlank(String str) {

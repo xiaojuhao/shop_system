@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -87,6 +88,14 @@ public class OrderService {
             v.returnAmount = this.sumReturnAmount(orderDishesList);
             v.orderErase = CommonUtils.orElse(order.getOrderErase(), 0D);
             v.orderReduction = CommonUtils.orElse(order.getOrderReduction(), 0D);
+            v.discountName = order.getDiscountReason();
+            if(CommonUtils.isNotBlank(order.getOrderDiscountInfo())){
+                OrderDiscount d = JSON.parseObject(Base64.decodeStr(order.getOrderDiscountInfo()), OrderDiscount.class);
+                if(d != null){
+                    v.discountName = d.getDiscountName();
+                }
+            }
+
             // 支付信息
             List<OrderPay> pays = orderPayService.selectByOrderId(order.getOrderId());
             StringBuilder payInfo = new StringBuilder();
@@ -213,7 +222,8 @@ public class OrderService {
         double orderErase = CommonUtils.orElse(order.getOrderErase(), 0D);
         double orderReduction = CommonUtils.orElse(order.getOrderReduction(), 0D);
         double paidAmt = CommonUtils.orElse(order.getOrderHadpaid(), 0D);
-        return totalBillAmt - orderErase - orderReduction - paidAmt;
+        double notPaid = Math.max(0, totalBillAmt - orderErase - orderReduction - paidAmt);
+        return CommonUtils.parseMoney(notPaid + "", 0D);
     }
 
     public Order createOrder(CreateOrderParam param) throws SQLException {
@@ -233,10 +243,8 @@ public class OrderService {
             order.setOrderRefund(0D);
             order.setOrderReduction(0D);
             order.setOrderHadpaid(0D);
+            order.setCreateTime(DateBuilder.now().mills());
 
-            if (order.getCreateTime() == null) {
-                order.setCreateTime(DateBuilder.now().mills());
-            }
             orderDAO.insert(order);
             return order;
         } finally {

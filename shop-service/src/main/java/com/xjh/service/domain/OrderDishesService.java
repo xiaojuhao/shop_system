@@ -2,12 +2,15 @@ package com.xjh.service.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.dao.mapper.OrderDishesDAO;
 
@@ -15,6 +18,25 @@ import com.xjh.dao.mapper.OrderDishesDAO;
 public class OrderDishesService {
     @Inject
     OrderDishesDAO orderDishesDAO;
+    @Inject
+    StoreService storeService;
+
+    public Result<Integer> updatePrimaryKey(OrderDishes update) {
+        try{
+            if (update == null) {
+                return Result.fail("入参错误");
+            }
+            int i = orderDishesDAO.updateByPK(update);
+            if(i == 0){
+                return Result.fail("更新失败");
+            }else {
+                return Result.success(i);
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return Result.fail(ex.getMessage());
+        }
+    }
 
     public List<OrderDishes> selectByOrderId(Integer orderId) {
         if (orderId == null) {
@@ -43,5 +65,10 @@ public class OrderDishesService {
             ex.printStackTrace();
             return 0;
         }
+    }
+
+    public Predicate<OrderDishes> discountableChecker() {
+        Set<Integer> discountableDishesIds = storeService.getStoreDiscountableDishesIds();
+        return o -> discountableDishesIds.contains(o.getDishesId()) && o.getIfDishesPackage() == 0;
     }
 }

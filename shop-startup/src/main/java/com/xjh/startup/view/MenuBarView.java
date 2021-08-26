@@ -1,5 +1,6 @@
 package com.xjh.startup.view;
 
+import com.xjh.startup.foundation.constants.CurrentAccount;
 import com.xjh.startup.foundation.constants.MainStageHolder;
 
 import javafx.scene.control.Label;
@@ -92,6 +93,8 @@ public class MenuBarView {
 
     private void logout() {
         try {
+            //
+            CurrentAccount.hold(null);
             //打开登录框
             Stage primaryStage = MainStageHolder.get();
             primaryStage.setTitle("登录系统");

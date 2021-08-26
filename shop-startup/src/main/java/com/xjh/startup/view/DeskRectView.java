@@ -1,6 +1,11 @@
 package com.xjh.startup.view;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.xjh.common.enumeration.EnumDesKStatus;
+import com.xjh.common.enumeration.OpenDeskResult;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
@@ -12,6 +17,7 @@ import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.model.OpenDeskParam;
 import com.xjh.startup.view.model.OpenDeskInputParam;
+
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -25,30 +31,27 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 public class DeskRectView extends VBox {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
+    DeskService deskService = GuiceContainer.getInstance(DeskService.class);
     static AtomicBoolean openingDesk = new AtomicBoolean(false);
 
-    public DeskRectView(SimpleObjectProperty<Desk> desk, double width) {
-        double height = width / 2;
-        this.setPrefSize(width, height);
+    public DeskRectView(SimpleObjectProperty<Desk> desk, double deskWidth) {
+        double height = deskWidth / 2;
+        this.setPrefSize(deskWidth, height);
         this.getStyleClass().add("desk");
         EnumDesKStatus status = EnumDesKStatus.of(desk.get().getStatus());
 
         Canvas canvas = new Canvas();
-        canvas.setWidth(width);
+        canvas.setWidth(deskWidth);
         canvas.setHeight(height);
         setBackground(this, status);
         canvas.setOnMouseClicked(evt -> this.onClickTable(desk));
         GraphicsContext gc = canvas.getGraphicsContext2D();
         // 状态
-        paintStatus(gc, width, status.remark());
+        paintStatus(gc, deskWidth, status.remark());
         // 桌号
-        paintTableNo(gc, desk.get(), width, height);
+        paintTableNo(gc, desk.get(), deskWidth, height);
 
         this.getChildren().addAll(canvas);
 
@@ -66,13 +69,13 @@ public class DeskRectView extends VBox {
                 time = "未点菜";
             }
             //
-            paintStatus(gc, width, desKStatus.remark());
+            paintStatus(gc, deskWidth, desKStatus.remark());
             // 用餐时间
-            paintTime(gc, width, height, time);
+            paintTime(gc, deskWidth, height, time);
             // 人数
             Order order = orderService.getOrder(orderId);
             if (order != null) {
-                paintCustNum(gc, width, height, order.getOrderCustomerNums());
+                paintCustNum(gc, deskWidth, height, order.getOrderCustomerNums());
             }
         });
     }
@@ -90,7 +93,6 @@ public class DeskRectView extends VBox {
     private void onClickTable(SimpleObjectProperty<Desk> desk) {
         if (openingDesk.compareAndSet(false, true)) {
             try {
-                DeskService deskService = GuiceContainer.getInstance(DeskService.class);
                 EnumDesKStatus runStatus = EnumDesKStatus.of(desk.get().getStatus());
                 if (runStatus == EnumDesKStatus.USED || runStatus == EnumDesKStatus.PAID) {
                     Window sceneWindow = this.getScene().getWindow();
@@ -104,13 +106,14 @@ public class DeskRectView extends VBox {
                     orderInfo.setWidth(width);
                     orderInfo.setHeight(height);
                     orderInfo.setTitle("订单详情");
-                    orderInfo.setScene(new Scene(new OrderDetailView(desk.get(), height)));
-                    orderInfo.show();
+                    orderInfo.setScene(new Scene(new OrderDetailView(desk.get(), width, height)));
+                    orderInfo.showAndWait();
+                    refreshTable(desk);
                     System.gc();
                 } else {
                     OpenDeskDialog dialog = new OpenDeskDialog(desk.get());
                     Optional<OpenDeskInputParam> result = dialog.showAndWait();
-                    if (result.isPresent() && result.get().getResult() == 1) {
+                    if (result.isPresent() && result.get().getResult() == OpenDeskResult.OPEN) {
                         if (result.get().getCustomerNum() <= 0) {
                             AlertBuilder.ERROR("请输入就餐人数");
                             return;
@@ -121,6 +124,8 @@ public class DeskRectView extends VBox {
                         Result<String> openDeskRs = deskService.openDesk(openDeskParam);
                         if (!openDeskRs.isSuccess()) {
                             AlertBuilder.ERROR("开桌失败", openDeskRs.getMsg());
+                        } else {
+                            refreshTable(desk);
                         }
                     }
                 }
@@ -129,6 +134,13 @@ public class DeskRectView extends VBox {
             } finally {
                 openingDesk.set(false);
             }
+        }
+    }
+
+    private void refreshTable(SimpleObjectProperty<Desk> desk) {
+        Desk d = deskService.getById(desk.get().getDeskId());
+        if (d != null) {
+            desk.set(d);
         }
     }
 
