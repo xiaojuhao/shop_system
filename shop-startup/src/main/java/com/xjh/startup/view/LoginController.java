@@ -1,7 +1,4 @@
-package com.xjh.startup.controller;
-
-import java.net.URL;
-import java.util.ResourceBundle;
+package com.xjh.startup.view;
 
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.Result;
@@ -10,10 +7,6 @@ import com.xjh.guice.GuiceContainer;
 import com.xjh.service.domain.AccountService;
 import com.xjh.startup.foundation.constants.CurrentAccount;
 import com.xjh.startup.foundation.constants.MainStageHolder;
-import com.xjh.startup.view.DeskListView;
-import com.xjh.startup.view.MenuBarView;
-import com.xjh.startup.view.SysConfigView;
-
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Rectangle2D;
@@ -27,6 +20,9 @@ import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+
+import java.net.URL;
+import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
     @FXML
