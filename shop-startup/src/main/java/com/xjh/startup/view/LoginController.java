@@ -55,7 +55,7 @@ public class LoginController implements Initializable {
             BorderPane main = new BorderPane();
             main.setTop(new MenuBarView(main).renderMenuBar());
             // 主体内容
-            main.setCenter(new DeskListView().view());
+            main.setCenter(new DeskListView());
             Scene scene = new Scene(main);
             scene.getStylesheets().add("/css/style.css");
             mainStage.setTitle("小句号点餐系统");

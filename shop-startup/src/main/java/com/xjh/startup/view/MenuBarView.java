@@ -38,7 +38,7 @@ public class MenuBarView {
     private Menu createIndexMenu() {
         Menu menu = new Menu();
         Label label = new Label("主页");
-        label.setOnMouseClicked(evt -> root.setCenter(new DeskListView().view()));
+        label.setOnMouseClicked(evt -> root.setCenter(new DeskListView()));
         menu.setGraphic(label);
         return menu;
     }

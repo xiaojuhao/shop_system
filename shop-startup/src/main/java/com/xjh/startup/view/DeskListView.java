@@ -22,16 +22,15 @@ import java.util.List;
 import static com.xjh.common.utils.CommonUtils.collect;
 import static com.xjh.common.utils.CommonUtils.sleep;
 
-public class DeskListView {
+public class DeskListView extends ScrollPane{
     private final static double padding = 10;
     private final static double gap = 5;
 
     DeskService deskService = GuiceContainer.getInstance(DeskService.class);
     static Holder<ScrollPane> instance = new Holder<>();
 
-    public ScrollPane view() {
-        ScrollPane s = new ScrollPane();
-        instance.set(s);
+    public DeskListView() {
+        instance.set(this);
         ObservableList<SimpleObjectProperty<Desk>> desks = FXCollections.observableArrayList();
         Rectangle2D screenRectangle = Screen.getPrimary().getBounds();
         double width = screenRectangle.getWidth();
@@ -42,7 +41,7 @@ public class DeskListView {
         pane.setVgap(gap);
         pane.setPrefWidth(width);
         pane.setPrefHeight(height * 0.90);
-        s.setContent(pane);
+        this.setContent(pane);
         ThreadUtils.runInNewThread(() -> {
             List<Desk> allDeskList = allDesks();
             int size_per_line = calcLineSize(allDeskList.size());
@@ -53,7 +52,7 @@ public class DeskListView {
             // 渲染tables;
             Platform.runLater(() -> pane.getChildren().addAll(views));
             // 监测变化
-            while (instance.get() == s) {
+            while (instance.get() == this) {
                 TimeRecord cost = TimeRecord.start();
                 desks.forEach(it -> Platform.runLater(() -> {
                     Desk dd = deskService.getById(it.get().getDeskId());
@@ -66,7 +65,6 @@ public class DeskListView {
             Logger.info("******* DeskListView 循环退出." + Thread.currentThread().getName());
             System.gc();
         });
-        return s;
     }
 
     List<Desk> allDesks() {
