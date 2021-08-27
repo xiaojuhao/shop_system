@@ -15,9 +15,9 @@ import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesType;
-import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.guice.GuiceContainer;
 import com.xjh.service.domain.CartService;
+import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.DishesTypeService;
 import com.xjh.service.domain.model.CartItemVO;
 import com.xjh.service.domain.model.CartVO;
@@ -44,7 +44,7 @@ import javafx.scene.paint.Color;
 public class CartView extends VBox {
     CartService cartService = GuiceContainer.getInstance(CartService.class);
     DishesTypeService dishesTypeService = GuiceContainer.getInstance(DishesTypeService.class);
-    DishesDAO dishesDAO = GuiceContainer.getInstance(DishesDAO.class);
+    DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
 
     public CartView(DeskOrderParam param) {
         TableView<CartItemBO> tv = new TableView<>();
@@ -150,7 +150,7 @@ public class CartView extends VBox {
             List<CartItemVO> list = cartService.selectByDeskId(param.getDeskId());
             AtomicInteger seqNo = new AtomicInteger();
             return list.stream().map(it -> {
-                Dishes dishes = dishesDAO.getById(it.getDishesId());
+                Dishes dishes = dishesService.getById(it.getDishesId());
                 CartItemBO bo = new CartItemBO();
                 bo.setSeqNo(seqNo.incrementAndGet());
                 bo.setDishesId(it.getDishesId());
