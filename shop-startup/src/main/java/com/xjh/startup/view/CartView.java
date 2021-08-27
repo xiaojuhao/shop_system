@@ -148,14 +148,16 @@ public class CartView extends VBox {
         try {
             Map<Integer, DishesType> typeMap = dishesTypeService.dishesTypeMap();
             List<CartItemVO> list = cartService.selectByDeskId(param.getDeskId());
+            List<Integer> dishesIds = CommonUtils.collect(list, CartItemVO::getDishesId);
+            Map<Integer, Dishes> dishesMap = dishesService.getByIdsAsMap(dishesIds);
             AtomicInteger seqNo = new AtomicInteger();
-            return list.stream().map(it -> {
-                Dishes dishes = dishesService.getById(it.getDishesId());
-                CartItemBO bo = new CartItemBO();
-                bo.setSeqNo(seqNo.incrementAndGet());
-                bo.setDishesId(it.getDishesId());
-                bo.setNums(CommonUtils.orElse(it.getNums(), 1));
+            return CommonUtils.collect(list, it -> {
+                Dishes dishes = dishesMap.get(it.getDishesId());
                 if (dishes != null) {
+                    CartItemBO bo = new CartItemBO();
+                    bo.setSeqNo(seqNo.incrementAndGet());
+                    bo.setDishesId(it.getDishesId());
+                    bo.setNums(CommonUtils.orElse(it.getNums(), 1));
                     DishesType type = typeMap.get(dishes.getDishesTypeId());
                     if (type != null) {
                         bo.setDishesTypeName(new RichText(type.getTypeName()).with(Color.RED));
@@ -163,9 +165,11 @@ public class CartView extends VBox {
                     bo.setDishesName(new RichText(dishes.getDishesName()));
                     bo.setDishesPrice(new Money(dishes.getDishesPrice()));
                     bo.setTotalPrice(new Money(bo.getNums() * dishes.getDishesPrice()));
+                    return bo;
+                } else {
+                    return null;
                 }
-                return bo;
-            }).collect(Collectors.toList());
+            });
         } catch (Exception ex) {
             Logger.error("查询购物车异常:" + param.getDeskName() + ", " + ex.getMessage());
         }
