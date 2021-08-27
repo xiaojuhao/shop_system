@@ -223,6 +223,9 @@ public class OrderService {
         double orderReduction = CommonUtils.orElse(order.getOrderReduction(), 0D);
         double paidAmt = CommonUtils.orElse(order.getOrderHadpaid(), 0D);
         double notPaid = Math.max(0, totalBillAmt - orderErase - orderReduction - paidAmt);
+        if (notPaid < 0.01) {
+            notPaid = 0D;
+        }
         return CommonUtils.parseMoney(notPaid + "", 0D);
     }
 
