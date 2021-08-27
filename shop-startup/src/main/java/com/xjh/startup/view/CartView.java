@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
@@ -106,21 +105,22 @@ public class CartView extends VBox {
     private void doDeleteItem(DeskOrderParam param, TableView<CartItemBO> tv) {
         Integer deskId = param.getDeskId();
 
+        List<Integer> removedDishesIds = new ArrayList<>();
+        ObservableList<CartItemBO> list = tv.getSelectionModel().getSelectedItems();
+        list.forEach(x -> removedDishesIds.add(x.getDishesId()));
+        if (CommonUtils.isEmpty(removedDishesIds)) {
+            AlertBuilder.ERROR("删除购物车失败", "请选择删除记录");
+            return;
+        }
+
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("删除购物车");
         alert.setContentText("确定要删除这行记录吗?");
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() != ButtonType.OK) {
+        if (result.orElse(null) != ButtonType.OK) {
             return;
         }
 
-        List<String> removeItems = new ArrayList<>();
-        ObservableList<CartItemBO> list = tv.getSelectionModel().getSelectedItems();
-        list.forEach(x -> removeItems.add(x.getDishesId() + ""));
-        if (CommonUtils.isEmpty(removeItems)) {
-            AlertBuilder.ERROR("删除购物车失败", "请选择删除记录");
-            return;
-        }
         Result<CartVO> getCartRs = cartService.getCartOfDesk(deskId);
         if (!getCartRs.isSuccess()) {
             AlertBuilder.ERROR("获取购物车信息失败", getCartRs.getMsg());
@@ -131,14 +131,11 @@ public class CartView extends VBox {
             return;
         }
         List<CartItemVO> items = cartVO.getContents();
-        items = items.stream()
-                .filter(it -> !removeItems.contains(it.getDishesId() + ""))
-                .collect(Collectors.toList());
+        items = CommonUtils.filter(items, it -> !removedDishesIds.contains(it.getDishesId()));
         cartVO.setContents(items);
         Result<CartVO> updateRs = cartService.updateCart(deskId, cartVO);
         if (updateRs.isSuccess()) {
             reloadData(param, tv);
-            // AlertBuilder.INFO("删除成功");
         } else {
             AlertBuilder.ERROR("删除失败," + updateRs.getMsg());
         }
