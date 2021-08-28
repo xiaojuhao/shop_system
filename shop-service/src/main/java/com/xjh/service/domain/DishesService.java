@@ -12,6 +12,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.DishesImgUtils;
 import com.xjh.common.valueobject.DishesImgVO;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPrice;
@@ -19,8 +20,6 @@ import com.xjh.dao.dataobject.DishesType;
 import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.dao.mapper.DishesPriceDAO;
 import com.xjh.dao.reqmodel.PageCond;
-
-import cn.hutool.core.codec.Base64;
 
 @Singleton
 public class DishesService {
@@ -60,16 +59,7 @@ public class DishesService {
         if (dishes == null) {
             return new ArrayList<>();
         }
-        List<DishesImgVO> imgs = new ArrayList<>();
-        String base64Imgs = dishes.getDishesImgs();
-        if (CommonUtils.isNotBlank(base64Imgs)) {
-            String json = Base64.decodeStr(base64Imgs);
-            List<DishesImgVO> arr = JSONArray.parseArray(json, DishesImgVO.class);
-            if (arr != null) {
-                imgs.addAll(arr);
-            }
-        }
-        return imgs;
+        return DishesImgUtils.resolveImgs(dishes.getDishesImgs());
     }
 
     public String getDishesImageUrl(Dishes dishes) {

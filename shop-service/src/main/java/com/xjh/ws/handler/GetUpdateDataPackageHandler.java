@@ -11,11 +11,18 @@ import org.java_websocket.WebSocket;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.DishesImgUtils;
 import com.xjh.dao.dataobject.Dishes;
+import com.xjh.dao.dataobject.DishesPackage;
+import com.xjh.dao.dataobject.DishesPackageDishes;
 import com.xjh.dao.dataobject.DishesPrice;
 import com.xjh.dao.dataobject.DishesType;
+import com.xjh.dao.mapper.DishesDAO;
+import com.xjh.dao.mapper.DishesPackageDishesDAO;
+import com.xjh.dao.mapper.DishesPackageUpdateDAO;
 import com.xjh.dao.mapper.DishesTypeUpdateDAO;
 import com.xjh.dao.mapper.DishesUpdateDAO;
+import com.xjh.service.domain.DishesPackageService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.DishesTypeService;
 import com.xjh.ws.WsApiType;
@@ -31,7 +38,15 @@ public class GetUpdateDataPackageHandler implements WsHandler {
     @Inject
     DishesTypeUpdateDAO dishesTypeUpdateDAO;
     @Inject
+    DishesPackageUpdateDAO dishesPackageUpdateDAO;
+    @Inject
     DishesTypeService dishesTypeService;
+    @Inject
+    DishesPackageService dishesPackageService;
+    @Inject
+    DishesPackageDishesDAO dishesPackageDishesDAO;
+    @Inject
+    DishesDAO dishesDAO;
 
     private long lastUpdatTimeNew = 0;
 
@@ -51,6 +66,7 @@ public class GetUpdateDataPackageHandler implements WsHandler {
         //
         resp.put("dishes", getDishesInfo(lastUpdatTime));
         resp.put("dishestype", getDishesType(lastUpdatTime));
+        resp.put("package", getDishesPackage(lastUpdatTime));
         return resp;
     }
 
@@ -131,6 +147,53 @@ public class GetUpdateDataPackageHandler implements WsHandler {
                 jSONObjectDishesType.put("hidden_h5", dishesType.getHiddenH5());
                 jSONObjectDishesType.put("hidden_flat", dishesType.getHiddenFlat());
                 jSONArray.add(jSONObjectDishesType);
+            }
+        }
+        return jSONArray;
+    }
+
+    private JSONArray getDishesPackage(long lastUpdatTime) {
+
+        List<DishesPackage> dishesPackages = dishesPackageService.selectAll();
+
+        JSONArray jSONArray = new JSONArray();
+        for (int i = 0; i < dishesPackages.size(); i++) {
+            DishesPackage dishesPackage = dishesPackages.get(i);
+            long lastUpdateTimeNow = dishesPackageUpdateDAO.getLastUpdateTime(dishesPackage.getDishesPackageId());
+            if (lastUpdateTimeNow > lastUpdatTime) {
+                if (lastUpdateTimeNow > lastUpdatTimeNew) {
+                    lastUpdatTimeNew = lastUpdateTimeNow;
+                }
+                JSONObject jSONObjectDishesPackage = new JSONObject();
+                jSONObjectDishesPackage.put("imgurl", "");
+                jSONObjectDishesPackage.put("imgNum", DishesImgUtils.resolveImgs(dishesPackage.getDishesPackageImg()).size());
+                jSONObjectDishesPackage.put("price", dishesPackage.getDishesPackagePrice());
+                jSONObjectDishesPackage.put("package_name", dishesPackage.getDishesPackageName());
+                jSONObjectDishesPackage.put("date_end", "");
+                jSONObjectDishesPackage.put("package_id", dishesPackage.getDishesPackageId());
+                jSONObjectDishesPackage.put("sku", dishesPackage.getDishesPackageId());
+                jSONObjectDishesPackage.put("date_available", dishesPackage.getCreatTime());
+
+                List<DishesPackageDishes> disheses = dishesPackageDishesDAO.getByDishesPackageTypeId(dishesPackage.getDishesPackageId());
+                JSONArray jSONArrayDishes = new JSONArray();
+
+                for (int j = 0; j < disheses.size(); j++) {
+                    DishesPackageDishes pkgDishes = disheses.get(j);
+                    Dishes dishes = dishesDAO.getById(pkgDishes.getDishesId());
+                    if (dishes != null) {
+                        JSONObject jSONObjectDishes = new JSONObject();
+                        jSONObjectDishes.put("imgurl", "");
+                        jSONObjectDishes.put("price", dishes.getDishesPrice());
+                        jSONObjectDishes.put("description", dishes.getDishesDescription());
+                        jSONObjectDishes.put("vipprice", 0);
+                        jSONObjectDishes.put("dishes_name", dishes.getDishesName());
+                        jSONObjectDishes.put("sku", dishes.getDishesId());
+                        jSONArrayDishes.add(jSONObjectDishes);
+                    }
+                }
+
+                jSONObjectDishesPackage.put("dishes", jSONArrayDishes);
+                jSONArray.add(jSONObjectDishesPackage);
             }
         }
         return jSONArray;

@@ -9,12 +9,12 @@ import java.util.Optional;
 import org.apache.commons.collections4.CollectionUtils;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.xjh.common.enumeration.EnumChoiceAction;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.ClickHelper;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.CopyUtils;
+import com.xjh.common.utils.DishesImgUtils;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.DishesImgVO;
@@ -35,7 +35,6 @@ import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.DishesChoiceItemBO;
 import com.xjh.startup.view.model.DishesQueryCond;
 
-import cn.hutool.core.codec.Base64;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -261,14 +260,10 @@ public class OrderDishesChoiceView extends VBox {
 
     private DishesChoiceItemBO buildBO(DishesPackage dishes) {
         DishesChoiceItemBO bo = new DishesChoiceItemBO();
+        List<DishesImgVO> imgs = DishesImgUtils.resolveImgs(dishes.getDishesPackageImg());
         String img = null;
-        String base64Imgs = dishes.getDishesPackageImg();
-        if (CommonUtils.isNotBlank(base64Imgs)) {
-            String json = Base64.decodeStr(base64Imgs);
-            List<DishesImgVO> arr = JSONArray.parseArray(json, DishesImgVO.class);
-            if (arr != null && arr.size() > 0) {
-                img = arr.get(0).getImageSrc();
-            }
+        if (CommonUtils.isNotEmpty(imgs)) {
+            img = imgs.get(0).getImageSrc();
         }
         bo.setOrderId(data.getOrderId());
         bo.setDeskId(data.getDeskId());

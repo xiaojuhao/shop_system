@@ -22,4 +22,8 @@ public class DishesPackageService {
     public List<DishesPackage> selectList(DishesPackage cond) {
         return dishesPackageDAO.selectList(cond);
     }
+
+    public List<DishesPackage> selectAll() {
+        return dishesPackageDAO.selectList(new DishesPackage());
+    }
 }
