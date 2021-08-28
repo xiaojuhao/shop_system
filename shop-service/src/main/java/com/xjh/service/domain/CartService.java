@@ -1,6 +1,5 @@
 package com.xjh.service.domain;
 
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +19,13 @@ import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
-import com.xjh.dao.dataobject.*;
+import com.xjh.dao.dataobject.Cart;
+import com.xjh.dao.dataobject.Desk;
+import com.xjh.dao.dataobject.Dishes;
+import com.xjh.dao.dataobject.DishesPackage;
+import com.xjh.dao.dataobject.Order;
+import com.xjh.dao.dataobject.OrderDishes;
+import com.xjh.dao.dataobject.SubOrder;
 import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.dao.mapper.DishesPackageDAO;
 import com.xjh.dao.mapper.OrderDAO;
@@ -57,11 +62,11 @@ public class CartService {
         Runnable clear = CurrentRequest.resetRequestId();
         try {
             Desk desk = deskService.getById(deskId);
-            if(desk == null){
-                return Result.fail("桌号"+deskId+"不存在");
+            if (desk == null) {
+                return Result.fail("桌号" + deskId + "不存在");
             }
-            if(EnumDesKStatus.of(desk.getStatus()) == EnumDesKStatus.FREE){
-                return Result.fail("桌号"+deskId+"未开台");
+            if (EnumDesKStatus.of(desk.getStatus()) == EnumDesKStatus.FREE) {
+                return Result.fail("桌号" + deskId + "未开台");
             }
             Cart cart = new Cart();
             cart.setDeskId(deskId);
@@ -301,8 +306,8 @@ public class CartService {
     }
 
 
-    public void clearCart(Integer deskId) throws SQLException {
-        CartStore.clearCart(deskId);
+    public Result<String> clearCart(Integer deskId) {
+        return CartStore.clearCart(deskId);
     }
 
     public Integer createSubOrderId() {

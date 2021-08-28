@@ -77,7 +77,7 @@ public class CartStore {
         Transaction txn = db.getEnvironment().beginTransaction(null, txConfig);
         try {
             db.delete(txn, theKey);
-            return Result.success(null);
+            return Result.success("清空购物车成功");
         } catch (Exception ex) {
             Logger.error("清空购物车失败:" + ex.getMessage());
             return Result.fail("清空购物车失败:" + ex.getMessage());
