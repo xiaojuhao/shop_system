@@ -4,6 +4,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.xjh.common.utils.Holder;
 import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.TimeRecord;
 import com.xjh.dao.DaoModule;
 import com.xjh.dao.DataSourceModule;
 import com.xjh.service.ServiceModule;
@@ -20,7 +21,7 @@ public class GuiceContainer {
             if (injector.get() != null) {
                 return injector.get();
             }
-            long start = System.currentTimeMillis();
+            TimeRecord timeRecord = TimeRecord.start();
             Injector ij = Guice.createInjector(
                     new DaoModule(),
                     new ServiceModule(),
@@ -28,7 +29,7 @@ public class GuiceContainer {
                     new WsHandlerModule()
             );
             injector.hold(ij);
-            Logger.info("初始化Guice, 耗时:" + (System.currentTimeMillis() - start));
+            Logger.info("初始化Guice, 耗时:" + timeRecord.getCost());
             return ij;
         }
     }
