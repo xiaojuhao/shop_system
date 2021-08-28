@@ -5,19 +5,45 @@ import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
 
 import com.xjh.startup.foundation.ioc.GuiceContainer;
+import com.xjh.ws.WsHandler;
+import com.xjh.ws.WsType;
 import com.xjh.ws.handler.*;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
 import java.net.InetSocketAddress;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class XjhWebSocketServer extends WebSocketServer {
+    private final Map<String, WsHandler> handlers = new ConcurrentHashMap<>();
+    private final AtomicBoolean initialized = new AtomicBoolean();
+
     public static XjhWebSocketServer startWS(int port){
         XjhWebSocketServer server = new XjhWebSocketServer(port);
         server.start();
-        Logger.info("启动WebSocket服务器...... >> " + port);
+        Logger.info("启动WebSocket服务器...... >> listen on " + port);
         return server;
+    }
+
+    private WsHandler getHandler(JSONObject msg){
+        tryInitHandlers();
+        return handlers.get(msg.getString("API_TYPE"));
+    }
+
+    private void tryInitHandlers(){
+        if(initialized.compareAndSet(false, true)) {
+            GuiceContainer.getInjector().getBindings().forEach((k, v) -> {
+                Object inst = GuiceContainer.getInjector().getInstance(k);
+                WsType wsType = inst.getClass().getAnnotation(WsType.class);
+                if (inst instanceof WsHandler && wsType != null) {
+                    Logger.info("Initialize WebSocket Handler: " + wsType.value());
+                    handlers.put(wsType.value(), (WsHandler) inst);
+                }
+            });
+        }
     }
 
     public XjhWebSocketServer(int port) {
@@ -28,6 +54,7 @@ public class XjhWebSocketServer extends WebSocketServer {
         try {
             Logger.info("停止WebSocket服务器......");
             this.stop();
+            initialized.set(false);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -51,26 +78,14 @@ public class XjhWebSocketServer extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket ws, String message) {
-        OpenDeskHandler openDeskHandler = GuiceContainer.getInstance(OpenDeskHandler.class);
-        CloseDeskHandler closeDeskHandler = GuiceContainer.getInstance(CloseDeskHandler.class);
-        AddCartHandler addCartHandler = GuiceContainer.getInstance(AddCartHandler.class);
-        OrderCartHandler orderCartHandler = GuiceContainer.getInstance(OrderCartHandler.class);
         String uuid = ws.getAttachment();
-        Logger.info(uuid + " >> 收到了消息:" + message);
+        Logger.info(uuid + " >> 收到了消息: " + message);
         JSONObject msg = JSONObject.parseObject(message);
-        JSONObject resp = null;
-        String type = msg.getString("API_TYPE");
-        if (CommonUtils.equals(type, "openDesk")) {
-            resp = openDeskHandler.handle(msg);
-        } else if (CommonUtils.eq(type, "closetable")) {
-            resp = closeDeskHandler.handle(msg);
-        } else if (CommonUtils.eq(type, "addDishesToCart")) {
-            resp = addCartHandler.handle(msg);
-        } else if (CommonUtils.eq(type, "orderCart")) {
-            resp = orderCartHandler.handle(msg);
-        }
-        if (resp != null) {
-            Logger.info(uuid + " >> 响应结果:" + resp);
+
+        WsHandler handler = getHandler(msg);
+        if (handler != null) {
+            JSONObject resp = handler.handle(msg);
+            Logger.info(uuid + " >> 响应结果: " + resp);
             ws.send(resp.toJSONString());
         }else {
             Logger.info(uuid + " >> 无法响应内容");

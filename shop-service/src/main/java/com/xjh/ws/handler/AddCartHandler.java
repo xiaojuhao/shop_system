@@ -10,8 +10,10 @@ import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.model.CartItemVO;
 import com.xjh.service.domain.model.CartVO;
 import com.xjh.ws.WsHandler;
+import com.xjh.ws.WsType;
 
 @Singleton
+@WsType(value = "addDishesToCart")
 public class AddCartHandler implements WsHandler {
     @Inject
     CartService cartService;

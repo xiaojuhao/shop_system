@@ -8,8 +8,10 @@ import com.xjh.common.utils.Result;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.model.OpenDeskParam;
 import com.xjh.ws.WsHandler;
+import com.xjh.ws.WsType;
 
 @Singleton
+@WsType("openDesk")
 public class OpenDeskHandler implements WsHandler {
     @Inject
     DeskService deskService;

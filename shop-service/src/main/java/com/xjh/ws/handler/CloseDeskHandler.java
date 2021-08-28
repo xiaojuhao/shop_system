@@ -7,8 +7,10 @@ import com.google.inject.Singleton;
 import com.xjh.common.utils.Result;
 import com.xjh.service.domain.DeskService;
 import com.xjh.ws.WsHandler;
+import com.xjh.ws.WsType;
 
 @Singleton
+@WsType("closetable")
 public class CloseDeskHandler implements WsHandler {
     @Inject
     DeskService deskService;

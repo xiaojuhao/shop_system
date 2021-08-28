@@ -10,8 +10,10 @@ import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
 import com.xjh.ws.WsHandler;
+import com.xjh.ws.WsType;
 
 @Singleton
+@WsType("orderCart")
 public class OrderCartHandler implements WsHandler {
     @Inject
     CartService cartService;

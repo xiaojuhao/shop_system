@@ -7,8 +7,11 @@ import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.LoginView;
 import com.xjh.startup.foundation.ws.XjhWebSocketServer;
 import com.xjh.ws.WsHandler;
+import com.xjh.ws.WsType;
 import javafx.application.Application;
 import javafx.stage.Stage;
+
+import java.lang.reflect.Type;
 
 public class LoginApp extends Application {
 
@@ -28,6 +31,7 @@ public class LoginApp extends Application {
         XjhWebSocketServer ws = XjhWebSocketServer.startWS(8889);
         primaryStage.setOnCloseRequest(evt -> ws.stopQuietly());
         Logger.info("启动WebSocket服务器，cost " + timeRecord.getCostAndReset());
+
     }
 
     public static void main(String[] args) {
