@@ -6,6 +6,7 @@ import java.util.List;
 import com.alibaba.fastjson.JSON;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
@@ -40,6 +41,9 @@ public class DeskService {
             Desk desk = deskDAO.getById(deskId);
             if (desk == null) {
                 return Result.fail("桌号不存在:" + deskId);
+            }
+            if(EnumDesKStatus.of(desk.getStatus()) != EnumDesKStatus.FREE){
+                return Result.fail("餐桌状态错误, 无法开台");
             }
             // 开桌
             Integer orderId = orderService.createNewOrderId();

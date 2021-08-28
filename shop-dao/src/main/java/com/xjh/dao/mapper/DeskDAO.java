@@ -69,7 +69,7 @@ public class DeskDAO {
                         " where deskId = ? ",
                 desk.getOrderId(),
                 DateBuilder.now().mills(),
-                EnumDesKStatus.USED.status(),
+                EnumDesKStatus.IN_USE.status(),
                 desk.getDeskId());
     }
 

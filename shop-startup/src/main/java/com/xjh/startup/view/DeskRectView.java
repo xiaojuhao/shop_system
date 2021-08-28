@@ -81,7 +81,7 @@ public class DeskRectView extends VBox {
     }
 
     private void setBackground(Node node, EnumDesKStatus status) {
-        if (status == EnumDesKStatus.USED) {
+        if (status == EnumDesKStatus.IN_USE) {
             node.setStyle("-fx-background-color: #CD0000;");
         } else if (status == EnumDesKStatus.PAID) {
             node.setStyle("-fx-background-color: #00bfff;");
@@ -94,7 +94,7 @@ public class DeskRectView extends VBox {
         if (openingDesk.compareAndSet(false, true)) {
             try {
                 EnumDesKStatus runStatus = EnumDesKStatus.of(desk.get().getStatus());
-                if (runStatus == EnumDesKStatus.USED || runStatus == EnumDesKStatus.PAID) {
+                if (runStatus == EnumDesKStatus.IN_USE || runStatus == EnumDesKStatus.PAID) {
                     Window sceneWindow = this.getScene().getWindow();
                     double width = sceneWindow.getWidth() / 10 * 9;
                     double height = sceneWindow.getHeight() / 10 * 9;

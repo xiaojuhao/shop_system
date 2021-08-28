@@ -11,6 +11,7 @@ import javax.inject.Singleton;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.store.SequenceDatabase;
@@ -19,12 +20,7 @@ import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
-import com.xjh.dao.dataobject.Cart;
-import com.xjh.dao.dataobject.Dishes;
-import com.xjh.dao.dataobject.DishesPackage;
-import com.xjh.dao.dataobject.Order;
-import com.xjh.dao.dataobject.OrderDishes;
-import com.xjh.dao.dataobject.SubOrder;
+import com.xjh.dao.dataobject.*;
 import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.dao.mapper.DishesPackageDAO;
 import com.xjh.dao.mapper.OrderDAO;
@@ -54,10 +50,19 @@ public class CartService {
     OrderDishesDAO orderDishesDAO;
     @Inject
     OrderService orderService;
+    @Inject
+    DeskService deskService;
 
     public Result<CartVO> addItem(Integer deskId, CartItemVO item) {
         Runnable clear = CurrentRequest.resetRequestId();
         try {
+            Desk desk = deskService.getById(deskId);
+            if(desk == null){
+                return Result.fail("桌号"+deskId+"不存在");
+            }
+            if(EnumDesKStatus.of(desk.getStatus()) == EnumDesKStatus.FREE){
+                return Result.fail("桌号"+deskId+"未开台");
+            }
             Cart cart = new Cart();
             cart.setDeskId(deskId);
             List<CartItemVO> contentItems = selectByDeskId(deskId);
