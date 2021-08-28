@@ -7,9 +7,10 @@ import com.google.inject.Singleton;
 import com.xjh.common.utils.Result;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.model.OpenDeskParam;
+import com.xjh.ws.WsHandler;
 
 @Singleton
-public class OpenDeskHandler {
+public class OpenDeskHandler implements WsHandler {
     @Inject
     DeskService deskService;
 

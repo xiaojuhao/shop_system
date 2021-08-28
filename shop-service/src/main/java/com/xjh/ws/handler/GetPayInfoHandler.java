@@ -8,9 +8,10 @@ import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderService;
+import com.xjh.ws.WsHandler;
 
 @Singleton
-public class GetPayInfoHandler {
+public class GetPayInfoHandler implements WsHandler {
     @Inject
     DeskService deskService;
     @Inject

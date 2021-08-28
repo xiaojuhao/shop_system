@@ -4,9 +4,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.service.domain.DeskService;
+import com.xjh.ws.WsHandler;
 
 @Singleton
-public class GetPayCodeHandler {
+public class GetPayCodeHandler implements WsHandler {
     @Inject
     DeskService deskService;
 

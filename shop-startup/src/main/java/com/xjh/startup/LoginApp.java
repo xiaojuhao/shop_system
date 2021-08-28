@@ -3,8 +3,10 @@ package com.xjh.startup;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.TimeRecord;
 import com.xjh.startup.foundation.constants.MainStageHolder;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.LoginView;
 import com.xjh.startup.foundation.ws.XjhWebSocketServer;
+import com.xjh.ws.WsHandler;
 import javafx.application.Application;
 import javafx.stage.Stage;
 

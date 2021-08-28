@@ -9,9 +9,10 @@ import com.xjh.dao.dataobject.Desk;
 import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
+import com.xjh.ws.WsHandler;
 
 @Singleton
-public class OrderCartHandler {
+public class OrderCartHandler implements WsHandler {
     @Inject
     CartService cartService;
     @Inject
