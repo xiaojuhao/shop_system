@@ -10,21 +10,29 @@ import org.java_websocket.WebSocket;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.xjh.common.enumeration.EnumDesKStatus;
+import com.xjh.common.enumeration.EnumDeskType;
+import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DishesImgUtils;
+import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.dao.dataobject.DishesPackageDishes;
 import com.xjh.dao.dataobject.DishesPrice;
 import com.xjh.dao.dataobject.DishesType;
+import com.xjh.dao.dataobject.Order;
+import com.xjh.dao.mapper.DeskDAO;
 import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.dao.mapper.DishesPackageDishesDAO;
 import com.xjh.dao.mapper.DishesPackageUpdateDAO;
 import com.xjh.dao.mapper.DishesTypeUpdateDAO;
 import com.xjh.dao.mapper.DishesUpdateDAO;
+import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.DishesPackageService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.DishesTypeService;
+import com.xjh.service.domain.OrderService;
 import com.xjh.ws.WsApiType;
 import com.xjh.ws.WsHandler;
 
@@ -46,7 +54,13 @@ public class GetUpdateDataPackageHandler implements WsHandler {
     @Inject
     DishesPackageDishesDAO dishesPackageDishesDAO;
     @Inject
+    DeskService deskService;
+    @Inject
     DishesDAO dishesDAO;
+    @Inject
+    DeskDAO deskDAO;
+    @Inject
+    OrderService orderService;
 
     private long lastUpdatTimeNew = 0;
 
@@ -67,6 +81,8 @@ public class GetUpdateDataPackageHandler implements WsHandler {
         resp.put("dishes", getDishesInfo(lastUpdatTime));
         resp.put("dishestype", getDishesType(lastUpdatTime));
         resp.put("package", getDishesPackage(lastUpdatTime));
+        resp.put("tables", getDesks(lastUpdatTime));
+        resp.put("tablestype", getDeskTypes(lastUpdatTime));
         return resp;
     }
 
@@ -197,5 +213,63 @@ public class GetUpdateDataPackageHandler implements WsHandler {
             }
         }
         return jSONArray;
+    }
+
+    private JSONArray getDesks(long lastUpdatTime) {
+        List<Desk> desks = deskService.getAllDesks();
+        JSONArray jSONArrayDesk = new JSONArray();
+        for (int i = 0; i < desks.size(); i++) {
+            Desk desk = desks.get(i);
+            long lastUpdateTimeNow = deskDAO.getDeskLastUpdateTime(desk.getDeskId());
+            if (lastUpdateTimeNow > lastUpdatTime) {
+                if (lastUpdateTimeNow > lastUpdatTimeNew) {
+                    lastUpdatTimeNew = lastUpdateTimeNow;
+                }
+
+                int meal_number = 0;
+                int pay_status = EnumOrderStatus.UNPAID.status;
+                int status = desk.getStatus();
+                if (status == EnumDesKStatus.IN_USE.status() || status == EnumDesKStatus.PAID.status()) {
+                    Order order = orderService.getOrder(desk.getOrderId());
+                    if (order != null) {
+                        meal_number = order.getOrderCustomerNums();
+                        pay_status = order.getStatus();
+                    }
+                }
+
+                JSONObject jSONObjectDesk = new JSONObject();
+                jSONObjectDesk.put("tables_id", desk.getDeskId());
+                jSONObjectDesk.put("pay_status", pay_status);
+                jSONObjectDesk.put("tables_number", desk.getDeskName());
+                jSONObjectDesk.put("nuclear_num", desk.getMaxPerson());
+                jSONObjectDesk.put("ifpack", "0");
+                jSONObjectDesk.put("use_status", desk.getStatus());
+                jSONObjectDesk.put("tables_type_name", EnumDeskType.of(desk.getBelongDeskType()).name);
+                jSONObjectDesk.put("meal_number", meal_number);
+                jSONArrayDesk.add(jSONObjectDesk);
+            }
+        }
+
+        return jSONArrayDesk;
+    }
+
+    private JSONArray getDeskTypes(long lastUpdatTime) {
+        JSONArray jSONArrayDeskType = new JSONArray();
+        for (EnumDeskType deskType : EnumDeskType.values()) {
+            long lastUpdateTimeNow = 0;
+            if (lastUpdateTimeNow > lastUpdatTime) {
+                if (lastUpdateTimeNow > lastUpdatTimeNew) {
+                    lastUpdatTimeNew = lastUpdateTimeNow;
+                }
+                JSONObject jSONObjectDeskType = new JSONObject();
+                jSONObjectDeskType.put("store_id", "");
+                // jSONObjectDeskType.put("date_added", deskType.getCreateTime());
+                jSONObjectDeskType.put("tables_type_id", deskType.code);
+                jSONObjectDeskType.put("tables_type_name", deskType.name);
+                jSONObjectDeskType.put("status", "1");
+                jSONArrayDeskType.add(jSONObjectDeskType);
+            }
+        }
+        return jSONArrayDeskType;
     }
 }

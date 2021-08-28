@@ -73,6 +73,21 @@ public class DeskDAO {
                 desk.getDeskId());
     }
 
+    public long getDeskLastUpdateTime(int deskId) {
+        try {
+            String sql = "select * from desk_add_or_remove_update where deskId='" + deskId + "'";
+            List<Entity> list = Db.use(ds).query(sql);
+            Entity entity = list.stream().findFirst().orElse(null);
+            if (entity == null) {
+                return 0;
+            }
+            return entity.getLong("lastUpdateTime");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return 0;
+        }
+    }
+
     public int freeDesk(Integer id) throws SQLException {
         return Db.use(ds).execute("update desks " +
                         " set orderId = 0," +

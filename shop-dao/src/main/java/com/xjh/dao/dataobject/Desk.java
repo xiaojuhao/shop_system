@@ -19,6 +19,8 @@ public class Desk implements Serializable {
     Integer deskType;
     @Column("orderId")
     Integer orderId;
+    @Column("belongDeskType")
+    Integer belongDeskType;
     @Column("createTime")
     Long orderCreateTime;
 
@@ -78,4 +80,11 @@ public class Desk implements Serializable {
         this.orderCreateTime = orderCreateTime;
     }
 
+    public Integer getBelongDeskType() {
+        return belongDeskType;
+    }
+
+    public void setBelongDeskType(Integer belongDeskType) {
+        this.belongDeskType = belongDeskType;
+    }
 }
