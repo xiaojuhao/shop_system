@@ -7,6 +7,7 @@ import com.xjh.ws.handler.AddCartHandler;
 import com.xjh.ws.handler.CloseDeskHandler;
 import com.xjh.ws.handler.GetPayCodeHandler;
 import com.xjh.ws.handler.GetPayInfoHandler;
+import com.xjh.ws.handler.GetUpdateDataPackageHandler;
 import com.xjh.ws.handler.OpenDeskHandler;
 import com.xjh.ws.handler.OrderCartHandler;
 import com.xjh.ws.handler.SocketOpenHandler;
@@ -22,6 +23,7 @@ public class WsHandlerModule extends AbstractModule {
         bind(OpenDeskHandler.class);
         bind(OrderCartHandler.class);
         bind(SocketOpenHandler.class);
+        bind(GetUpdateDataPackageHandler.class);
         Logger.info("WebService模块注入 耗时:" + timeRecord.getCost());
     }
 }

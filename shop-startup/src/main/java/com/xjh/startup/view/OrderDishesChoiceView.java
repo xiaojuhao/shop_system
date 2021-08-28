@@ -1,17 +1,28 @@
 package com.xjh.startup.view;
 
-import cn.hutool.core.codec.Base64;
+import static com.xjh.common.utils.CommonUtils.collect;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.apache.commons.collections4.CollectionUtils;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.xjh.common.enumeration.EnumChoiceAction;
-import com.xjh.common.utils.*;
-import com.xjh.common.valueobject.DishesImg;
+import com.xjh.common.utils.AlertBuilder;
+import com.xjh.common.utils.ClickHelper;
+import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.CopyUtils;
+import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.Result;
+import com.xjh.common.valueobject.DishesImgVO;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.dao.dataobject.DishesType;
 import com.xjh.dao.mapper.DishesPackageDAO;
 import com.xjh.dao.reqmodel.PageCond;
-import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.DishesTypeService;
@@ -19,9 +30,12 @@ import com.xjh.service.domain.model.CartItemVO;
 import com.xjh.service.domain.model.CartVO;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
 import com.xjh.service.domain.model.SendOrderRequest;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.DishesChoiceItemBO;
 import com.xjh.startup.view.model.DishesQueryCond;
+
+import cn.hutool.core.codec.Base64;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -33,7 +47,16 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
@@ -43,13 +66,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.StringConverter;
-import org.apache.commons.collections4.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static com.xjh.common.utils.CommonUtils.collect;
 
 
 public class OrderDishesChoiceView extends VBox {
@@ -231,20 +247,11 @@ public class OrderDishesChoiceView extends VBox {
 
     private DishesChoiceItemBO buildBO(Dishes dishes) {
         DishesChoiceItemBO bo = new DishesChoiceItemBO();
-        String img = null;
-        String base64Imgs = dishes.getDishesImgs();
-        if (CommonUtils.isNotBlank(base64Imgs)) {
-            String json = Base64.decodeStr(base64Imgs);
-            List<DishesImg> arr = JSONArray.parseArray(json, DishesImg.class);
-            if (arr != null && arr.size() > 0) {
-                img = arr.get(0).getImageSrc();
-            }
-        }
         bo.setOrderId(data.getOrderId());
         bo.setDeskId(data.getDeskId());
         bo.setDeskName(data.getDeskName());
 
-        bo.setImg(img);
+        bo.setImg(dishesService.getDishesImageUrl(dishes));
         bo.setDishesId(dishes.getDishesId());
         bo.setDishesName(dishes.getDishesName());
         bo.setDishesPrice(dishes.getDishesPrice());
@@ -258,7 +265,7 @@ public class OrderDishesChoiceView extends VBox {
         String base64Imgs = dishes.getDishesPackageImg();
         if (CommonUtils.isNotBlank(base64Imgs)) {
             String json = Base64.decodeStr(base64Imgs);
-            List<DishesImg> arr = JSONArray.parseArray(json, DishesImg.class);
+            List<DishesImgVO> arr = JSONArray.parseArray(json, DishesImgVO.class);
             if (arr != null && arr.size() > 0) {
                 img = arr.get(0).getImageSrc();
             }
@@ -425,17 +432,8 @@ public class OrderDishesChoiceView extends VBox {
         canvas.setWidth(200);
         canvas.setHeight(210);
 
-        String imgSrc = null;
-        String base64Imgs = dishes.getDishesImgs();
         try {
-            if (CommonUtils.isNotBlank(base64Imgs)) {
-                String json = Base64.decodeStr(base64Imgs);
-                List<DishesImg> arr = JSONArray.parseArray(json, DishesImg.class);
-                if (CommonUtils.isNotEmpty(arr)) {
-                    imgSrc = getImageUrl(arr.get(0).getImageSrc());
-                }
-            }
-            Image img = new Image(imgSrc);
+            Image img = new Image(dishesService.getDishesImageUrl(dishes));
             canvas.getGraphicsContext2D().drawImage(img, 0, 10, 180, 160);
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,6 +1,6 @@
 package com.xjh.common.valueobject;
 
-public class OrderDiscount {
+public class OrderDiscountVO {
     private float rate;
     private String discountName = "N";
     // com.xjh.common.enumeration.EnumDiscountType

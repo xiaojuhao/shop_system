@@ -21,7 +21,7 @@ import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
-import com.xjh.common.valueobject.OrderDiscount;
+import com.xjh.common.valueobject.OrderDiscountVO;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.dao.dataobject.OrderPay;
@@ -90,7 +90,7 @@ public class OrderService {
             v.orderReduction = CommonUtils.orElse(order.getOrderReduction(), 0D);
             v.discountName = order.getDiscountReason();
             if(CommonUtils.isNotBlank(order.getOrderDiscountInfo())){
-                OrderDiscount d = JSON.parseObject(Base64.decodeStr(order.getOrderDiscountInfo()), OrderDiscount.class);
+                OrderDiscountVO d = JSON.parseObject(Base64.decodeStr(order.getOrderDiscountInfo()), OrderDiscountVO.class);
                 if(d != null){
                     v.discountName = d.getDiscountName();
                 }
@@ -238,7 +238,7 @@ public class OrderService {
             order.setOrderStatus(EnumOrderStatus.UNPAID.status);
             order.setStatus(EnumOrderServeStatus.START.status);
             order.setOrderType(EnumOrderType.NORMAL.type);
-            order.setOrderDiscountInfo(Base64.encode(JSONObject.toJSONString(new OrderDiscount())));
+            order.setOrderDiscountInfo(Base64.encode(JSONObject.toJSONString(new OrderDiscountVO())));
             order.setMemberId(0L);
             order.setOrderCustomerNums(param.getCustomerNum());
             order.setAccountId(0L);

@@ -12,13 +12,13 @@ import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Holder;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
-import com.xjh.common.valueobject.OrderDiscount;
+import com.xjh.common.valueobject.OrderDiscountVO;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
-import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.StoreService;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.DiscountApplyReq;
@@ -213,7 +213,7 @@ public class OrderDiscountSelectionView extends SmallForm {
             }
         }
         // 保存折扣信息
-        OrderDiscount orderDiscount = new OrderDiscount();
+        OrderDiscountVO orderDiscount = new OrderDiscountVO();
         orderDiscount.setDiscountName(req.getDiscountName());
         orderDiscount.setRate(new Double(req.getDiscountRate()).floatValue());
         orderDiscount.setType(req.getType().code());

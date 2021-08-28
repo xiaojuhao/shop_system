@@ -1,6 +1,6 @@
 package com.xjh.common.valueobject;
 
-public class DishesImg {
+public class DishesImgVO {
     Boolean isMain;
     String imageSrc;
 
