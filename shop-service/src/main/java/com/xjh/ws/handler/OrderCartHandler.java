@@ -10,17 +10,18 @@ import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
 import com.xjh.ws.WsHandler;
-import com.xjh.ws.WsType;
+import com.xjh.ws.WsApiType;
+import org.java_websocket.WebSocket;
 
 @Singleton
-@WsType("orderCart")
+@WsApiType("orderCart")
 public class OrderCartHandler implements WsHandler {
     @Inject
     CartService cartService;
     @Inject
     DeskService deskService;
 
-    public JSONObject handle(JSONObject msg) {
+    public JSONObject handle(WebSocket ws, JSONObject msg) {
         JSONObject resp = new JSONObject();
         resp.put("API_TYPE", "orderCart_ACK");
 

@@ -5,13 +5,14 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.service.domain.DeskService;
 import com.xjh.ws.WsHandler;
+import org.java_websocket.WebSocket;
 
 @Singleton
 public class GetPayCodeHandler implements WsHandler {
     @Inject
     DeskService deskService;
 
-    public JSONObject handle(JSONObject msg) {
+    public JSONObject handle(WebSocket ws, JSONObject msg) {
         int deskId = msg.getInteger("tables_id");
         String payType = msg.getString("pay_type");
         String remark = msg.getString("remark");

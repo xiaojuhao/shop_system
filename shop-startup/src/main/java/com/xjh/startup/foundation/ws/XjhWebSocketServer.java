@@ -6,7 +6,7 @@ import com.xjh.common.utils.Logger;
 
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.ws.WsHandler;
-import com.xjh.ws.WsType;
+import com.xjh.ws.WsApiType;
 import com.xjh.ws.handler.*;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
@@ -37,7 +37,7 @@ public class XjhWebSocketServer extends WebSocketServer {
         if(initialized.compareAndSet(false, true)) {
             GuiceContainer.getInjector().getBindings().forEach((k, v) -> {
                 Object inst = GuiceContainer.getInjector().getInstance(k);
-                WsType wsType = inst.getClass().getAnnotation(WsType.class);
+                WsApiType wsType = inst.getClass().getAnnotation(WsApiType.class);
                 if (inst instanceof WsHandler && wsType != null) {
                     Logger.info("Initialize WebSocket Handler: " + wsType.value());
                     handlers.put(wsType.value(), (WsHandler) inst);
@@ -61,13 +61,13 @@ public class XjhWebSocketServer extends WebSocketServer {
     }
 
     @Override
-    public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
+    public void onOpen(WebSocket ws, ClientHandshake clientHandshake) {
         SocketOpenHandler socketOpenHandler = GuiceContainer.getInstance(SocketOpenHandler.class);
-        JSONObject resp = socketOpenHandler.handle(webSocket);
+        JSONObject resp = socketOpenHandler.handle(ws, null);
         String uuid = CommonUtils.randomStr(10);
-        webSocket.setAttachment(uuid);
+        ws.setAttachment(uuid);
         Logger.info(uuid + " >> WS链接打开: " + resp);
-        webSocket.send(resp.toJSONString());
+        ws.send(resp.toJSONString());
     }
 
     @Override
@@ -84,7 +84,7 @@ public class XjhWebSocketServer extends WebSocketServer {
 
         WsHandler handler = getHandler(msg);
         if (handler != null) {
-            JSONObject resp = handler.handle(msg);
+            JSONObject resp = handler.handle(ws, msg);
             Logger.info(uuid + " >> 响应结果: " + resp);
             ws.send(resp.toJSONString());
         }else {

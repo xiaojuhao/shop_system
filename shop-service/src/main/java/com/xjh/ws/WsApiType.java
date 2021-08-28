@@ -10,6 +10,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 @BindingAnnotation
-public @interface WsType {
+public @interface WsApiType {
     String value() ;
 }

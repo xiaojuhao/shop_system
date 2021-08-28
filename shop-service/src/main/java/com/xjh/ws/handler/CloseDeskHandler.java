@@ -7,15 +7,16 @@ import com.google.inject.Singleton;
 import com.xjh.common.utils.Result;
 import com.xjh.service.domain.DeskService;
 import com.xjh.ws.WsHandler;
-import com.xjh.ws.WsType;
+import com.xjh.ws.WsApiType;
+import org.java_websocket.WebSocket;
 
 @Singleton
-@WsType("closetable")
+@WsApiType("closetable")
 public class CloseDeskHandler implements WsHandler {
     @Inject
     DeskService deskService;
 
-    public JSONObject handle(JSONObject msg) {
+    public JSONObject handle(WebSocket ws, JSONObject msg) {
         JSONObject resp = new JSONObject();
         resp.put("API_TYPE", "closetable_ACK");
 

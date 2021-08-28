@@ -8,15 +8,16 @@ import com.xjh.common.utils.Result;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.model.OpenDeskParam;
 import com.xjh.ws.WsHandler;
-import com.xjh.ws.WsType;
+import com.xjh.ws.WsApiType;
+import org.java_websocket.WebSocket;
 
 @Singleton
-@WsType("openDesk")
+@WsApiType("openDesk")
 public class OpenDeskHandler implements WsHandler {
     @Inject
     DeskService deskService;
 
-    public JSONObject handle(JSONObject msg) {
+    public JSONObject handle(WebSocket ws, JSONObject msg) {
         JSONObject resp = new JSONObject();
         resp.put("API_TYPE", "openDesk_ACK");
 

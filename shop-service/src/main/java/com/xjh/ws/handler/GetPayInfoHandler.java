@@ -9,6 +9,7 @@ import com.xjh.dao.dataobject.Order;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.ws.WsHandler;
+import org.java_websocket.WebSocket;
 
 @Singleton
 public class GetPayInfoHandler implements WsHandler {
@@ -17,7 +18,7 @@ public class GetPayInfoHandler implements WsHandler {
     @Inject
     OrderService orderService;
 
-    public JSONObject handle(JSONObject msg) {
+    public JSONObject handle(WebSocket ws, JSONObject msg) {
         int deskId = msg.getInteger("tables_id");
         String openid = msg.getString("openid");
         JSONObject jSONObjectReturn = new JSONObject();
