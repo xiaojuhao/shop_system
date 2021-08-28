@@ -1,13 +1,16 @@
 package com.xjh.ws.handler;
 
+import org.java_websocket.WebSocket;
+
 import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.service.domain.DeskService;
+import com.xjh.ws.WsApiType;
 import com.xjh.ws.WsHandler;
-import org.java_websocket.WebSocket;
 
 @Singleton
+@WsApiType("getPayCode")
 public class GetPayCodeHandler implements WsHandler {
     @Inject
     DeskService deskService;
