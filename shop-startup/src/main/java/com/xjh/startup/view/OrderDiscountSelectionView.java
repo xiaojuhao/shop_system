@@ -15,7 +15,7 @@ import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.OrderDiscount;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
-import com.xjh.guice.GuiceContainer;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.StoreService;

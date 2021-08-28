@@ -3,7 +3,7 @@ package com.xjh.startup.view;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Account;
-import com.xjh.guice.GuiceContainer;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.service.domain.AccountService;
 import com.xjh.startup.foundation.constants.CurrentAccount;
 import com.xjh.startup.foundation.constants.MainStageHolder;

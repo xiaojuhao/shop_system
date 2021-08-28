@@ -12,7 +12,7 @@ import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Order;
-import com.xjh.guice.GuiceContainer;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.model.OpenDeskParam;

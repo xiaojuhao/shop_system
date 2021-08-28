@@ -5,7 +5,7 @@ import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.ThreadUtils;
 import com.xjh.common.utils.TimeRecord;
 import com.xjh.dao.dataobject.Desk;
-import com.xjh.guice.GuiceContainer;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.service.domain.DeskService;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;

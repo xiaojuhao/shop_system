@@ -1,9 +1,10 @@
-package com.xjh.ws;
+package com.xjh.startup.foundation.ws;
 
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
-import com.xjh.guice.GuiceContainer;
+
+import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.ws.handler.*;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
@@ -12,13 +13,15 @@ import org.java_websocket.server.WebSocketServer;
 import java.net.InetSocketAddress;
 
 public class XjhWebSocketServer extends WebSocketServer {
-    public XjhWebSocketServer() {
-        super(new InetSocketAddress(8889));
+    public static XjhWebSocketServer startWS(int port){
+        XjhWebSocketServer server = new XjhWebSocketServer(port);
+        server.start();
+        Logger.info("启动WebSocket服务器...... >> " + port);
+        return server;
     }
 
-    public void startWS() {
-        Logger.info("启动WebSocket服务器......");
-        super.start();
+    public XjhWebSocketServer(int port) {
+        super(new InetSocketAddress(port));
     }
 
     public void stopQuietly() {

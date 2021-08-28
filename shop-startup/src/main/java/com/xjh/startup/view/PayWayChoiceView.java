@@ -6,7 +6,7 @@ import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Order;
-import com.xjh.guice.GuiceContainer;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderPayService;
 import com.xjh.service.domain.OrderService;

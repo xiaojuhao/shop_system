@@ -11,7 +11,7 @@ import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.dao.dataobject.DishesType;
 import com.xjh.dao.mapper.DishesPackageDAO;
 import com.xjh.dao.reqmodel.PageCond;
-import com.xjh.guice.GuiceContainer;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.DishesTypeService;

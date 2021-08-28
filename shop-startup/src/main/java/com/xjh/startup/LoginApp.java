@@ -4,7 +4,7 @@ import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.TimeRecord;
 import com.xjh.startup.foundation.constants.MainStageHolder;
 import com.xjh.startup.view.LoginView;
-import com.xjh.ws.XjhWebSocketServer;
+import com.xjh.startup.foundation.ws.XjhWebSocketServer;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -23,8 +23,7 @@ public class LoginApp extends Application {
         primaryStage.show();
         Logger.info("主页面渲染, cost " + timeRecord.getCostAndReset());
         // 启动 webSocket服务器
-        XjhWebSocketServer ws = new XjhWebSocketServer();
-        ws.startWS();
+        XjhWebSocketServer ws = XjhWebSocketServer.startWS(8889);
         primaryStage.setOnCloseRequest(evt -> ws.stopQuietly());
         Logger.info("启动WebSocket服务器，cost " + timeRecord.getCostAndReset());
     }

@@ -9,7 +9,7 @@ import com.xjh.dao.dataobject.DishesPackageDishes;
 import com.xjh.dao.dataobject.DishesPackageType;
 import com.xjh.dao.mapper.DishesPackageDishesDAO;
 import com.xjh.dao.mapper.DishesPackageTypeDAO;
-import com.xjh.guice.GuiceContainer;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.model.CartItemVO;
 import com.xjh.startup.view.model.DishesChoiceItemBO;

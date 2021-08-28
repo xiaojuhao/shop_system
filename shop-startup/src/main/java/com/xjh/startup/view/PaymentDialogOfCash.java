@@ -2,7 +2,7 @@ package com.xjh.startup.view;
 
 import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.guice.GuiceContainer;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.model.PaymentResult;
 import com.xjh.startup.view.model.DeskOrderParam;
