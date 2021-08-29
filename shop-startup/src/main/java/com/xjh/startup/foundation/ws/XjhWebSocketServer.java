@@ -65,8 +65,7 @@ public class XjhWebSocketServer extends WebSocketServer {
 
     @Override
     public void onOpen(WebSocket ws, ClientHandshake clientHandshake) {
-        SocketOpenHandler socketOpenHandler = GuiceContainer.getInstance(SocketOpenHandler.class);
-        JSONObject resp = socketOpenHandler.handle(ws, null);
+        JSONObject resp = handlers.get("socketOpen").handle(ws, null);
         String uuid = CommonUtils.randomStr(10);
         ws.setAttachment(uuid);
         Logger.info(uuid + " >> WS链接打开: " + resp);

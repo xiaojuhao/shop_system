@@ -1,5 +1,6 @@
 package com.xjh.ws.handler;
 
+import com.xjh.ws.WsApiType;
 import com.xjh.ws.WsHandler;
 import org.java_websocket.WebSocket;
 
@@ -8,6 +9,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Singleton;
 
 @Singleton
+@WsApiType("socketOpen")
 public class SocketOpenHandler implements WsHandler {
     public JSONObject handle(WebSocket ws, JSONObject msg) {
         JSONObject content = new JSONObject();
