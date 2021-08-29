@@ -56,6 +56,19 @@ public class OrderService {
         }
     }
 
+    public Result<String> erase(Integer orderId, double eraseAmt) {
+        Order order = this.getOrder(orderId);
+        if (order != null) {
+            Order update = new Order();
+            update.setOrderId(orderId);
+            update.setOrderErase(eraseAmt);
+            this.updateByOrderId(update);
+            return Result.success("");
+        } else {
+            return Result.fail("");
+        }
+    }
+
     public Result<Integer> updateByOrderId(Order order) {
         if (order == null || order.getOrderId() == null) {
             return Result.fail("更新订单失败");
@@ -89,9 +102,9 @@ public class OrderService {
             v.orderErase = CommonUtils.orElse(order.getOrderErase(), 0D);
             v.orderReduction = CommonUtils.orElse(order.getOrderReduction(), 0D);
             v.discountName = order.getDiscountReason();
-            if(CommonUtils.isNotBlank(order.getOrderDiscountInfo())){
+            if (CommonUtils.isNotBlank(order.getOrderDiscountInfo())) {
                 OrderDiscountVO d = JSON.parseObject(Base64.decodeStr(order.getOrderDiscountInfo()), OrderDiscountVO.class);
-                if(d != null){
+                if (d != null) {
                     v.discountName = d.getDiscountName();
                 }
             }

@@ -3,9 +3,8 @@ package com.xjh.startup.view;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
-import com.xjh.dao.dataobject.Order;
-import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.service.domain.OrderService;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
 
@@ -44,19 +43,9 @@ public class OrderEraseView extends SmallForm {
                 return;
             }
             Logger.info("订单:" + param.getOrderId() + ", 桌号:" + param.getDeskName() + "抹零金额:" + r);
-            doOrderErase(param.getOrderId(), r);
+            orderService.erase(param.getOrderId(), r);
             this.getScene().getWindow().hide();
         });
         addLine(newLine(cancel, ok));
-    }
-
-    private void doOrderErase(Integer orderId, double eraseAmt) {
-        Order order = orderService.getOrder(orderId);
-        if (order != null) {
-            Order update = new Order();
-            update.setOrderId(orderId);
-            update.setOrderErase(eraseAmt);
-            orderService.updateByOrderId(update);
-        }
     }
 }
