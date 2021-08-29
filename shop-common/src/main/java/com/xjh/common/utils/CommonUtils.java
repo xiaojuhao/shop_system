@@ -580,6 +580,20 @@ public class CommonUtils {
         return JSON.toJSONString(value);
     }
 
+    public static String stringJoin(String[] coll, String delimiter) {
+        if (coll == null) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (String str : coll) {
+            if (sb.length() > 0) {
+                sb.append(delimiter);
+            }
+            sb.append(str);
+        }
+        return sb.toString();
+    }
+
     public static String stringJoin(Collection<String> coll, String delimiter) {
         if (isEmpty(coll)) {
             return "";
