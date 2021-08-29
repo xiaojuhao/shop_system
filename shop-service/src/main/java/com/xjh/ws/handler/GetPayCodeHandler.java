@@ -10,7 +10,7 @@ import com.xjh.ws.WsApiType;
 import com.xjh.ws.WsHandler;
 
 @Singleton
-@WsApiType("getPayCode")
+@WsApiType({"getPayCode", "getPayTokenId"})
 public class GetPayCodeHandler implements WsHandler {
     @Inject
     DeskService deskService;
