@@ -1,4 +1,4 @@
-package com.xjh.service.domain.model;
+package com.xjh.common.valueobject;
 
 public class OrderBillVO {
     public String orderId;

@@ -15,6 +15,7 @@ import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumDeskType;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.valueobject.OrderBillVO;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackage;
@@ -27,7 +28,6 @@ import com.xjh.service.domain.DishesPackageService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
-import com.xjh.service.domain.model.OrderBillVO;
 import com.xjh.ws.WsApiType;
 import com.xjh.ws.WsHandler;
 

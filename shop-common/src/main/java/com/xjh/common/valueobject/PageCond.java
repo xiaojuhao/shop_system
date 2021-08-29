@@ -1,4 +1,4 @@
-package com.xjh.dao.reqmodel;
+package com.xjh.common.valueobject;
 
 public class PageCond {
     Integer pageNo;

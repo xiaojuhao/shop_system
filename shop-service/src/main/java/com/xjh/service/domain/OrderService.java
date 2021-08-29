@@ -21,6 +21,7 @@ import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
+import com.xjh.common.valueobject.OrderBillVO;
 import com.xjh.common.valueobject.OrderDiscountVO;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
@@ -29,7 +30,6 @@ import com.xjh.dao.dataobject.SubOrder;
 import com.xjh.dao.mapper.OrderDAO;
 import com.xjh.dao.mapper.SubOrderDAO;
 import com.xjh.service.domain.model.CreateOrderParam;
-import com.xjh.service.domain.model.OrderBillVO;
 
 import cn.hutool.core.codec.Base64;
 

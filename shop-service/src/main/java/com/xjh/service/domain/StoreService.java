@@ -13,11 +13,11 @@ import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.CopyUtils;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
+import com.xjh.common.valueobject.DishesGroupVO;
 import com.xjh.dao.dataobject.DishesGroup;
 import com.xjh.dao.dataobject.Store;
 import com.xjh.dao.mapper.DishesGroupDAO;
 import com.xjh.dao.mapper.StoreDAO;
-import com.xjh.service.domain.model.DishesGroupVO;
 import com.xjh.service.domain.model.StoreVO;
 
 import cn.hutool.core.codec.Base64;
