@@ -27,6 +27,9 @@ public class DeskService {
     CartService cartService;
 
     public Desk getById(Integer id) {
+        if (id == null) {
+            return null;
+        }
         try {
             return deskDAO.getById(id).getData();
         } catch (Exception ex) {

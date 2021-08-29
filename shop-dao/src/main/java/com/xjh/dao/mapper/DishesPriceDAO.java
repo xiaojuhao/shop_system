@@ -39,5 +39,11 @@ public class DishesPriceDAO {
         return selectList(cond);
     }
 
+    public DishesPrice queryByPriceId(Integer priceId) {
+        DishesPrice cond = new DishesPrice();
+        cond.setDishesPriceId(priceId);
+        return selectList(cond).stream().findFirst().orElse(null);
+    }
+
 
 }
