@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.xjh.common.enumeration.EnumDesKStatus;
+import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.OpenDeskResult;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
@@ -12,10 +12,10 @@ import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Order;
-import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.model.OpenDeskParam;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.model.OpenDeskInputParam;
 
 import javafx.beans.property.SimpleObjectProperty;
@@ -40,7 +40,7 @@ public class DeskRectView extends VBox {
         double height = deskWidth / 2;
         this.setPrefSize(deskWidth, height);
         this.getStyleClass().add("desk");
-        EnumDesKStatus status = EnumDesKStatus.of(desk.get().getStatus());
+        EnumDeskStatus status = EnumDeskStatus.of(desk.get().getStatus());
 
         Canvas canvas = new Canvas();
         canvas.setWidth(deskWidth);
@@ -56,13 +56,13 @@ public class DeskRectView extends VBox {
         this.getChildren().addAll(canvas);
 
         desk.addListener((cc, _old, _new) -> {
-            EnumDesKStatus desKStatus = EnumDesKStatus.of(_new.getStatus());
+            EnumDeskStatus desKStatus = EnumDeskStatus.of(_new.getStatus());
             setBackground(this, desKStatus);
             Integer orderId = _new.getOrderId();
 
             String time = "";
             LocalDateTime firstSubOrderTime = orderService.firstSubOrderTime(orderId).getData();
-            if (firstSubOrderTime != null && desKStatus != EnumDesKStatus.FREE) {
+            if (firstSubOrderTime != null && desKStatus != EnumDeskStatus.FREE) {
                 long usedSeconds = DateBuilder.intervalSeconds(firstSubOrderTime, LocalDateTime.now());
                 time = CommonUtils.formatSeconds(usedSeconds);
             } else if (firstSubOrderTime == null) {
@@ -80,10 +80,10 @@ public class DeskRectView extends VBox {
         });
     }
 
-    private void setBackground(Node node, EnumDesKStatus status) {
-        if (status == EnumDesKStatus.IN_USE) {
+    private void setBackground(Node node, EnumDeskStatus status) {
+        if (status == EnumDeskStatus.IN_USE) {
             node.setStyle("-fx-background-color: #CD0000;");
-        } else if (status == EnumDesKStatus.PAID) {
+        } else if (status == EnumDeskStatus.PAID) {
             node.setStyle("-fx-background-color: #00bfff;");
         } else {
             node.setStyle("-fx-background-color: #228B22;");
@@ -93,8 +93,8 @@ public class DeskRectView extends VBox {
     private void onClickTable(SimpleObjectProperty<Desk> desk) {
         if (openingDesk.compareAndSet(false, true)) {
             try {
-                EnumDesKStatus runStatus = EnumDesKStatus.of(desk.get().getStatus());
-                if (runStatus == EnumDesKStatus.IN_USE || runStatus == EnumDesKStatus.PAID) {
+                EnumDeskStatus runStatus = EnumDeskStatus.of(desk.get().getStatus());
+                if (runStatus == EnumDeskStatus.IN_USE || runStatus == EnumDeskStatus.PAID) {
                     Window sceneWindow = this.getScene().getWindow();
                     double width = sceneWindow.getWidth() / 10 * 9;
                     double height = sceneWindow.getHeight() / 10 * 9;

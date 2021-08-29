@@ -10,7 +10,7 @@ import javax.inject.Singleton;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.xjh.common.enumeration.EnumDesKStatus;
+import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.store.SequenceDatabase;
@@ -65,7 +65,7 @@ public class CartService {
             if (desk == null) {
                 return Result.fail("桌号" + deskId + "不存在");
             }
-            if (EnumDesKStatus.of(desk.getStatus()) == EnumDesKStatus.FREE) {
+            if (EnumDeskStatus.of(desk.getStatus()) == EnumDeskStatus.FREE) {
                 return Result.fail("桌号" + deskId + "未开台");
             }
             Cart cart = new Cart();

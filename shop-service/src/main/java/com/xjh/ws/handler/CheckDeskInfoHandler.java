@@ -10,8 +10,8 @@ import org.java_websocket.WebSocket;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.enumeration.EnumDeskPhysicalStatus;
+import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumDeskType;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.utils.CommonUtils;
@@ -63,7 +63,7 @@ public class CheckDeskInfoHandler implements WsHandler {
             jSONObjectReturn.put("deskId", desk.getDeskId());
             jSONObjectReturn.put("deskName", desk.getDeskName());
             jSONObjectReturn.put("deskMaxPersonNum", desk.getMaxPerson());
-            EnumDesKStatus deskUseStatus = EnumDesKStatus.of(desk.getStatus());
+            EnumDeskStatus deskUseStatus = EnumDeskStatus.of(desk.getStatus());
             jSONObjectReturn.put("deskUseStatus", deskUseStatus);
 
             int deskPhysicalStatus = desk.getPhysicalStatus();
@@ -72,7 +72,7 @@ public class CheckDeskInfoHandler implements WsHandler {
             Order order = orderService.getOrder(desk.getOrderId());
             List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(desk.getOrderId());
             if (physicalStatus != EnumDeskPhysicalStatus.DISABLE) {
-                if (deskUseStatus != EnumDesKStatus.FREE && deskUseStatus != EnumDesKStatus.PRESERVED
+                if (deskUseStatus != EnumDeskStatus.FREE && deskUseStatus != EnumDeskStatus.PRESERVED
                         && order != null) {
                     JSONObject jSONObjectOrder = new JSONObject();
                     int orderId = order.getOrderId();

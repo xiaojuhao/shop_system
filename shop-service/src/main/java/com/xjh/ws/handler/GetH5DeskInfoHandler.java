@@ -6,8 +6,8 @@ import javax.inject.Singleton;
 import org.java_websocket.WebSocket;
 
 import com.alibaba.fastjson.JSONObject;
-import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.enumeration.EnumDeskPhysicalStatus;
+import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.service.domain.DeskService;
@@ -38,14 +38,14 @@ public class GetH5DeskInfoHandler implements WsHandler {
                 return jSONObjectReturn;
             }
             Desk oneDesk = oneDeskRs.getData();
-            EnumDesKStatus status = EnumDesKStatus.of(oneDesk.getStatus());
+            EnumDeskStatus status = EnumDeskStatus.of(oneDesk.getStatus());
             if (EnumDeskPhysicalStatus.of(oneDesk.getPhysicalStatus()) == EnumDeskPhysicalStatus.DISABLE) {
                 jSONObjectReturn.put("status", 1);
                 jSONObjectReturn.put("msg", "桌子被禁用!");
-            } else if (status == EnumDesKStatus.FREE) {
+            } else if (status == EnumDeskStatus.FREE) {
                 jSONObjectReturn.put("status", 1);
                 jSONObjectReturn.put("msg", "还未开台，请联系服务员！");
-            } else if (status == EnumDesKStatus.PRESERVED) {
+            } else if (status == EnumDeskStatus.PRESERVED) {
                 jSONObjectReturn.put("status", 1);
                 jSONObjectReturn.put("msg", "桌子预约中...");
             } else {

@@ -6,7 +6,7 @@ import java.util.List;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import com.xjh.common.enumeration.EnumDesKStatus;
+import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Result;
@@ -84,7 +84,7 @@ public class DeskDAO {
                         " where deskId = ? ",
                 desk.getOrderId(),
                 DateBuilder.now().mills(),
-                EnumDesKStatus.IN_USE.status(),
+                EnumDeskStatus.IN_USE.status(),
                 desk.getDeskId());
     }
 
@@ -109,7 +109,7 @@ public class DeskDAO {
                         " createTime = null, " +
                         " useStatus = ? " +
                         " where deskId = ? ",
-                EnumDesKStatus.FREE.status(),
+                EnumDeskStatus.FREE.status(),
                 id);
     }
 

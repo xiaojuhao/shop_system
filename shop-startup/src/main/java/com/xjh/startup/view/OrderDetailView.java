@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 
 import com.xjh.common.enumeration.EnumChoiceAction;
-import com.xjh.common.enumeration.EnumDesKStatus;
+import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
@@ -30,13 +30,13 @@ import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
-import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.DishesPackageService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.model.OrderBillVO;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.OrderDishesTableItemVO;
 
@@ -393,7 +393,7 @@ public class OrderDetailView extends VBox {
     private void doCloseDesk(Desk desk) {
         Desk current = deskService.getById(desk.getDeskId());
         // 已关台
-        if (current == null || EnumDesKStatus.of(current.getStatus()) == EnumDesKStatus.FREE) {
+        if (current == null || EnumDeskStatus.of(current.getStatus()) == EnumDeskStatus.FREE) {
             this.getScene().getWindow().hide();
             return;
         }

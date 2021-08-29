@@ -6,7 +6,7 @@ import java.util.List;
 import com.alibaba.fastjson.JSON;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.xjh.common.enumeration.EnumDesKStatus;
+import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.Logger;
@@ -60,7 +60,7 @@ public class DeskService {
                 return Result.fail("桌号不存在:" + deskId);
             }
             Desk desk = deskRs.getData();
-            if (EnumDesKStatus.of(desk.getStatus()) != EnumDesKStatus.FREE) {
+            if (EnumDeskStatus.of(desk.getStatus()) != EnumDeskStatus.FREE) {
                 return Result.fail("餐桌状态错误, 无法开台");
             }
             // 开桌

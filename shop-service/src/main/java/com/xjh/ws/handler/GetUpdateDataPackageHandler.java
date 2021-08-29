@@ -10,7 +10,7 @@ import org.java_websocket.WebSocket;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.xjh.common.enumeration.EnumDesKStatus;
+import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumDeskType;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.utils.CommonUtils;
@@ -229,7 +229,7 @@ public class GetUpdateDataPackageHandler implements WsHandler {
                 int meal_number = 0;
                 int pay_status = EnumOrderStatus.UNPAID.status;
                 int status = desk.getStatus();
-                if (status == EnumDesKStatus.IN_USE.status() || status == EnumDesKStatus.PAID.status()) {
+                if (status == EnumDeskStatus.IN_USE.status() || status == EnumDeskStatus.PAID.status()) {
                     Order order = orderService.getOrder(desk.getOrderId());
                     if (order != null) {
                         meal_number = order.getOrderCustomerNums();

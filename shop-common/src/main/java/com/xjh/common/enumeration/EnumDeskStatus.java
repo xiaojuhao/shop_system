@@ -1,6 +1,6 @@
 package com.xjh.common.enumeration;
 
-public enum EnumDesKStatus {
+public enum EnumDeskStatus {
     FREE(1, "空闲中"),
     IN_USE(2, "使用中"),
     PRESERVED(3, "已预约"),
@@ -17,16 +17,16 @@ public enum EnumDesKStatus {
         return status;
     }
 
-    EnumDesKStatus(int status, String remark) {
+    EnumDeskStatus(int status, String remark) {
         this.status = status;
         this.remark = remark;
     }
 
-    public static EnumDesKStatus of(Integer status) {
+    public static EnumDeskStatus of(Integer status) {
         if (status == null) {
             return FREE;
         }
-        for (EnumDesKStatus e : EnumDesKStatus.values()) {
+        for (EnumDeskStatus e : EnumDeskStatus.values()) {
             if (e.status == status) {
                 return e;
             }
