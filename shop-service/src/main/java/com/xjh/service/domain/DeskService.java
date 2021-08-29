@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSON;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.common.enumeration.EnumDesKStatus;
+import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
@@ -27,22 +28,36 @@ public class DeskService {
 
     public Desk getById(Integer id) {
         try {
-            return deskDAO.getById(id);
+            return deskDAO.getById(id).getData();
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
         }
     }
 
+    public Result<Desk> getByName(String name) {
+        if (CommonUtils.isBlank(name)) {
+            return null;
+        }
+        Desk cond = new Desk();
+        cond.setDeskName(name);
+        Result<List<Desk>> deskRs = deskDAO.select(cond);
+        if (CommonUtils.isNotEmpty(deskRs.getData())) {
+            return Result.success(deskRs.getData().get(0));
+        }
+        return Result.fail("找不到数据:" + name);
+    }
+
     public Result<String> openDesk(OpenDeskParam param) {
         Runnable clear = CurrentRequest.resetRequestId();
         try {
             int deskId = param.getDeskId();
-            Desk desk = deskDAO.getById(deskId);
-            if (desk == null) {
+            Result<Desk> deskRs = deskDAO.getById(deskId);
+            if (!deskRs.isSuccess()) {
                 return Result.fail("桌号不存在:" + deskId);
             }
-            if(EnumDesKStatus.of(desk.getStatus()) != EnumDesKStatus.FREE){
+            Desk desk = deskRs.getData();
+            if (EnumDesKStatus.of(desk.getStatus()) != EnumDesKStatus.FREE) {
                 return Result.fail("餐桌状态错误, 无法开台");
             }
             // 开桌
@@ -87,7 +102,7 @@ public class DeskService {
     public List<Desk> getAllDesks() {
         List<Desk> desks = new ArrayList<>();
         try {
-            desks.addAll(deskDAO.select(new Desk()));
+            desks.addAll(deskDAO.select(new Desk()).getData());
         } catch (Exception ex) {
             ex.printStackTrace();
         }

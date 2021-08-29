@@ -23,6 +23,8 @@ public class Desk implements Serializable {
     Integer belongDeskType;
     @Column("createTime")
     Long orderCreateTime;
+    @Column("physicalStatus")
+    Integer physicalStatus;
 
     public Integer getDeskId() {
         return deskId;
@@ -86,5 +88,13 @@ public class Desk implements Serializable {
 
     public void setBelongDeskType(Integer belongDeskType) {
         this.belongDeskType = belongDeskType;
+    }
+
+    public Integer getPhysicalStatus() {
+        return physicalStatus;
+    }
+
+    public void setPhysicalStatus(Integer physicalStatus) {
+        this.physicalStatus = physicalStatus;
     }
 }

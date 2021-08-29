@@ -9,6 +9,7 @@ import com.google.inject.name.Named;
 import com.xjh.common.enumeration.EnumDesKStatus;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.foundation.EntityUtils;
 import com.zaxxer.hikari.HikariDataSource;
@@ -26,39 +27,53 @@ public class DeskDAO {
         return Db.use(ds).insert(EntityUtils.create(desk));
     }
 
-    public List<Desk> select(Desk desk) throws SQLException {
-        StringBuilder sql = new StringBuilder("select * from desks where 1 = 1 ");
-        if (desk.getDeskId() != null) {
-            sql.append(" and deskId = ").append(desk.getDeskId());
+    public Result<List<Desk>> select(Desk desk) {
+        try {
+            StringBuilder sql = new StringBuilder("select * from desks where 1 = 1 ");
+            if (desk.getDeskId() != null) {
+                sql.append(" and deskId = ").append(desk.getDeskId());
+            }
+            if (CommonUtils.isNotBlank(desk.getDeskName())) {
+                sql.append(" and deskName like '%").append(desk.getDeskName()).append("%' ");
+            }
+            if (desk.getStatus() != null) {
+                sql.append(" and useStatus = ").append(desk.getStatus());
+            }
+            if (desk.getOrderId() != null) {
+                sql.append(" and orderId = '").append(desk.getOrderId()).append("'");
+            }
+            List<Entity> list = Db.use(ds).query(sql.toString());
+            return Result.success(CommonUtils.collect(list, this::convert));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail("查询异常:" + ex.getMessage());
         }
-        if (CommonUtils.isNotBlank(desk.getDeskName())) {
-            sql.append(" and deskName like '%").append(desk.getDeskName()).append("%' ");
-        }
-        if (desk.getStatus() != null) {
-            sql.append(" and useStatus = ").append(desk.getStatus());
-        }
-        if (desk.getOrderId() != null) {
-            sql.append(" and orderId = '").append(desk.getOrderId()).append("'");
-        }
-        List<Entity> list = Db.use(ds).query(sql.toString());
-        return CommonUtils.collect(list, this::convert);
     }
 
-    public Desk getById(Integer id) throws SQLException {
+    public Result<Desk> getById(Integer id) throws SQLException {
         if (id == null) {
             return null;
         }
         Desk cond = new Desk();
         cond.setDeskId(id);
-        List<Desk> desks = select(cond);
-        return desks.stream().findFirst().orElse(null);
+        Result<List<Desk>> desksRs = select(cond);
+        if (CommonUtils.isNotEmpty(desksRs.getData())) {
+            return Result.success(desksRs.getData().stream().findFirst().orElse(null));
+        }
+        return Result.fail("查询失败");
     }
 
-    public int updateById(Desk desk) throws SQLException {
-        return Db.use(ds).update(
-                EntityUtils.create(desk),
-                EntityUtils.idCond(desk)
-        );
+    public Result<Integer> updateById(Desk desk) {
+        try {
+            int i = Db.use(ds).update(
+                    EntityUtils.create(desk),
+                    EntityUtils.idCond(desk)
+            );
+            return Result.success(i);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail("更新异常:" + ex.getMessage());
+        }
     }
 
     public int useDesk(Desk desk) throws SQLException {
