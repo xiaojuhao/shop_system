@@ -1,5 +1,6 @@
 package com.xjh.ws.handler;
 
+import com.xjh.common.utils.CommonUtils;
 import com.xjh.ws.WsApiType;
 import com.xjh.ws.WsHandler;
 import org.java_websocket.WebSocket;
@@ -16,12 +17,9 @@ public class SocketOpenHandler implements WsHandler {
         content.put("Server_version", "v1.0");
         content.put("clientIP", ws.getLocalSocketAddress());
 
-        JSONArray contents = new JSONArray();
-        contents.add(content);
-
         JSONObject resp = new JSONObject();
         resp.put("API_TYPE", "connect success");
-        resp.put("contents", contents);
+        resp.put("contents", CommonUtils.asList(content));
         return resp;
     }
 }

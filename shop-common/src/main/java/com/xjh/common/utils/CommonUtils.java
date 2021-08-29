@@ -62,6 +62,20 @@ public class CommonUtils {
         }
     }
 
+    @SafeVarargs
+    public static<T> List<T> asList(T ... ts){
+        if(ts == null){
+            return new ArrayList<>();
+        }
+        List<T> list = new ArrayList<>();
+        for(T t : ts){
+            if(t != null){
+                list.add(t);
+            }
+        }
+        return list;
+    }
+
     public static <T> T firstOf(Collection<T> coll) {
         if (coll == null || coll.size() == 0) {
             return null;
