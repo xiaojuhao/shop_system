@@ -12,21 +12,27 @@ public abstract class AbstractBerkeleyKvDB implements KvDB {
     ThreadLocal<Transaction> transaction = new ThreadLocal<>();
 
     @Override
-    public void beginTransaction() {
+    public Committable beginTransaction() {
+        if (transaction.get() != null) {
+            return () -> {
+            };
+        }
         TransactionConfig txConfig = new TransactionConfig();
         txConfig.setSerializableIsolation(true);
         Database db = getDB();
         Transaction txn = db.getEnvironment().beginTransaction(null, txConfig);
         transaction.set(txn);
+        return () -> {
+            txn.commit();
+            transaction.remove();
+        };
     }
 
     @Override
-    public void commit() {
-        Transaction txn = transaction.get();
-        if (txn != null) {
-            txn.commit();
+    public void commit(Committable committable) {
+        if (committable != null) {
+            committable.commit();
         }
-        transaction.remove();
     }
 
     @Override

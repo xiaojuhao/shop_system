@@ -1,6 +1,7 @@
 package com.xjh.common.store;
 
 import com.sleepycat.je.DatabaseEntry;
+import com.xjh.common.kvdb.Committable;
 import com.xjh.common.kvdb.cart.SeqKvDB;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
@@ -12,7 +13,7 @@ public class SequenceDatabase {
 
     public static synchronized int nextId(String group) {
         String key = "sequence_" + group;
-        seqKvDB.beginTransaction();
+        Committable committable = seqKvDB.beginTransaction();
         int newId;
         try {
             String value = seqKvDB.get(key, String.class);
@@ -27,7 +28,7 @@ public class SequenceDatabase {
             Logger.error("获取订单ID失败:" + group + "," + ex.getMessage());
             throw new RuntimeException("获取订单ID序列失败");
         } finally {
-            seqKvDB.commit();
+            seqKvDB.commit(committable);
         }
         Logger.info("创建序列号:" + group + ", 返回ID:" + newId);
         return newId;

@@ -1,9 +1,9 @@
 package com.xjh.common.kvdb;
 
 public interface KvDB {
-    void beginTransaction();
+    Committable beginTransaction();
 
-    void commit();
+    void commit(Committable committable);
 
     void put(String key, Object val);
 
