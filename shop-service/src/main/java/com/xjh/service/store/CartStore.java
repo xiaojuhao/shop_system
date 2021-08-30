@@ -5,7 +5,8 @@ import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Cart;
 
 public class CartStore {
-    static CartKvDB cartKvDB = new CartKvDB();
+    static CartKvDB cartKvDB = CartKvDB.inst();
+
     public static Cart getCart(Integer deskId) {
         String key = "cart_" + deskId;
         return cartKvDB.get(key, Cart.class);

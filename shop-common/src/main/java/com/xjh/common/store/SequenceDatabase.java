@@ -8,7 +8,7 @@ import com.xjh.common.utils.Logger;
 import java.nio.charset.StandardCharsets;
 
 public class SequenceDatabase {
-    static SeqKvDB seqKvDB = new SeqKvDB();
+    static SeqKvDB seqKvDB = SeqKvDB.inst();
 
     public static synchronized int nextId(String group) {
         String key = "sequence_" + group;
