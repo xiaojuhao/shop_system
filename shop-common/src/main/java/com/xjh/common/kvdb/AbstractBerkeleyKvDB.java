@@ -5,6 +5,7 @@ import com.sleepycat.je.*;
 import com.xjh.common.store.BerkeleyDBUtils;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Holder;
+import com.xjh.common.utils.Logger;
 
 import java.nio.charset.StandardCharsets;
 
@@ -39,13 +40,15 @@ public abstract class AbstractBerkeleyKvDB implements KvDB {
     public void put(String key, Object val) {
         DatabaseEntry theKey = new DatabaseEntry(key.getBytes(StandardCharsets.UTF_8));
         DatabaseEntry newData = new DatabaseEntry(JSON.toJSONString(val).getBytes(StandardCharsets.UTF_8));
-        getDB().put(transaction.get(), theKey, newData);
+        OperationStatus status = getDB().put(transaction.get(), theKey, newData);
+        Logger.info("保存KV数据, key=" + key +", status="+ status +", val=" + CommonUtils.reflectString(val));
     }
 
     @Override
     public void remove(String key) {
         DatabaseEntry theKey = new DatabaseEntry(key.getBytes(StandardCharsets.UTF_8));
-        getDB().delete(transaction.get(), theKey);
+        OperationStatus status = getDB().delete(transaction.get(), theKey);
+        Logger.info("刪除KV数据, key=" + key +", status=" + status);
     }
 
     @Override

@@ -22,8 +22,7 @@ public class SequenceDatabase {
             } else {
                 newId = 1;
             }
-            DatabaseEntry newData = new DatabaseEntry(String.valueOf(newId + 1).getBytes(StandardCharsets.UTF_8));
-            seqKvDB.put(key, newData);
+            seqKvDB.put(key, String.valueOf(newId + 1));
         } catch (Exception ex) {
             Logger.error("获取订单ID失败:" + group + "," + ex.getMessage());
             throw new RuntimeException("获取订单ID序列失败");
