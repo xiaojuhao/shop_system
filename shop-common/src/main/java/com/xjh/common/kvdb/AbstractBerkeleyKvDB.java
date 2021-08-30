@@ -3,7 +3,6 @@ package com.xjh.common.kvdb;
 import com.alibaba.fastjson.JSON;
 import com.sleepycat.je.*;
 import com.xjh.common.store.BerkeleyDBUtils;
-import com.xjh.common.store.SequenceDatabase;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Holder;
 
@@ -44,7 +43,7 @@ public abstract class AbstractBerkeleyKvDB implements KvDB {
     }
 
     @Override
-    public<T> T get(String key, Class<T> clz) {
+    public <T> T get(String key, Class<T> clz) {
         DatabaseEntry theKey = new DatabaseEntry(key.getBytes(StandardCharsets.UTF_8));
         DatabaseEntry theData = new DatabaseEntry();
         getDB().get(null, theKey, theData, LockMode.READ_UNCOMMITTED_ALL);
@@ -63,22 +62,22 @@ public abstract class AbstractBerkeleyKvDB implements KvDB {
         return null;
     }
 
-    Holder<Database> staticInst = new Holder<>();
+    Holder<Database> instHolder = new Holder<>();
 
     private Database getDB() {
-        if (staticInst.get() != null) {
-            return staticInst.get();
+        if (instHolder.get() != null) {
+            return instHolder.get();
         }
-        synchronized (SequenceDatabase.class) {
-            if (staticInst.get() != null) {
-                return staticInst.get();
+        synchronized (AbstractBerkeleyKvDB.class) {
+            if (instHolder.get() != null) {
+                return instHolder.get();
             }
             DatabaseConfig dbConfig = new DatabaseConfig();
             dbConfig.setTransactional(true);
             dbConfig.setAllowCreate(true);
             Database db = BerkeleyDBUtils.getEnv()
                     .openDatabase(null, getDbName(), dbConfig);
-            return staticInst.hold(db);
+            return instHolder.hold(db);
         }
     }
 
