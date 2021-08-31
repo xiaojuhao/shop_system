@@ -1,8 +1,5 @@
 package com.xjh.service.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.alibaba.fastjson.JSON;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -16,6 +13,9 @@ import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.mapper.DeskDAO;
 import com.xjh.service.domain.model.CreateOrderParam;
 import com.xjh.service.domain.model.OpenDeskParam;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Singleton
 public class DeskService {
@@ -71,6 +71,7 @@ public class DeskService {
             CreateOrderParam createOrderParam = new CreateOrderParam();
             createOrderParam.setOrderId(orderId);
             createOrderParam.setDeskId(deskId);
+            createOrderParam.setRecommender(param.getRecommender());
             createOrderParam.setCustomerNum(param.getCustomerNum());
             Order order = orderService.createOrder(createOrderParam);
             Logger.info("下单成功: " + JSON.toJSONString(order));

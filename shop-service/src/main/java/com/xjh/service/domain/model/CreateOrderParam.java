@@ -4,6 +4,7 @@ public class CreateOrderParam {
     Integer orderId;
     Integer deskId;
     Integer customerNum;
+    String recommender;
 
     public Integer getOrderId() {
         return orderId;
@@ -27,5 +28,13 @@ public class CreateOrderParam {
 
     public void setCustomerNum(Integer customerNum) {
         this.customerNum = customerNum;
+    }
+
+    public String getRecommender() {
+        return recommender;
+    }
+
+    public void setRecommender(String recommender) {
+        this.recommender = recommender;
     }
 }

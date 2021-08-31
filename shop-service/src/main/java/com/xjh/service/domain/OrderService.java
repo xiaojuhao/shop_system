@@ -1,26 +1,13 @@
 package com.xjh.service.domain;
 
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
+import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.xjh.common.enumeration.EnumOrderSaleType;
-import com.xjh.common.enumeration.EnumOrderServeStatus;
-import com.xjh.common.enumeration.EnumOrderStatus;
-import com.xjh.common.enumeration.EnumOrderType;
-import com.xjh.common.enumeration.EnumPayMethod;
+import com.xjh.common.enumeration.*;
 import com.xjh.common.store.SequenceDatabase;
-import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.CurrentRequest;
-import com.xjh.common.utils.DateBuilder;
-import com.xjh.common.utils.Logger;
-import com.xjh.common.utils.Result;
+import com.xjh.common.utils.*;
 import com.xjh.common.valueobject.OrderBillVO;
 import com.xjh.common.valueobject.OrderDiscountVO;
 import com.xjh.dao.dataobject.Order;
@@ -31,7 +18,11 @@ import com.xjh.dao.mapper.OrderDAO;
 import com.xjh.dao.mapper.SubOrderDAO;
 import com.xjh.service.domain.model.CreateOrderParam;
 
-import cn.hutool.core.codec.Base64;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Singleton
 public class OrderService {
@@ -252,6 +243,7 @@ public class OrderService {
             order.setStatus(EnumOrderServeStatus.START.status);
             order.setOrderType(EnumOrderType.NORMAL.type);
             order.setOrderDiscountInfo(Base64.encode(JSONObject.toJSONString(new OrderDiscountVO())));
+            order.setOrderRecommender(param.getRecommender());
             order.setMemberId(0L);
             order.setOrderCustomerNums(param.getCustomerNum());
             order.setAccountId(0L);
