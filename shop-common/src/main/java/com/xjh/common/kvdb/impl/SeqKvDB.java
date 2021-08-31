@@ -9,6 +9,7 @@ public class SeqKvDB extends AbstractBerkeleyKvDB<String> {
     }
 
     private SeqKvDB() {
+        Logger.info("初始化KVDB: SeqKvDB");
     }
 
     @Override
@@ -17,7 +18,6 @@ public class SeqKvDB extends AbstractBerkeleyKvDB<String> {
     }
 
     public static SeqKvDB inst() {
-        Logger.info("初始化KVDB: SeqKvDB");
         return Inst.inst;
     }
 }

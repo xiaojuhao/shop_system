@@ -1,26 +1,41 @@
 package com.xjh.service.domain;
 
-import cn.hutool.core.codec.Base64;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import com.alibaba.fastjson.JSON;
 import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.store.SequenceDatabase;
-import com.xjh.common.utils.*;
+import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.CurrentRequest;
+import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.CartItemVO;
 import com.xjh.common.valueobject.CartVO;
-import com.xjh.dao.dataobject.*;
-import com.xjh.dao.mapper.*;
+import com.xjh.dao.dataobject.Desk;
+import com.xjh.dao.dataobject.Dishes;
+import com.xjh.dao.dataobject.DishesPackage;
+import com.xjh.dao.dataobject.Order;
+import com.xjh.dao.dataobject.OrderDishes;
+import com.xjh.dao.dataobject.SubOrder;
+import com.xjh.dao.mapper.DishesDAO;
+import com.xjh.dao.mapper.DishesPackageDAO;
+import com.xjh.dao.mapper.OrderDAO;
+import com.xjh.dao.mapper.OrderDishesDAO;
+import com.xjh.dao.mapper.SubOrderDAO;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
 import com.xjh.service.domain.model.SendOrderRequest;
 import com.xjh.service.store.CartStore;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import cn.hutool.core.codec.Base64;
 
 @Singleton
 public class CartService {
@@ -96,7 +111,7 @@ public class CartService {
     public List<CartItemVO> getCartItems(Integer deskId) {
         CartVO cart = CartStore.getCart(deskId);
         List<CartItemVO> items = cart.getContents();
-        if (items != null) {
+        if (items == null) {
             return new ArrayList<>();
         } else {
             return items;

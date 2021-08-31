@@ -3,7 +3,6 @@ package com.xjh.common.kvdb.impl;
 import com.xjh.common.kvdb.AbstractBerkeleyKvDB;
 import com.xjh.common.kvdb.Committable;
 import com.xjh.common.utils.Logger;
-
 import com.xjh.common.valueobject.CartVO;
 
 public class CartDB extends AbstractBerkeleyKvDB<CartVO> {
@@ -12,11 +11,11 @@ public class CartDB extends AbstractBerkeleyKvDB<CartVO> {
     }
 
     public static CartDB inst() {
-        Logger.info("初始化KVDB: CartDB");
         return Inst.inst;
     }
 
     private CartDB() {
+        Logger.info("初始化KVDB: CartDB");
     }
 
     public void putInTransaction(String key, CartVO val) {
