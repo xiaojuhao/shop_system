@@ -1,22 +1,10 @@
 package com.xjh.startup.view;
 
-import static com.xjh.common.utils.CommonUtils.collect;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.apache.commons.collections4.CollectionUtils;
-
 import com.alibaba.fastjson.JSON;
 import com.xjh.common.enumeration.EnumChoiceAction;
-import com.xjh.common.utils.AlertBuilder;
-import com.xjh.common.utils.ClickHelper;
-import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.CopyUtils;
-import com.xjh.common.utils.DishesImgUtils;
-import com.xjh.common.utils.Logger;
-import com.xjh.common.utils.Result;
+import com.xjh.common.utils.*;
+import com.xjh.common.valueobject.CartItemVO;
+import com.xjh.common.valueobject.CartVO;
 import com.xjh.common.valueobject.DishesImgVO;
 import com.xjh.common.valueobject.PageCond;
 import com.xjh.dao.dataobject.Dishes;
@@ -26,15 +14,12 @@ import com.xjh.dao.mapper.DishesPackageDAO;
 import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.DishesTypeService;
-import com.xjh.common.valueobject.CartItemVO;
-import com.xjh.common.valueobject.CartVO;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
 import com.xjh.service.domain.model.SendOrderRequest;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.DishesChoiceItemBO;
 import com.xjh.startup.view.model.DishesQueryCond;
-
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -46,16 +31,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Separator;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
@@ -65,6 +41,13 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.StringConverter;
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static com.xjh.common.utils.CommonUtils.collect;
 
 
 public class OrderDishesChoiceView extends VBox {
@@ -466,7 +449,7 @@ public class OrderDishesChoiceView extends VBox {
 
     private void refreshCartSize() {
         try {
-            cartSize.set(cartService.selectByDeskId(data.getDeskId()).size());
+            cartSize.set(cartService.getCartItems(data.getDeskId()).size());
         } catch (Exception ex) {
             Logger.error(ex.getMessage());
         }

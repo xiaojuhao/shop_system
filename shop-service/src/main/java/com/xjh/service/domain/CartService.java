@@ -52,7 +52,7 @@ public class CartService {
             }
             CartVO cart = new CartVO();
             cart.setDeskId(deskId);
-            List<CartItemVO> contentItems = selectByDeskId(deskId);
+            List<CartItemVO> contentItems = getCartItems(deskId);
             boolean exists = false;
             for (CartItemVO vo : contentItems) {
                 if (Objects.equals(vo.getDishesId(), item.getDishesId())) {
@@ -93,15 +93,17 @@ public class CartService {
         }
     }
 
-    public List<CartItemVO> selectByDeskId(Integer deskId) throws Exception {
+    public List<CartItemVO> getCartItems(Integer deskId) {
         CartVO cart = CartStore.getCart(deskId);
-        if (cart != null) {
-            return cart.getContents();
+        List<CartItemVO> items = cart.getContents();
+        if (items != null) {
+            return new ArrayList<>();
+        } else {
+            return items;
         }
-        return new ArrayList<>();
     }
 
-    public Result<CartVO> getCartOfDesk(Integer deskId) {
+    public Result<CartVO> getCart(Integer deskId) {
         try {
             CartVO cart = CartStore.getCart(deskId);
             return Result.success(cart);

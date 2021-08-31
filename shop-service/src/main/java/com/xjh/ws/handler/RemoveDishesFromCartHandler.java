@@ -30,7 +30,7 @@ public class RemoveDishesFromCartHandler implements WsHandler {
         try {
             int deskId = msg.getInteger("tables_id");
             int cartDishesId = msg.getInteger("cartDishesId");
-            CartVO cartVO = cartService.getCartOfDesk(deskId).getData();
+            CartVO cartVO = cartService.getCart(deskId).getData();
             if (cartVO != null) {
                 List<CartItemVO> cartItems = cartVO.getContents();
                 cartItems = CommonUtils.filter(cartItems, it -> it.getDishesId().equals(cartDishesId));

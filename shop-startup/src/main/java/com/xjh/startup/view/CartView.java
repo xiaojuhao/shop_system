@@ -121,7 +121,7 @@ public class CartView extends VBox {
             return;
         }
 
-        Result<CartVO> getCartRs = cartService.getCartOfDesk(deskId);
+        Result<CartVO> getCartRs = cartService.getCart(deskId);
         if (!getCartRs.isSuccess()) {
             AlertBuilder.ERROR("获取购物车信息失败", getCartRs.getMsg());
             return;
@@ -144,7 +144,7 @@ public class CartView extends VBox {
     private List<CartItemBO> loadCartItems(DeskOrderParam param) {
         try {
             Map<Integer, DishesType> typeMap = dishesTypeService.dishesTypeMap();
-            List<CartItemVO> list = cartService.selectByDeskId(param.getDeskId());
+            List<CartItemVO> list = cartService.getCartItems(param.getDeskId());
             List<Integer> dishesIds = CommonUtils.collect(list, CartItemVO::getDishesId);
             Map<Integer, Dishes> dishesMap = dishesService.getByIdsAsMap(dishesIds);
             AtomicInteger seqNo = new AtomicInteger();

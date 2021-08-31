@@ -26,7 +26,7 @@ public class CheckDeskCartHandler implements WsHandler {
         try {
             int deskId = msg.getInteger("tables_id");
             //Desk desk = desksManager.getOneDesk(deskId);
-            CartVO cartVO = cartService.getCartOfDesk(deskId).getData();
+            CartVO cartVO = cartService.getCart(deskId).getData();
             JSONArray jSONArray = new JSONArray();
             for (CartItemVO cartDishes : cartVO.getContents()) {
                 //                if (cartDishes.getIfDishesPackage() != 2) {

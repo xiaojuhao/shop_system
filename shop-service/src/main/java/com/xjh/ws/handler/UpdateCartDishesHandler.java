@@ -28,7 +28,7 @@ public class UpdateCartDishesHandler implements WsHandler {
         try {
             int deskId = msg.getInteger("tables_id");
             int cartDishesId = msg.getInteger("cartDishesId");
-            Result<CartVO> cartVOResult = cartService.getCartOfDesk(deskId);
+            Result<CartVO> cartVOResult = cartService.getCart(deskId);
             int num = msg.getInteger("num");
             CartVO cartVO = cartVOResult.getData();
             if (num <= 0) {
