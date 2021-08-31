@@ -3,13 +3,12 @@ package com.xjh.startup.view;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
-import com.xjh.dao.dataobject.Order;
-import com.xjh.startup.foundation.ioc.GuiceContainer;
+import com.xjh.common.utils.Result;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.StoreService;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
-
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -41,24 +40,13 @@ public class OrderReductionView extends SmallForm {
                 return;
             }
             Logger.info("订单:" + param.getOrderId() + ", 桌号:" + param.getDeskName() + "店长减免:" + r);
-            doOrderReduction(param.getOrderId(), CommonUtils.parseDouble(r, 0D));
-            this.getScene().getWindow().hide();
+            Result<String> reductionRs = orderService.reduction(param.getOrderId(), CommonUtils.parseDouble(r, 0D));
+            if (reductionRs.isSuccess()) {
+                this.getScene().getWindow().hide();
+            } else {
+                AlertBuilder.ERROR(reductionRs.getMsg());
+            }
         });
         addLine(newLine(cancel, okBtn));
-    }
-
-    private void doOrderReduction(Integer orderId, double amt) {
-        Order order = orderService.getOrder(orderId);
-        if (order != null) {
-            double bill = orderService.notPaidBillAmount(order);
-            if (amt > bill) {
-                AlertBuilder.ERROR("减免金额不能大于可支付金额");
-                return;
-            }
-            Order update = new Order();
-            update.setOrderId(orderId);
-            update.setOrderReduction(amt);
-            orderService.updateByOrderId(update);
-        }
     }
 }

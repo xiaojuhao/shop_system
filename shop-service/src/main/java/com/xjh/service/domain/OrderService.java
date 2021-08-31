@@ -60,6 +60,23 @@ public class OrderService {
         }
     }
 
+    public Result<String> reduction(Integer orderId, double amt) {
+        Order order = this.getOrder(orderId);
+        if (order != null) {
+            double bill = this.notPaidBillAmount(order);
+            if (amt > bill) {
+                return Result.fail("减免金额不能大于可支付金额");
+            }
+            Order update = new Order();
+            update.setOrderId(orderId);
+            update.setOrderReduction(amt);
+            this.updateByOrderId(update);
+            return Result.success("");
+        } else {
+            return Result.fail("订单信息不存在");
+        }
+    }
+
     public Result<Integer> updateByOrderId(Order order) {
         if (order == null || order.getOrderId() == null) {
             return Result.fail("更新订单失败");
