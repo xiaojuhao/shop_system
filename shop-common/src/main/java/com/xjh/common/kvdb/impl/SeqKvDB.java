@@ -1,6 +1,7 @@
 package com.xjh.common.kvdb.impl;
 
 import com.xjh.common.kvdb.AbstractBerkeleyKvDB;
+import com.xjh.common.utils.Logger;
 
 public class SeqKvDB extends AbstractBerkeleyKvDB<String> {
     private static class Inst {
@@ -16,6 +17,7 @@ public class SeqKvDB extends AbstractBerkeleyKvDB<String> {
     }
 
     public static SeqKvDB inst() {
+        Logger.info("初始化KVDB: SeqKvDB");
         return Inst.inst;
     }
 }

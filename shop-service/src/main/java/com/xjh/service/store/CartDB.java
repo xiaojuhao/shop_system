@@ -2,6 +2,7 @@ package com.xjh.service.store;
 
 import com.xjh.common.kvdb.AbstractBerkeleyKvDB;
 import com.xjh.common.kvdb.Committable;
+import com.xjh.common.utils.Logger;
 import com.xjh.dao.dataobject.Cart;
 
 public class CartDB extends AbstractBerkeleyKvDB<Cart> {
@@ -10,6 +11,7 @@ public class CartDB extends AbstractBerkeleyKvDB<Cart> {
     }
 
     public static CartDB inst() {
+        Logger.info("初始化KVDB: CartDB");
         return Inst.inst;
     }
 
