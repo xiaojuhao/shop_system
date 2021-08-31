@@ -1,4 +1,4 @@
-package com.xjh.service.store;
+package com.xjh.common.kvdb.impl;
 
 import com.xjh.common.kvdb.AbstractBerkeleyKvDB;
 import com.xjh.common.kvdb.Committable;
