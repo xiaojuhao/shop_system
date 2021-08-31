@@ -3,9 +3,10 @@ package com.xjh.service.store;
 import com.xjh.common.kvdb.AbstractBerkeleyKvDB;
 import com.xjh.common.kvdb.Committable;
 import com.xjh.common.utils.Logger;
-import com.xjh.dao.dataobject.Cart;
 
-public class CartDB extends AbstractBerkeleyKvDB<Cart> {
+import com.xjh.common.valueobject.CartVO;
+
+public class CartDB extends AbstractBerkeleyKvDB<CartVO> {
     private static class Inst {
         public static CartDB inst = new CartDB();
     }
@@ -18,7 +19,7 @@ public class CartDB extends AbstractBerkeleyKvDB<Cart> {
     private CartDB() {
     }
 
-    public void putInTransaction(String key, Cart val) {
+    public void putInTransaction(String key, CartVO val) {
         CartDB db = inst();
         Committable committable = null;
         try {

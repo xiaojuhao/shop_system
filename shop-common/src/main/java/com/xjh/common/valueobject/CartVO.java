@@ -1,14 +1,11 @@
-package com.xjh.dao.dataobject;
+package com.xjh.common.valueobject;
 
-import com.xjh.dao.foundation.Id;
-import com.xjh.dao.foundation.Table;
+import java.util.List;
 
-@Table("cart")
-public class Cart {
-    @Id
+public class CartVO {
     Integer id;
     Integer deskId;
-    String contents;
+    List<CartItemVO> contents;
     Long createTime;
 
     public Integer getId() {
@@ -27,11 +24,11 @@ public class Cart {
         this.deskId = deskId;
     }
 
-    public String getContents() {
+    public List<CartItemVO> getContents() {
         return contents;
     }
 
-    public void setContents(String contents) {
+    public void setContents(List<CartItemVO> contents) {
         this.contents = contents;
     }
 

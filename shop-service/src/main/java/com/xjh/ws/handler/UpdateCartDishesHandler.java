@@ -1,20 +1,18 @@
 package com.xjh.ws.handler;
 
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.java_websocket.WebSocket;
-
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Result;
+import com.xjh.common.valueobject.CartItemVO;
+import com.xjh.common.valueobject.CartVO;
 import com.xjh.service.domain.CartService;
-import com.xjh.service.domain.model.CartItemVO;
-import com.xjh.service.domain.model.CartVO;
 import com.xjh.ws.WsApiType;
 import com.xjh.ws.WsHandler;
+import org.java_websocket.WebSocket;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.List;
 
 @Singleton
 @WsApiType("updateCartDishes")

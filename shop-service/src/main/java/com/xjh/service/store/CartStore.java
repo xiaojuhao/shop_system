@@ -1,7 +1,11 @@
 package com.xjh.service.store;
 
+import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Result;
-import com.xjh.dao.dataobject.Cart;
+
+import com.xjh.common.valueobject.CartVO;
+
+import java.util.ArrayList;
 
 public class CartStore {
     static CartDB cartDB = CartDB.inst();
@@ -10,11 +14,18 @@ public class CartStore {
         return "cart_" + deskId;
     }
 
-    public static Cart getCart(Integer deskId) {
-        return cartDB.get(buildCartId(deskId), Cart.class);
+    public static CartVO getCart(Integer deskId) {
+        CartVO cart = cartDB.get(buildCartId(deskId), CartVO.class);
+        if (cart == null) {
+            cart = new CartVO();
+            cart.setDeskId(deskId);
+            cart.setContents(new ArrayList<>());
+            cart.setCreateTime(DateBuilder.now().mills());
+        }
+        return cart;
     }
 
-    public static Result<String> saveCart(Cart cart) {
+    public static Result<String> saveCart(CartVO cart) {
         if (cart == null) {
             return Result.fail("保存失败,入参错误");
         }

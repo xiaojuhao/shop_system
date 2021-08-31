@@ -11,7 +11,7 @@ import com.xjh.dao.mapper.DishesPackageDishesDAO;
 import com.xjh.dao.mapper.DishesPackageTypeDAO;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.service.domain.DishesService;
-import com.xjh.service.domain.model.CartItemVO;
+import com.xjh.common.valueobject.CartItemVO;
 import com.xjh.startup.view.model.DishesChoiceItemBO;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

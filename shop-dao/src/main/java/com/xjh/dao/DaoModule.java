@@ -4,7 +4,6 @@ import com.google.inject.AbstractModule;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.TimeRecord;
 import com.xjh.dao.mapper.AccountDAO;
-import com.xjh.dao.mapper.CartDAO;
 import com.xjh.dao.mapper.DeskDAO;
 import com.xjh.dao.mapper.DishesAttributeDAO;
 import com.xjh.dao.mapper.DishesDAO;
@@ -32,7 +31,6 @@ public class DaoModule extends AbstractModule {
         bind(OrderDishesDAO.class);
         bind(DishesPackageDAO.class);
         bind(DishesDAO.class);
-        bind(CartDAO.class);
         bind(SubOrderDAO.class);
         bind(DishesTypeDAO.class);
         bind(OrderPayDAO.class);

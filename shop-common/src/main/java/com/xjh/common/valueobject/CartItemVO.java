@@ -1,9 +1,9 @@
-package com.xjh.service.domain.model;
+package com.xjh.common.valueobject;
+
+import com.alibaba.fastjson.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.alibaba.fastjson.JSONObject;
 
 public class CartItemVO {
     Integer dishesId;

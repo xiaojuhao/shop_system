@@ -11,8 +11,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Result;
 import com.xjh.service.domain.CartService;
-import com.xjh.service.domain.model.CartItemVO;
-import com.xjh.service.domain.model.CartVO;
+import com.xjh.common.valueobject.CartItemVO;
+import com.xjh.common.valueobject.CartVO;
 import com.xjh.ws.WsApiType;
 import com.xjh.ws.WsHandler;
 
