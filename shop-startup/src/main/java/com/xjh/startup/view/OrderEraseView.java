@@ -3,11 +3,11 @@ package com.xjh.startup.view;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.Result;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
-
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -34,16 +34,12 @@ public class OrderEraseView extends SmallForm {
         Button ok = new Button("确认");
         ok.setOnMouseClicked(evt -> {
             double r = CommonUtils.parseDouble(eraseAmt.getText(), -1D);
-            if (r < 0) {
-                AlertBuilder.ERROR("抹零金额错误");
-                return;
-            }
-            if (r >= 10) {
-                AlertBuilder.ERROR("抹零金额不能大于10");
-                return;
-            }
             Logger.info("订单:" + param.getOrderId() + ", 桌号:" + param.getDeskName() + "抹零金额:" + r);
-            orderService.erase(param.getOrderId(), r);
+            Result<String> rs = orderService.erase(param.getOrderId(), r);
+            if (!rs.isSuccess()) {
+                AlertBuilder.ERROR(rs.getMsg());
+                return;
+            }
             this.getScene().getWindow().hide();
         });
         addLine(newLine(cancel, ok));

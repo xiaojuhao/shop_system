@@ -48,15 +48,26 @@ public class OrderService {
     }
 
     public Result<String> erase(Integer orderId, double eraseAmt) {
+        if (eraseAmt < 0) {
+            return Result.fail("抹零金额错误");
+        }
+        if (eraseAmt >= 10) {
+            return Result.fail("抹零金额不能大于10");
+        }
         Order order = this.getOrder(orderId);
         if (order != null) {
+            double bill = this.notPaidBillAmount(order);
+            if (eraseAmt > bill) {
+                return Result.fail("抹零金额不能大于可支付金额");
+            }
+
             Order update = new Order();
             update.setOrderId(orderId);
             update.setOrderErase(eraseAmt);
             this.updateByOrderId(update);
             return Result.success("");
         } else {
-            return Result.fail("");
+            return Result.fail("订单信息不存在");
         }
     }
 
