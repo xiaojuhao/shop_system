@@ -1,8 +1,22 @@
 package com.xjh.startup.view;
 
+import static com.xjh.common.utils.CommonUtils.collect;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.apache.commons.collections4.CollectionUtils;
+
 import com.alibaba.fastjson.JSON;
 import com.xjh.common.enumeration.EnumChoiceAction;
-import com.xjh.common.utils.*;
+import com.xjh.common.utils.AlertBuilder;
+import com.xjh.common.utils.ClickHelper;
+import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.CopyUtils;
+import com.xjh.common.utils.DishesImgUtils;
+import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.CartItemVO;
 import com.xjh.common.valueobject.CartVO;
 import com.xjh.common.valueobject.DishesImgVO;
@@ -20,6 +34,7 @@ import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.DishesChoiceItemBO;
 import com.xjh.startup.view.model.DishesQueryCond;
+
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -30,8 +45,16 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
@@ -41,13 +64,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.StringConverter;
-import org.apache.commons.collections4.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static com.xjh.common.utils.CommonUtils.collect;
 
 
 public class OrderDishesChoiceView extends VBox {
@@ -99,9 +115,8 @@ public class OrderDishesChoiceView extends VBox {
         // 按名称搜索
         hbox.getChildren().add(new Label("菜品名称:"));
         TextField dishesNameField = new TextField();
-        dishesNameField.focusedProperty().addListener((_obs, _old, _new) -> {
-            qryDishesCond.get().setDishesName(dishesNameField.getText());
-        });
+        dishesNameField.focusedProperty().addListener((_obs, _old, _new) ->
+                qryDishesCond.get().setDishesName(dishesNameField.getText()));
         hbox.getChildren().add(dishesNameField);
 
         // 菜品类型
@@ -110,9 +125,7 @@ public class OrderDishesChoiceView extends VBox {
         // 查询按钮
         Button queryBtn = new Button();
         queryBtn.setText("查 询");
-        queryBtn.setOnMouseClicked(evt -> {
-            qryDishesCond.set(CopyUtils.cloneObj(qryDishesCond.get()));
-        });
+        queryBtn.setOnMouseClicked(evt -> qryDishesCond.set(CopyUtils.cloneObj(qryDishesCond.get())));
         hbox.getChildren().add(queryBtn);
 
         // 分割线
@@ -121,9 +134,7 @@ public class OrderDishesChoiceView extends VBox {
         // 购物车按钮
         Button cartBtn = new Button();
         cartBtn.setText("查看购物车(" + cartSize.get() + ")");
-        cartSize.addListener((_this, _old, _new) -> {
-            cartBtn.setText("查看购物车(" + _new + ")");
-        });
+        cartSize.addListener((_this, _old, _new) -> cartBtn.setText("查看购物车(" + _new + ")"));
         cartBtn.setOnMouseClicked(evt -> {
             Stage cartStage = new Stage();
             cartStage.initOwner(this.getScene().getWindow());
@@ -273,13 +284,12 @@ public class OrderDishesChoiceView extends VBox {
                     alert.setHeaderText("确定给用户送菜吗?");
                     alert.setContentText(bo.getDishesName());
                     Optional<ButtonType> result = alert.showAndWait();
-                    if (result.get() != ButtonType.OK) {
+                    if (result.isPresent() && result.get() != ButtonType.OK) {
                         return;
                     }
                     Result<String> sendRs = sendDishes(bo);
                     if (!sendRs.isSuccess()) {
                         AlertBuilder.ERROR(sendRs.getMsg());
-                        return;
                     }
                 }
                 // 打开套餐
@@ -401,50 +411,6 @@ public class OrderDishesChoiceView extends VBox {
             }
         });
         return selector;
-    }
-
-    private VBox paintDishesView(Dishes dishes) {
-        VBox box = new VBox();
-        box.setPrefWidth(200);
-        Canvas canvas = new Canvas();
-        canvas.setWidth(200);
-        canvas.setHeight(210);
-
-        try {
-            Image img = new Image(dishesService.getDishesImageUrl(dishes));
-            canvas.getGraphicsContext2D().drawImage(img, 0, 10, 180, 160);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        canvas.getGraphicsContext2D().fillText(dishes.getDishesName(), 10, 185);
-        canvas.getGraphicsContext2D().fillText("单价:" + dishes.getDishesPrice(), 10, 200);
-        canvas.setOnMouseClicked(evt -> {
-            if (ClickHelper.isDblClick()) {
-                Logger.info("添加到购物车, DishesId=" +
-                        dishes.getDishesId() + "," +
-                        dishes.getDishesName() + ", "
-                        + CommonUtils.reflectString(data));
-                CartItemVO cartItem = new CartItemVO();
-                cartItem.setDishesId(dishes.getDishesId());
-                cartItem.setDishesPriceId(0);
-                cartItem.setNums(1);
-                cartItem.setIfDishesPackage(0);
-                try {
-                    Result<CartVO> addCartRs = cartService.addItem(data.getDeskId(), cartItem);
-                    Logger.info("购物车信息:" + JSON.toJSONString(addCartRs));
-                    if (addCartRs.isSuccess()) {
-                        AlertBuilder.INFO("通知消息", "添加购物车成功");
-                        cartSize.set(CollectionUtils.size(addCartRs.getData().getContents()));
-                    } else {
-                        AlertBuilder.ERROR(addCartRs.getMsg());
-                    }
-                } catch (Exception ex) {
-                    AlertBuilder.ERROR("报错消息", "添加购物车异常");
-                }
-            }
-        });
-        box.getChildren().add(canvas);
-        return box;
     }
 
     private void refreshCartSize() {
