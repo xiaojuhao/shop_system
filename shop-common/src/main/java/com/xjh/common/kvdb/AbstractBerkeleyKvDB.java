@@ -9,7 +9,7 @@ import com.xjh.common.utils.Logger;
 
 import java.nio.charset.StandardCharsets;
 
-public abstract class AbstractBerkeleyKvDB implements KvDB {
+public abstract class AbstractBerkeleyKvDB<T> implements KvDB<T> {
     ThreadLocal<Transaction> transaction = new ThreadLocal<>();
 
     @Override
@@ -37,7 +37,7 @@ public abstract class AbstractBerkeleyKvDB implements KvDB {
     }
 
     @Override
-    public void put(String key, Object val) {
+    public void put(String key, T val) {
         DatabaseEntry theKey = new DatabaseEntry(key.getBytes(StandardCharsets.UTF_8));
         DatabaseEntry newData = new DatabaseEntry(JSON.toJSONString(val).getBytes(StandardCharsets.UTF_8));
         OperationStatus status = getDB().put(transaction.get(), theKey, newData);
@@ -52,7 +52,7 @@ public abstract class AbstractBerkeleyKvDB implements KvDB {
     }
 
     @Override
-    public <T> T get(String key, Class<T> clz) {
+    public T get(String key, Class<T> clz) {
         DatabaseEntry theKey = new DatabaseEntry(key.getBytes(StandardCharsets.UTF_8));
         DatabaseEntry theData = new DatabaseEntry();
         getDB().get(null, theKey, theData, LockMode.READ_UNCOMMITTED_ALL);

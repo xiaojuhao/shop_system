@@ -1,7 +1,7 @@
 package com.xjh.common.store;
 
 import com.xjh.common.kvdb.Committable;
-import com.xjh.common.kvdb.cart.SeqKvDB;
+import com.xjh.common.kvdb.impl.SeqKvDB;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
 

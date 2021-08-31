@@ -1,8 +1,8 @@
-package com.xjh.common.kvdb.cart;
+package com.xjh.common.kvdb.impl;
 
 import com.xjh.common.kvdb.AbstractBerkeleyKvDB;
 
-public class SeqKvDB extends AbstractBerkeleyKvDB {
+public class SeqKvDB extends AbstractBerkeleyKvDB<String> {
     private static class Inst {
         public static SeqKvDB inst = new SeqKvDB();
     }

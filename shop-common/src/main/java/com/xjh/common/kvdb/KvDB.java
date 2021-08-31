@@ -1,14 +1,14 @@
 package com.xjh.common.kvdb;
 
-public interface KvDB {
+public interface KvDB<T> {
     Committable beginTransaction();
 
     void commit(Committable committable);
 
-    void put(String key, Object val);
+    void put(String key, T val);
 
     void remove(String key);
 
-    <T> T get(String key, Class<T> clz);
+     T get(String key, Class<T> clz);
 
 }

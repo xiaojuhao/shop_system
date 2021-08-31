@@ -1,16 +1,15 @@
 package com.xjh.service.store;
 
 import com.xjh.common.kvdb.Committable;
-import com.xjh.common.kvdb.cart.CartKvDB;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Cart;
 
 public class CartStore {
-    static CartKvDB cartKvDB = CartKvDB.inst();
+    static CartDB cartDB = CartDB.inst();
 
     public static Cart getCart(Integer deskId) {
         String key = "cart_" + deskId;
-        return cartKvDB.get(key, Cart.class);
+        return cartDB.get(key, Cart.class);
     }
 
     public static Result<String> saveCart(Cart cart) {
@@ -18,9 +17,9 @@ public class CartStore {
             return Result.fail("保存失败,入参错误");
         }
         String key = "cart_" + cart.getDeskId();
-        Committable committable = cartKvDB.beginTransaction();
-        cartKvDB.put(key, cart);
-        cartKvDB.commit(committable);
+        Committable committable = cartDB.beginTransaction();
+        cartDB.put(key, cart);
+        cartDB.commit(committable);
         return Result.success(null);
     }
 
@@ -29,9 +28,9 @@ public class CartStore {
             return Result.fail("保存失败,入参错误");
         }
         String key = "cart_" + deskId;
-        Committable committable = cartKvDB.beginTransaction();
-        cartKvDB.remove(key);
-        cartKvDB.commit(committable);
+        Committable committable = cartDB.beginTransaction();
+        cartDB.remove(key);
+        cartDB.commit(committable);
         return Result.fail("");
     }
 }
