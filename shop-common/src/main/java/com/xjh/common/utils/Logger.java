@@ -1,11 +1,11 @@
 package com.xjh.common.utils;
 
-import com.xjh.common.store.SysConfigUtils;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import com.xjh.common.store.SysConfigUtils;
 
 public class Logger {
     public static void info(String msg) {
@@ -53,7 +53,7 @@ public class Logger {
             if (CommonUtils.isBlank(workDir)) {
                 workDir = SysConfigUtils.userHomeDir().getAbsolutePath();
             }
-            File commonLog = new File(workDir, "common-" + DateBuilder.today().format("yyyy-MM-dd") + ".log");
+            File commonLog = new File(workDir + "/logs/", "common-" + DateBuilder.today().format("yyyy-MM-dd") + ".log");
             if (!commonLog.getParentFile().exists()) {
                 if (!commonLog.mkdirs()) {
                     System.out.println("创建日志目录失败");
