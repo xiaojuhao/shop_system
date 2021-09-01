@@ -53,13 +53,14 @@ public class Logger {
             if (CommonUtils.isBlank(workDir)) {
                 workDir = SysConfigUtils.userHomeDir().getAbsolutePath();
             }
-            File commonLog = new File(workDir + "/logs/", "common-" + DateBuilder.today().format("yyyy-MM-dd") + ".log");
-            if (!commonLog.getParentFile().exists()) {
-                if (!commonLog.mkdirs()) {
+            String fileName = "common-" + DateBuilder.today().format("yyyy-MM-dd") + ".log";
+            File logDir = new File(workDir + "/logs/");
+            if (!logDir.exists()) {
+                if (!logDir.mkdirs()) {
                     System.out.println("创建日志目录失败");
                 }
             }
-            FileWriter writer = new FileWriter(commonLog, true);
+            FileWriter writer = new FileWriter(new File(logDir, fileName), true);
             flushInSchedule(writer);
             return writer;
         } catch (Exception ex) {
