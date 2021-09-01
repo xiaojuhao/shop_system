@@ -1,7 +1,7 @@
 package com.xjh.dao.datasource;
 
 import com.google.inject.Provider;
-import com.xjh.common.store.RtPropNames;
+import com.xjh.common.enumeration.EnumPropName;
 import com.xjh.common.store.SysConfigUtils;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.TimeRecord;
@@ -22,10 +22,10 @@ public class MysqlDataSourceProvider implements Provider<HikariDataSource> {
 
     private static HikariDataSource newDS() {
         Properties properties = SysConfigUtils.getDbConfig();
-        String url = properties.getProperty(RtPropNames.dbUrlName);
-        String driver = properties.getProperty(RtPropNames.dbDriverName);
-        String username = properties.getProperty(RtPropNames.dbUsernameName);
-        String password = properties.getProperty(RtPropNames.dbPasswordName);
+        String url = properties.getProperty(EnumPropName.DB_URL.name);
+        String driver = properties.getProperty(EnumPropName.DB_DRIVER.name);
+        String username = properties.getProperty(EnumPropName.DB_USERNAME.name);
+        String password = properties.getProperty(EnumPropName.DB_PASSWORD.name);
         TimeRecord record = TimeRecord.start();
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(url);

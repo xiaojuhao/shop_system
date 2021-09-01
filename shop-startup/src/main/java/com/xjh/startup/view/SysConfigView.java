@@ -1,14 +1,9 @@
 package com.xjh.startup.view;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import com.xjh.common.store.RtPropNames;
+import com.xjh.common.enumeration.EnumPropName;
 import com.xjh.common.store.SysConfigUtils;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -16,6 +11,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 public class SysConfigView extends GridPane {
     public SysConfigView() {
@@ -32,19 +31,19 @@ public class SysConfigView extends GridPane {
     public static boolean checkConfig() {
         Properties properties = SysConfigUtils.loadRuntimeProperties();
 
-        if (CommonUtils.isBlank(properties.getProperty(RtPropNames.workDirName))) {
+        if (CommonUtils.isBlank(properties.getProperty(EnumPropName.WORK_DIR.name))) {
             return false;
         }
-        if (CommonUtils.isBlank(properties.getProperty(RtPropNames.dbUrlName))) {
+        if (CommonUtils.isBlank(properties.getProperty(EnumPropName.DB_URL.name))) {
             return false;
         }
-        if (CommonUtils.isBlank(properties.getProperty(RtPropNames.dbDriverName))) {
+        if (CommonUtils.isBlank(properties.getProperty(EnumPropName.DB_DRIVER.name))) {
             return false;
         }
-        if (CommonUtils.isBlank(properties.getProperty(RtPropNames.dbUsernameName))) {
+        if (CommonUtils.isBlank(properties.getProperty(EnumPropName.DB_USERNAME.name))) {
             return false;
         }
-        if (CommonUtils.isBlank(properties.getProperty(RtPropNames.dbPasswordName))) {
+        if (CommonUtils.isBlank(properties.getProperty(EnumPropName.DB_PASSWORD.name))) {
             return false;
         }
         return true;
@@ -60,15 +59,15 @@ public class SysConfigView extends GridPane {
         workDir.setPrefWidth(450);
         this.add(new Label("工作目录："), 0, row);
         this.add(workDir, 1, row);
-        collectData.add(() -> runtimeProp.setProperty(RtPropNames.workDirName, CommonUtils.trim(workDir.getText())));
+        collectData.add(() -> runtimeProp.setProperty(EnumPropName.WORK_DIR.name, CommonUtils.trim(workDir.getText())));
 
         row++;
         TextField dbUrl = new TextField();
-        dbUrl.setText(runtimeProp.getProperty(RtPropNames.dbUrlName));
+        dbUrl.setText(runtimeProp.getProperty(EnumPropName.DB_URL.name));
         dbUrl.setPrefWidth(450);
         this.add(new Label("数据库链接："), 0, row);
         this.add(dbUrl, 1, row);
-        collectData.add(() -> runtimeProp.setProperty(RtPropNames.dbUrlName, CommonUtils.trim(dbUrl.getText())));
+        collectData.add(() -> runtimeProp.setProperty(EnumPropName.DB_URL.name, CommonUtils.trim(dbUrl.getText())));
 
         row++;
         TextField dbDriver = new TextField();
@@ -78,23 +77,23 @@ public class SysConfigView extends GridPane {
         // dbDriver.setEditable(false);
         this.add(new Label("驱动："), 0, row);
         this.add(dbDriver, 1, row);
-        collectData.add(() -> runtimeProp.setProperty(RtPropNames.dbDriverName, CommonUtils.trim(dbDriver.getText())));
+        collectData.add(() -> runtimeProp.setProperty(EnumPropName.DB_DRIVER.name, CommonUtils.trim(dbDriver.getText())));
 
         row++;
         TextField dbUser = new TextField();
-        dbUser.setText(runtimeProp.getProperty(RtPropNames.dbUsernameName));
+        dbUser.setText(runtimeProp.getProperty(EnumPropName.DB_USERNAME.name));
         dbUser.setPrefWidth(450);
         this.add(new Label("DB用户名："), 0, row);
         this.add(dbUser, 1, row);
-        collectData.add(() -> runtimeProp.setProperty(RtPropNames.dbUsernameName, CommonUtils.trim(dbUser.getText())));
+        collectData.add(() -> runtimeProp.setProperty(EnumPropName.DB_USERNAME.name, CommonUtils.trim(dbUser.getText())));
 
         row++;
         TextField dbPwd = new TextField();
-        dbPwd.setText(runtimeProp.getProperty(RtPropNames.dbPasswordName));
+        dbPwd.setText(runtimeProp.getProperty(EnumPropName.DB_PASSWORD.name));
         dbPwd.setPrefWidth(450);
         this.add(new Label("DB密码："), 0, row);
         this.add(dbPwd, 1, row);
-        collectData.add(() -> runtimeProp.setProperty(RtPropNames.dbPasswordName, CommonUtils.trim(dbPwd.getText())));
+        collectData.add(() -> runtimeProp.setProperty(EnumPropName.DB_PASSWORD.name, CommonUtils.trim(dbPwd.getText())));
         // save button
         row++;
         VBox saveRow = new VBox();
