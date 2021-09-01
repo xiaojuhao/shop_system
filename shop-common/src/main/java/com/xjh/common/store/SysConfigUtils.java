@@ -10,11 +10,12 @@ import java.util.Properties;
 
 public class SysConfigUtils {
 
-    static Holder<String> cache = new Holder<>();
+    static Holder<String> workDirHomeCache = new Holder<>();
+    static Holder<Properties> propertiesHolder = new Holder<>();
 
     public static String getWorkDir() {
-        if (cache.get() != null) {
-            return cache.get();
+        if (workDirHomeCache.get() != null) {
+            return workDirHomeCache.get();
         }
         TimeRecord time = TimeRecord.start();
         Properties prop = loadRuntimeProperties();
@@ -26,8 +27,7 @@ public class SysConfigUtils {
         if (!workDir.endsWith("/")) {
             workDir = workDir + "/";
         }
-        cache.hold(workDir);
-        return workDir;
+        return workDirHomeCache.hold(workDir);
     }
 
     public static Properties getDbConfig() {
@@ -46,19 +46,23 @@ public class SysConfigUtils {
     }
 
     public static void dumpRuntimeProperties(Properties properties) {
-        File home = userHomeDir();
-        File file = new File(home.getAbsolutePath(), "runtime.properties");
+        File file = new File(userHomeDir().getAbsolutePath(), "runtime.properties");
         PropertiesUtils.dumpProperties(file, properties);
+        propertiesHolder.hold(null);
+        workDirHomeCache.hold(null);
     }
 
     public static Properties loadRuntimeProperties() {
-        String userHome = System.getProperty("user.home");
-        File home = new File(userHome + "/ShopSystem/");
+        if (propertiesHolder.get() != null) {
+            return propertiesHolder.get();
+        }
+        File home = new File(userHomeDir().getAbsolutePath(), "runtime.properties");
         if (!home.exists()) {
             if (!home.mkdirs()) {
                 throw new RuntimeException("系统基础信息目录:" + home.getAbsolutePath());
             }
         }
-        return PropertiesUtils.loadProperties(home.getAbsolutePath(), "runtime.properties");
+        Properties p = PropertiesUtils.loadProperties(home.getAbsolutePath(), "runtime.properties");
+        return propertiesHolder.hold(p);
     }
 }
