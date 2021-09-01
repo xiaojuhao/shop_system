@@ -33,13 +33,15 @@ public class Logger {
             if (logWriter == null) {
                 return;
             }
-            logWriter.append(DateBuilder.now().format("yyyy-MM-dd HH:mm:ss"));
-            logWriter.append("[").append(level).append("]");
+            String time = DateBuilder.now().format("yyyy-MM-dd HH:mm:ss");
+            StringBuffer log = new StringBuffer();
+            log.append(time).append(" [").append(level).append("] ");
             if (CommonUtils.isNotBlank(CurrentRequest.requestId())) {
-                logWriter.append(CurrentRequest.requestId()).append(" >> ");
+                log.append(CurrentRequest.requestId()).append(" >> ");
             }
-            logWriter.append(msg);
-            logWriter.append("\r\n");
+            log.append(msg).append("\r\n");
+
+            logWriter.append(log);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
