@@ -54,6 +54,11 @@ public class Logger {
                 workDir = SysConfigUtils.userHomeDir().getAbsolutePath();
             }
             File commonLog = new File(workDir, "common.log");
+            if (!commonLog.getParentFile().exists()) {
+                if (!commonLog.mkdirs()) {
+                    System.out.println("创建日志目录失败");
+                }
+            }
             FileWriter writer = new FileWriter(commonLog, true);
             flushInSchedule(writer);
             return writer;
@@ -64,12 +69,9 @@ public class Logger {
     }
 
     private static void flushInSchedule(FileWriter fileWriter) {
-        Thread f = new Thread(() -> {
-            info("flush日志记录。。。。。");
-            doFlush(fileWriter);
-        });
-        f.setDaemon(true);
-        Runtime.getRuntime().addShutdownHook(f);
+        // 退出时刷一次
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> doFlush(fileWriter)));
+        // 定期刷日志
         Executors.newScheduledThreadPool(1)
                 .scheduleAtFixedRate(() -> doFlush(fileWriter), 3, 3, TimeUnit.SECONDS);
     }
