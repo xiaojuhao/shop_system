@@ -1,9 +1,11 @@
 package com.xjh.common.utils;
 
+import com.xjh.common.store.SysConfigUtils;
+
 import java.io.File;
 import java.io.FileWriter;
-
-import com.xjh.common.store.SysConfigUtils;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class Logger {
     public static void info(String msg) {
@@ -38,7 +40,6 @@ public class Logger {
             }
             logWriter.append(msg);
             logWriter.append("\r\n");
-            logWriter.flush();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -53,10 +54,23 @@ public class Logger {
                 workDir = SysConfigUtils.userHomeDir().getAbsolutePath();
             }
             File commonLog = new File(workDir, "common.log");
-            return new FileWriter(commonLog, true);
+            FileWriter writer = new FileWriter(commonLog, true);
+            flushInSchedule(writer);
+            return writer;
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    private static void flushInSchedule(FileWriter fileWriter) {
+        Executors.newScheduledThreadPool(1)
+                .scheduleAtFixedRate(() -> {
+                    try {
+                        fileWriter.flush();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }, 3, 3, TimeUnit.SECONDS);
     }
 }
