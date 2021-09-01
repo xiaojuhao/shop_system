@@ -9,7 +9,7 @@ import java.io.File;
 import java.util.Properties;
 
 public class SysConfigUtils {
-
+    static String runtimePropertyFileName = "runtime.properties";
     static Holder<String> workDirHomeCache = new Holder<>();
     static Holder<Properties> propertiesHolder = new Holder<>();
 
@@ -46,7 +46,7 @@ public class SysConfigUtils {
     }
 
     public static void dumpRuntimeProperties(Properties properties) {
-        File file = new File(userHomeDir().getAbsolutePath(), "runtime.properties");
+        File file = new File(userHomeDir(), runtimePropertyFileName);
         PropertiesUtils.dumpProperties(file, properties);
         propertiesHolder.hold(null);
         workDirHomeCache.hold(null);
@@ -56,13 +56,13 @@ public class SysConfigUtils {
         if (propertiesHolder.get() != null) {
             return propertiesHolder.get();
         }
-        File home = new File(userHomeDir().getAbsolutePath(), "runtime.properties");
+        File home = new File(userHomeDir(), runtimePropertyFileName);
         if (!home.exists()) {
             if (!home.mkdirs()) {
                 throw new RuntimeException("系统基础信息目录:" + home.getAbsolutePath());
             }
         }
-        Properties p = PropertiesUtils.loadProperties(home.getAbsolutePath(), "runtime.properties");
+        Properties p = PropertiesUtils.loadProperties(home.getAbsolutePath(), runtimePropertyFileName);
         return propertiesHolder.hold(p);
     }
 }
