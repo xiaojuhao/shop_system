@@ -1,12 +1,12 @@
 package com.xjh.common.store;
 
+import java.io.File;
+import java.util.Properties;
+
 import com.xjh.common.enumeration.EnumPropName;
 import com.xjh.common.utils.Holder;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.TimeRecord;
-
-import java.io.File;
-import java.util.Properties;
 
 public class SysConfigUtils {
     static String runtimePropertyFileName = "runtime.properties";
@@ -56,7 +56,7 @@ public class SysConfigUtils {
         if (propertiesHolder.get() != null) {
             return propertiesHolder.get();
         }
-        File home = new File(userHomeDir(), runtimePropertyFileName);
+        File home = userHomeDir();
         if (!home.exists()) {
             if (!home.mkdirs()) {
                 throw new RuntimeException("系统基础信息目录:" + home.getAbsolutePath());
