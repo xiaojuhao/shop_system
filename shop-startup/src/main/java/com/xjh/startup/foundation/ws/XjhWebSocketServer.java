@@ -19,12 +19,12 @@ public class XjhWebSocketServer extends WebSocketServer {
     private final Map<String, WsHandler> handlers = new ConcurrentHashMap<>();
     private final AtomicBoolean initialized = new AtomicBoolean();
 
-    public static XjhWebSocketServer startWS(int port) {
+    public static void startWS(int port) {
         XjhWebSocketServer server = new XjhWebSocketServer(port);
         server.start();
         Logger.info("启动WebSocket服务器...... >> listen on " + port);
+        // 关闭系统时退出
         Runtime.getRuntime().addShutdownHook(new Thread(server::stopQuietly));
-        return server;
     }
 
     private WsHandler getHandler(JSONObject msg) {
@@ -56,7 +56,6 @@ public class XjhWebSocketServer extends WebSocketServer {
         try {
             Logger.info("停止WebSocket服务器......");
             this.stop();
-            initialized.set(false);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
