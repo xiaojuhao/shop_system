@@ -71,7 +71,14 @@ public class Logger {
 
     private static void flushInSchedule(FileWriter fileWriter) {
         // 退出时刷一次
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> doFlush(fileWriter)));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                doFlush(fileWriter);
+                fileWriter.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }));
         // 定期刷日志
         Executors.newScheduledThreadPool(1)
                 .scheduleAtFixedRate(() -> doFlush(fileWriter), 3, 3, TimeUnit.SECONDS);
