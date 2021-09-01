@@ -53,7 +53,7 @@ public class Logger {
             if (CommonUtils.isBlank(workDir)) {
                 workDir = SysConfigUtils.userHomeDir().getAbsolutePath();
             }
-            File commonLog = new File(workDir, "common.log");
+            File commonLog = new File(workDir, "common-" + DateBuilder.today().format("yyyy-mm-dd") + ".log");
             if (!commonLog.getParentFile().exists()) {
                 if (!commonLog.mkdirs()) {
                     System.out.println("创建日志目录失败");
