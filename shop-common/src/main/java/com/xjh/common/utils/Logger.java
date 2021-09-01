@@ -2,12 +2,16 @@ package com.xjh.common.utils;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.xjh.common.store.SysConfigUtils;
 
 public class Logger {
+    private static AtomicBoolean exiting = new AtomicBoolean(false);
+
     public static void info(String msg) {
         System.out.println("INFO:" + msg);
         append("INFO", msg);
@@ -28,6 +32,11 @@ public class Logger {
         append("ERROR", msg);
     }
 
+    public static void existing(){
+        exiting.set(true);
+        doFlush(logWriter);
+    }
+
     private static void append(String level, String msg) {
         try {
             if (logWriter == null) {
@@ -40,8 +49,10 @@ public class Logger {
                 log.append(CurrentRequest.requestId()).append(" >> ");
             }
             log.append(msg).append("\r\n");
-
             logWriter.append(log);
+            if(exiting.get()){
+                doFlush(logWriter);
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -72,15 +83,6 @@ public class Logger {
     }
 
     private static void flushInSchedule(FileWriter fileWriter) {
-        // 退出时刷一次
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                doFlush(fileWriter);
-                fileWriter.close();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }));
         // 定期刷日志
         Executors.newScheduledThreadPool(1)
                 .scheduleAtFixedRate(() -> doFlush(fileWriter), 3, 3, TimeUnit.SECONDS);

@@ -24,7 +24,10 @@ public class LoginApp extends Application {
         Logger.info("主页面渲染, cost " + timeRecord.getCostAndReset());
         // 启动 webSocket服务器
         XjhWebSocketServer.startWS(8889);
-        primaryStage.setOnCloseRequest(evt -> System.exit(0));
+        primaryStage.setOnCloseRequest(evt -> {
+            Logger.existing();
+            System.exit(0);
+        });
         Logger.info("启动WebSocket服务器，cost " + timeRecord.getCostAndReset());
     }
 
