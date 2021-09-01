@@ -1,21 +1,19 @@
 package com.xjh.startup.foundation.ws;
 
-import java.net.InetSocketAddress;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.java_websocket.WebSocket;
-import org.java_websocket.handshake.ClientHandshake;
-import org.java_websocket.server.WebSocketServer;
-
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.ws.WsApiType;
 import com.xjh.ws.WsHandler;
-import com.xjh.ws.handler.SocketOpenHandler;
+import org.java_websocket.WebSocket;
+import org.java_websocket.handshake.ClientHandshake;
+import org.java_websocket.server.WebSocketServer;
+
+import java.net.InetSocketAddress;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class XjhWebSocketServer extends WebSocketServer {
     private final Map<String, WsHandler> handlers = new ConcurrentHashMap<>();
@@ -25,6 +23,7 @@ public class XjhWebSocketServer extends WebSocketServer {
         XjhWebSocketServer server = new XjhWebSocketServer(port);
         server.start();
         Logger.info("启动WebSocket服务器...... >> listen on " + port);
+        Runtime.getRuntime().addShutdownHook(new Thread(server::stopQuietly));
         return server;
     }
 

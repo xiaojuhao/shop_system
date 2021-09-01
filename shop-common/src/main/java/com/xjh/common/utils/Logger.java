@@ -64,13 +64,21 @@ public class Logger {
     }
 
     private static void flushInSchedule(FileWriter fileWriter) {
+        Thread f = new Thread(() -> {
+            info("flush日志记录。。。。。");
+            doFlush(fileWriter);
+        });
+        f.setDaemon(true);
+        Runtime.getRuntime().addShutdownHook(f);
         Executors.newScheduledThreadPool(1)
-                .scheduleAtFixedRate(() -> {
-                    try {
-                        fileWriter.flush();
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                }, 3, 3, TimeUnit.SECONDS);
+                .scheduleAtFixedRate(() -> doFlush(fileWriter), 3, 3, TimeUnit.SECONDS);
+    }
+
+    private static void doFlush(FileWriter fileWriter) {
+        try {
+            fileWriter.flush();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }

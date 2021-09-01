@@ -23,10 +23,9 @@ public class LoginApp extends Application {
         primaryStage.show();
         Logger.info("主页面渲染, cost " + timeRecord.getCostAndReset());
         // 启动 webSocket服务器
-        XjhWebSocketServer ws = XjhWebSocketServer.startWS(8889);
-        primaryStage.setOnCloseRequest(evt -> ws.stopQuietly());
+        XjhWebSocketServer.startWS(8889);
+        primaryStage.setOnCloseRequest(evt -> System.exit(0));
         Logger.info("启动WebSocket服务器，cost " + timeRecord.getCostAndReset());
-
     }
 
     public static void main(String[] args) {
