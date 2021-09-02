@@ -6,10 +6,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.xjh.common.utils.AlertBuilder;
-import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.Logger;
-import com.xjh.common.utils.Result;
+import com.xjh.common.utils.*;
+import com.xjh.common.utils.cellvalue.InputNumber;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.dao.dataobject.Dishes;
@@ -28,14 +26,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Separator;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -70,12 +61,12 @@ public class CartView extends VBox {
     private TableView<CartItemBO> tableList(DeskOrderParam param, TableView<CartItemBO> tv) {
         try {
             tv.getColumns().addAll(
-                    newCol("序号", "seqNo", 100),
-                    newCol("菜品类型", "dishesTypeName", 100),
-                    newCol("菜品名称", "dishesName", 200),
-                    newCol("价格", "dishesPrice", 100),
-                    newCol("数量", "nums", 100),
-                    newCol("小计", "totalPrice", 100)
+                    TableViewUtils.newCol("序号", "seqNo", 100),
+                    TableViewUtils.newCol("菜品类型", "dishesTypeName", 100),
+                    TableViewUtils.newCol("菜品名称", "dishesName", 200),
+                    TableViewUtils.newCol("价格", "dishesPrice", 100),
+                    TableViewUtils.newCol("数量", "nums", 150),
+                    TableViewUtils.newCol("小计", "totalPrice", 100)
             );
             reloadData(param, tv);
         } catch (Exception ex) {
@@ -154,14 +145,26 @@ public class CartView extends VBox {
                     CartItemBO bo = new CartItemBO();
                     bo.setSeqNo(seqNo.incrementAndGet());
                     bo.setDishesId(it.getDishesId());
-                    bo.setNums(CommonUtils.orElse(it.getNums(), 1));
+                    InputNumber num = InputNumber.from(CommonUtils.orElse(it.getNums(), 1));
+                    num.setOnChange(n -> {
+                        CartVO cart = cartService.getCart(param.getDeskId()).getData();
+                        if(cart != null){
+                            CommonUtils.forEach(cart.getContents(), item -> {
+                                if(CommonUtils.eq(item.getDishesId(), it.getDishesId())) {
+                                    item.setNums(n);
+                                }
+                            });
+                            cartService.updateCart(param.getDeskId(), cart);
+                        }
+                    });
+                    bo.setNums(num);
                     DishesType type = typeMap.get(dishes.getDishesTypeId());
                     if (type != null) {
                         bo.setDishesTypeName(new RichText(type.getTypeName()).with(Color.RED));
                     }
                     bo.setDishesName(new RichText(dishes.getDishesName()));
                     bo.setDishesPrice(new Money(dishes.getDishesPrice()));
-                    bo.setTotalPrice(new Money(bo.getNums() * dishes.getDishesPrice()));
+                    bo.setTotalPrice(new Money(bo.getNums().getNumber() * dishes.getDishesPrice()));
                     return bo;
                 } else {
                     return null;
@@ -171,43 +174,5 @@ public class CartView extends VBox {
             Logger.error("查询购物车异常:" + param.getDeskName() + ", " + ex.getMessage());
         }
         return new ArrayList<>();
-    }
-
-    private TableColumn<CartItemBO, Object> newCol(String name, String filed, double width) {
-        TableColumn<CartItemBO, Object> c = new TableColumn<>(name);
-        c.setStyle("-fx-border-width: 0px; ");
-        c.setMinWidth(width);
-        c.setCellValueFactory(new PropertyValueFactory<>(filed));
-        c.setCellFactory(col -> {
-            TableCell<CartItemBO, Object> cell = new TableCell<>();
-            cell.itemProperty().addListener((obs, ov, nv) -> {
-                if (nv == null) {
-                    return;
-                }
-                if (nv instanceof RichText) {
-                    RichText val = (RichText) nv;
-                    cell.textProperty().set(CommonUtils.stringify(val.getText()));
-                    if (val.getColor() != null) {
-                        cell.setTextFill(val.getColor());
-                    }
-                    if (val.getPos() != null) {
-                        cell.setAlignment(val.getPos());
-                    }
-                } else if (nv instanceof Money) {
-                    Money val = (Money) nv;
-                    cell.textProperty().set(CommonUtils.formatMoney(val.getAmount()));
-                    if (val.getColor() != null) {
-                        cell.setTextFill(val.getColor());
-                    }
-                    if (val.getPos() != null) {
-                        cell.setAlignment(val.getPos());
-                    }
-                } else {
-                    cell.textProperty().set(CommonUtils.stringify(nv));
-                }
-            });
-            return cell;
-        });
-        return c;
     }
 }

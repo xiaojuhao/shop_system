@@ -12,17 +12,12 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import com.xjh.common.utils.*;
 import org.apache.commons.collections4.CollectionUtils;
 
 import com.xjh.common.enumeration.EnumChoiceAction;
 import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
-import com.xjh.common.utils.AlertBuilder;
-import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.CopyUtils;
-import com.xjh.common.utils.Logger;
-import com.xjh.common.utils.Result;
-import com.xjh.common.utils.TimeRecord;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.common.valueobject.OrderBillVO;
@@ -57,11 +52,8 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Separator;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
@@ -195,13 +187,13 @@ public class OrderDetailView extends VBox {
             }
             tableView.setPadding(new Insets(5, 0, 0, 5));
             tableView.getColumns().addAll(
-                    newCol("序号", "orderDishesId", 100),
-                    newCol("子订单", "subOrderId", 100),
-                    newCol("菜名名称", "dishesName", 300),
-                    newCol("单价", "price", 160),
-                    newCol("折后价", "discountPrice", 100),
-                    newCol("数量", "orderDishesNum", 100),
-                    newCol("类型", "saleType", 100)
+                    TableViewUtils.newCol("序号", "orderDishesId", 100),
+                    TableViewUtils.newCol("子订单", "subOrderId", 100),
+                    TableViewUtils.newCol("菜名名称", "dishesName", 300),
+                    TableViewUtils.newCol("单价", "price", 160),
+                    TableViewUtils.newCol("折后价", "discountPrice", 100),
+                    TableViewUtils.newCol("数量", "orderDishesNum", 100),
+                    TableViewUtils.newCol("类型", "saleType", 100)
             );
             addLine(tableView);
         }
@@ -279,45 +271,6 @@ public class OrderDetailView extends VBox {
             btn.setOnMouseClicked(onClick);
         }
         return btn;
-    }
-
-    private TableColumn<OrderDishesTableItemVO, Object> newCol(String name, String filed, double width) {
-        TableColumn<OrderDishesTableItemVO, Object> c = new TableColumn<>(name);
-        c.setStyle("-fx-border-width: 0px; ");
-        c.setMinWidth(width);
-        c.setSortable(false);
-        c.setCellValueFactory(new PropertyValueFactory<>(filed));
-        c.setCellFactory(col -> {
-            TableCell<OrderDishesTableItemVO, Object> cell = new TableCell<>();
-            cell.itemProperty().addListener((obs, ov, nv) -> {
-                if (nv == null) {
-                    return;
-                }
-                if (nv instanceof RichText) {
-                    RichText val = (RichText) nv;
-                    cell.textProperty().set(CommonUtils.stringify(val.getText()));
-                    if (val.getColor() != null) {
-                        cell.setTextFill(val.getColor());
-                    }
-                    if (val.getPos() != null) {
-                        cell.setAlignment(val.getPos());
-                    }
-                } else if (nv instanceof Money) {
-                    Money val = (Money) nv;
-                    cell.textProperty().set(CommonUtils.formatMoney(val.getAmount()));
-                    if (val.getColor() != null) {
-                        cell.setTextFill(val.getColor());
-                    }
-                    if (val.getPos() != null) {
-                        cell.setAlignment(val.getPos());
-                    }
-                } else {
-                    cell.textProperty().set(CommonUtils.stringify(nv));
-                }
-            });
-            return cell;
-        });
-        return c;
     }
 
     private ObservableList<OrderDishesTableItemVO> buildTableItemList(List<OrderDishes> orderDishes) {

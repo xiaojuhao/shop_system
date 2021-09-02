@@ -1,5 +1,6 @@
 package com.xjh.startup.view.model;
 
+import com.xjh.common.utils.cellvalue.InputNumber;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.RichText;
 
@@ -10,7 +11,7 @@ public class CartItemBO {
     RichText dishesName;
     String dishesPriceId;
     Money dishesPrice;
-    Integer nums;
+    InputNumber nums;
     Money totalPrice;
     String ifDishesPackage;
 
@@ -62,11 +63,11 @@ public class CartItemBO {
         this.dishesPrice = dishesPrice;
     }
 
-    public Integer getNums() {
+    public InputNumber getNums() {
         return nums;
     }
 
-    public void setNums(Integer nums) {
+    public void setNums(InputNumber nums) {
         this.nums = nums;
     }
 
