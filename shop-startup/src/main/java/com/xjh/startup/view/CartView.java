@@ -132,6 +132,18 @@ public class CartView extends VBox {
         }
     }
 
+    private void doUpdateItemNum(Integer deskId, Integer dishesId, Integer num){
+        CartVO cart = cartService.getCart(deskId).getData();
+        if(cart != null){
+            CommonUtils.forEach(cart.getContents(), item -> {
+                if(CommonUtils.eq(item.getDishesId(), dishesId)) {
+                    item.setNums(num);
+                }
+            });
+            cartService.updateCart(deskId, cart);
+        }
+    }
+
     private List<CartItemBO> loadCartItems(DeskOrderParam param) {
         try {
             Map<Integer, DishesType> typeMap = dishesTypeService.dishesTypeMap();
@@ -146,17 +158,7 @@ public class CartView extends VBox {
                     bo.setSeqNo(seqNo.incrementAndGet());
                     bo.setDishesId(it.getDishesId());
                     InputNumber num = InputNumber.from(CommonUtils.orElse(it.getNums(), 1));
-                    num.setOnChange(n -> {
-                        CartVO cart = cartService.getCart(param.getDeskId()).getData();
-                        if(cart != null){
-                            CommonUtils.forEach(cart.getContents(), item -> {
-                                if(CommonUtils.eq(item.getDishesId(), it.getDishesId())) {
-                                    item.setNums(n);
-                                }
-                            });
-                            cartService.updateCart(param.getDeskId(), cart);
-                        }
-                    });
+                    num.setOnChange(n -> doUpdateItemNum(param.getDeskId(), it.getDishesId(), n));
                     bo.setNums(num);
                     DishesType type = typeMap.get(dishes.getDishesTypeId());
                     if (type != null) {
