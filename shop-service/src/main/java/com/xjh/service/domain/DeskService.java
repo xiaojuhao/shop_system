@@ -1,5 +1,8 @@
 package com.xjh.service.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.alibaba.fastjson.JSON;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -13,9 +16,6 @@ import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.mapper.DeskDAO;
 import com.xjh.service.domain.model.CreateOrderParam;
 import com.xjh.service.domain.model.OpenDeskParam;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Singleton
 public class DeskService {
@@ -81,6 +81,16 @@ public class DeskService {
             return Result.fail("开桌失败:" + ex.getMessage());
         } finally {
             clear.run();
+        }
+    }
+
+    public Result<Integer> useDesk(Desk desk) {
+        try {
+            int i = deskDAO.useDesk(desk);
+            return Result.success(i);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail(ex.getMessage());
         }
     }
 

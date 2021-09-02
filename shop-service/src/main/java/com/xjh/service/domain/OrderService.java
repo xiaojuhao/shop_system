@@ -1,15 +1,30 @@
 package com.xjh.service.domain;
 
-import cn.hutool.core.codec.Base64;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.xjh.common.enumeration.*;
+import com.xjh.common.enumeration.EnumDeskStatus;
+import com.xjh.common.enumeration.EnumOrderSaleType;
+import com.xjh.common.enumeration.EnumOrderServeStatus;
+import com.xjh.common.enumeration.EnumOrderStatus;
+import com.xjh.common.enumeration.EnumOrderType;
+import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.store.SequenceDatabase;
-import com.xjh.common.utils.*;
+import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.CurrentRequest;
+import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.OrderBillVO;
 import com.xjh.common.valueobject.OrderDiscountVO;
+import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.dao.dataobject.OrderPay;
@@ -18,11 +33,7 @@ import com.xjh.dao.mapper.OrderDAO;
 import com.xjh.dao.mapper.SubOrderDAO;
 import com.xjh.service.domain.model.CreateOrderParam;
 
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import cn.hutool.core.codec.Base64;
 
 @Singleton
 public class OrderService {
@@ -34,6 +45,8 @@ public class OrderService {
     OrderDishesService orderDishesService;
     @Inject
     OrderPayService orderPayService;
+    @Inject
+    DeskService deskService;
 
     public Order getOrder(Integer orderId) {
         try {
@@ -45,6 +58,39 @@ public class OrderService {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    public Result<String> changeDesk(Integer orderId, Integer targetDeskId) {
+        Order order = this.getOrder(orderId);
+        if (order == null) {
+            return Result.fail("查询订单信息失败:" + orderId);
+        }
+        Desk targetDesk = deskService.getById(targetDeskId);
+        Desk currDesk = deskService.getById(order.getDeskId());
+        if (targetDesk == null) {
+            return Result.fail("目标餐桌不存在:" + targetDeskId);
+        }
+        if (currDesk == null) {
+            return Result.fail("获取订单餐桌失败:" + order.getDeskId());
+        }
+        if (EnumDeskStatus.of(targetDesk.getStatus()) != EnumDeskStatus.FREE) {
+            return Result.fail("目标餐桌状态已占用");
+        }
+        // 占用新餐桌
+        targetDesk.setOrderId(orderId);
+        targetDesk.setStatus(EnumDeskStatus.IN_USE.status());
+        Result<Integer> useRs = deskService.useDesk(targetDesk);
+        if (!useRs.isSuccess()) {
+            return Result.fail(useRs.getMsg());
+        }
+        // 更新订单信息
+        Order updateOrder = new Order();
+        updateOrder.setOrderId(order.getOrderId());
+        updateOrder.setDeskId(targetDesk.getDeskId());
+        updateByOrderId(updateOrder);
+        // 释放老餐桌
+        deskService.closeDesk(targetDesk.getDeskId());
+        return Result.success(null);
     }
 
     public Result<String> erase(Integer orderId, double eraseAmt) {
