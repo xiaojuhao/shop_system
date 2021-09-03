@@ -18,6 +18,7 @@ public class TableViewUtils {
         if (width > 0) {
             c.setMinWidth(width);
         }
+        c.setSortable(false);
         c.setCellValueFactory(new PropertyValueFactory<>(filed));
         c.setCellFactory(col -> {
             TableCell<T, Object> cell = new TableCell<>();
