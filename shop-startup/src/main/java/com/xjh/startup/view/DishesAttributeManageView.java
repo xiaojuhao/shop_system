@@ -8,20 +8,22 @@ import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.service.domain.DishesAttributeService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
+import com.xjh.startup.view.base.SimpleForm;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.TableView;
-import javafx.scene.layout.VBox;
 
-public class DishesAttributeManageView extends VBox {
+public class DishesAttributeManageView extends SimpleForm {
     DishesAttributeService dishesAttributeService = GuiceContainer.getInstance(DishesAttributeService.class);
 
     TableView<TableItemBO> tableView = new TableView<>();
 
     public DishesAttributeManageView() {
-        this.getChildren().add(tableView);
+        this.setSpacing(15);
+
+        addLine(tableView);
         tableView.setPadding(new Insets(5, 0, 0, 5));
         tableView.getColumns().addAll(
                 TableViewUtils.newCol("ID", "dishesAttributeId", 100),
