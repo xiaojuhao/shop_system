@@ -6,6 +6,7 @@ import com.xjh.common.utils.TimeRecord;
 import com.xjh.service.domain.AccountService;
 import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.DeskService;
+import com.xjh.service.domain.DishesAttributeService;
 import com.xjh.service.domain.DishesPackageService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.OrderDishesService;
@@ -22,6 +23,7 @@ public class ServiceModule extends AbstractModule {
         bind(DishesService.class);
         bind(DishesPackageService.class);
         bind(AccountService.class);
+        bind(DishesAttributeService.class);
         Logger.info("ServiceModule 耗时:" + timeRecord.getCost());
     }
 }

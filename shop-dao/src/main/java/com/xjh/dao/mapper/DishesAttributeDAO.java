@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.google.inject.name.Named;
+import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.DishesAttribute;
 import com.xjh.dao.foundation.EntityUtils;
 import com.zaxxer.hikari.HikariDataSource;
@@ -27,6 +28,22 @@ public class DishesAttributeDAO {
         } catch (Exception ex) {
             ex.printStackTrace();
             return new ArrayList<>();
+        }
+    }
+
+    public Result<Integer> updateById(DishesAttribute attr) {
+        try {
+            if (attr.getDishesAttributeId() == null) {
+                return Result.fail("主键ID为空");
+            }
+            int i = Db.use(ds).update(
+                    EntityUtils.create(attr),
+                    EntityUtils.idCond(attr)
+            );
+            return Result.success(i);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail("更新异常:" + ex.getMessage());
         }
     }
 
