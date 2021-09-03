@@ -36,7 +36,9 @@ public class CartView extends VBox {
     DishesTypeService dishesTypeService = GuiceContainer.getInstance(DishesTypeService.class);
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
 
-    public CartView(DeskOrderParam param) {
+    Runnable onPlaceOrder = null;
+    public CartView(DeskOrderParam param, Runnable onPlaceOrder) {
+        this.onPlaceOrder = onPlaceOrder;
         TableView<CartItemBO> tv = new TableView<>();
         this.getChildren().add(tableList(param, tv));
         this.getChildren().add(new Separator(Orientation.HORIZONTAL));
@@ -88,6 +90,7 @@ public class CartView extends VBox {
         if (createOrderRs.isSuccess()) {
             AlertBuilder.INFO("下单成功");
             this.getScene().getWindow().hide();
+            CommonUtils.safeRun(onPlaceOrder);
         } else {
             AlertBuilder.ERROR(createOrderRs.getMsg());
         }

@@ -144,7 +144,7 @@ public class OrderDishesChoiceView extends VBox {
             cartStage.setWidth(this.getScene().getWindow().getWidth() - 10);
             cartStage.setHeight(this.getScene().getWindow().getHeight() - 100);
             cartStage.setTitle("购物车[桌号:" + param.getDeskName() + "]");
-            cartStage.setScene(new Scene(new CartView(param)));
+            cartStage.setScene(new Scene(new CartView(param, () -> this.getScene().getWindow().hide())));
             cartStage.showAndWait();
             refreshCartSize();
         });
