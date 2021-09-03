@@ -3,13 +3,17 @@ package com.xjh.startup.view;
 import com.xjh.startup.foundation.constants.CurrentAccount;
 import com.xjh.startup.foundation.constants.MainStageHolder;
 
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.stage.Window;
 
 public class MenuBarView {
     BorderPane root;
@@ -53,15 +57,24 @@ public class MenuBarView {
 
     private Menu createDishesMenu() {
         Menu menu = new Menu("菜品管理");
-        MenuItem updatePassword = new MenuItem("菜品属性管理");
-        MenuItem updateName = new MenuItem("菜品分类管理");
-        MenuItem subAccountItem = new MenuItem("菜品管理");
+        MenuItem dishesAttrManger = new MenuItem("菜品属性管理");
+        dishesAttrManger.setOnAction(evt -> openView("菜品属性管理", new DishesAttributeManageView()));
+
+        MenuItem dishesCate = new MenuItem("菜品分类管理");
+        dishesCate.setOnAction(evt -> openView("菜品分类管理", null));
+
+        MenuItem dishesManager = new MenuItem("菜品管理");
+        dishesManager.setOnAction(evt -> openView("菜品管理", null));
+
         MenuItem dishesCollMenu = new MenuItem("菜品集合管理");
+
         MenuItem menuManager = new MenuItem("菜单管理");
+
         MenuItem taocan = new MenuItem("套餐管理");
-        menu.getItems().addAll(updatePassword, updateName, subAccountItem,
-                dishesCollMenu, menuManager,
-                new SeparatorMenuItem(), taocan);
+        taocan.setOnAction(evt -> openView("套餐管理", null));
+
+        menu.getItems().addAll(dishesAttrManger, dishesCate, dishesManager,
+                dishesCollMenu, menuManager, taocan);
         return menu;
     }
 
@@ -102,5 +115,24 @@ public class MenuBarView {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    private void openView(String title, Parent content) {
+        Window sceneWindow = MainStageHolder.get().getScene().getWindow();
+        double width = sceneWindow.getWidth() / 10 * 9;
+        double height = sceneWindow.getHeight() / 10 * 9;
+
+        Stage orderInfo = new Stage();
+        orderInfo.initOwner(sceneWindow);
+        orderInfo.initModality(Modality.WINDOW_MODAL);
+        orderInfo.initStyle(StageStyle.DECORATED);
+        orderInfo.centerOnScreen();
+        orderInfo.setWidth(width);
+        orderInfo.setHeight(height);
+        orderInfo.setTitle(title);
+        if (content != null) {
+            orderInfo.setScene(new Scene(content));
+        }
+        orderInfo.showAndWait();
     }
 }

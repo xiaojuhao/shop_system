@@ -3,6 +3,7 @@ package com.xjh.startup.view;
 import com.xjh.common.utils.Holder;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.TimeRecord;
+import com.xjh.startup.view.base.FxmlView;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

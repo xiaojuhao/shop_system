@@ -1,4 +1,4 @@
-package com.xjh.startup.view;
+package com.xjh.startup.view.base;
 
 import javafx.fxml.FXMLLoader;
 
