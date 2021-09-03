@@ -1,6 +1,8 @@
 package com.xjh.common.valueobject;
 
-public class OrderBillVO {
+public class OrderOverviewVO {
+    public String deskName;
+    public Integer deskId;
     public String orderId;
     public int customerNum;
     public String orderTime;
@@ -17,6 +19,21 @@ public class OrderBillVO {
     public double returnAmount;
     public String payInfoRemark;
 
+    public String getDeskName() {
+        return deskName;
+    }
+
+    public void setDeskName(String deskName) {
+        this.deskName = deskName;
+    }
+
+    public Integer getDeskId() {
+        return deskId;
+    }
+
+    public void setDeskId(Integer deskId) {
+        this.deskId = deskId;
+    }
 
     public String getDiscountName() {
         return discountName;

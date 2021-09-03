@@ -22,8 +22,8 @@ import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
-import com.xjh.common.valueobject.OrderBillVO;
 import com.xjh.common.valueobject.OrderDiscountVO;
+import com.xjh.common.valueobject.OrderOverviewVO;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
@@ -89,8 +89,12 @@ public class OrderService {
         updateOrder.setDeskId(targetDesk.getDeskId());
         updateByOrderId(updateOrder);
         // 释放老餐桌
-        deskService.closeDesk(targetDesk.getDeskId());
-        return Result.success(null);
+        Result<String> rs = deskService.closeDesk(currDesk.getDeskId());
+        if (!rs.isSuccess()) {
+            return Result.fail(rs.getMsg());
+        } else {
+            return Result.success(null);
+        }
     }
 
     public Result<String> erase(Integer orderId, double eraseAmt) {
@@ -151,9 +155,14 @@ public class OrderService {
         }
     }
 
-    public Result<OrderBillVO> calcOrderBill(Order order, List<OrderDishes> orderDishesList) {
+    public Result<OrderOverviewVO> buildOrderOverview(Order order, List<OrderDishes> orderDishesList) {
         if (order != null) {
-            OrderBillVO v = new OrderBillVO();
+            OrderOverviewVO v = new OrderOverviewVO();
+            Desk desk = deskService.getById(order.getDeskId());
+            if (desk != null) {
+                v.setDeskId(desk.getDeskId());
+                v.setDeskName(desk.getDeskName());
+            }
             v.orderId = order.getOrderId().toString();
             v.customerNum = order.getOrderCustomerNums();
             v.orderTime = DateBuilder.base(order.getCreateTime()).timeStr();

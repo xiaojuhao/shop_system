@@ -15,7 +15,7 @@ import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumDeskType;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.valueobject.OrderBillVO;
+import com.xjh.common.valueobject.OrderOverviewVO;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackage;
@@ -89,7 +89,7 @@ public class CheckDeskInfoHandler implements WsHandler {
                     jSONObjectOrder.put("reduction", order.getOrderReduction());
                     jSONObjectOrder.put("refund", order.getOrderRefund());
 
-                    OrderBillVO billVO = orderService.calcOrderBill(order, orderDishesList).getData();
+                    OrderOverviewVO billVO = orderService.buildOrderOverview(order, orderDishesList).getData();
                     EnumOrderStatus orderStatus = EnumOrderStatus.of(order.getOrderStatus());
                     String status = orderStatus.remark;
                     jSONObjectOrder.put("status", status);

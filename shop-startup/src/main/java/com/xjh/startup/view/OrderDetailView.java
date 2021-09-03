@@ -25,7 +25,7 @@ import com.xjh.common.utils.Result;
 import com.xjh.common.utils.TableViewUtils;
 import com.xjh.common.utils.TimeRecord;
 import com.xjh.common.utils.cellvalue.RichText;
-import com.xjh.common.valueobject.OrderBillVO;
+import com.xjh.common.valueobject.OrderOverviewVO;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackage;
@@ -80,7 +80,7 @@ public class OrderDetailView extends VBox {
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
     DishesPackageService dishesPackageService = GuiceContainer.getInstance(DishesPackageService.class);
 
-    ObjectProperty<OrderBillVO> orderView = new SimpleObjectProperty<>();
+    ObjectProperty<OrderOverviewVO> orderView = new SimpleObjectProperty<>();
 
     public OrderDetailView(Desk desk, double width, double height) {
         TimeRecord cost = TimeRecord.start();
@@ -110,6 +110,7 @@ public class OrderDetailView extends VBox {
             tableNameLabel.setMinHeight(50);
             tableNameLabel.setFont(new Font(18));
             tableNameLabel.setAlignment(Pos.CENTER);
+            orderView.addListener((x, o, n) -> tableNameLabel.setText("桌号:" + n.getDeskName()));
             gridPane.add(tableNameLabel, 0, rowIndex, 4, 1);
             // 关台按钮
             Button closeDeskBtn = new Button("关台");
@@ -256,7 +257,7 @@ public class OrderDetailView extends VBox {
         this.getChildren().add(line);
     }
 
-    private Label createLabel(String name, double width, Function<OrderBillVO, String> onChage) {
+    private Label createLabel(String name, double width, Function<OrderOverviewVO, String> onChage) {
         double swdith = Math.max(200, width / 5 - 20);
 
         Label label = new Label(name);
@@ -342,7 +343,7 @@ public class OrderDetailView extends VBox {
     }
 
     private void loadAndRefreshOrderBill(Order order, List<OrderDishes> orderDishesList) {
-        Result<OrderBillVO> billRs = orderService.calcOrderBill(order, orderDishesList);
+        Result<OrderOverviewVO> billRs = orderService.buildOrderOverview(order, orderDishesList);
         if (billRs.isSuccess()) {
             orderView.set(billRs.getData());
         } else {
