@@ -88,6 +88,13 @@ public class DeskDAO {
                 desk.getDeskId());
     }
 
+    public int updateDeskByDeskId(Desk desk) throws Exception {
+        return Db.use(ds).update(
+                EntityUtils.create(desk),
+                EntityUtils.idCond(desk)
+        );
+    }
+
     public long getDeskLastUpdateTime(int deskId) {
         try {
             String sql = "select * from desk_add_or_remove_update where deskId='" + deskId + "'";

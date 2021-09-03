@@ -6,12 +6,14 @@ import java.util.List;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.enumeration.EnumPayStatus;
 import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
+import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderPay;
 import com.xjh.dao.mapper.OrderDAO;
@@ -26,6 +28,8 @@ public class OrderPayService {
     OrderDAO orderDAO;
     @Inject
     OrderService orderService;
+    @Inject
+    DeskService deskService;
 
     public Result<String> handlePaymentResult(PaymentResult paymentResult) {
         Runnable clear = CurrentRequest.resetRequestId();
@@ -60,7 +64,7 @@ public class OrderPayService {
                 Logger.error("保存支付信息失败: insert error >> " + payRs);
                 return Result.fail("保存支付明细失败");
             }
-            //
+            // 订单状态
             order.setOrderHadpaid(order.getOrderHadpaid() + orderPay.getAmount());
             if (Math.abs(notPaidBillAmount - paymentResult.getPayAmount()) <= 0.01) {
                 order.setOrderStatus(EnumOrderStatus.PAID.status);
@@ -71,6 +75,13 @@ public class OrderPayService {
             if (!updateRs.isSuccess()) {
                 Logger.error("更新订单支付结果失败: update error >> " + updateRs.getMsg());
                 return Result.fail("更新订单支付结果失败," + updateRs.getMsg());
+            }
+            // 餐桌状态
+            if (EnumOrderStatus.of(order.getOrderStatus()) == EnumOrderStatus.PAID) {
+                Desk updateDesk = new Desk();
+                updateDesk.setStatus(EnumDeskStatus.PAID.status());
+                updateDesk.setDeskId(order.getDeskId());
+                deskService.updateDeskByDeskId(updateDesk);
             }
             return Result.success("支付成功");
         } catch (Exception ex) {

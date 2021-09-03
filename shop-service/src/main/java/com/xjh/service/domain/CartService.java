@@ -220,6 +220,14 @@ public class CartService {
             clearCart(deskId);
             // 更新订单状态
             orderService.updateByOrderId(order);
+            // 餐桌状态
+            EnumOrderStatus orderStatus = EnumOrderStatus.of(order.getOrderStatus());
+            if (orderStatus == EnumOrderStatus.UNPAID || orderStatus == EnumOrderStatus.PARTIAL_PAID) {
+                Desk updateDesk = new Desk();
+                updateDesk.setStatus(EnumDeskStatus.IN_USE.status());
+                updateDesk.setDeskId(order.getDeskId());
+                deskService.updateDeskByDeskId(updateDesk);
+            }
             return Result.success("下单成功");
         } catch (Exception ex) {
             ex.printStackTrace();

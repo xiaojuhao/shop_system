@@ -94,6 +94,16 @@ public class DeskService {
         }
     }
 
+    public Result<Integer> updateDeskByDeskId(Desk desk) {
+        try {
+            int i = deskDAO.updateDeskByDeskId(desk);
+            return Result.success(i);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail(ex.getMessage());
+        }
+    }
+
     public Result<String> closeDesk(Integer deskId) {
         Runnable clear = CurrentRequest.resetRequestId();
         try {
