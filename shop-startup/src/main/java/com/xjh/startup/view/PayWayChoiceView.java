@@ -1,17 +1,21 @@
 package com.xjh.startup.view;
 
+import java.util.Optional;
+
 import com.xjh.common.enumeration.EnumOrderServeStatus;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Order;
-import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderPayService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.model.PaymentResult;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
+import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
+
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -19,11 +23,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.VBox;
 
-import java.util.Optional;
-
-public class PayWayChoiceView extends VBox {
+public class PayWayChoiceView extends SmallForm {
     OrderPayService orderPayService = GuiceContainer.getInstance(OrderPayService.class);
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
     DeskService deskService = GuiceContainer.getInstance(DeskService.class);
@@ -32,7 +33,7 @@ public class PayWayChoiceView extends VBox {
         FlowPane pane = new FlowPane();
         pane.setPadding(new Insets(10));
         pane.setHgap(10);
-        pane.setVgap(20);
+        pane.setVgap(10);
         pane.setPrefHeight(500);
 
         pane.getChildren().add(cashButtonAction("现金结账", param));

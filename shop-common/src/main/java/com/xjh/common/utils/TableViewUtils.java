@@ -3,6 +3,7 @@ package com.xjh.common.utils;
 import com.xjh.common.utils.cellvalue.InputNumber;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.RichText;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
@@ -14,7 +15,9 @@ public class TableViewUtils {
     public static <T> TableColumn<T, Object> newCol(String name, String filed, double width) {
         TableColumn<T, Object> c = new TableColumn<>(name);
         c.setStyle("-fx-border-width: 0px; ");
-        c.setMinWidth(width);
+        if (width > 0) {
+            c.setMinWidth(width);
+        }
         c.setCellValueFactory(new PropertyValueFactory<>(filed));
         c.setCellFactory(col -> {
             TableCell<T, Object> cell = new TableCell<>();

@@ -12,13 +12,18 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import com.xjh.common.utils.*;
 import org.apache.commons.collections4.CollectionUtils;
 
 import com.xjh.common.enumeration.EnumChoiceAction;
 import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
-import com.xjh.common.utils.cellvalue.Money;
+import com.xjh.common.utils.AlertBuilder;
+import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.CopyUtils;
+import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.Result;
+import com.xjh.common.utils.TableViewUtils;
+import com.xjh.common.utils.TimeRecord;
 import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.common.valueobject.OrderBillVO;
 import com.xjh.dao.dataobject.Desk;
@@ -32,6 +37,8 @@ import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
+import com.xjh.startup.view.base.MediumForm;
+import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.OrderDishesTableItemVO;
 
@@ -44,6 +51,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -226,7 +234,7 @@ public class OrderDetailView extends VBox {
             Button orderBtn = createButton("点菜", width, e -> openDishesChoiceView(deskOrderParam));
             Button sendBtn = createButton("送菜", width, e -> openSendDishesChoiceView(deskOrderParam));
             Button returnBtn = createButton("退菜", width, e -> returnDishesConfirm(deskOrderParam, tableView));
-            Button transferBtn = createButton("转台", width, null);
+            Button transferBtn = createButton("转台", width, e -> openDeskChangeView(deskOrderParam));
             Button splitBtn = createButton("拆台", width, null);
             Button payBillBtn = createButton("结账", width, evt -> openPayWayChoiceView(deskOrderParam));
             Button orderErase = createButton("抹零", width, evt -> openOrderEraseView(deskOrderParam));
@@ -377,14 +385,14 @@ public class OrderDetailView extends VBox {
         param.setChoiceAction(EnumChoiceAction.PLACE);
         String title = "点菜[桌号:" + param.getDeskName() + "]";
         double width = this.getScene().getWindow().getWidth() - 60;
-        openView(title, param, new OrderDishesChoiceView(param, width), 1);
+        openView(title, param, new OrderDishesChoiceView(param, width));
     }
 
     private void openSendDishesChoiceView(DeskOrderParam param) {
         param.setChoiceAction(EnumChoiceAction.SEND);
         String title = "送菜[桌号:" + param.getDeskName() + "]";
         double width = this.getScene().getWindow().getWidth() - 60;
-        openView(title, param, new OrderDishesChoiceView(param, width), 1);
+        openView(title, param, new OrderDishesChoiceView(param, width));
     }
 
     private void returnDishesConfirm(DeskOrderParam param, TableView<OrderDishesTableItemVO> tv) {
@@ -413,44 +421,63 @@ public class OrderDetailView extends VBox {
         param.setChoiceAction(EnumChoiceAction.RETURN);
         param.setReturnList(returnList);
         String title = "退菜[桌号:" + param.getDeskName() + "]";
-        openView(title, param, new OrderReturnDishesView(param), 3);
+        openView(title, param, new OrderReturnDishesView(param));
+    }
+
+    private void openDeskChangeView(DeskOrderParam param) {
+        param.setChoiceAction(EnumChoiceAction.NULL);
+        String title = "转台[桌号:" + param.getDeskName() + "]";
+        Stage stg = new Stage();
+        double width = this.getScene().getWindow().getWidth() * 0.4;
+        double height = this.getScene().getWindow().getHeight() * 0.68;
+        stg.initOwner(this.getScene().getWindow());
+        stg.initModality(Modality.WINDOW_MODAL);
+        stg.initStyle(StageStyle.DECORATED);
+        stg.centerOnScreen();
+        stg.setWidth(width);
+        stg.setHeight(height);
+        stg.setTitle(title);
+        stg.setScene(new Scene(new DeskChangeView(param)));
+        stg.showAndWait();
+        // 窗口关闭之后执行回调函数
+        CommonUtils.safeRun(param.getCallback());
     }
 
     private void openPayWayChoiceView(DeskOrderParam param) {
         param.setChoiceAction(EnumChoiceAction.NULL);
         String title = "结账[桌号:" + param.getDeskName() + "]";
-        openView(title, param, new PayWayChoiceView(param), 3);
+        openView(title, param, new PayWayChoiceView(param));
     }
 
     private void openOrderEraseView(DeskOrderParam param) {
         param.setChoiceAction(EnumChoiceAction.ERASE);
         String title = "抹零[桌号:" + param.getDeskName() + "]";
         VBox view = new OrderEraseView(param);
-        openView(title, param, view, 3);
+        openView(title, param, view);
     }
 
     private void openOrderReductionDialog(DeskOrderParam param) {
         param.setChoiceAction(EnumChoiceAction.NULL);
         String title = "店长减免[桌号:" + param.getDeskName() + "]";
         VBox view = new OrderReductionView(param);
-        openView(title, param, view, 3);
+        openView(title, param, view);
     }
 
     private void openDiscountSelectionDialog(DeskOrderParam param) {
         param.setChoiceAction(EnumChoiceAction.NULL);
         String title = "选择折扣[桌号:" + param.getDeskName() + "]";
         VBox view = new OrderDiscountSelectionView(param);
-        openView(title, param, view, 3);
+        openView(title, param, view);
     }
 
-    private void openView(String title, DeskOrderParam param, VBox view, int size) {
+    private void openView(String title, DeskOrderParam param, Parent node) {
         Stage stg = new Stage();
         double width = this.getScene().getWindow().getWidth() - 60;
         double height = this.getScene().getWindow().getHeight() - 100;
-        if (size == 2) {
+        if (node instanceof MediumForm) {
             width = this.getScene().getWindow().getWidth() / 2;
             height = this.getScene().getWindow().getHeight() / 2;
-        } else if (size == 3) {
+        } else if (node instanceof SmallForm) {
             width = this.getScene().getWindow().getWidth() / 3;
             height = this.getScene().getWindow().getHeight() / 3;
         }
@@ -461,7 +488,7 @@ public class OrderDetailView extends VBox {
         stg.setWidth(width);
         stg.setHeight(height);
         stg.setTitle(title);
-        stg.setScene(new Scene(view));
+        stg.setScene(new Scene(node));
         stg.showAndWait();
         // 窗口关闭之后执行回调函数
         CommonUtils.safeRun(param.getCallback());
