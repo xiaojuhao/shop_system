@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.codec.binary.Base64;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.CommonUtils;
@@ -91,7 +93,8 @@ public class DishesAttributeService {
         vo.setAllAttributeValues(new ArrayList<>());
         vo.setSelectedAttributeValues(new ArrayList<>());
         // allAttributeValues
-        JSONObject attrObj = JSONBuilder.toJSON(attr.getDishesAttributeObj());
+
+        JSONObject attrObj = JSONBuilder.toJSON(decodeBase64(attr.getDishesAttributeObj()));
         if (attrObj.containsKey("allAttributeValues")) {
             JSONArray values = attrObj.getJSONArray("allAttributeValues");
             for (int i = 0; i < values.size(); i++) {
@@ -112,5 +115,12 @@ public class DishesAttributeService {
             }
         }
         return vo;
+    }
+
+    private String decodeBase64(String str) {
+        if (str == null || str.length() == 0) {
+            return null;
+        }
+        return new String(Base64.decodeBase64(str));
     }
 }

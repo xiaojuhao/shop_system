@@ -13,6 +13,8 @@ public class DishesAttributeVO {
 
     Boolean isSync;
 
+    Long createTime;
+
     List<DishesAttributeValueVO> selectedAttributeValues;
 
     List<DishesAttributeValueVO> allAttributeValues;
@@ -71,5 +73,13 @@ public class DishesAttributeVO {
 
     public void setAllAttributeValues(List<DishesAttributeValueVO> allAttributeValues) {
         this.allAttributeValues = allAttributeValues;
+    }
+
+    public Long getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Long createTime) {
+        this.createTime = createTime;
     }
 }

@@ -11,6 +11,12 @@ public class JSONBuilder {
         if (obj instanceof String && CommonUtils.isBlank(obj.toString())) {
             return new JSONObject();
         }
+        if (obj instanceof JSONObject) {
+            return (JSONObject) obj;
+        }
+        if (obj instanceof String) {
+            return JSON.parseObject((String) obj);
+        }
         return JSON.parseObject(JSON.toJSONString(obj));
     }
 }
