@@ -1,12 +1,18 @@
 package com.xjh.startup.view;
 
-import cn.hutool.core.lang.Holder;
+import static com.xjh.common.utils.CommonUtils.collect;
+import static com.xjh.common.utils.CommonUtils.sleep;
+
+import java.util.List;
+
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.ThreadUtils;
 import com.xjh.common.utils.TimeRecord;
 import com.xjh.dao.dataobject.Desk;
-import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.service.domain.DeskService;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
+
+import cn.hutool.core.lang.Holder;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -16,11 +22,6 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Screen;
-
-import java.util.List;
-
-import static com.xjh.common.utils.CommonUtils.collect;
-import static com.xjh.common.utils.CommonUtils.sleep;
 
 public class DeskListView extends ScrollPane{
     private final static double padding = 10;
