@@ -87,7 +87,11 @@ public class PayWayChoiceView extends SmallForm {
         _alert.setHeaderText("逃单处理");
         Optional<ButtonType> _buttonType = _alert.showAndWait();
         if (_buttonType.get().getButtonData().equals(ButtonBar.ButtonData.YES)) {
-            this.updateOrderStatusAndCloseDesk(param, EnumOrderStatus.ESCAPE);
+            Order updateOrder = new Order();
+            updateOrder.setOrderId(param.getOrderId());
+            updateOrder.setOrderStatus(EnumOrderStatus.ESCAPE.status);
+            updateOrder.setStatus(EnumOrderServeStatus.END.status);
+            this.updateOrderStatusAndCloseDesk(updateOrder);
         }
     }
 
@@ -100,7 +104,11 @@ public class PayWayChoiceView extends SmallForm {
         _alert.setHeaderText("免单处理");
         Optional<ButtonType> _buttonType = _alert.showAndWait();
         if (_buttonType.get().getButtonData().equals(ButtonBar.ButtonData.YES)) {
-            this.updateOrderStatusAndCloseDesk(param, EnumOrderStatus.FREE);
+            Order updateOrder = new Order();
+            updateOrder.setOrderId(param.getOrderId());
+            updateOrder.setOrderStatus(EnumOrderStatus.FREE.status);
+            updateOrder.setStatus(EnumOrderServeStatus.END.status);
+            this.updateOrderStatusAndCloseDesk(updateOrder);
         }
     }
 
@@ -108,20 +116,14 @@ public class PayWayChoiceView extends SmallForm {
         AlertBuilder.ERROR("功能还未实现。。。");
     }
 
-    private void updateOrderStatusAndCloseDesk(DeskOrderParam param, EnumOrderStatus status) {
-        Order order = orderService.getOrder(param.getOrderId());
-        // 更新订单状态
-        Order updateOrder = new Order();
-        updateOrder.setOrderId(order.getOrderId());
-        updateOrder.setOrderStatus(status.status);
-        updateOrder.setStatus(EnumOrderServeStatus.END.status);
-        Result<Integer> updateOrderRs = orderService.updateByOrderId(updateOrder);
+    private void updateOrderStatusAndCloseDesk(Order order) {
+        Result<Integer> updateOrderRs = orderService.updateByOrderId(order);
         if (!updateOrderRs.isSuccess()) {
             AlertBuilder.ERROR(updateOrderRs.getMsg());
             return;
         }
         // 关台
-        Result<String> closeDeskRs = deskService.closeDesk(param.getDeskId());
+        Result<String> closeDeskRs = deskService.closeDesk(order.getDeskId());
         if (!closeDeskRs.isSuccess()) {
             AlertBuilder.ERROR(closeDeskRs.getMsg());
             return;
