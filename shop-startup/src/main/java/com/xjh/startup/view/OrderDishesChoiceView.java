@@ -71,12 +71,12 @@ public class OrderDishesChoiceView extends VBox {
     DishesPackageDAO dishesPackageDAO = GuiceContainer.getInstance(DishesPackageDAO.class);
     CartService cartService = GuiceContainer.getInstance(CartService.class);
 
-    private final DeskOrderParam data;
+    private final DeskOrderParam param;
     private final SimpleIntegerProperty cartSize = new SimpleIntegerProperty(0);
     private final ObjectProperty<DishesQueryCond> qryDishesCond = new SimpleObjectProperty<>();
 
-    public OrderDishesChoiceView(DeskOrderParam data, double prefWidth) {
-        this.data = data;
+    public OrderDishesChoiceView(DeskOrderParam param, double prefWidth) {
+        this.param = param;
         this.getChildren().add(topMenus());
         this.getChildren().add(separator());
         this.getChildren().add(initDishesView(prefWidth));
@@ -97,7 +97,7 @@ public class OrderDishesChoiceView extends VBox {
         commonType.setSelected(true);
         hbox.getChildren().add(commonType);
         // 送菜不展示套餐
-        if (data.getChoiceAction() != EnumChoiceAction.SEND) {
+        if (param.getChoiceAction() != EnumChoiceAction.SEND) {
             RadioButton packageType = new RadioButton("套餐");
             packageType.setToggleGroup(toggleGroup);
             packageType.setUserData(1);
@@ -143,15 +143,15 @@ public class OrderDishesChoiceView extends VBox {
             cartStage.centerOnScreen();
             cartStage.setWidth(this.getScene().getWindow().getWidth() - 10);
             cartStage.setHeight(this.getScene().getWindow().getHeight() - 100);
-            cartStage.setTitle("购物车[桌号:" + data.getDeskName() + "]");
-            cartStage.setScene(new Scene(new CartView(data)));
+            cartStage.setTitle("购物车[桌号:" + param.getDeskName() + "]");
+            cartStage.setScene(new Scene(new CartView(param)));
             cartStage.showAndWait();
             refreshCartSize();
         });
         hbox.getChildren().add(cartBtn);
 
         // 下单按钮(赠送时不展示)
-        if (data.getChoiceAction() != EnumChoiceAction.SEND) {
+        if (param.getChoiceAction() != EnumChoiceAction.SEND) {
             Button placeOrder = new Button("直接下单");
             placeOrder.setOnMouseClicked(evt -> createOrderFromCart());
             hbox.getChildren().add(placeOrder);
@@ -240,9 +240,9 @@ public class OrderDishesChoiceView extends VBox {
 
     private DishesChoiceItemBO buildBO(Dishes dishes) {
         DishesChoiceItemBO bo = new DishesChoiceItemBO();
-        bo.setOrderId(data.getOrderId());
-        bo.setDeskId(data.getDeskId());
-        bo.setDeskName(data.getDeskName());
+        bo.setOrderId(param.getOrderId());
+        bo.setDeskId(param.getDeskId());
+        bo.setDeskName(param.getDeskName());
 
         bo.setImg(dishesService.getDishesImageUrl(dishes));
         bo.setDishesId(dishes.getDishesId());
@@ -259,9 +259,9 @@ public class OrderDishesChoiceView extends VBox {
         if (CommonUtils.isNotEmpty(imgs)) {
             img = imgs.get(0).getImageSrc();
         }
-        bo.setOrderId(data.getOrderId());
-        bo.setDeskId(data.getDeskId());
-        bo.setDeskName(data.getDeskName());
+        bo.setOrderId(param.getOrderId());
+        bo.setDeskId(param.getDeskId());
+        bo.setDeskName(param.getDeskName());
         bo.setImg(img);
         bo.setDishesPackageId(dishes.getDishesPackageId());
         bo.setDishesName(dishes.getDishesPackageName());
@@ -278,7 +278,7 @@ public class OrderDishesChoiceView extends VBox {
         box.setOnMouseClicked(evt -> {
             if (ClickHelper.isDblClick()) {
                 // 赠送
-                if (data.getChoiceAction() == EnumChoiceAction.SEND) {
+                if (param.getChoiceAction() == EnumChoiceAction.SEND) {
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                     alert.setTitle("送菜");
                     alert.setHeaderText("确定给用户送菜吗?");
@@ -291,6 +291,7 @@ public class OrderDishesChoiceView extends VBox {
                     if (!sendRs.isSuccess()) {
                         AlertBuilder.ERROR(sendRs.getMsg());
                     }
+                    this.getScene().getWindow().hide();
                 }
                 // 打开套餐
                 else if (bo.getIfPackage() == 1) {
@@ -324,7 +325,7 @@ public class OrderDishesChoiceView extends VBox {
         stage.centerOnScreen();
         stage.setWidth(this.getScene().getWindow().getWidth() / 2);
         stage.setHeight(this.getScene().getWindow().getHeight() / 3 * 2);
-        stage.setTitle("点菜[桌号:" + data.getDeskName() + "]");
+        stage.setTitle("点菜[桌号:" + param.getDeskName() + "]");
         stage.setScene(new Scene(new PackageDishesChoiceView(bo, this::addCartItem)));
         stage.showAndWait();
     }
@@ -335,7 +336,7 @@ public class OrderDishesChoiceView extends VBox {
                 "PackageId=" + bo.getDishesPackageId() + "," +
                 bo.getDishesName() + ", " +
                 (bo.getIfPackage() == 0 ? "普通菜品" : "套餐")
-                + CommonUtils.reflectString(data));
+                + CommonUtils.reflectString(param));
         CartItemVO cartItem = new CartItemVO();
         if (bo.getIfPackage() == 1) {
             cartItem.setDishesId(bo.getDishesPackageId());
@@ -351,7 +352,7 @@ public class OrderDishesChoiceView extends VBox {
 
     private void addCartItem(CartItemVO cartItem) {
         try {
-            Result<CartVO> addCartRs = cartService.addItem(data.getDeskId(), cartItem);
+            Result<CartVO> addCartRs = cartService.addItem(param.getDeskId(), cartItem);
             Logger.info("购物车信息:" + JSON.toJSONString(addCartRs));
             if (addCartRs.isSuccess()) {
                 AlertBuilder.INFO("通知消息", "添加购物车成功");
@@ -367,8 +368,8 @@ public class OrderDishesChoiceView extends VBox {
     private void createOrderFromCart() {
         try {
             PlaceOrderFromCartReq req = new PlaceOrderFromCartReq();
-            req.setDeskId(data.getDeskId());
-            req.setOrderId(data.getOrderId());
+            req.setDeskId(param.getDeskId());
+            req.setOrderId(param.getOrderId());
             Result<String> createOrderRs = cartService.createOrder(req);
             if (createOrderRs.isSuccess()) {
                 refreshCartSize();
@@ -416,7 +417,7 @@ public class OrderDishesChoiceView extends VBox {
 
     private void refreshCartSize() {
         try {
-            cartSize.set(cartService.getCartItems(data.getDeskId()).size());
+            cartSize.set(cartService.getCartItems(param.getDeskId()).size());
         } catch (Exception ex) {
             Logger.error(ex.getMessage());
         }
