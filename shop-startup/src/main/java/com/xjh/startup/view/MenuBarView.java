@@ -2,6 +2,7 @@ package com.xjh.startup.view;
 
 import com.xjh.startup.foundation.constants.CurrentAccount;
 import com.xjh.startup.foundation.constants.MainStageHolder;
+import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.LargeForm;
 import com.xjh.startup.view.base.MediumForm;
 
@@ -130,17 +131,20 @@ public class MenuBarView {
             width = sceneWindow.getWidth() * 0.6;
             height = sceneWindow.getHeight() * 0.6;
         }
-        Stage orderInfo = new Stage();
-        orderInfo.initOwner(sceneWindow);
-        orderInfo.initModality(Modality.WINDOW_MODAL);
-        orderInfo.initStyle(StageStyle.DECORATED);
-        orderInfo.centerOnScreen();
-        orderInfo.setWidth(width);
-        orderInfo.setHeight(height);
-        orderInfo.setTitle(title);
+        Stage stage = new Stage();
+        stage.initOwner(sceneWindow);
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initStyle(StageStyle.DECORATED);
+        stage.centerOnScreen();
+        stage.setWidth(width);
+        stage.setHeight(height);
+        stage.setTitle(title);
         if (content != null) {
-            orderInfo.setScene(new Scene(content));
+            stage.setScene(new Scene(content));
+            if (content instanceof Initializable) {
+                ((Initializable) content).initialize();
+            }
         }
-        orderInfo.showAndWait();
+        stage.showAndWait();
     }
 }

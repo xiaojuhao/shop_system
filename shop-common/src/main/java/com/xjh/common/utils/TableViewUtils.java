@@ -2,6 +2,7 @@ package com.xjh.common.utils;
 
 import com.xjh.common.utils.cellvalue.InputNumber;
 import com.xjh.common.utils.cellvalue.Money;
+import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.utils.cellvalue.RichText;
 
 import javafx.scene.control.Button;
@@ -44,8 +45,8 @@ public class TableViewUtils {
                     if (val.getPos() != null) {
                         cell.setAlignment(val.getPos());
                     }
-                } else if(nv instanceof InputNumber){
-                    InputNumber number = (InputNumber)nv;
+                } else if (nv instanceof InputNumber) {
+                    InputNumber number = (InputNumber) nv;
                     HBox group = new HBox();
                     Label label = new Label(number.toString());
                     label.setPrefWidth(60);
@@ -53,23 +54,28 @@ public class TableViewUtils {
                     plus.setOnMouseClicked(evt -> {
                         number.setNumber(number.getNumber() + 1);
                         label.setText(number.toString());
-                        if(number.getOnChange() != null){
+                        if (number.getOnChange() != null) {
                             number.getOnChange().accept(number.getNumber());
                         }
                     });
                     Button minus = new Button("-");
                     minus.setOnMouseClicked(evt -> {
-                        if(number.getNumber() <= 1){
+                        if (number.getNumber() <= 1) {
                             return;
                         }
                         number.setNumber(number.getNumber() - 1);
                         label.setText(number.toString());
-                        if(number.getOnChange() != null){
+                        if (number.getOnChange() != null) {
                             number.getOnChange().accept(number.getNumber());
                         }
                     });
                     group.getChildren().addAll(label, plus, minus);
                     cell.setGraphic(group);
+                } else if (nv instanceof OperationButton) {
+                    OperationButton ob = (OperationButton) nv;
+                    Button op = new Button(ob.getTitle());
+                    op.setOnMouseClicked(evt -> CommonUtils.safeRun(ob.getAction()));
+                    cell.setGraphic(op);
                 } else {
                     cell.textProperty().set(CommonUtils.stringify(nv));
                 }
