@@ -5,15 +5,13 @@ import static com.xjh.common.utils.TableViewUtils.newCol;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.xjh.common.utils.DateBuilder;
-import com.xjh.common.utils.cellvalue.OperationButton;
-import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesAttributeValueVO;
 import com.xjh.service.domain.DishesAttributeService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.LargeForm;
+import com.xjh.startup.view.model.DishesAttributeBO;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -31,7 +29,7 @@ import javafx.stage.Window;
 public class DishesAttributeManageView extends LargeForm implements Initializable {
     DishesAttributeService dishesAttributeService = GuiceContainer.getInstance(DishesAttributeService.class);
 
-    TableView<TableItemBO> attrPane = new TableView<>();
+    TableView<DishesAttributeBO> attrPane = new TableView<>();
     TableView<DishesAttributeValueVO> attrValuePane = new TableView<>();
 
     public DishesAttributeManageView() {
@@ -44,6 +42,10 @@ public class DishesAttributeManageView extends LargeForm implements Initializabl
     }
 
     public void initialize() {
+        loadData();
+    }
+
+    private void loadData() {
         attrPane.setItems(loadAll(DishesAttributeManageView.this.getScene().getWindow()));
         attrPane.refresh();
     }
@@ -85,105 +87,26 @@ public class DishesAttributeManageView extends LargeForm implements Initializabl
         return pane;
     }
 
-    public ObservableList<TableItemBO> loadAll(Window window) {
+    public ObservableList<DishesAttributeBO> loadAll(Window window) {
         List<DishesAttributeVO> allAttrs = dishesAttributeService.selectAll();
         return FXCollections.observableArrayList(allAttrs.stream()
-                .map(it -> new TableItemBO(it, window))
+                .map(it -> new DishesAttributeBO(it, () -> this.showEditView(window)))
                 .collect(Collectors.toList()));
     }
 
-    public static class TableItemBO {
-        public TableItemBO(DishesAttributeVO vo, Window pwindown) {
-            this.dishesAttributeId = vo.getDishesAttributeId();
-            this.dishesAttributeName = vo.getDishesAttributeName();
-            this.dishesAttributeMarkInfo = vo.getDishesAttributeMarkInfo();
-            if (vo.getIsValueRadio() != null && vo.getIsValueRadio()) {
-                this.isValueRadio = RichText.create("单选");
-            } else {
-                this.isValueRadio = RichText.create("多选");
-            }
-            this.createTime = RichText.create(DateBuilder.base(vo.getCreateTime()).timeStr());
-            this.attachment = vo;
-            this.operation = new OperationButton();
-            this.operation.setTitle("编辑");
-            this.operation.setAction(() -> {
-                double width = pwindown.getWidth() * 0.9;
-                double height = pwindown.getHeight() * 0.9;
-                Stage stg = new Stage();
-                stg.initOwner(pwindown);
-                stg.initModality(Modality.WINDOW_MODAL);
-                stg.initStyle(StageStyle.DECORATED);
-                stg.centerOnScreen();
-                stg.setWidth(width);
-                stg.setHeight(height);
-                stg.setTitle("属性信息");
-                stg.setScene(new Scene(new DishesAttributeEditView()));
-                stg.showAndWait();
-            });
-        }
-
-        Integer dishesAttributeId;
-        String dishesAttributeName;
-        String dishesAttributeMarkInfo;
-        RichText isValueRadio;
-        RichText createTime;
-        OperationButton operation;
-        DishesAttributeVO attachment;
-
-        public Integer getDishesAttributeId() {
-            return dishesAttributeId;
-        }
-
-        public void setDishesAttributeId(Integer dishesAttributeId) {
-            this.dishesAttributeId = dishesAttributeId;
-        }
-
-        public String getDishesAttributeName() {
-            return dishesAttributeName;
-        }
-
-        public void setDishesAttributeName(String dishesAttributeName) {
-            this.dishesAttributeName = dishesAttributeName;
-        }
-
-        public String getDishesAttributeMarkInfo() {
-            return dishesAttributeMarkInfo;
-        }
-
-        public void setDishesAttributeMarkInfo(String dishesAttributeMarkInfo) {
-            this.dishesAttributeMarkInfo = dishesAttributeMarkInfo;
-        }
-
-        public RichText getIsValueRadio() {
-            return isValueRadio;
-        }
-
-        public void setIsValueRadio(RichText isValueRadio) {
-            this.isValueRadio = isValueRadio;
-        }
-
-        public RichText getCreateTime() {
-            return createTime;
-        }
-
-        public void setCreateTime(RichText createTime) {
-            this.createTime = createTime;
-        }
-
-        public void setAttachment(DishesAttributeVO attachment) {
-            this.attachment = attachment;
-        }
-
-        public DishesAttributeVO getAttachment() {
-            return attachment;
-        }
-
-        public OperationButton getOperation() {
-            return operation;
-        }
-
-        public void setOperation(OperationButton operation) {
-            this.operation = operation;
-        }
+    public void showEditView(Window window) {
+        double width = window.getWidth() * 0.9;
+        double height = window.getHeight() * 0.9;
+        Stage stg = new Stage();
+        stg.initOwner(window);
+        stg.initModality(Modality.WINDOW_MODAL);
+        stg.initStyle(StageStyle.DECORATED);
+        stg.centerOnScreen();
+        stg.setWidth(width);
+        stg.setHeight(height);
+        stg.setTitle("属性信息");
+        stg.setScene(new Scene(new DishesAttributeEditView()));
+        stg.showAndWait();
     }
+
 }
