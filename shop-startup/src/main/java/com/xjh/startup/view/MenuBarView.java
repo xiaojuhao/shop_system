@@ -2,6 +2,7 @@ package com.xjh.startup.view;
 
 import com.xjh.startup.foundation.constants.CurrentAccount;
 import com.xjh.startup.foundation.constants.MainStageHolder;
+import com.xjh.startup.view.base.MediumForm;
 
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -121,7 +122,10 @@ public class MenuBarView {
         Window sceneWindow = MainStageHolder.get().getScene().getWindow();
         double width = sceneWindow.getWidth() / 10 * 9;
         double height = sceneWindow.getHeight() / 10 * 9;
-
+        if (content instanceof MediumForm) {
+            width = sceneWindow.getWidth() / 2;
+            height = sceneWindow.getHeight() / 2;
+        }
         Stage orderInfo = new Stage();
         orderInfo.initOwner(sceneWindow);
         orderInfo.initModality(Modality.WINDOW_MODAL);

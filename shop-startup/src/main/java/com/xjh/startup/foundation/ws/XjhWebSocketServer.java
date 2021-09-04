@@ -1,19 +1,20 @@
 package com.xjh.startup.foundation.ws;
 
+import java.net.InetSocketAddress;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.java_websocket.WebSocket;
+import org.java_websocket.handshake.ClientHandshake;
+import org.java_websocket.server.WebSocketServer;
+
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.ws.WsApiType;
 import com.xjh.ws.WsHandler;
-import org.java_websocket.WebSocket;
-import org.java_websocket.handshake.ClientHandshake;
-import org.java_websocket.server.WebSocketServer;
-
-import java.net.InetSocketAddress;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class XjhWebSocketServer extends WebSocketServer {
     private final Map<String, WsHandler> handlers = new ConcurrentHashMap<>();
@@ -94,9 +95,12 @@ public class XjhWebSocketServer extends WebSocketServer {
 
     @Override
     public void onError(WebSocket webSocket, Exception e) {
-        String uuid = webSocket.getAttachment();
-        Logger.info(uuid + " >> socket出现了异常, 关闭链接" + e);
-        webSocket.close();
+        e.printStackTrace();
+        if (webSocket != null) {
+            String uuid = webSocket.getAttachment();
+            Logger.info(uuid + " >> socket出现了异常, 关闭链接" + e);
+            webSocket.close();
+        }
     }
 
     @Override
