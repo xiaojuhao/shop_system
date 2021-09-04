@@ -53,7 +53,7 @@ public class DishesAttributeManageView extends SimpleForm {
             } else {
                 this.isValueRadio = RichText.create("多选");
             }
-            this.createTime = RichText.create(DateBuilder.base(vo.getCreateTime()));
+            this.createTime = RichText.create(DateBuilder.base(vo.getCreateTime()).timeStr());
         }
 
         Integer dishesAttributeId;
