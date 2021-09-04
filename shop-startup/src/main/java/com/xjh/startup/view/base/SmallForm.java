@@ -5,20 +5,19 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 
-public class SmallForm extends VBox {
+public class SmallForm extends SimpleForm {
 
-    public SmallForm(){
+    public SmallForm() {
         this.setAlignment(Pos.CENTER);
         this.setSpacing(15);
     }
 
-    public void addLine(Node node){
+    public void addLine(Node node) {
         this.getChildren().add(node);
     }
 
-    public HBox newDefaultLine(Node... nodes){
+    public HBox newDefaultLine(Node... nodes) {
         HBox line = new HBox();
         line.setAlignment(Pos.CENTER);
         line.setSpacing(10);
@@ -28,7 +27,7 @@ public class SmallForm extends VBox {
         return line;
     }
 
-    public HBox newLine(Node... nodes){
+    public HBox newLine(Node... nodes) {
         HBox line = new HBox();
         line.setAlignment(Pos.CENTER);
         line.setSpacing(10);
@@ -44,7 +43,7 @@ public class SmallForm extends VBox {
         return textField;
     }
 
-    public Label createLabel(String text){
+    public Label createLabel(String text) {
         return new Label(text);
     }
 }

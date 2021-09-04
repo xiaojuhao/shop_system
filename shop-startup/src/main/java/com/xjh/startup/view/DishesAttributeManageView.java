@@ -11,7 +11,7 @@ import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesAttributeValueVO;
 import com.xjh.service.domain.DishesAttributeService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
-import com.xjh.startup.view.base.MediumForm;
+import com.xjh.startup.view.base.LargeForm;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,7 +21,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableView;
 
-public class DishesAttributeManageView extends MediumForm {
+public class DishesAttributeManageView extends LargeForm {
     DishesAttributeService dishesAttributeService = GuiceContainer.getInstance(DishesAttributeService.class);
 
     TableView<TableItemBO> attrPane = new TableView<>();

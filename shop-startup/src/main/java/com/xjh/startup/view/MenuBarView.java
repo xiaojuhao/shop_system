@@ -2,6 +2,7 @@ package com.xjh.startup.view;
 
 import com.xjh.startup.foundation.constants.CurrentAccount;
 import com.xjh.startup.foundation.constants.MainStageHolder;
+import com.xjh.startup.view.base.LargeForm;
 import com.xjh.startup.view.base.MediumForm;
 
 import javafx.scene.Parent;
@@ -120,11 +121,14 @@ public class MenuBarView {
 
     private void openView(String title, Parent content) {
         Window sceneWindow = MainStageHolder.get().getScene().getWindow();
-        double width = sceneWindow.getWidth() / 10 * 9;
-        double height = sceneWindow.getHeight() / 10 * 9;
-        if (content instanceof MediumForm) {
-            width = sceneWindow.getWidth() / 2;
-            height = sceneWindow.getHeight() / 2;
+        double width = sceneWindow.getWidth() * 0.9;
+        double height = sceneWindow.getHeight() * 0.9;
+        if (content instanceof LargeForm) {
+            width = sceneWindow.getWidth() * 0.8;
+            height = sceneWindow.getHeight() * 0.8;
+        } else if (content instanceof MediumForm) {
+            width = sceneWindow.getWidth() * 0.6;
+            height = sceneWindow.getHeight() * 0.6;
         }
         Stage orderInfo = new Stage();
         orderInfo.initOwner(sceneWindow);

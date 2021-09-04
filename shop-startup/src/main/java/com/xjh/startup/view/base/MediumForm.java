@@ -5,9 +5,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 
-public class MediumForm extends VBox {
+public class MediumForm extends SimpleForm {
 
     public MediumForm() {
         this.setAlignment(Pos.CENTER);
