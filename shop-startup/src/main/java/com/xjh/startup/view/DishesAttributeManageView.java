@@ -46,7 +46,7 @@ public class DishesAttributeManageView extends LargeForm implements Initializabl
     }
 
     private void loadData() {
-        attrPane.setItems(loadAll(DishesAttributeManageView.this.getScene().getWindow()));
+        attrPane.setItems(loadAll(this.getScene().getWindow()));
         attrPane.refresh();
     }
 
