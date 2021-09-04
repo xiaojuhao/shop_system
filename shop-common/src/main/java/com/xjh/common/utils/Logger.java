@@ -32,7 +32,7 @@ public class Logger {
         append("ERROR", msg);
     }
 
-    public static void existing(){
+    public static void exiting(){
         exiting.set(true);
         doFlush(logWriter);
     }
