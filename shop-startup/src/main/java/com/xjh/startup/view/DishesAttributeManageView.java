@@ -90,13 +90,13 @@ public class DishesAttributeManageView extends LargeForm implements Initializabl
     public ObservableList<DishesAttributeBO> loadAll(Window window) {
         List<DishesAttributeVO> allAttrs = dishesAttributeService.selectAll();
         return FXCollections.observableArrayList(allAttrs.stream()
-                .map(it -> new DishesAttributeBO(it, () -> this.showEditView(window)))
+                .map(it -> new DishesAttributeBO(it, () -> this.showEditView(it, window)))
                 .collect(Collectors.toList()));
     }
 
-    public void showEditView(Window window) {
-        double width = window.getWidth() * 0.9;
-        double height = window.getHeight() * 0.9;
+    public void showEditView(DishesAttributeVO attr, Window window) {
+        double width = window.getWidth() * 0.6;
+        double height = window.getHeight() * 0.6;
         Stage stg = new Stage();
         stg.initOwner(window);
         stg.initModality(Modality.WINDOW_MODAL);
@@ -105,7 +105,7 @@ public class DishesAttributeManageView extends LargeForm implements Initializabl
         stg.setWidth(width);
         stg.setHeight(height);
         stg.setTitle("属性信息");
-        stg.setScene(new Scene(new DishesAttributeEditView()));
+        stg.setScene(new Scene(new DishesAttributeEditView(attr)));
         stg.showAndWait();
     }
 
