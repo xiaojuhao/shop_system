@@ -3,6 +3,7 @@ package com.xjh.startup.view;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.TableViewUtils;
 import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.common.valueobject.DishesAttributeVO;
@@ -29,7 +30,8 @@ public class DishesAttributeManageView extends SimpleForm {
                 TableViewUtils.newCol("ID", "dishesAttributeId", 100),
                 TableViewUtils.newCol("属性名称", "dishesAttributeName", 100),
                 TableViewUtils.newCol("备注", "dishesAttributeMarkInfo", 300),
-                TableViewUtils.newCol("类型", "isValueRadio", 160)
+                TableViewUtils.newCol("类型", "isValueRadio", 160),
+                TableViewUtils.newCol("创建时间", "createTime", 160)
         );
         tableView.setItems(loadAll());
         tableView.refresh();
@@ -51,7 +53,7 @@ public class DishesAttributeManageView extends SimpleForm {
             } else {
                 this.isValueRadio = RichText.create("多选");
             }
-
+            this.createTime = RichText.create(DateBuilder.base(vo.getCreateTime()));
         }
 
         Integer dishesAttributeId;
