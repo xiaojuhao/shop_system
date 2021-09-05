@@ -102,8 +102,8 @@ public class DishesAttributeManageView extends LargeForm implements Initializabl
         stg.initModality(Modality.WINDOW_MODAL);
         stg.initStyle(StageStyle.DECORATED);
         stg.centerOnScreen();
-        stg.setWidth(width);
-        stg.setHeight(height);
+        //        stg.setWidth(width);
+        //        stg.setHeight(height);
         stg.setTitle("属性信息");
         stg.setScene(new Scene(new DishesAttributeEditView(attr)));
         stg.showAndWait();
