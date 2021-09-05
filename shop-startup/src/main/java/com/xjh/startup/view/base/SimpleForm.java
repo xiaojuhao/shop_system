@@ -6,6 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 public class SimpleForm extends VBox {
@@ -13,9 +14,10 @@ public class SimpleForm extends VBox {
         this.getChildren().add(node);
     }
 
-    public HBox newLine(Pane title, Pane content){
-        HBox line = new HBox();
-        return line;
+    public void addPairLine(Region title, double titleWidth, Region content, double contentWidth){
+        title.setPrefWidth(titleWidth);
+        content.setPrefWidth(contentWidth);
+        addLine(newLine(title, content));
     }
 
     public HBox newLine(Node... nodes) {
