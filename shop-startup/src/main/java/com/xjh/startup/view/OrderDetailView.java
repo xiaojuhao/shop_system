@@ -40,7 +40,7 @@ import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.MediumForm;
 import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
-import com.xjh.startup.view.model.OrderDishesTableItemVO;
+import com.xjh.startup.view.model.OrderDishesTableItemBO;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -85,7 +85,7 @@ public class OrderDetailView extends VBox {
     public OrderDetailView(Desk desk, double width, double height) {
         TimeRecord cost = TimeRecord.start();
         Integer orderId = desk.getOrderId();
-        TableView<OrderDishesTableItemVO> tableView = new TableView<>();
+        TableView<OrderDishesTableItemBO> tableView = new TableView<>();
         Runnable refreshView = () -> {
             Order order = orderService.getOrder(orderId);
             List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(orderId);
@@ -282,7 +282,7 @@ public class OrderDetailView extends VBox {
         return btn;
     }
 
-    private ObservableList<OrderDishesTableItemVO> buildTableItemList(List<OrderDishes> orderDishes) {
+    private ObservableList<OrderDishesTableItemBO> buildTableItemList(List<OrderDishes> orderDishes) {
         // 可折扣的菜品信息
         Predicate<OrderDishes> discountableChecker = orderDishesService.discountableChecker();
         // 订单菜品明细
@@ -291,7 +291,7 @@ public class OrderDetailView extends VBox {
         List<Integer> dishesIdList = CommonUtils.collect(orderDishes, OrderDishes::getDishesId);
         // 菜品明细
         Map<Integer, Dishes> dishesMap = dishesService.getByIdsAsMap(dishesIdList);
-        List<OrderDishesTableItemVO> items = new ArrayList<>();
+        List<OrderDishesTableItemBO> items = new ArrayList<>();
         List<OrderDishes> discountableList = CommonUtils.filter(orderDishes, discountableChecker);
         List<OrderDishes> nonDiscountableList = CommonUtils.filter(orderDishes, discountableChecker.negate());
         if (CommonUtils.isNotEmpty(discountableList)) {
@@ -301,7 +301,7 @@ public class OrderDetailView extends VBox {
             double discountableAmount = sumDishesPrice(discountableList);
             orderView.get().discountableAmount = discountableAmount;
             orderView.set(CopyUtils.cloneObj(orderView.get()));
-            items.add(new OrderDishesTableItemVO(
+            items.add(new OrderDishesTableItemBO(
                     "",
                     "",
                     RichText.EMPTY,
@@ -311,7 +311,7 @@ public class OrderDetailView extends VBox {
                     RichText.EMPTY));
         }
         if (CommonUtils.isNotEmpty(nonDiscountableList)) {
-            items.add(new OrderDishesTableItemVO(
+            items.add(new OrderDishesTableItemBO(
                     "",
                     "",
                     new RichText("以下为不参与优惠活动菜品").with(Color.RED).with(Pos.CENTER_RIGHT),
@@ -322,14 +322,14 @@ public class OrderDetailView extends VBox {
             // 不参加优惠的菜品
             nonDiscountableList.forEach(o -> {
                 // 构建菜品展示明细
-                OrderDishesTableItemVO vo = buildTableItem(dishesMap.get(o.getDishesId()), o);
+                OrderDishesTableItemBO vo = buildTableItem(dishesMap.get(o.getDishesId()), o);
                 vo.getDishesName().with(Color.RED);
                 vo.getPrice().with(Color.RED);
                 vo.getDiscountPrice().with(Color.RED);
                 items.add(vo);
             });
             // 不可参与优惠的价格合计
-            items.add(new OrderDishesTableItemVO(
+            items.add(new OrderDishesTableItemBO(
                     "",
                     "",
                     RichText.EMPTY,
@@ -396,8 +396,8 @@ public class OrderDetailView extends VBox {
         openView(title, param, new OrderDishesChoiceView(param, width));
     }
 
-    private void returnDishesConfirm(DeskOrderParam param, TableView<OrderDishesTableItemVO> tv) {
-        ObservableList<OrderDishesTableItemVO> list = tv.getSelectionModel().getSelectedItems();
+    private void returnDishesConfirm(DeskOrderParam param, TableView<OrderDishesTableItemBO> tv) {
+        ObservableList<OrderDishesTableItemBO> list = tv.getSelectionModel().getSelectedItems();
         if (CollectionUtils.isEmpty(list)) {
             AlertBuilder.ERROR("请选择退菜记录");
             return;
@@ -527,13 +527,13 @@ public class OrderDetailView extends VBox {
         return null;
     }
 
-    private OrderDishesTableItemVO buildTableItem(Dishes dishes, OrderDishes orderDishes) {
+    private OrderDishesTableItemBO buildTableItem(Dishes dishes, OrderDishes orderDishes) {
         EnumOrderSaleType saleType = EnumOrderSaleType.of(orderDishes.getOrderDishesSaletype());
         RichText saleTypeText = new RichText(saleType.remark).with(Color.BLACK);
         if (saleType == EnumOrderSaleType.RETURN) {
             saleTypeText.with(Color.GRAY);
         }
-        return new OrderDishesTableItemVO(
+        return new OrderDishesTableItemBO(
                 orderDishes.getOrderDishesId() + "",
                 orderDishes.getSubOrderId() + "",
                 new RichText(buildDishesName(dishes, orderDishes)),

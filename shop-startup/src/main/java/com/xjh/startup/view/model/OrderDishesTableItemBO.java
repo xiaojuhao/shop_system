@@ -2,7 +2,7 @@ package com.xjh.startup.view.model;
 
 import com.xjh.common.utils.cellvalue.RichText;
 
-public class OrderDishesTableItemVO {
+public class OrderDishesTableItemBO {
     String orderDishesId;
     String subOrderId;
     RichText dishesName;
@@ -11,7 +11,7 @@ public class OrderDishesTableItemVO {
     String orderDishesNum;
     RichText saleType;
 
-    public OrderDishesTableItemVO(String orderDishesId, String subOrderId, RichText dishesName, RichText price, RichText discountPrice, String orderDishesNum, RichText saleType) {
+    public OrderDishesTableItemBO(String orderDishesId, String subOrderId, RichText dishesName, RichText price, RichText discountPrice, String orderDishesNum, RichText saleType) {
         this.orderDishesId = orderDishesId;
         this.subOrderId = subOrderId;
         this.dishesName = dishesName;
