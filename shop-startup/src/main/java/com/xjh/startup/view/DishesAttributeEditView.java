@@ -77,6 +77,13 @@ public class DishesAttributeEditView extends SmallForm {
         addLine(attrValueTV);
 
         Button update = new Button("保存属性");
+        update.setOnAction(e -> {
+            attr.setDishesAttributeName(nameText.getText());
+            attr.setDishesAttributeMarkInfo(markInput.getText());
+            String s = modelSelect.getSelectionModel().getSelectedItem();
+            attr.setIsValueRadio("单选".equals(s));
+            this.updateAttr(attr);
+        });
         Button addAttr = new Button("增加属性");
 
         addLine(newLine(addAttr, update));
