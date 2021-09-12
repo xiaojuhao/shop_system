@@ -1,5 +1,6 @@
 package com.xjh.service.domain;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -73,6 +74,7 @@ public class DishesAttributeService {
             selectedAttributeValues.add(v);
         });
         valueObj.put("selectedAttributeValues", selectedAttributeValues);
+        dd.setDishesAttributeObj(Base64.encodeBase64String(valueObj.toJSONString().getBytes(StandardCharsets.UTF_8)));
         return dd;
     }
 

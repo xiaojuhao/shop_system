@@ -56,6 +56,10 @@ public class DishesAttributeEditView extends SmallForm {
             OperationButton op = new OperationButton();
             op.setTitle("删除");
             op.setAction(() -> {
+                attr.setDishesAttributeName(nameText.getText());
+                attr.setDishesAttributeMarkInfo(markInput.getText());
+                String s = modelSelect.getSelectionModel().getSelectedItem();
+                attr.setIsValueRadio("单选".equals(s));
                 attr.setAllAttributeValues(CommonUtils.filter(attr.getAllAttributeValues(),
                         it -> !CommonUtils.eq(it.getAttributeValue(), v.getAttributeValue())));
                 this.updateAttr(attr);
