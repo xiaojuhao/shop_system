@@ -28,6 +28,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 
 @SuppressWarnings({"unused"})
 public class CommonUtils {
@@ -43,6 +44,11 @@ public class CommonUtils {
             }
         }
         return retList;
+    }
+
+    public static <T> T deepClone(T v, Class<T> clz){
+        JSONObject j = JSONBuilder.toJSON(v);
+        return j.toJavaObject(clz);
     }
 
     public static <V> List<V> filter(List<V> list, Predicate<V> test) {

@@ -21,34 +21,50 @@ import javafx.scene.control.TextField;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class DishesAttributeEditView extends SmallForm {
     DishesAttributeService dishesAttributeService = GuiceContainer.getInstance(DishesAttributeService.class);
 
+    DishesAttributeVO data;
+    List<Runnable> collectData = new ArrayList<>();
     public DishesAttributeEditView(DishesAttributeVO attr) {
         super();
+
+        data = CommonUtils.deepClone(attr, DishesAttributeVO.class);
         double titleWidth = 100;
         double contentWidth = 200;
 
         TextField nameText = new TextField();
         nameText.setText(attr.getDishesAttributeName());
         addPairLine(new Label("属性名:"), titleWidth, nameText, contentWidth);
+        collectData.add(()->data.setDishesAttributeName(nameText.getText()));
 
         ObservableList<String> options = FXCollections.observableArrayList("单选", "复选");
         ComboBox<String> modelSelect = new ComboBox<>(options);
         addPairLine(new Label("属性类型:"), titleWidth, modelSelect, contentWidth);
+        collectData.add(() -> data.setIsValueRadio("单选".equals(modelSelect.getSelectionModel().getSelectedItem())));
 
         TextField markInput = new TextField();
         markInput.setText(attr.getDishesAttributeMarkInfo());
         addPairLine(new Label("属性备注:"), titleWidth, markInput, contentWidth);
+        collectData.add(() -> data.setDishesAttributeMarkInfo(markInput.getText()));
 
         TableView<AttributeValueBO> attrValueTV = new TableView<>();
         attrValueTV.getColumns().addAll(
                 newCol("属性值", "attributeValue", 200),
                 newCol("操作", "action", 100)
         );
-
         attrValueTV.setMaxHeight(200);
+        collectData.add(() -> {
+            List<DishesAttributeValueVO> vals = new ArrayList<>();
+            CommonUtils.forEach(attrValueTV.getItems(), it -> {
+                DishesAttributeValueVO v = new DishesAttributeValueVO();
+                v.setAttributeValue(it.getAttributeValue());
+                vals.add(v);
+            });
+            data.setAllAttributeValues(vals);
+        });
         List<AttributeValueBO> valueBOList = new ArrayList<>();
         CommonUtils.forEach(attr.getAllAttributeValues(), v -> {
             AttributeValueBO bo = new AttributeValueBO();
@@ -56,17 +72,11 @@ public class DishesAttributeEditView extends SmallForm {
             OperationButton op = new OperationButton();
             op.setTitle("删除");
             op.setAction(() -> {
-                attr.setDishesAttributeName(nameText.getText());
-                attr.setDishesAttributeMarkInfo(markInput.getText());
-                String s = modelSelect.getSelectionModel().getSelectedItem();
-                attr.setIsValueRadio("单选".equals(s));
-                attr.setAllAttributeValues(CommonUtils.filter(attr.getAllAttributeValues(),
-                        it -> !CommonUtils.eq(it.getAttributeValue(), v.getAttributeValue())));
-                this.updateAttr(attr);
-                valueBOList.remove(v);
-
-                ObservableList<AttributeValueBO> attrValues = FXCollections.observableArrayList(valueBOList);
-                attrValueTV.setItems(attrValues);
+                Predicate<AttributeValueBO> keeped = it-> !it.getAttributeValue().equals(v.getAttributeValue());
+                attrValueTV.setItems(FXCollections.observableArrayList(CommonUtils.filter(attrValueTV.getItems(),keeped)));
+                attrValueTV.refresh();
+                CommonUtils.safeRun(collectData);
+                this.updateAttr(data);
             });
             bo.setAction(op);
             valueBOList.add(bo);
@@ -78,11 +88,8 @@ public class DishesAttributeEditView extends SmallForm {
 
         Button update = new Button("保存属性");
         update.setOnAction(e -> {
-            attr.setDishesAttributeName(nameText.getText());
-            attr.setDishesAttributeMarkInfo(markInput.getText());
-            String s = modelSelect.getSelectionModel().getSelectedItem();
-            attr.setIsValueRadio("单选".equals(s));
-            this.updateAttr(attr);
+            CommonUtils.safeRun(collectData);
+            this.updateAttr(data);
         });
         Button addAttr = new Button("增加属性");
 
