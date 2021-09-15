@@ -25,12 +25,12 @@ import javafx.stage.StageStyle;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
 public class DishesAttributeEditView extends SmallForm {
     DishesAttributeService dishesAttributeService = GuiceContainer.getInstance(DishesAttributeService.class);
 
-    TableView<AttributeValueBO> tv = new TableView<>();
+
+    ObservableList<AttributeValueBO> attrList = FXCollections.observableArrayList();
     DishesAttributeVO data;
     List<Runnable> collectData = new ArrayList<>();
 
@@ -55,12 +55,13 @@ public class DishesAttributeEditView extends SmallForm {
         markInput.setText(attr.getDishesAttributeMarkInfo());
         addPairLine(new Label("属性备注:"), titleWidth, markInput, contentWidth);
         collectData.add(() -> data.setDishesAttributeMarkInfo(markInput.getText()));
-
+        TableView<AttributeValueBO> tv = new TableView<>();
         tv.getColumns().addAll(
                 newCol("属性值", "attributeValue", 200),
                 newCol("操作", "action", 100)
         );
         tv.setMaxHeight(200);
+        tv.setItems(attrList);
         collectData.add(() -> {
             List<DishesAttributeValueVO> vals = new ArrayList<>();
             CommonUtils.forEach(tv.getItems(), it -> {
@@ -70,33 +71,26 @@ public class DishesAttributeEditView extends SmallForm {
             });
             data.setAllAttributeValues(vals);
         });
-        List<AttributeValueBO> valueBOList = new ArrayList<>();
         CommonUtils.forEach(attr.getAllAttributeValues(), v -> {
             AttributeValueBO bo = new AttributeValueBO();
             bo.setAttributeValue(v.getAttributeValue());
             OperationButton op = new OperationButton();
             op.setTitle("删除");
             op.setAction(() -> {
-                AttributeValueBO t = tv.getItems().stream()
-                        .filter(it->it.getAttributeValue().equals(v.getAttributeValue()))
-                        .findFirst().orElse(null);
-                tv.getItems().remove(t);
+                removeItem(attrList, v.getAttributeValue());
                 tv.refresh();
             });
             bo.setAction(op);
-            valueBOList.add(bo);
+            attrList.add(bo);
         });
-
-        ObservableList<AttributeValueBO> attrValues = FXCollections.observableArrayList(valueBOList);
-        tv.setItems(attrValues);
         addLine(tv);
-
-        Button update = new Button("保存属性");
+        tv.refresh();
+        Button update = new Button("保 存");
         update.setOnAction(e -> {
             CommonUtils.safeRun(collectData);
             this.updateAttr(data);
         });
-        Button addAttr = new Button("增加属性");
+        Button addAttr = new Button("增 加");
         addAttr.setOnAction(evt -> {
             Stage stg = new Stage();
             double width = this.getScene().getWindow().getWidth();
@@ -107,7 +101,7 @@ public class DishesAttributeEditView extends SmallForm {
             stg.centerOnScreen();
             stg.setWidth(width);
             stg.setHeight(height);
-            stg.setTitle("增加属性");
+            stg.setTitle("增 加");
             SmallForm node = new SmallForm();
             TextField textField = new TextField();
             textField.setPrefWidth(width - 100);
@@ -121,20 +115,23 @@ public class DishesAttributeEditView extends SmallForm {
                 OperationButton op = new OperationButton();
                 op.setTitle("删除");
                 op.setAction(() -> {
-                    AttributeValueBO tt = tv.getItems().stream()
-                            .filter(it->it.getAttributeValue().equals(v))
-                            .findFirst().orElse(null);
-                    tv.getItems().remove(tt);
+                    removeItem(attrList, v);
                     tv.refresh();
                 });
                 t.setAction(op);
-                tv.getItems().add(t);
+                attrList.add(t);
                 tv.refresh();
             });
             stg.setScene(new Scene(node));
             stg.showAndWait();
         });
         addLine(newLine(addAttr, update));
+    }
+
+    private void removeItem(ObservableList<AttributeValueBO> list, String item){
+        list.stream()
+                .filter(it -> it.getAttributeValue().equals(item))
+                .findFirst().ifPresent(list::remove);
     }
 
     private void updateAttr(DishesAttributeVO attr) {
