@@ -4,7 +4,6 @@ import static com.xjh.common.utils.TableViewUtils.newCol;
 
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
-import com.xjh.common.utils.Result;
 import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesAttributeValueVO;
@@ -21,9 +20,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 import java.util.ArrayList;
 import java.util.List;
