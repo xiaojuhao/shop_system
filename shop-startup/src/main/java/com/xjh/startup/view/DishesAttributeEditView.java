@@ -13,11 +13,15 @@ import com.xjh.startup.view.base.SmallForm;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +30,10 @@ import java.util.function.Predicate;
 public class DishesAttributeEditView extends SmallForm {
     DishesAttributeService dishesAttributeService = GuiceContainer.getInstance(DishesAttributeService.class);
 
+    TableView<AttributeValueBO> tv = new TableView<>();
     DishesAttributeVO data;
     List<Runnable> collectData = new ArrayList<>();
+
     public DishesAttributeEditView(DishesAttributeVO attr) {
         super();
 
@@ -38,7 +44,7 @@ public class DishesAttributeEditView extends SmallForm {
         TextField nameText = new TextField();
         nameText.setText(attr.getDishesAttributeName());
         addPairLine(new Label("属性名:"), titleWidth, nameText, contentWidth);
-        collectData.add(()->data.setDishesAttributeName(nameText.getText()));
+        collectData.add(() -> data.setDishesAttributeName(nameText.getText()));
 
         ObservableList<String> options = FXCollections.observableArrayList("单选", "复选");
         ComboBox<String> modelSelect = new ComboBox<>(options);
@@ -50,15 +56,14 @@ public class DishesAttributeEditView extends SmallForm {
         addPairLine(new Label("属性备注:"), titleWidth, markInput, contentWidth);
         collectData.add(() -> data.setDishesAttributeMarkInfo(markInput.getText()));
 
-        TableView<AttributeValueBO> attrValueTV = new TableView<>();
-        attrValueTV.getColumns().addAll(
+        tv.getColumns().addAll(
                 newCol("属性值", "attributeValue", 200),
                 newCol("操作", "action", 100)
         );
-        attrValueTV.setMaxHeight(200);
+        tv.setMaxHeight(200);
         collectData.add(() -> {
             List<DishesAttributeValueVO> vals = new ArrayList<>();
-            CommonUtils.forEach(attrValueTV.getItems(), it -> {
+            CommonUtils.forEach(tv.getItems(), it -> {
                 DishesAttributeValueVO v = new DishesAttributeValueVO();
                 v.setAttributeValue(it.getAttributeValue());
                 vals.add(v);
@@ -72,19 +77,19 @@ public class DishesAttributeEditView extends SmallForm {
             OperationButton op = new OperationButton();
             op.setTitle("删除");
             op.setAction(() -> {
-                Predicate<AttributeValueBO> keeped = it-> !it.getAttributeValue().equals(v.getAttributeValue());
-                attrValueTV.setItems(FXCollections.observableArrayList(CommonUtils.filter(attrValueTV.getItems(),keeped)));
-                attrValueTV.refresh();
-                CommonUtils.safeRun(collectData);
-                this.updateAttr(data);
+                AttributeValueBO t = tv.getItems().stream()
+                        .filter(it->it.getAttributeValue().equals(v.getAttributeValue()))
+                        .findFirst().orElse(null);
+                tv.getItems().remove(t);
+                tv.refresh();
             });
             bo.setAction(op);
             valueBOList.add(bo);
         });
 
         ObservableList<AttributeValueBO> attrValues = FXCollections.observableArrayList(valueBOList);
-        attrValueTV.setItems(attrValues);
-        addLine(attrValueTV);
+        tv.setItems(attrValues);
+        addLine(tv);
 
         Button update = new Button("保存属性");
         update.setOnAction(e -> {
@@ -92,11 +97,47 @@ public class DishesAttributeEditView extends SmallForm {
             this.updateAttr(data);
         });
         Button addAttr = new Button("增加属性");
-
+        addAttr.setOnAction(evt -> {
+            Stage stg = new Stage();
+            double width = this.getScene().getWindow().getWidth();
+            double height = 200;
+            stg.initOwner(this.getScene().getWindow());
+            stg.initModality(Modality.WINDOW_MODAL);
+            stg.initStyle(StageStyle.DECORATED);
+            stg.centerOnScreen();
+            stg.setWidth(width);
+            stg.setHeight(height);
+            stg.setTitle("增加属性");
+            SmallForm node = new SmallForm();
+            TextField textField = new TextField();
+            textField.setPrefWidth(width - 100);
+            node.addLine(node.newLine(new Label("名称"), textField));
+            Button confirm = new Button("确定");
+            node.addLine(node.newLine(confirm));
+            confirm.setOnAction(e -> {
+                String v = textField.getText();
+                AttributeValueBO t = new AttributeValueBO();
+                t.setAttributeValue(v);
+                OperationButton op = new OperationButton();
+                op.setTitle("删除");
+                op.setAction(() -> {
+                    AttributeValueBO tt = tv.getItems().stream()
+                            .filter(it->it.getAttributeValue().equals(v))
+                            .findFirst().orElse(null);
+                    tv.getItems().remove(tt);
+                    tv.refresh();
+                });
+                t.setAction(op);
+                tv.getItems().add(t);
+                tv.refresh();
+            });
+            stg.setScene(new Scene(node));
+            stg.showAndWait();
+        });
         addLine(newLine(addAttr, update));
     }
 
-    private void updateAttr(DishesAttributeVO attr){
+    private void updateAttr(DishesAttributeVO attr) {
         Logger.info("保存菜品属性:" + CommonUtils.reflectString(attr));
         dishesAttributeService.updateById(attr);
     }
