@@ -4,6 +4,7 @@ import static com.xjh.common.utils.TableViewUtils.newCol;
 
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.Result;
 import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesAttributeValueVO;
@@ -39,8 +40,8 @@ public class DishesAttributeEditView extends SmallForm {
         super();
 
         data = CommonUtils.deepClone(attr, DishesAttributeVO.class);
-        double titleWidth = 100;
-        double contentWidth = 200;
+        double titleWidth = 150;
+        double contentWidth = 250;
 
         Label nameLabel = createLabel("属性名:", titleWidth);
         TextField nameText = initTextField(attr.getDishesAttributeName(), contentWidth);
@@ -90,7 +91,7 @@ public class DishesAttributeEditView extends SmallForm {
         Button update = new Button("保 存");
         update.setOnAction(e -> {
             CommonUtils.safeRun(collectData);
-            this.updateAttr(data);
+            this.saveDishesAttr(data);
         });
         Button addAttr = new Button("增 加");
         addAttr.setOnAction(evt -> {
@@ -129,9 +130,13 @@ public class DishesAttributeEditView extends SmallForm {
         tv.refresh();
     }
 
-    private void updateAttr(DishesAttributeVO attr) {
+    private void saveDishesAttr(DishesAttributeVO attr) {
         Logger.info("保存菜品属性:" + CommonUtils.reflectString(attr));
-        dishesAttributeService.updateById(attr);
+        if(attr.getDishesAttributeId() != null) {
+            dishesAttributeService.updateById(attr);
+        }else {
+            dishesAttributeService.addNew(attr);
+        }
     }
 
 

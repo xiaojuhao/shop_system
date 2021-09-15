@@ -39,6 +39,9 @@ public class DishesAttributeManageView extends LargeForm implements Initializabl
         addLine(buildAttrPane());
         addLine(buildAttrValuePane());
         Button add = new Button("增加属性");
+        add.setOnAction(e -> {
+            showEditView(new DishesAttributeVO(), this.getScene().getWindow());
+        });
         addLine(add);
     }
 

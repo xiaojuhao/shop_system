@@ -49,6 +49,9 @@ public class DishesAttributeService {
         return dishesAttributeDAO.updateById(toDD(attr));
     }
 
+    public Result<Integer> addNew(DishesAttributeVO vo){
+        return dishesAttributeDAO.insert(toDD(vo));
+    }
 
     public DishesAttribute toDD(DishesAttributeVO vo) {
         DishesAttribute dd = new DishesAttribute();
