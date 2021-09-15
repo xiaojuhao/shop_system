@@ -9,6 +9,7 @@ import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesAttributeValueVO;
 import com.xjh.service.domain.DishesAttributeService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
+import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SmallForm;
 
 import javafx.collections.FXCollections;
@@ -48,6 +49,7 @@ public class DishesAttributeEditView extends SmallForm {
 
         ObservableList<String> options = FXCollections.observableArrayList("单选", "复选");
         ComboBox<String> modelSelect = new ComboBox<>(options);
+        modelSelect.getSelectionModel().select((attr.getIsValueRadio() != null && attr.getIsValueRadio()) ? "单选" : "复选");
         addPairLine(new Label("属性类型:"), titleWidth, modelSelect, contentWidth);
         collectData.add(() -> data.setIsValueRadio("单选".equals(modelSelect.getSelectionModel().getSelectedItem())));
 
@@ -63,11 +65,10 @@ public class DishesAttributeEditView extends SmallForm {
         tv.setMaxHeight(200);
         tv.setItems(attrList);
         collectData.add(() -> {
-            List<DishesAttributeValueVO> vals = new ArrayList<>();
-            CommonUtils.forEach(tv.getItems(), it -> {
+            List<DishesAttributeValueVO> vals = CommonUtils.collect(attrList, it -> {
                 DishesAttributeValueVO v = new DishesAttributeValueVO();
                 v.setAttributeValue(it.getAttributeValue());
-                vals.add(v);
+                return v;
             });
             data.setAllAttributeValues(vals);
         });
@@ -76,10 +77,7 @@ public class DishesAttributeEditView extends SmallForm {
             bo.setAttributeValue(v.getAttributeValue());
             OperationButton op = new OperationButton();
             op.setTitle("删除");
-            op.setAction(() -> {
-                removeItem(attrList, v.getAttributeValue());
-                tv.refresh();
-            });
+            op.setAction(() -> removeItem(tv, v.getAttributeValue()));
             bo.setAction(op);
             attrList.add(bo);
         });
@@ -92,46 +90,39 @@ public class DishesAttributeEditView extends SmallForm {
         });
         Button addAttr = new Button("增 加");
         addAttr.setOnAction(evt -> {
-            Stage stg = new Stage();
-            double width = this.getScene().getWindow().getWidth();
-            double height = 200;
-            stg.initOwner(this.getScene().getWindow());
-            stg.initModality(Modality.WINDOW_MODAL);
-            stg.initStyle(StageStyle.DECORATED);
-            stg.centerOnScreen();
-            stg.setWidth(width);
-            stg.setHeight(height);
-            stg.setTitle("增 加");
-            SmallForm node = new SmallForm();
-            TextField textField = new TextField();
-            textField.setPrefWidth(width - 100);
-            node.addLine(node.newLine(new Label("名称"), textField));
-            Button confirm = new Button("确定");
-            node.addLine(node.newLine(confirm));
+            ModelWindow stg = new ModelWindow(this.getScene().getWindow(), "增加属性");
+            stg.setHeight(200);
+            SmallForm sform = new SmallForm();
+            TextField textField = createTextField("属性值", stg.getWidth() - 100);
+            sform.addLine(sform.newLine(createLabel("名称"), textField));
+            Button confirm = new Button("确 定");
+            sform.addLine(sform.newLine(confirm));
             confirm.setOnAction(e -> {
-                String v = textField.getText();
-                AttributeValueBO t = new AttributeValueBO();
-                t.setAttributeValue(v);
-                OperationButton op = new OperationButton();
-                op.setTitle("删除");
-                op.setAction(() -> {
-                    removeItem(attrList, v);
-                    tv.refresh();
-                });
-                t.setAction(op);
-                attrList.add(t);
-                tv.refresh();
+                addItem(tv, textField.getText());
+                stg.hide();
             });
-            stg.setScene(new Scene(node));
+            stg.setScene(new Scene(sform));
             stg.showAndWait();
         });
         addLine(newLine(addAttr, update));
     }
 
-    private void removeItem(ObservableList<AttributeValueBO> list, String item){
-        list.stream()
+    private void removeItem(TableView<AttributeValueBO> tv, String item) {
+        tv.getItems().stream()
                 .filter(it -> it.getAttributeValue().equals(item))
-                .findFirst().ifPresent(list::remove);
+                .findFirst().ifPresent(tv.getItems()::remove);
+        tv.refresh();
+    }
+
+    private void addItem(TableView<AttributeValueBO> tv, String item) {
+        AttributeValueBO t = new AttributeValueBO();
+        t.setAttributeValue(item);
+        OperationButton op = new OperationButton();
+        op.setTitle("删除");
+        op.setAction(() -> removeItem(tv, item));
+        t.setAction(op);
+        attrList.add(t);
+        tv.refresh();
     }
 
     private void updateAttr(DishesAttributeVO attr) {

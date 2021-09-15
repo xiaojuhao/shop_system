@@ -89,7 +89,7 @@ public class DishesAttributeService {
             vo.setIsSync(true);
         }
         vo.setIsValueRadio(false);
-        if (vo.getIsValueRadio() != null && attr.getIsValueRadio() != null) {
+        if (attr.getIsValueRadio() != null && attr.getIsValueRadio() == 1) {
             vo.setIsValueRadio(true);
         }
         vo.setAllAttributeValues(new ArrayList<>());

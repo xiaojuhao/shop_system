@@ -31,8 +31,15 @@ public class SimpleForm extends VBox {
     }
 
     public TextField createTextField(String promptText) {
+        return createTextField(promptText, 0);
+    }
+
+    public TextField createTextField(String promptText, double width) {
         TextField textField = new TextField();
         textField.setPromptText(promptText);
+        if(width > 0) {
+            textField.setPrefWidth(width);
+        }
         return textField;
     }
 

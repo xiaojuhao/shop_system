@@ -11,6 +11,7 @@ import com.xjh.service.domain.DishesAttributeService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.LargeForm;
+import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.model.DishesAttributeBO;
 
 import javafx.collections.FXCollections;
@@ -89,21 +90,15 @@ public class DishesAttributeManageView extends LargeForm implements Initializabl
 
     public ObservableList<DishesAttributeBO> loadAll(Window window) {
         List<DishesAttributeVO> allAttrs = dishesAttributeService.selectAll();
-        System.out.println("sfsdsfffaf");
         return FXCollections.observableArrayList(allAttrs.stream()
                 .map(it -> new DishesAttributeBO(it, () -> this.showEditView(it, window)))
                 .collect(Collectors.toList()));
     }
 
     public void showEditView(DishesAttributeVO attr, Window window) {
-        Stage stg = new Stage();
-        stg.initOwner(window);
-        stg.initModality(Modality.WINDOW_MODAL);
-        stg.initStyle(StageStyle.DECORATED);
-        stg.centerOnScreen();
-        //        stg.setWidth(width);
-        //        stg.setHeight(height);
-        stg.setTitle("属性信息");
+        Stage stg = new ModelWindow(window, "属性信息");
+        stg.setWidth(460);
+        stg.setHeight(600);
         stg.setScene(new Scene(new DishesAttributeEditView(attr)));
         stg.showAndWait();
         loadData();
