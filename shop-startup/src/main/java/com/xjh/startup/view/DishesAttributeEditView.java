@@ -42,21 +42,25 @@ public class DishesAttributeEditView extends SmallForm {
         double titleWidth = 100;
         double contentWidth = 200;
 
-        TextField nameText = new TextField();
-        nameText.setText(attr.getDishesAttributeName());
-        addPairLine(new Label("属性名:"), titleWidth, nameText, contentWidth);
+        Label nameLabel = createLabel("属性名:", titleWidth);
+        TextField nameText = initTextField(attr.getDishesAttributeName(), contentWidth);
+        addPairLine(nameLabel, nameText);
         collectData.add(() -> data.setDishesAttributeName(nameText.getText()));
 
+        Label modelLabel = createLabel("属性类型:", titleWidth);
         ObservableList<String> options = FXCollections.observableArrayList("单选", "复选");
         ComboBox<String> modelSelect = new ComboBox<>(options);
+        modelSelect.setPrefWidth(contentWidth);
         modelSelect.getSelectionModel().select((attr.getIsValueRadio() != null && attr.getIsValueRadio()) ? "单选" : "复选");
-        addPairLine(new Label("属性类型:"), titleWidth, modelSelect, contentWidth);
+        addPairLine(modelLabel, modelSelect);
         collectData.add(() -> data.setIsValueRadio("单选".equals(modelSelect.getSelectionModel().getSelectedItem())));
 
-        TextField markInput = new TextField();
-        markInput.setText(attr.getDishesAttributeMarkInfo());
-        addPairLine(new Label("属性备注:"), titleWidth, markInput, contentWidth);
+        Label markLabel = createLabel("属性备注:", titleWidth);
+        TextField markInput = initTextField(attr.getDishesAttributeMarkInfo(), contentWidth);
+        addPairLine(markLabel, markInput);
         collectData.add(() -> data.setDishesAttributeMarkInfo(markInput.getText()));
+
+
         TableView<AttributeValueBO> tv = new TableView<>();
         tv.getColumns().addAll(
                 newCol("属性值", "attributeValue", 200),
@@ -104,7 +108,7 @@ public class DishesAttributeEditView extends SmallForm {
             stg.setScene(new Scene(sform));
             stg.showAndWait();
         });
-        addLine(newLine(addAttr, update));
+        addPairLine(addAttr, update);
     }
 
     private void removeItem(TableView<AttributeValueBO> tv, String item) {

@@ -1,5 +1,6 @@
 package com.xjh.startup.view.base;
 
+import com.xjh.common.utils.CommonUtils;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -14,9 +15,7 @@ public class SimpleForm extends VBox {
         this.getChildren().add(node);
     }
 
-    public void addPairLine(Region title, double titleWidth, Region content, double contentWidth){
-        title.setPrefWidth(titleWidth);
-        content.setPrefWidth(contentWidth);
+    public void addPairLine(Region title,  Region content){
         addLine(newLine(title, content));
     }
 
@@ -30,13 +29,25 @@ public class SimpleForm extends VBox {
         return line;
     }
 
+    public TextField initTextField(String text) {
+        return initTextField(text, 0);
+    }
+
+    public TextField initTextField(String text, double width) {
+        TextField tf = createTextField(null, width);
+        tf.setText(text);
+        return tf;
+    }
+
     public TextField createTextField(String promptText) {
         return createTextField(promptText, 0);
     }
 
     public TextField createTextField(String promptText, double width) {
         TextField textField = new TextField();
-        textField.setPromptText(promptText);
+        if(CommonUtils.isNotBlank(promptText)) {
+            textField.setPromptText(promptText);
+        }
         if(width > 0) {
             textField.setPrefWidth(width);
         }
@@ -44,6 +55,14 @@ public class SimpleForm extends VBox {
     }
 
     public Label createLabel(String text) {
-        return new Label(text);
+        return createLabel(text, 0);
+    }
+
+    public Label createLabel(String text, double width) {
+        Label label = new Label(text);
+        if(width > 0){
+            label.setPrefWidth(width);
+        }
+        return label;
     }
 }
