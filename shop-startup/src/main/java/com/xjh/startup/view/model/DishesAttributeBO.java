@@ -2,6 +2,7 @@ package com.xjh.startup.view.model;
 
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.cellvalue.OperationButton;
+import com.xjh.common.utils.cellvalue.Operations;
 import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.common.valueobject.DishesAttributeVO;
 
@@ -17,9 +18,15 @@ public class DishesAttributeBO {
         }
         this.createTime = RichText.create(DateBuilder.base(vo.getCreateTime()).timeStr());
         this.attachment = vo;
-        this.operation = new OperationButton();
-        this.operation.setTitle("编辑");
-        this.operation.setAction(action);
+        OperationButton edit = new OperationButton();
+        edit.setTitle("编辑");
+        edit.setAction(action);
+        this.operations.add(edit);
+
+        OperationButton del = new OperationButton();
+        del.setTitle("删除");
+        del.setAction(action);
+        this.operations.add(del);
     }
 
     Integer dishesAttributeId;
@@ -27,7 +34,7 @@ public class DishesAttributeBO {
     String dishesAttributeMarkInfo;
     RichText isValueRadio;
     RichText createTime;
-    OperationButton operation;
+    Operations operations = new Operations();
     DishesAttributeVO attachment;
 
     public Integer getDishesAttributeId() {
@@ -78,11 +85,11 @@ public class DishesAttributeBO {
         return attachment;
     }
 
-    public OperationButton getOperation() {
-        return operation;
+    public Operations getOperations() {
+        return operations;
     }
 
-    public void setOperation(OperationButton operation) {
-        this.operation = operation;
+    public void setOperations(Operations operations) {
+        this.operations = operations;
     }
 }

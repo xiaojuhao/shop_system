@@ -54,13 +54,17 @@ public class DishesAttributeService {
     }
 
     public DishesAttribute toDD(DishesAttributeVO vo) {
+        boolean isSync = vo.getIsSync() != null && vo.getIsSync();
+        boolean isValueRadio = vo.getIsValueRadio() != null && vo.getIsValueRadio();
         DishesAttribute dd = new DishesAttribute();
         dd.setDishesAttributeId(vo.getDishesAttributeId());
         dd.setDishesAttributeName(vo.getDishesAttributeName());
         dd.setDishesAttributeMarkInfo(vo.getDishesAttributeMarkInfo());
-        dd.setIsSync((vo.getIsSync() != null && vo.getIsSync()) ? 1 : 0);
-        dd.setIsValueRadio((vo.getIsValueRadio() != null && vo.getIsValueRadio()) ? 1 : 0);
+        dd.setIsSync(isSync ? 1 : 0);
+        dd.setIsValueRadio(isValueRadio ? 1 : 0);
         JSONObject valueObj = JSONBuilder.toJSON(dd);
+        valueObj.put("isSync", isSync);
+        valueObj.put("isValueRadio", isValueRadio);
         // allAttributeValues
         JSONArray allAttributeValues = new JSONArray();
         CommonUtils.forEach(vo.getAllAttributeValues(), a -> {

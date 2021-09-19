@@ -22,9 +22,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableView;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.stage.Window;
 
 public class DishesAttributeManageView extends LargeForm implements Initializable {
@@ -66,7 +64,7 @@ public class DishesAttributeManageView extends LargeForm implements Initializabl
                 newCol("备注", "dishesAttributeMarkInfo", 300),
                 newCol("类型", "isValueRadio", 160),
                 newCol("创建时间", "createTime", 160),
-                newCol("操作", "operation", 0)
+                newCol("操作", "operations", 0)
         );
         attrPane.getSelectionModel().selectedItemProperty().addListener((a, b, c) -> {
             if (c != null) {

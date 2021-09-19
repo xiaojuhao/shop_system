@@ -3,6 +3,7 @@ package com.xjh.common.utils;
 import com.xjh.common.utils.cellvalue.InputNumber;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.OperationButton;
+import com.xjh.common.utils.cellvalue.Operations;
 import com.xjh.common.utils.cellvalue.RichText;
 
 import javafx.scene.control.Button;
@@ -76,6 +77,15 @@ public class TableViewUtils {
                     Button op = new Button(ob.getTitle());
                     op.setOnMouseClicked(evt -> CommonUtils.safeRun(ob.getAction()));
                     cell.setGraphic(op);
+                } else if (nv instanceof Operations) {
+                    Operations ops = (Operations) nv;
+                    HBox hbox = new HBox();
+                    for (OperationButton ob : ops.getOperations()) {
+                        Button op = new Button(ob.getTitle());
+                        op.setOnMouseClicked(evt -> CommonUtils.safeRun(ob.getAction()));
+                        hbox.getChildren().add(op);
+                    }
+                    cell.setGraphic(hbox);
                 } else {
                     cell.textProperty().set(CommonUtils.stringify(nv));
                 }
