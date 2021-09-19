@@ -1,6 +1,5 @@
 package com.xjh.dao.mapper;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +8,6 @@ import javax.inject.Singleton;
 
 import com.google.inject.name.Named;
 import com.xjh.common.utils.Result;
-import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.DishesAttribute;
 import com.xjh.dao.foundation.EntityUtils;
 import com.zaxxer.hikari.HikariDataSource;
@@ -53,7 +51,17 @@ public class DishesAttributeDAO {
         try {
             int i = Db.use(ds).insert(EntityUtils.create(dd));
             return Result.success(i);
-        }catch (Exception ex){
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail("保存数据错误");
+        }
+    }
+
+    public Result<Integer> deleteById(DishesAttribute dd) {
+        try {
+            int i = Db.use(ds).del(EntityUtils.idCond(dd));
+            return Result.success(i);
+        } catch (Exception ex) {
             ex.printStackTrace();
             return Result.fail("保存数据错误");
         }

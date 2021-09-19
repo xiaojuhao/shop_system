@@ -5,6 +5,9 @@ import static com.xjh.common.utils.TableViewUtils.newCol;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.utils.cellvalue.OperationButton;
+import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesAttributeValueVO;
 import com.xjh.service.domain.DishesAttributeService;
@@ -92,8 +95,32 @@ public class DishesAttributeManageView extends LargeForm implements Initializabl
     public ObservableList<DishesAttributeBO> loadAll(Window window) {
         List<DishesAttributeVO> allAttrs = dishesAttributeService.selectAll();
         return FXCollections.observableArrayList(allAttrs.stream()
-                .map(it -> new DishesAttributeBO(it, () -> this.showEditView(it, window)))
+                .map(it -> toBO(it, window))
                 .collect(Collectors.toList()));
+    }
+
+    private DishesAttributeBO toBO(DishesAttributeVO vo, Window window) {
+        DishesAttributeBO bo = new DishesAttributeBO();
+        bo.setDishesAttributeId(vo.getDishesAttributeId());
+        bo.setDishesAttributeName(vo.getDishesAttributeName());
+        bo.setDishesAttributeMarkInfo(vo.getDishesAttributeMarkInfo());
+        if (vo.getIsValueRadio() != null && vo.getIsValueRadio()) {
+            bo.setIsValueRadio(RichText.create("单选"));
+        } else {
+            bo.setIsValueRadio(RichText.create("多选"));
+        }
+        bo.setCreateTime(RichText.create(DateBuilder.base(vo.getCreateTime()).timeStr()));
+        bo.setAttachment(vo);
+        OperationButton edit = new OperationButton();
+        edit.setTitle("编辑");
+        edit.setAction(() -> this.showEditView(vo, window));
+        bo.getOperations().add(edit);
+
+        OperationButton del = new OperationButton();
+        del.setTitle("删除");
+        del.setAction(() -> this.delDishesAttr(vo, window));
+        bo.getOperations().add(del);
+        return bo;
     }
 
     public void showEditView(DishesAttributeVO attr, Window window) {
@@ -102,6 +129,11 @@ public class DishesAttributeManageView extends LargeForm implements Initializabl
         stg.setHeight(600);
         stg.setScene(new Scene(new DishesAttributeEditView(attr)));
         stg.showAndWait();
+        loadData();
+    }
+
+    public void delDishesAttr(DishesAttributeVO attr, Window window) {
+        dishesAttributeService.deleteById(attr);
         loadData();
     }
 

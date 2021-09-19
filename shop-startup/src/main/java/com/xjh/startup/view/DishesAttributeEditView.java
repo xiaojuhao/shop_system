@@ -2,6 +2,9 @@ package com.xjh.startup.view;
 
 import static com.xjh.common.utils.TableViewUtils.newCol;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.cellvalue.OperationButton;
@@ -20,9 +23,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class DishesAttributeEditView extends SmallForm {
     DishesAttributeService dishesAttributeService = GuiceContainer.getInstance(DishesAttributeService.class);
@@ -134,7 +134,6 @@ public class DishesAttributeEditView extends SmallForm {
             dishesAttributeService.addNew(attr);
         }
     }
-
 
     public static class AttributeValueBO {
         String attributeValue;

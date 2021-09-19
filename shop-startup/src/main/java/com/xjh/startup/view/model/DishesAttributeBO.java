@@ -1,34 +1,10 @@
 package com.xjh.startup.view.model;
 
-import com.xjh.common.utils.DateBuilder;
-import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.utils.cellvalue.Operations;
 import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.common.valueobject.DishesAttributeVO;
 
 public class DishesAttributeBO {
-    public DishesAttributeBO(DishesAttributeVO vo, Runnable action) {
-        this.dishesAttributeId = vo.getDishesAttributeId();
-        this.dishesAttributeName = vo.getDishesAttributeName();
-        this.dishesAttributeMarkInfo = vo.getDishesAttributeMarkInfo();
-        if (vo.getIsValueRadio() != null && vo.getIsValueRadio()) {
-            this.isValueRadio = RichText.create("单选");
-        } else {
-            this.isValueRadio = RichText.create("多选");
-        }
-        this.createTime = RichText.create(DateBuilder.base(vo.getCreateTime()).timeStr());
-        this.attachment = vo;
-        OperationButton edit = new OperationButton();
-        edit.setTitle("编辑");
-        edit.setAction(action);
-        this.operations.add(edit);
-
-        OperationButton del = new OperationButton();
-        del.setTitle("删除");
-        del.setAction(action);
-        this.operations.add(del);
-    }
-
     Integer dishesAttributeId;
     String dishesAttributeName;
     String dishesAttributeMarkInfo;
