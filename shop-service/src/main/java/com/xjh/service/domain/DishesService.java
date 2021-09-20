@@ -12,7 +12,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.DishesImgUtils;
+import com.xjh.common.utils.ImageHelper;
 import com.xjh.common.valueobject.DishesImgVO;
 import com.xjh.common.valueobject.PageCond;
 import com.xjh.dao.dataobject.Dishes;
@@ -59,7 +59,7 @@ public class DishesService {
         if (dishes == null) {
             return new ArrayList<>();
         }
-        return DishesImgUtils.resolveImgs(dishes.getDishesImgs());
+        return ImageHelper.resolveImgs(dishes.getDishesImgs());
     }
 
     public String getDishesImageUrl(Dishes dishes) {

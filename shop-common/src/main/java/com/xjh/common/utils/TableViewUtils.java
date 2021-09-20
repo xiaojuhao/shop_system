@@ -1,5 +1,8 @@
 package com.xjh.common.utils;
 
+import static com.xjh.common.utils.ImageHelper.buildImageView;
+
+import com.xjh.common.utils.cellvalue.ImageSrc;
 import com.xjh.common.utils.cellvalue.InputNumber;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.OperationButton;
@@ -11,6 +14,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 
 public class TableViewUtils {
@@ -86,6 +90,17 @@ public class TableViewUtils {
                         hbox.getChildren().add(op);
                     }
                     cell.setGraphic(hbox);
+                } else if (nv instanceof ImageSrc) {
+                    ImageSrc img = (ImageSrc) nv;
+                    ImageView iv = buildImageView(img.getImgUrl());
+                    assert iv != null;
+                    if (img.getWidth() > 0) {
+                        iv.setFitWidth(img.getWidth());
+                    }
+                    if (img.getHeight() > 0) {
+                        iv.setFitHeight(img.getHeight());
+                    }
+                    cell.setGraphic(iv);
                 } else {
                     cell.textProperty().set(CommonUtils.stringify(nv));
                 }

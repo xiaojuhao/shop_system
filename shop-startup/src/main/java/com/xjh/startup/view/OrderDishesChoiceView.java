@@ -1,6 +1,7 @@
 package com.xjh.startup.view;
 
 import static com.xjh.common.utils.CommonUtils.collect;
+import static com.xjh.common.utils.ImageHelper.buildImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.ClickHelper;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.CopyUtils;
-import com.xjh.common.utils.DishesImgUtils;
+import com.xjh.common.utils.ImageHelper;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.CartItemVO;
@@ -55,7 +56,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -256,7 +256,7 @@ public class OrderDishesChoiceView extends VBox {
 
     private DishesChoiceItemBO buildBO(DishesPackage dishes) {
         DishesChoiceItemBO bo = new DishesChoiceItemBO();
-        List<DishesImgVO> imgs = DishesImgUtils.resolveImgs(dishes.getDishesPackageImg());
+        List<DishesImgVO> imgs = ImageHelper.resolveImgs(dishes.getDishesPackageImg());
         String img = null;
         if (CommonUtils.isNotEmpty(imgs)) {
             img = imgs.get(0).getImageSrc();
@@ -427,24 +427,18 @@ public class OrderDishesChoiceView extends VBox {
 
     private ImageView getImageView(String path, double width) {
         try {
-            ImageView iv = new ImageView(new Image(getImageUrl(path)));
+            ImageView iv = buildImageView(path);
+            assert iv != null;
             iv.setFitWidth(width);
             iv.setFitHeight(width / 3 * 2);
             return iv;
         } catch (Exception ex) {
-            ImageView iv = new ImageView(getImageUrl("/img/logo.png"));
+            ImageView iv = buildImageView("/img/logo.png");
+            assert iv != null;
             iv.setFitWidth(width);
             iv.setFitHeight(width / 3 * 2);
             return iv;
         }
-    }
-
-    private String getImageUrl(String url) {
-        if (CommonUtils.isBlank(url)) {
-            url = "/img/book1.jpg";
-        }
-        String imageDir = SysConfigView.getImageDir();
-        return "file:" + imageDir + url.replaceAll("\\\\", "/");
     }
 
     @Override

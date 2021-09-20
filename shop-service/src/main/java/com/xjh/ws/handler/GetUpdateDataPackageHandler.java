@@ -14,7 +14,7 @@ import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumDeskType;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.DishesImgUtils;
+import com.xjh.common.utils.ImageHelper;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackage;
@@ -182,7 +182,7 @@ public class GetUpdateDataPackageHandler implements WsHandler {
                 }
                 JSONObject jSONObjectDishesPackage = new JSONObject();
                 jSONObjectDishesPackage.put("imgurl", "");
-                jSONObjectDishesPackage.put("imgNum", DishesImgUtils.resolveImgs(dishesPackage.getDishesPackageImg()).size());
+                jSONObjectDishesPackage.put("imgNum", ImageHelper.resolveImgs(dishesPackage.getDishesPackageImg()).size());
                 jSONObjectDishesPackage.put("price", dishesPackage.getDishesPackagePrice());
                 jSONObjectDishesPackage.put("package_name", dishesPackage.getDishesPackageName());
                 jSONObjectDishesPackage.put("date_end", "");

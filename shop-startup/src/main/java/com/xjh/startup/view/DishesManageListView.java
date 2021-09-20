@@ -1,14 +1,18 @@
 package com.xjh.startup.view;
 
 
+import static com.xjh.common.utils.TableViewUtils.newCol;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.TableViewUtils;
+import com.xjh.common.utils.ImageHelper;
+import com.xjh.common.utils.cellvalue.ImageSrc;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.utils.cellvalue.Operations;
+import com.xjh.common.valueobject.DishesImgVO;
 import com.xjh.common.valueobject.PageCond;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.service.domain.DishesService;
@@ -77,6 +81,14 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 operations.add(onoff);
                 operations.add(del);
                 bo.setOperations(operations);
+                DishesImgVO imgvo = ImageHelper.resolveImgs(it.getDishesImgs())
+                        .stream().findFirst().orElse(null);
+                if (imgvo != null) {
+                    ImageSrc img = new ImageSrc(imgvo.getImageSrc());
+                    img.setWidth(100);
+                    img.setHeight(60);
+                    bo.setDishesImgs(img);
+                }
                 return bo;
             }).collect(Collectors.toList()));
             tableView.refresh();
@@ -119,12 +131,13 @@ public class DishesManageListView extends SimpleForm implements Initializable {
     private void buildContent() {
 
         tableView.getColumns().addAll(
-                TableViewUtils.newCol("序号", "dishesId", 100),
-                TableViewUtils.newCol("名称", "dishesName", 200),
-                TableViewUtils.newCol("状态", "dishesStatus", 80),
-                TableViewUtils.newCol("价格", "dishesPrice", 100),
-                TableViewUtils.newCol("库存", "dishesStock", 100),
-                TableViewUtils.newCol("操作", "operations", 200)
+                newCol("ID", "dishesId", 100),
+                newCol("名称", "dishesName", 200),
+                newCol("图像", "dishesImgs", 200),
+                newCol("状态", "dishesStatus", 80),
+                newCol("价格", "dishesPrice", 100),
+                newCol("库存", "dishesStock", 100),
+                newCol("操作", "operations", 200)
         );
         tableView.setItems(items);
         addLine(tableView);
@@ -191,7 +204,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         Money dishesPrice;
         String dishesStock;
         String dishesDescription;
-        String dishesImgs;
+        ImageSrc dishesImgs;
         String dishesUnitName;
         String dishesStatus;
         Long creatTime;
@@ -248,11 +261,11 @@ public class DishesManageListView extends SimpleForm implements Initializable {
             this.dishesDescription = dishesDescription;
         }
 
-        public String getDishesImgs() {
+        public ImageSrc getDishesImgs() {
             return dishesImgs;
         }
 
-        public void setDishesImgs(String dishesImgs) {
+        public void setDishesImgs(ImageSrc dishesImgs) {
             this.dishesImgs = dishesImgs;
         }
 
