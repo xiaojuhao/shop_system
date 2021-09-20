@@ -70,7 +70,7 @@ public class MenuBarView {
         dishesCate.setOnAction(evt -> openView("菜品分类管理", null));
 
         MenuItem dishesManager = new MenuItem("菜品管理");
-        dishesManager.setOnAction(evt -> openView("菜品管理", null));
+        dishesManager.setOnAction(evt -> openView("菜品管理", new DishesManageListView()));
 
         MenuItem dishesCollMenu = new MenuItem("菜品集合管理");
 
