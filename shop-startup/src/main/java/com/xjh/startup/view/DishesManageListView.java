@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.TableViewUtils;
+import com.xjh.common.utils.cellvalue.Money;
+import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.utils.cellvalue.Operations;
 import com.xjh.common.valueobject.PageCond;
 import com.xjh.dao.dataobject.Dishes;
@@ -53,6 +55,28 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 BO bo = new BO();
                 bo.setDishesId(it.getDishesId());
                 bo.setDishesName(it.getDishesName());
+                bo.setDishesPrice(new Money(it.getDishesPrice()));
+                if (it.getDishesStock() != null && it.getDishesStock() >= 0) {
+                    bo.setDishesStock(it.getDishesStock().toString());
+                } else {
+                    bo.setDishesStock("不限");
+                }
+                if (it.getDishesStatus() != null && it.getDishesStatus() == 1) {
+                    bo.setDishesStatus("上架");
+                } else {
+                    bo.setDishesStatus("下架");
+                }
+                Operations operations = new Operations();
+                OperationButton edit = new OperationButton("编辑", () -> {
+                });
+                OperationButton onoff = new OperationButton("上下架", () -> {
+                });
+                OperationButton del = new OperationButton("删除", () -> {
+                });
+                operations.add(edit);
+                operations.add(onoff);
+                operations.add(del);
+                bo.setOperations(operations);
                 return bo;
             }).collect(Collectors.toList()));
             tableView.refresh();
@@ -96,8 +120,11 @@ public class DishesManageListView extends SimpleForm implements Initializable {
 
         tableView.getColumns().addAll(
                 TableViewUtils.newCol("序号", "dishesId", 100),
-                TableViewUtils.newCol("名称", "dishesName", 100),
-                TableViewUtils.newCol("操作", "operations", 160)
+                TableViewUtils.newCol("名称", "dishesName", 200),
+                TableViewUtils.newCol("状态", "dishesStatus", 80),
+                TableViewUtils.newCol("价格", "dishesPrice", 100),
+                TableViewUtils.newCol("库存", "dishesStock", 100),
+                TableViewUtils.newCol("操作", "operations", 200)
         );
         tableView.setItems(items);
         addLine(tableView);
@@ -161,16 +188,25 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         Integer dishesId;
         Integer dishesTypeId;
         String dishesName;
-        Integer dishesStock;
+        Money dishesPrice;
+        String dishesStock;
         String dishesDescription;
         String dishesImgs;
         String dishesUnitName;
-        Integer dishesStatus;
+        String dishesStatus;
         Long creatTime;
         Integer ifNeedMergePrint;
         Integer ifNeedPrint;
         String validTime;
         Operations operations;
+
+        public Money getDishesPrice() {
+            return dishesPrice;
+        }
+
+        public void setDishesPrice(Money dishesPrice) {
+            this.dishesPrice = dishesPrice;
+        }
 
         public Integer getDishesId() {
             return dishesId;
@@ -196,11 +232,11 @@ public class DishesManageListView extends SimpleForm implements Initializable {
             this.dishesName = dishesName;
         }
 
-        public Integer getDishesStock() {
+        public String getDishesStock() {
             return dishesStock;
         }
 
-        public void setDishesStock(Integer dishesStock) {
+        public void setDishesStock(String dishesStock) {
             this.dishesStock = dishesStock;
         }
 
@@ -228,11 +264,11 @@ public class DishesManageListView extends SimpleForm implements Initializable {
             this.dishesUnitName = dishesUnitName;
         }
 
-        public Integer getDishesStatus() {
+        public String getDishesStatus() {
             return dishesStatus;
         }
 
-        public void setDishesStatus(Integer dishesStatus) {
+        public void setDishesStatus(String dishesStatus) {
             this.dishesStatus = dishesStatus;
         }
 

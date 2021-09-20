@@ -4,6 +4,14 @@ public class OperationButton {
     String title;
     Runnable action;
 
+    public OperationButton() {
+    }
+
+    public OperationButton(String title, Runnable action) {
+        this.title = title;
+        this.action = action;
+    }
+
     public String getTitle() {
         return title;
     }

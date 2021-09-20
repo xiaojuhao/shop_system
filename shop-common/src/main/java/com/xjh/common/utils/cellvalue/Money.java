@@ -14,7 +14,11 @@ public class Money {
     }
 
     public Money(Double amount) {
-        this.amount = amount;
+        if (amount == null) {
+            this.amount = 0D;
+        } else {
+            this.amount = amount;
+        }
     }
 
     public Money with(Color color) {
