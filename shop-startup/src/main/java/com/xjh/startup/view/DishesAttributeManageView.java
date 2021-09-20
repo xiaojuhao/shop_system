@@ -3,14 +3,19 @@ package com.xjh.startup.view;
 import static com.xjh.common.utils.TableViewUtils.newCol;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.xjh.common.utils.AlertBuilder;
+import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesAttributeValueVO;
+import com.xjh.dao.dataobject.Dishes;
 import com.xjh.service.domain.DishesAttributeService;
+import com.xjh.service.domain.DishesService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.LargeForm;
@@ -29,6 +34,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 
 public class DishesAttributeManageView extends LargeForm implements Initializable {
+    DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
     DishesAttributeService dishesAttributeService = GuiceContainer.getInstance(DishesAttributeService.class);
 
     TableView<DishesAttributeBO> attrPane = new TableView<>();
@@ -133,6 +139,17 @@ public class DishesAttributeManageView extends LargeForm implements Initializabl
     }
 
     public void delDishesAttr(DishesAttributeVO attr, Window window) {
+        List<Dishes> dishesList = dishesService.getAllDishes();
+        for (Dishes d : dishesList) {
+            if (CommonUtils.isBlank(d.getDishesPublicAttribute())) {
+                continue;
+            }
+            Set<String> usedIds = CommonUtils.splitAsSet(d.getDishesPublicAttribute(), ",");
+            if (usedIds.contains(attr.getDishesAttributeId() + "")) {
+                AlertBuilder.ERROR("您想删除的菜品属性" + attr.getDishesAttributeName() + "已被一些菜品调用，不可删除!");
+                return;
+            }
+        }
         dishesAttributeService.deleteById(attr);
         loadData();
     }
