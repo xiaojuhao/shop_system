@@ -121,8 +121,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         Button next = new Button("下一页");
         next.setOnMouseClicked(e -> {
             Condition c = CommonUtils.deepClone(cond.get(), Condition.class);
-            int pageNo = c.getPageNo();
-            c.setPageNo(pageNo + 1);
+            c.setPageNo(c.getPageNo() + 1);
             cond.set(c);
         });
         addLine(newLine(prev, next));
