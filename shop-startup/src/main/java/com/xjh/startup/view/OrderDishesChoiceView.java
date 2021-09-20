@@ -227,6 +227,7 @@ public class OrderDishesChoiceView extends VBox {
         cond.setDishesTypeId(queryCond.getDishesTypeId());
         cond.setDishesName(queryCond.getDishesName());
         cond.setDishesStatus(1);
+        cond.setIfdelete(0);
         return dishesService.pageQuery(cond, page);
     }
 
