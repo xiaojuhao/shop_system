@@ -18,6 +18,7 @@ import com.xjh.dao.dataobject.Dishes;
 import com.xjh.service.domain.DishesService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
+import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SimpleForm;
 
 import javafx.application.Platform;
@@ -25,6 +26,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -72,6 +74,9 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 }
                 Operations operations = new Operations();
                 OperationButton edit = new OperationButton("编辑", () -> {
+                    ModelWindow mw = new ModelWindow(this.getScene().getWindow(), "编辑菜品");
+                    mw.setScene(new Scene(new DishesEditView(it)));
+                    mw.showAndWait();
                 });
                 OperationButton onoff = new OperationButton("上下架", () -> {
                 });
