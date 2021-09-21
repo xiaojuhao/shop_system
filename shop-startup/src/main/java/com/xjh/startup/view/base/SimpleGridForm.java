@@ -28,8 +28,12 @@ public class SimpleGridForm extends GridPane {
         if (title instanceof Label) {
             ((Label) title).setAlignment(Pos.CENTER_RIGHT);
         }
-        this.add(title, 0, row);
-        this.add(content, 1, row);
+        if (title != null) {
+            this.add(title, 0, row);
+        }
+        if (content != null) {
+            this.add(content, 1, row);
+        }
     }
 
     public HBox hbox(Node... nodes) {
