@@ -5,7 +5,9 @@ import static com.xjh.common.utils.TableViewUtils.newCol;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.function.Function;
 
+import com.google.common.collect.Lists;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.ImageHelper;
@@ -14,10 +16,15 @@ import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.utils.cellvalue.Operations;
 import com.xjh.dao.dataobject.Dishes;
+import com.xjh.dao.dataobject.DishesType;
+import com.xjh.service.domain.DishesTypeService;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
+import com.xjh.startup.view.base.SimpleComboBox;
 import com.xjh.startup.view.base.SimpleGridForm;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -30,6 +37,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 public class DishesEditView extends SimpleGridForm {
+    DishesTypeService dishesTypeService = GuiceContainer.getInstance(DishesTypeService.class);
+
     public DishesEditView(Dishes dishes) {
         double labelWidth = 200;
         Label nameLabel = createLabel("名称:", labelWidth);
@@ -47,11 +56,11 @@ public class DishesEditView extends SimpleGridForm {
         Label stockLabel = createLabel("库存:", labelWidth);
         TextField stockInput = createTextField("库存");
         stockInput.setText(CommonUtils.orElse(dishes.getDishesStock(), 0).toString());
-        ComboBox<String> stockTypeSelector = new ComboBox<>();
-        stockTypeSelector.setItems(FXCollections.observableArrayList("有限库存", "无限库存"));
-        stockTypeSelector.valueProperty().addListener((_obs, _old, _new) -> {
-            stockInput.setDisable(CommonUtils.eq(_new, "无限库存"));
-        });
+        ComboBox<String> stockTypeSelector = new SimpleComboBox<>(
+                Lists.newArrayList("有限库存", "无限库存"),
+                Function.identity(),
+                selected -> stockInput.setDisable(CommonUtils.eq(selected, "无限库存"))
+        );
         stockTypeSelector.getSelectionModel().select("无限库存");
 
         addLine(stockLabel, hbox(stockTypeSelector, stockInput));
@@ -61,16 +70,30 @@ public class DishesEditView extends SimpleGridForm {
         unitInput.setText(dishes.getDishesUnitName());
         addLine(unitLabel, hbox(unitInput));
 
+        Label dishesTypeLabel = createLabel("菜品类型:", labelWidth);
+        ComboBox<DishesType> dishesTypeInput = new SimpleComboBox<>(
+                dishesTypeService.loadAllTypes(),
+                DishesType::getTypeName,
+                null
+        );
+        dishesTypeInput.getSelectionModel().selectFirst();
+        Label printSnoLabel = new Label("打印序列:");
+        printSnoLabel.setPadding(new Insets(0, 5, 0, 100));
+        TextField printSnoInput = new TextField();
+        printSnoInput.setPrefWidth(60);
+        addLine(dishesTypeLabel, hbox(dishesTypeInput, printSnoLabel, printSnoInput));
+
         Label descLabel = createLabel("菜品描述:", labelWidth);
         TextArea descInput = new TextArea();
         descInput.setText(dishes.getDishesDescription());
-        descInput.setMinHeight(100);
+        descInput.setPrefHeight(100);
         addLine(descLabel, descInput);
 
         ObservableList<ImgBO> imgItems = FXCollections.observableArrayList();
         Label imgLabel = createLabel("菜品图片:", labelWidth);
         TableView<ImgBO> imgTV = new TableView<>();
-        imgTV.setPrefWidth(500);
+        imgTV.setPrefWidth(600);
+        imgTV.setPrefHeight(200);
         imgTV.getColumns().addAll(
                 newCol("序号", "sno", 60),
                 newCol("图片", "img", 150),
@@ -145,6 +168,9 @@ public class DishesEditView extends SimpleGridForm {
         Label priAttrLabel = createLabel("私有属性:", labelWidth);
         TextField priAttrInput = createTextField("私有属性");
         addLine(priAttrLabel, priAttrInput);
+
+        Button save = new Button("保 存");
+        addLine((Node) null, save);
     }
 
     public static class ImgBO {

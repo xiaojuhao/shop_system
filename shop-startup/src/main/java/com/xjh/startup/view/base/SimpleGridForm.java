@@ -6,17 +6,21 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 
-public class SimpleGridForm extends GridPane {
+public class SimpleGridForm extends ScrollPane {
+    GridPane grid = new GridPane();
     int row = -1;
 
     public SimpleGridForm() {
-        this.setHgap(10);
-        this.setVgap(10);
-        this.setPadding(new Insets(20, 100, 10, 10));
+        this.setContent(grid);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 100, 10, 10));
+        grid.setPrefWidth(1000);
     }
 
     public void addLine(String title, Node content) {
@@ -29,10 +33,10 @@ public class SimpleGridForm extends GridPane {
             ((Label) title).setAlignment(Pos.CENTER_RIGHT);
         }
         if (title != null) {
-            this.add(title, 0, row);
+            grid.add(title, 0, row);
         }
         if (content != null) {
-            this.add(content, 1, row);
+            grid.add(content, 1, row);
         }
     }
 

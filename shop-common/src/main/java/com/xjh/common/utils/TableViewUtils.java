@@ -84,6 +84,7 @@ public class TableViewUtils {
                 } else if (nv instanceof Operations) {
                     Operations ops = (Operations) nv;
                     HBox hbox = new HBox();
+                    hbox.setSpacing(3);
                     for (OperationButton ob : ops.getOperations()) {
                         Button op = new Button(ob.getTitle());
                         op.setOnMouseClicked(evt -> CommonUtils.safeRun(ob.getAction()));
