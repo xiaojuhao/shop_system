@@ -228,7 +228,7 @@ public class DishesEditView extends SimpleGridForm {
         HBox pubAttrInput = new HBox();
         pubAttrInput.setSpacing(10);
         TableView<DishesAttributeVO> pubAttrTV = new TableView<>();
-        pubAttrTV.setPrefWidth(350);
+        pubAttrTV.setPrefWidth(600);
         pubAttrTV.setPrefHeight(150);
         pubAttrTV.getColumns().addAll(
                 newCol("序号", "dishesAttributeId", 100),
@@ -243,7 +243,7 @@ public class DishesEditView extends SimpleGridForm {
         pubAttrValTV.setPrefWidth(200);
         pubAttrValTV.setPrefHeight(150);
         pubAttrValTV.getColumns().addAll(
-                newCol("名称", "attributeValue", 100)
+                newCol("属性值名称", "attributeValue", 200)
         );
         selectedPubAttr.addListener((obs, old, _new) -> {
             pubAttrValTV.getItems().clear();
@@ -279,12 +279,13 @@ public class DishesEditView extends SimpleGridForm {
         HBox priAttrInput = new HBox();
         priAttrInput.setSpacing(10);
         TableView<DishesAttributeBO> priAttrTV = new TableView<>();
-        priAttrTV.setPrefWidth(350);
+        priAttrTV.setPrefWidth(600);
         priAttrTV.setPrefHeight(150);
         priAttrTV.getColumns().addAll(
-                newCol("ID", "dishesAttributeId", 100),
-                newCol("名称", "dishesAttributeName", 200),
-                newCol("备注", "dishesAttributeMarkInfo", 200)
+                newCol("ID", "dishesAttributeId", 60),
+                newCol("名称", "dishesAttributeName", 150),
+                newCol("备注", "dishesAttributeMarkInfo", 150),
+                newCol("操作", "operations", 200)
         );
         priAttrTV.setItems(priAttrList);
 
@@ -292,16 +293,9 @@ public class DishesEditView extends SimpleGridForm {
         priAttrValTV.setPrefWidth(200);
         priAttrValTV.setPrefHeight(150);
         priAttrValTV.getColumns().addAll(
-                newCol("序号", "sno", 100),
-                newCol("名称", "name", 100)
+                newCol("属性值名称", "attributeValue", 200)
         );
-        VBox priAttrValOperations = new VBox();
-        priAttrValOperations.getChildren().addAll(
-                new Button("增加属性"),
-                new Button("修改属性"),
-                new Button("删除属性")
-        );
-        priAttrInput.getChildren().addAll(priAttrTV, priAttrValTV, priAttrValOperations);
+        priAttrInput.getChildren().addAll(priAttrTV, priAttrValTV);
         addLine(priAttrOperations, priAttrInput);
 
         Button save = new Button("保 存");
