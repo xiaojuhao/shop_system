@@ -269,7 +269,13 @@ public class DishesEditView extends SimpleGridForm {
             modelDialog.setWidth(600);
             modelDialog.setWidth(400);
             DishesAttributeEditView view = new DishesAttributeEditView(new DishesAttributeVO(), it -> {
-
+                DishesAttributeBO bo = new DishesAttributeBO();
+                bo.setAttachment(it);
+                bo.setDishesAttributeId(1);
+                bo.setDishesAttributeName(it.getDishesAttributeName());
+                bo.setDishesAttributeMarkInfo(it.getDishesAttributeMarkInfo());
+                priAttrList.add(bo);
+                modelDialog.close();
             });
             modelDialog.setScene(new Scene(view));
             modelDialog.showAndWait();
@@ -281,6 +287,7 @@ public class DishesEditView extends SimpleGridForm {
         TableView<DishesAttributeBO> priAttrTV = new TableView<>();
         priAttrTV.setPrefWidth(600);
         priAttrTV.setPrefHeight(150);
+        priAttrTV.setItems(priAttrList);
         priAttrTV.getColumns().addAll(
                 newCol("ID", "dishesAttributeId", 60),
                 newCol("名称", "dishesAttributeName", 150),
