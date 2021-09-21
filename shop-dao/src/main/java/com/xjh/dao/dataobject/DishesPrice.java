@@ -4,6 +4,9 @@ import com.xjh.dao.foundation.Column;
 import com.xjh.dao.foundation.Id;
 import com.xjh.dao.foundation.Table;
 
+import lombok.Data;
+
+@Data
 @Table("dishes_package_type")
 public class DishesPrice {
     @Id
@@ -18,43 +21,4 @@ public class DishesPrice {
     @Column("creatTime")
     private Long creatTime;
 
-    public Integer getDishesPriceId() {
-        return dishesPriceId;
-    }
-
-    public void setDishesPriceId(Integer dishesPriceId) {
-        this.dishesPriceId = dishesPriceId;
-    }
-
-    public Integer getDishesId() {
-        return dishesId;
-    }
-
-    public void setDishesId(Integer dishesId) {
-        this.dishesId = dishesId;
-    }
-
-    public String getDishesPriceName() {
-        return dishesPriceName;
-    }
-
-    public void setDishesPriceName(String dishesPriceName) {
-        this.dishesPriceName = dishesPriceName;
-    }
-
-    public Double getDishesPrice() {
-        return dishesPrice;
-    }
-
-    public void setDishesPrice(Double dishesPrice) {
-        this.dishesPrice = dishesPrice;
-    }
-
-    public Long getCreatTime() {
-        return creatTime;
-    }
-
-    public void setCreatTime(Long creatTime) {
-        this.creatTime = creatTime;
-    }
 }

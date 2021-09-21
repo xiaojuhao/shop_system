@@ -4,6 +4,9 @@ import com.xjh.dao.foundation.Column;
 import com.xjh.dao.foundation.Id;
 import com.xjh.dao.foundation.Table;
 
+import lombok.Data;
+
+@Data
 @Table("dishesattribute_list")
 public class DishesAttribute {
     @Id
@@ -27,60 +30,4 @@ public class DishesAttribute {
 
     @Column("creatTime")
     Long creatTime;
-
-    public Integer getDishesAttributeId() {
-        return dishesAttributeId;
-    }
-
-    public void setDishesAttributeId(Integer dishesAttributeId) {
-        this.dishesAttributeId = dishesAttributeId;
-    }
-
-    public String getDishesAttributeName() {
-        return dishesAttributeName;
-    }
-
-    public void setDishesAttributeName(String dishesAttributeName) {
-        this.dishesAttributeName = dishesAttributeName;
-    }
-
-    public String getDishesAttributeMarkInfo() {
-        return dishesAttributeMarkInfo;
-    }
-
-    public void setDishesAttributeMarkInfo(String dishesAttributeMarkInfo) {
-        this.dishesAttributeMarkInfo = dishesAttributeMarkInfo;
-    }
-
-    public Integer getIsValueRadio() {
-        return isValueRadio;
-    }
-
-    public void setIsValueRadio(Integer isValueRadio) {
-        this.isValueRadio = isValueRadio;
-    }
-
-    public Integer getIsSync() {
-        return isSync;
-    }
-
-    public void setIsSync(Integer isSync) {
-        this.isSync = isSync;
-    }
-
-    public String getDishesAttributeObj() {
-        return dishesAttributeObj;
-    }
-
-    public void setDishesAttributeObj(String dishesAttributeObj) {
-        this.dishesAttributeObj = dishesAttributeObj;
-    }
-
-    public Long getCreatTime() {
-        return creatTime;
-    }
-
-    public void setCreatTime(Long creatTime) {
-        this.creatTime = creatTime;
-    }
 }
