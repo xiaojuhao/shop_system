@@ -14,6 +14,7 @@ import com.xjh.service.domain.DishesAttributeService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SmallForm;
+import com.xjh.startup.view.model.DishesAttributeValueBO;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -28,7 +29,7 @@ public class DishesAttributeEditView extends SmallForm {
     DishesAttributeService dishesAttributeService = GuiceContainer.getInstance(DishesAttributeService.class);
 
 
-    ObservableList<AttributeValueBO> attrList = FXCollections.observableArrayList();
+    ObservableList<DishesAttributeValueBO> attrList = FXCollections.observableArrayList();
     DishesAttributeVO data;
     List<Runnable> collectData = new ArrayList<>();
 
@@ -58,7 +59,7 @@ public class DishesAttributeEditView extends SmallForm {
         collectData.add(() -> data.setDishesAttributeMarkInfo(markInput.getText()));
 
 
-        TableView<AttributeValueBO> tv = new TableView<>();
+        TableView<DishesAttributeValueBO> tv = new TableView<>();
         tv.getColumns().addAll(
                 newCol("属性值", "attributeValue", 200),
                 newCol("操作", "action", 100)
@@ -74,7 +75,7 @@ public class DishesAttributeEditView extends SmallForm {
             data.setAllAttributeValues(vals);
         });
         CommonUtils.forEach(attr.getAllAttributeValues(), v -> {
-            AttributeValueBO bo = new AttributeValueBO();
+            DishesAttributeValueBO bo = new DishesAttributeValueBO();
             bo.setAttributeValue(v.getAttributeValue());
             OperationButton op = new OperationButton();
             op.setTitle("删除");
@@ -108,15 +109,15 @@ public class DishesAttributeEditView extends SmallForm {
         addPairLine(addAttr, update);
     }
 
-    private void removeItem(TableView<AttributeValueBO> tv, String item) {
+    private void removeItem(TableView<DishesAttributeValueBO> tv, String item) {
         tv.getItems().stream()
                 .filter(it -> it.getAttributeValue().equals(item))
                 .findFirst().ifPresent(tv.getItems()::remove);
         tv.refresh();
     }
 
-    private void addItem(TableView<AttributeValueBO> tv, String item) {
-        AttributeValueBO t = new AttributeValueBO();
+    private void addItem(TableView<DishesAttributeValueBO> tv, String item) {
+        DishesAttributeValueBO t = new DishesAttributeValueBO();
         t.setAttributeValue(item);
         OperationButton op = new OperationButton();
         op.setTitle("删除");
@@ -132,27 +133,6 @@ public class DishesAttributeEditView extends SmallForm {
             dishesAttributeService.updateById(attr);
         }else {
             dishesAttributeService.addNew(attr);
-        }
-    }
-
-    public static class AttributeValueBO {
-        String attributeValue;
-        OperationButton action;
-
-        public String getAttributeValue() {
-            return attributeValue;
-        }
-
-        public void setAttributeValue(String attributeValue) {
-            this.attributeValue = attributeValue;
-        }
-
-        public OperationButton getAction() {
-            return action;
-        }
-
-        public void setAction(OperationButton action) {
-            this.action = action;
         }
     }
 }

@@ -5,7 +5,9 @@ import static com.xjh.common.utils.TableViewUtils.newCol;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 import com.xjh.common.utils.AlertBuilder;
@@ -15,18 +17,26 @@ import com.xjh.common.utils.cellvalue.ImageSrc;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.utils.cellvalue.Operations;
+import com.xjh.common.valueobject.DishesAttributeVO;
+import com.xjh.common.valueobject.DishesAttributeValueVO;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesType;
+import com.xjh.service.domain.DishesAttributeService;
 import com.xjh.service.domain.DishesTypeService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
+import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SimpleComboBox;
 import com.xjh.startup.view.base.SimpleGridForm;
+import com.xjh.startup.view.model.DishesAttributeBO;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -37,9 +47,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Window;
 
 public class DishesEditView extends SimpleGridForm {
     DishesTypeService dishesTypeService = GuiceContainer.getInstance(DishesTypeService.class);
+    DishesAttributeService dishesAttributeService = GuiceContainer.getInstance(DishesAttributeService.class);
 
     public DishesEditView(Dishes dishes) {
         double labelWidth = 200;
@@ -165,28 +177,84 @@ public class DishesEditView extends SimpleGridForm {
 
         addLine(createLabel("菜品属性:", labelWidth), new Label("公共属性(不能修改)"));
 
+        ObservableList<DishesAttributeVO> selectedPubAttrItems = FXCollections.observableArrayList();
+        ObjectProperty<DishesAttributeVO> selectedPubAttr = new SimpleObjectProperty<>();
         VBox pubAttrOperations = new VBox();
         pubAttrOperations.setSpacing(10);
-        pubAttrOperations.getChildren().add(new Button("添加公共属性"));
-        pubAttrOperations.getChildren().add(new Button("移除公共属性"));
+        Button addPubAttrBtn = new Button("添加公共属性");
+        addPubAttrBtn.setOnAction(evt -> {
+            // 弹出公共属性选择框
+            List<DishesAttributeVO> allAttrList = dishesAttributeService.selectAll();
+            Window window = this.getScene().getWindow();
+            ModelWindow w = new ModelWindow(window);
+            HBox box = new HBox();
+            box.setSpacing(20);
+            box.setPadding(new Insets(10, 10, 10, 10));
+            TableView<DishesAttributeBO> attrsTV = new TableView<>();
+            attrsTV.setPrefWidth(window.getWidth() * 0.9 * 0.6);
+            attrsTV.getColumns().addAll(
+                    newCol("属性ID", "dishesAttributeId", 60),
+                    newCol("属性名称", "dishesAttributeName", 200),
+                    newCol("属性名称", "operations", 0)
+            );
+            attrsTV.setItems(FXCollections.observableArrayList(allAttrList.stream().map(it -> {
+                DishesAttributeBO bo = new DishesAttributeBO();
+                bo.setAttachment(it);
+                bo.setDishesAttributeId(it.getDishesAttributeId());
+                bo.setDishesAttributeName(it.getDishesAttributeName());
+                if (!selectedPubAttrItems.stream()
+                        .map(DishesAttributeVO::getDishesAttributeId).collect(Collectors.toList())
+                        .contains(it.getDishesAttributeId())) {
+                    bo.getOperations().add(new OperationButton("添加", () -> {
+                        selectedPubAttrItems.add(it);
+                        w.hide();
+                    }));
+                }
+                return bo;
+            }).collect(Collectors.toList())));
+            attrsTV.refresh();
+
+            TableView<DishesAttributeValueVO> attrsValTV = new TableView<>();
+            attrsValTV.setPrefWidth(window.getWidth() * 0.9 * 0.3);
+            attrsValTV.getColumns().addAll(
+                    newCol("属性值", "name", 200)
+            );
+            box.getChildren().addAll(attrsTV, attrsValTV);
+            w.setScene(new Scene(box));
+            w.showAndWait();
+        });
+        Button removePubAttrBtn = new Button("移除公共属性");
+        pubAttrOperations.getChildren().addAll(addPubAttrBtn, removePubAttrBtn);
         HBox pubAttrInput = new HBox();
         pubAttrInput.setSpacing(10);
-        TableView<Dishes> pubAttrTV = new TableView<>();
+        TableView<DishesAttributeVO> pubAttrTV = new TableView<>();
         pubAttrTV.setPrefWidth(350);
         pubAttrTV.setPrefHeight(150);
         pubAttrTV.getColumns().addAll(
-                newCol("序号", "sno", 100),
-                newCol("名称", "name", 200)
+                newCol("序号", "dishesAttributeId", 100),
+                newCol("名称", "dishesAttributeName", 200)
         );
-        TableView<Dishes> pubAttrValTV = new TableView<>();
+        pubAttrTV.setItems(selectedPubAttrItems);
+        pubAttrTV.getSelectionModel().selectedItemProperty().addListener((x, o, n) -> {
+            selectedPubAttr.set(n);
+        });
+
+        TableView<DishesAttributeValueVO> pubAttrValTV = new TableView<>();
         pubAttrValTV.setPrefWidth(200);
         pubAttrValTV.setPrefHeight(150);
         pubAttrValTV.getColumns().addAll(
-                newCol("序号", "sno", 100),
-                newCol("名称", "name", 100)
+                newCol("名称", "attributeValue", 100)
         );
-        pubAttrInput.getChildren().add(pubAttrTV);
-        pubAttrInput.getChildren().add(pubAttrValTV);
+        selectedPubAttr.addListener((obs, old, _new) -> {
+            pubAttrValTV.getItems().clear();
+            if (_new != null && _new.getAllAttributeValues() != null) {
+                pubAttrValTV.getItems().addAll(
+                        FXCollections.observableArrayList(_new.getAllAttributeValues()));
+            }
+            pubAttrValTV.refresh();
+        });
+
+        pubAttrInput.getChildren().addAll(pubAttrTV, pubAttrValTV);
         addLine(pubAttrOperations, pubAttrInput);
 
         addLine("", new Label("私有属性(可修改)"));
