@@ -33,6 +33,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 
@@ -161,13 +163,62 @@ public class DishesEditView extends SimpleGridForm {
         });
         addLine((Node) null, uploadFile);
 
-        Label pubAttrLabel = createLabel("公共属性:", labelWidth);
-        TextField pubAttrInput = createTextField("公共属性");
-        addLine(pubAttrLabel, pubAttrInput);
+        addLine(createLabel("菜品属性:", labelWidth), new Label("公共属性(不能修改)"));
 
-        Label priAttrLabel = createLabel("私有属性:", labelWidth);
-        TextField priAttrInput = createTextField("私有属性");
-        addLine(priAttrLabel, priAttrInput);
+        VBox pubAttrOperations = new VBox();
+        pubAttrOperations.setSpacing(10);
+        pubAttrOperations.getChildren().add(new Button("添加公共属性"));
+        pubAttrOperations.getChildren().add(new Button("移除公共属性"));
+        HBox pubAttrInput = new HBox();
+        pubAttrInput.setSpacing(10);
+        TableView<Dishes> pubAttrTV = new TableView<>();
+        pubAttrTV.setPrefWidth(350);
+        pubAttrTV.setPrefHeight(150);
+        pubAttrTV.getColumns().addAll(
+                newCol("序号", "sno", 100),
+                newCol("名称", "name", 200)
+        );
+        TableView<Dishes> pubAttrValTV = new TableView<>();
+        pubAttrValTV.setPrefWidth(200);
+        pubAttrValTV.setPrefHeight(150);
+        pubAttrValTV.getColumns().addAll(
+                newCol("序号", "sno", 100),
+                newCol("名称", "name", 100)
+        );
+        pubAttrInput.getChildren().add(pubAttrTV);
+        pubAttrInput.getChildren().add(pubAttrValTV);
+        addLine(pubAttrOperations, pubAttrInput);
+
+        addLine("", new Label("私有属性(可修改)"));
+
+        VBox priAttrOperations = new VBox();
+        priAttrOperations.setSpacing(10);
+        priAttrOperations.getChildren().add(new Button("添加私有属性"));
+        priAttrOperations.getChildren().add(new Button("移除私有属性"));
+        HBox priAttrInput = new HBox();
+        priAttrInput.setSpacing(10);
+        TableView<Dishes> priAttrTV = new TableView<>();
+        priAttrTV.setPrefWidth(350);
+        priAttrTV.setPrefHeight(150);
+        priAttrTV.getColumns().addAll(
+                newCol("序号", "sno", 100),
+                newCol("名称", "name", 200)
+        );
+        TableView<Dishes> priAttrValTV = new TableView<>();
+        priAttrValTV.setPrefWidth(200);
+        priAttrValTV.setPrefHeight(150);
+        priAttrValTV.getColumns().addAll(
+                newCol("序号", "sno", 100),
+                newCol("名称", "name", 100)
+        );
+        VBox priAttrValOperations = new VBox();
+        priAttrValOperations.getChildren().addAll(
+                new Button("增加属性"),
+                new Button("修改属性"),
+                new Button("删除属性")
+        );
+        priAttrInput.getChildren().addAll(priAttrTV, priAttrValTV, priAttrValOperations);
+        addLine(priAttrOperations, priAttrInput);
 
         Button save = new Button("保 存");
         addLine((Node) null, save);
