@@ -1,12 +1,12 @@
 package com.xjh.startup.view.base;
 
 import com.xjh.common.utils.CommonUtils;
+
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
@@ -15,7 +15,10 @@ public class SimpleForm extends VBox {
         this.getChildren().add(node);
     }
 
-    public void addPairLine(Region title,  Region content){
+    public void addPairLine(Region title,  Region content) {
+        if (title instanceof Label) {
+            ((Label) title).setAlignment(Pos.CENTER_RIGHT);
+        }
         addLine(newLine(title, content));
     }
 

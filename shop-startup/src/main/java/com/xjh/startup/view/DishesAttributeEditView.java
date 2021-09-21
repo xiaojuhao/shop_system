@@ -4,14 +4,12 @@ import static com.xjh.common.utils.TableViewUtils.newCol;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesAttributeValueVO;
-import com.xjh.service.domain.DishesAttributeService;
-import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DishesAttributeValueBO;
@@ -26,18 +24,15 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 
 public class DishesAttributeEditView extends SmallForm {
-    DishesAttributeService dishesAttributeService = GuiceContainer.getInstance(DishesAttributeService.class);
-
-
     ObservableList<DishesAttributeValueBO> attrList = FXCollections.observableArrayList();
     DishesAttributeVO data;
     List<Runnable> collectData = new ArrayList<>();
 
-    public DishesAttributeEditView(DishesAttributeVO attr) {
+    public DishesAttributeEditView(DishesAttributeVO attr, Consumer<DishesAttributeVO> onSave) {
         super();
 
         data = CommonUtils.deepClone(attr, DishesAttributeVO.class);
-        double titleWidth = 150;
+        double titleWidth = 80;
         double contentWidth = 250;
 
         Label nameLabel = createLabel("属性名:", titleWidth);
@@ -57,7 +52,6 @@ public class DishesAttributeEditView extends SmallForm {
         TextField markInput = initTextField(attr.getDishesAttributeMarkInfo(), contentWidth);
         addPairLine(markLabel, markInput);
         collectData.add(() -> data.setDishesAttributeMarkInfo(markInput.getText()));
-
 
         TableView<DishesAttributeValueBO> tv = new TableView<>();
         tv.getColumns().addAll(
@@ -88,7 +82,7 @@ public class DishesAttributeEditView extends SmallForm {
         Button update = new Button("保 存");
         update.setOnAction(e -> {
             CommonUtils.safeRun(collectData);
-            this.saveDishesAttr(data);
+            onSave.accept(data);
         });
         Button addAttr = new Button("增 加");
         addAttr.setOnAction(evt -> {
@@ -127,12 +121,5 @@ public class DishesAttributeEditView extends SmallForm {
         tv.refresh();
     }
 
-    private void saveDishesAttr(DishesAttributeVO attr) {
-        Logger.info("保存菜品属性:" + CommonUtils.reflectString(attr));
-        if(attr.getDishesAttributeId() != null) {
-            dishesAttributeService.updateById(attr);
-        }else {
-            dishesAttributeService.addNew(attr);
-        }
-    }
+
 }

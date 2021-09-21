@@ -259,19 +259,35 @@ public class DishesEditView extends SimpleGridForm {
 
         addLine("", new Label("私有属性(可修改)"));
 
+        ObservableList<DishesAttributeBO> priAttrList = FXCollections.observableArrayList();
         VBox priAttrOperations = new VBox();
         priAttrOperations.setSpacing(10);
-        priAttrOperations.getChildren().add(new Button("添加私有属性"));
-        priAttrOperations.getChildren().add(new Button("移除私有属性"));
+        Button addPriAttrBtn = new Button("添加私有属性");
+        addPriAttrBtn.setOnAction(evt -> {
+            Window w = this.getScene().getWindow();
+            ModelWindow modelDialog = new ModelWindow(w);
+            modelDialog.setWidth(600);
+            modelDialog.setWidth(400);
+            DishesAttributeEditView view = new DishesAttributeEditView(new DishesAttributeVO(), it -> {
+
+            });
+            modelDialog.setScene(new Scene(view));
+            modelDialog.showAndWait();
+        });
+        Button removePriAttrBtn = new Button("移除私有属性");
+        priAttrOperations.getChildren().addAll(addPriAttrBtn, removePriAttrBtn);
         HBox priAttrInput = new HBox();
         priAttrInput.setSpacing(10);
-        TableView<Dishes> priAttrTV = new TableView<>();
+        TableView<DishesAttributeBO> priAttrTV = new TableView<>();
         priAttrTV.setPrefWidth(350);
         priAttrTV.setPrefHeight(150);
         priAttrTV.getColumns().addAll(
-                newCol("序号", "sno", 100),
-                newCol("名称", "name", 200)
+                newCol("ID", "dishesAttributeId", 100),
+                newCol("名称", "dishesAttributeName", 200),
+                newCol("备注", "dishesAttributeMarkInfo", 200)
         );
+        priAttrTV.setItems(priAttrList);
+
         TableView<Dishes> priAttrValTV = new TableView<>();
         priAttrValTV.setPrefWidth(200);
         priAttrValTV.setPrefHeight(150);

@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.common.valueobject.DishesAttributeVO;
@@ -133,7 +134,7 @@ public class DishesAttributeManageView extends LargeForm implements Initializabl
         Stage stg = new ModelWindow(window, "属性信息");
         stg.setWidth(460);
         stg.setHeight(600);
-        stg.setScene(new Scene(new DishesAttributeEditView(attr)));
+        stg.setScene(new Scene(new DishesAttributeEditView(attr, this::saveDishesAttr)));
         stg.showAndWait();
         loadData();
     }
@@ -152,6 +153,15 @@ public class DishesAttributeManageView extends LargeForm implements Initializabl
         }
         dishesAttributeService.deleteById(attr);
         loadData();
+    }
+
+    private void saveDishesAttr(DishesAttributeVO attr) {
+        Logger.info("保存菜品属性:" + CommonUtils.reflectString(attr));
+        if (attr.getDishesAttributeId() != null) {
+            dishesAttributeService.updateById(attr);
+        } else {
+            dishesAttributeService.addNew(attr);
+        }
     }
 
 }
