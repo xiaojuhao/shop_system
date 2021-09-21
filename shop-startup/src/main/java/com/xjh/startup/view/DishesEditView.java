@@ -48,6 +48,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Window;
+import lombok.Data;
 
 public class DishesEditView extends SimpleGridForm {
     DishesTypeService dishesTypeService = GuiceContainer.getInstance(DishesTypeService.class);
@@ -309,42 +310,11 @@ public class DishesEditView extends SimpleGridForm {
         addLine((Node) null, save);
     }
 
+    @Data
     public static class ImgBO {
         int sno;
         ImageSrc img;
         String isMain;
         Operations operations = new Operations();
-
-        public int getSno() {
-            return sno;
-        }
-
-        public void setSno(int sno) {
-            this.sno = sno;
-        }
-
-        public ImageSrc getImg() {
-            return img;
-        }
-
-        public void setImg(ImageSrc img) {
-            this.img = img;
-        }
-
-        public Operations getOperations() {
-            return operations;
-        }
-
-        public void setOperations(Operations operations) {
-            this.operations = operations;
-        }
-
-        public String getIsMain() {
-            return isMain;
-        }
-
-        public void setIsMain(String isMain) {
-            this.isMain = isMain;
-        }
     }
 }
