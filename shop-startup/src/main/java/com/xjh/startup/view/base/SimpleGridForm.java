@@ -20,7 +20,6 @@ public class SimpleGridForm extends ScrollPane {
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 100, 10, 10));
-        grid.setPrefWidth(1000);
     }
 
     public void addLine(String title, Node content) {

@@ -215,7 +215,7 @@ public class DishesEditView extends SimpleGridForm {
             attrsTV.refresh();
 
             TableView<DishesAttributeValueVO> attrsValTV = new TableView<>();
-            attrsValTV.setPrefWidth(window.getWidth() * 0.9 * 0.3);
+            attrsValTV.setPrefWidth(window.getWidth() * 0.9 * 0.4);
             attrsValTV.getColumns().addAll(
                     newCol("属性值", "name", 200)
             );

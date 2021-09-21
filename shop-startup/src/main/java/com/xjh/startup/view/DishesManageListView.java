@@ -34,6 +34,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
+import javafx.stage.Window;
 
 public class DishesManageListView extends SimpleForm implements Initializable {
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
@@ -74,8 +75,11 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 }
                 Operations operations = new Operations();
                 OperationButton edit = new OperationButton("编辑", () -> {
-                    ModelWindow mw = new ModelWindow(this.getScene().getWindow(), "编辑菜品");
-                    mw.setScene(new Scene(new DishesEditView(it)));
+                    Window window = this.getScene().getWindow();
+                    ModelWindow mw = new ModelWindow(window, "编辑菜品");
+                    DishesEditView view = new DishesEditView(it);
+                    view.setPrefWidth(window.getWidth() * 0.8);
+                    mw.setScene(new Scene(view));
                     mw.showAndWait();
                 });
                 OperationButton onoff = new OperationButton("上下架", () -> {
