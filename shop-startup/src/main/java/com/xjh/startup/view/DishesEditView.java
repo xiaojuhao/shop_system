@@ -130,7 +130,7 @@ public class DishesEditView extends SimpleGridForm {
             bo.getOperations().add(new OperationButton("设为主图", () -> {
 
             }));
-            if (it.getMain() != null && it.getMain()) {
+            if (it.getIsMain() != null && it.getIsMain()) {
                 bo.setIsMain("是");
             } else {
                 bo.setIsMain("否");
