@@ -179,6 +179,7 @@ public class DishesEditView extends SimpleGridForm {
         addLine(createLabel("菜品属性:", labelWidth), new Label("公共属性(不能修改)"));
 
         ObservableList<DishesAttributeVO> selectedPubAttrItems = FXCollections.observableArrayList();
+        ObservableList<DishesAttributeValueVO> selectedPubAttrValueItems = FXCollections.observableArrayList();
         ObjectProperty<DishesAttributeVO> selectedPubAttr = new SimpleObjectProperty<>();
         VBox pubAttrOperations = new VBox();
         pubAttrOperations.setSpacing(10);
@@ -186,6 +187,7 @@ public class DishesEditView extends SimpleGridForm {
         addPubAttrBtn.setOnAction(evt -> {
             // 弹出公共属性选择框
             List<DishesAttributeVO> allAttrList = dishesAttributeService.selectAll();
+            ObjectProperty<DishesAttributeBO> selectedAttr = new SimpleObjectProperty<>();
             Window window = this.getScene().getWindow();
             ModelWindow w = new ModelWindow(window);
             HBox box = new HBox();
@@ -213,13 +215,22 @@ public class DishesEditView extends SimpleGridForm {
                 }
                 return bo;
             }).collect(Collectors.toList())));
+            attrsTV.getSelectionModel().selectedItemProperty().addListener((x, o, n) -> {
+                selectedAttr.set(n);
+            });
             attrsTV.refresh();
-
             TableView<DishesAttributeValueVO> attrsValTV = new TableView<>();
             attrsValTV.setPrefWidth(window.getWidth() * 0.9 * 0.4);
             attrsValTV.getColumns().addAll(
-                    newCol("属性值", "name", 200)
+                    newCol("属性值", "attributeValue", 200)
             );
+            selectedAttr.addListener((obs, ov, nv) -> {
+                attrsValTV.getItems().clear();
+                if (nv != null && nv.getAttachment() != null && nv.getAttachment().getAllAttributeValues() != null) {
+                    attrsValTV.setItems(FXCollections.observableArrayList(nv.getAttachment().getAllAttributeValues()));
+                }
+                attrsValTV.refresh();
+            });
             box.getChildren().addAll(attrsTV, attrsValTV);
             w.setScene(new Scene(box));
             w.showAndWait();
@@ -243,6 +254,7 @@ public class DishesEditView extends SimpleGridForm {
         TableView<DishesAttributeValueVO> pubAttrValTV = new TableView<>();
         pubAttrValTV.setPrefWidth(200);
         pubAttrValTV.setPrefHeight(150);
+        pubAttrValTV.setItems(selectedPubAttrValueItems);
         pubAttrValTV.getColumns().addAll(
                 newCol("属性值名称", "attributeValue", 200)
         );

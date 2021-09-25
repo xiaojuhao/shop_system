@@ -84,7 +84,7 @@ public class DishesAttributeEditView extends SmallForm {
             CommonUtils.safeRun(collectData);
             onSave.accept(data);
         });
-        Button addAttr = new Button("增 加");
+        Button addAttr = new Button("增加属性值");
         addAttr.setOnAction(evt -> {
             ModelWindow stg = new ModelWindow(this.getScene().getWindow(), "增加属性");
             stg.setHeight(200);
