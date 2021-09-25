@@ -1,5 +1,6 @@
 package com.xjh.dao.mapper;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,22 @@ public class DishesDAO {
     @Inject
     @Named("mysql")
     HikariDataSource ds;
+
+    public int updateByDishesId(Dishes dishes) throws SQLException {
+        return Db.use(ds).update(
+                EntityUtils.create(dishes),
+                EntityUtils.idCond(dishes)
+        );
+    }
+
+    public int insert(Dishes dishes) throws SQLException {
+        return Db.use(ds).insert(EntityUtils.create(dishes));
+    }
+
+    public int maxDishesId() throws SQLException {
+        List<Entity> rs = Db.use(ds).query("select max(dishesId) as dishesId from dishes_list");
+        return rs.get(0).getInt("dishesId");
+    }
 
     public Dishes getById(Integer id) {
         if (id == null) {

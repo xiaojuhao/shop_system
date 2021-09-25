@@ -1,6 +1,7 @@
 package com.xjh.dao.dataobject;
 
 import com.xjh.dao.foundation.Column;
+import com.xjh.dao.foundation.Id;
 import com.xjh.dao.foundation.Table;
 
 import lombok.Data;
@@ -8,6 +9,7 @@ import lombok.Data;
 @Data
 @Table("dishes_list")
 public class Dishes {
+    @Id
     @Column("dishesId")
     Integer dishesId;
 
@@ -58,4 +60,7 @@ public class Dishes {
 
     @Column("ifdelete")
     Integer ifdelete;
+
+    @Column("printSortby")
+    Integer printSortby;
 }

@@ -28,6 +28,16 @@ public class DishesService {
     @Inject
     DishesPriceDAO dishesPriceDAO;
 
+    public int save(Dishes dishes) throws Exception {
+        if (dishes.getDishesId() != null) {
+            return dishesDAO.updateByDishesId(dishes);
+        } else {
+            int maxId = dishesDAO.maxDishesId();
+            dishes.setDishesId(maxId + 1);
+            return dishesDAO.insert(dishes);
+        }
+    }
+
     public Dishes getById(Integer id) {
         return dishesDAO.getById(id);
     }

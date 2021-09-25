@@ -12,6 +12,10 @@
     <artifactId>shop-startup</artifactId>
 
     <dependencies>
+        <dependency>
+            <groupId>org.controlsfx</groupId>
+            <artifactId>controlsfx</artifactId>
+        </dependency>
         <!--Java工具集合的依赖-->
         <dependency>
             <groupId>cn.hutool</groupId>

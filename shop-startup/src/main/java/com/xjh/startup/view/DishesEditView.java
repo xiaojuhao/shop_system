@@ -5,10 +5,12 @@ import static com.xjh.common.utils.TableViewUtils.newCol;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
@@ -19,9 +21,11 @@ import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.utils.cellvalue.Operations;
 import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesAttributeValueVO;
+import com.xjh.common.valueobject.DishesImgVO;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesType;
 import com.xjh.service.domain.DishesAttributeService;
+import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.DishesTypeService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.ModelWindow;
@@ -29,6 +33,7 @@ import com.xjh.startup.view.base.SimpleComboBox;
 import com.xjh.startup.view.base.SimpleGridForm;
 import com.xjh.startup.view.model.DishesAttributeBO;
 
+import cn.hutool.core.codec.Base64;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -51,15 +56,20 @@ import javafx.stage.Window;
 import lombok.Data;
 
 public class DishesEditView extends SimpleGridForm {
+
     DishesTypeService dishesTypeService = GuiceContainer.getInstance(DishesTypeService.class);
     DishesAttributeService dishesAttributeService = GuiceContainer.getInstance(DishesAttributeService.class);
+    DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
+
+    List<Runnable> collectData = new ArrayList<>();
 
     public DishesEditView(Dishes dishes) {
-        double labelWidth = 200;
+        double labelWidth = 120;
         Label nameLabel = createLabel("名称:", labelWidth);
         TextField nameInput = createTextField("名称", 300);
         nameInput.setText(dishes.getDishesName());
         addLine(nameLabel, hbox(nameInput));
+        collectData.add(() -> dishes.setDishesName(nameInput.getText()));
 
         Label priceLabel = createLabel("价格:", labelWidth);
         TextField priceInput = createTextField("价格");
@@ -67,6 +77,7 @@ public class DishesEditView extends SimpleGridForm {
         Label priceTail = new Label("元");
         priceTail.setAlignment(Pos.CENTER_LEFT);
         addLine(priceLabel, hbox(priceInput, priceTail));
+        collectData.add(() -> dishes.setDishesPrice(CommonUtils.parseDouble(priceInput.getText(), 0D)));
 
         Label stockLabel = createLabel("库存:", labelWidth);
         TextField stockInput = createTextField("库存");
@@ -77,13 +88,14 @@ public class DishesEditView extends SimpleGridForm {
                 selected -> stockInput.setDisable(CommonUtils.eq(selected, "无限库存"))
         );
         stockTypeSelector.getSelectionModel().select("无限库存");
-
         addLine(stockLabel, hbox(stockTypeSelector, stockInput));
+        collectData.add(() -> dishes.setDishesStock(CommonUtils.parseInt(stockInput.getText(), 0)));
 
         Label unitLabel = createLabel("库存单位:", labelWidth);
         TextField unitInput = createTextField("库存单位");
         unitInput.setText(dishes.getDishesUnitName());
         addLine(unitLabel, hbox(unitInput));
+        collectData.add(() -> dishes.setDishesUnitName(unitInput.getText()));
 
         Label dishesTypeLabel = createLabel("菜品类型:", labelWidth);
         ComboBox<DishesType> dishesTypeInput = new SimpleComboBox<>(
@@ -95,14 +107,20 @@ public class DishesEditView extends SimpleGridForm {
         Label printSnoLabel = new Label("打印序列:");
         printSnoLabel.setPadding(new Insets(0, 5, 0, 100));
         TextField printSnoInput = new TextField();
+        printSnoInput.setText(dishes.getPrintSortby() + "");
         printSnoInput.setPrefWidth(60);
         addLine(dishesTypeLabel, hbox(dishesTypeInput, printSnoLabel, printSnoInput));
+        collectData.add(() -> {
+            dishes.setDishesTypeId(dishesTypeInput.getSelectionModel().getSelectedItem().getTypeId());
+            dishes.setPrintSortby(CommonUtils.parseInt(printSnoInput.getText(), 0));
+        });
 
         Label descLabel = createLabel("菜品描述:", labelWidth);
         TextArea descInput = new TextArea();
         descInput.setText(dishes.getDishesDescription());
         descInput.setPrefHeight(100);
         addLine(descLabel, descInput);
+        collectData.add(() -> dishes.setDishesDescription(descInput.getText()));
 
         ObservableList<ImgBO> imgItems = FXCollections.observableArrayList();
         Label imgLabel = createLabel("菜品图片:", labelWidth);
@@ -117,6 +135,15 @@ public class DishesEditView extends SimpleGridForm {
         );
         imgTV.setItems(imgItems);
         addLine(imgLabel, imgTV);
+        collectData.add(() -> {
+            List<DishesImgVO> imgs = imgItems.stream().map(it -> {
+                DishesImgVO v = new DishesImgVO();
+                v.setIsMain("是".equals(it.getIsMain()));
+                v.setImageSrc(it.getImg().getImgUrl());
+                return v;
+            }).collect(Collectors.toList());
+            dishes.setDishesImgs(Base64.encode(JSON.toJSONString(imgs)));
+        });
         CommonUtils.forEach(ImageHelper.resolveImgs(dishes.getDishesImgs()), it -> {
             ImgBO bo = new ImgBO();
             bo.setSno(imgItems.size() + 1);
@@ -319,6 +346,16 @@ public class DishesEditView extends SimpleGridForm {
         addLine(priAttrOperations, priAttrInput);
 
         Button save = new Button("保 存");
+        save.setOnAction(evt -> {
+            CommonUtils.safeRun(collectData);
+            System.out.println(JSON.toJSONString(dishes, true));
+            try {
+                dishesService.save(dishes);
+                AlertBuilder.INFO("保存成功");
+            } catch (Exception e) {
+                AlertBuilder.ERROR("保存失败," + e.getMessage());
+            }
+        });
         addLine((Node) null, save);
     }
 

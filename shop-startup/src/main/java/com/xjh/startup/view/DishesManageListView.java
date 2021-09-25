@@ -12,7 +12,6 @@ import com.xjh.common.utils.cellvalue.ImageSrc;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.utils.cellvalue.Operations;
-import com.xjh.common.valueobject.DishesImgVO;
 import com.xjh.common.valueobject.PageCond;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.service.domain.DishesService;
@@ -36,6 +35,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.stage.Window;
+import lombok.Data;
 
 public class DishesManageListView extends SimpleForm implements Initializable {
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
@@ -80,7 +80,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                     Window window = this.getScene().getWindow();
                     ModelWindow mw = new ModelWindow(window, "编辑菜品");
                     DishesEditView view = new DishesEditView(it);
-                    view.setPrefWidth(window.getWidth() * 0.8);
+                    view.setPrefWidth(window.getWidth() * 0.75);
                     mw.setScene(new Scene(view));
                     mw.showAndWait();
                 });
@@ -92,14 +92,13 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 operations.add(onoff);
                 operations.add(del);
                 bo.setOperations(operations);
-                DishesImgVO imgvo = ImageHelper.resolveImgs(it.getDishesImgs())
-                        .stream().findFirst().orElse(null);
-                if (imgvo != null) {
-                    ImageSrc img = new ImageSrc(imgvo.getImageSrc());
+                ImageHelper.resolveImgs(it.getDishesImgs()).stream()
+                        .findFirst().ifPresent(x -> {
+                    ImageSrc img = new ImageSrc(x.getImageSrc());
                     img.setWidth(100);
                     img.setHeight(60);
                     bo.setDishesImgs(img);
-                }
+                });
                 return bo;
             }).collect(Collectors.toList()));
             tableView.refresh();
@@ -183,36 +182,14 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         addLine(line);
     }
 
+    @Data
     public static class Condition {
         int pageNo = 1;
         int pageSize = 20;
         String name;
-
-        public int getPageNo() {
-            return pageNo;
-        }
-
-        public void setPageNo(int pageNo) {
-            this.pageNo = pageNo;
-        }
-
-        public int getPageSize() {
-            return pageSize;
-        }
-
-        public void setPageSize(int pageSize) {
-            this.pageSize = pageSize;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
     }
 
+    @Data
     public static class BO {
         Integer dishesId;
         Integer dishesTypeId;
@@ -228,117 +205,5 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         Integer ifNeedPrint;
         String validTime;
         Operations operations;
-
-        public Money getDishesPrice() {
-            return dishesPrice;
-        }
-
-        public void setDishesPrice(Money dishesPrice) {
-            this.dishesPrice = dishesPrice;
-        }
-
-        public Integer getDishesId() {
-            return dishesId;
-        }
-
-        public void setDishesId(Integer dishesId) {
-            this.dishesId = dishesId;
-        }
-
-        public Integer getDishesTypeId() {
-            return dishesTypeId;
-        }
-
-        public void setDishesTypeId(Integer dishesTypeId) {
-            this.dishesTypeId = dishesTypeId;
-        }
-
-        public String getDishesName() {
-            return dishesName;
-        }
-
-        public void setDishesName(String dishesName) {
-            this.dishesName = dishesName;
-        }
-
-        public String getDishesStock() {
-            return dishesStock;
-        }
-
-        public void setDishesStock(String dishesStock) {
-            this.dishesStock = dishesStock;
-        }
-
-        public String getDishesDescription() {
-            return dishesDescription;
-        }
-
-        public void setDishesDescription(String dishesDescription) {
-            this.dishesDescription = dishesDescription;
-        }
-
-        public ImageSrc getDishesImgs() {
-            return dishesImgs;
-        }
-
-        public void setDishesImgs(ImageSrc dishesImgs) {
-            this.dishesImgs = dishesImgs;
-        }
-
-        public String getDishesUnitName() {
-            return dishesUnitName;
-        }
-
-        public void setDishesUnitName(String dishesUnitName) {
-            this.dishesUnitName = dishesUnitName;
-        }
-
-        public String getDishesStatus() {
-            return dishesStatus;
-        }
-
-        public void setDishesStatus(String dishesStatus) {
-            this.dishesStatus = dishesStatus;
-        }
-
-        public Long getCreatTime() {
-            return creatTime;
-        }
-
-        public void setCreatTime(Long creatTime) {
-            this.creatTime = creatTime;
-        }
-
-        public Integer getIfNeedMergePrint() {
-            return ifNeedMergePrint;
-        }
-
-        public void setIfNeedMergePrint(Integer ifNeedMergePrint) {
-            this.ifNeedMergePrint = ifNeedMergePrint;
-        }
-
-        public Integer getIfNeedPrint() {
-            return ifNeedPrint;
-        }
-
-        public void setIfNeedPrint(Integer ifNeedPrint) {
-            this.ifNeedPrint = ifNeedPrint;
-        }
-
-        public String getValidTime() {
-            return validTime;
-        }
-
-        public void setValidTime(String validTime) {
-            this.validTime = validTime;
-        }
-
-        public Operations getOperations() {
-            return operations;
-        }
-
-        public void setOperations(Operations operations) {
-            this.operations = operations;
-        }
     }
 }
