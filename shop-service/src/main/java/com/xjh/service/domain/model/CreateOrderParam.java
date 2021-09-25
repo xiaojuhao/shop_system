@@ -1,40 +1,12 @@
 package com.xjh.service.domain.model;
 
+import lombok.Data;
+
+@Data
 public class CreateOrderParam {
     Integer orderId;
     Integer deskId;
     Integer customerNum;
     String recommender;
 
-    public Integer getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Integer orderId) {
-        this.orderId = orderId;
-    }
-
-    public Integer getDeskId() {
-        return deskId;
-    }
-
-    public void setDeskId(Integer deskId) {
-        this.deskId = deskId;
-    }
-
-    public Integer getCustomerNum() {
-        return customerNum;
-    }
-
-    public void setCustomerNum(Integer customerNum) {
-        this.customerNum = customerNum;
-    }
-
-    public String getRecommender() {
-        return recommender;
-    }
-
-    public void setRecommender(String recommender) {
-        this.recommender = recommender;
-    }
 }
