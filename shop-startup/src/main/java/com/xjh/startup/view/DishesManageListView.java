@@ -26,6 +26,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -45,8 +46,9 @@ public class DishesManageListView extends SimpleForm implements Initializable {
 
     @Override
     public void initialize() {
+        Window window = this.getScene().getWindow();
         buildCond();
-        buildContent();
+        buildContent(window.getHeight() - 130);
         buildFoot();
         loadData();
     }
@@ -133,11 +135,13 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         statusLine.getChildren().add(statusLabel);
         statusLine.getChildren().add(newLine(online, offline));
 
-
-        addLine(newLine(nameLine, statusLine));
+        HBox line = newLine(nameLine, statusLine);
+        line.setSpacing(20);
+        line.setPadding(new Insets(10, 0, 20, 0));
+        addLine(line);
     }
 
-    private void buildContent() {
+    private void buildContent(double height) {
 
         tableView.getColumns().addAll(
                 newCol("ID", "dishesId", 100),
@@ -149,6 +153,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 newCol("操作", "operations", 200)
         );
         tableView.setItems(items);
+        tableView.setPrefHeight(height);
         addLine(tableView);
     }
 
@@ -173,7 +178,9 @@ public class DishesManageListView extends SimpleForm implements Initializable {
             c.setPageNo(c.getPageNo() + 1);
             cond.set(c);
         });
-        addLine(newLine(prev, next));
+        HBox line = newLine(prev, next);
+        line.setPadding(new Insets(10, 0, 0, 0));
+        addLine(line);
     }
 
     public static class Condition {
