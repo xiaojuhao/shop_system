@@ -9,6 +9,7 @@ import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.utils.cellvalue.Operations;
 import com.xjh.common.utils.cellvalue.RichText;
 
+import javafx.beans.property.StringProperty;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
@@ -87,7 +88,12 @@ public class TableViewUtils {
                     hbox.setSpacing(3);
                     for (OperationButton ob : ops.getOperations()) {
                         Button op = new Button(ob.getTitle());
-                        op.setOnMouseClicked(evt -> CommonUtils.safeRun(ob.getAction()));
+                        op.setOnMouseClicked(evt -> {
+                            CommonUtils.safeRun(ob.getAction());
+                            if(ob.getConsumer() != null){
+                                ob.getConsumer().accept(obs);
+                            }
+                        });
                         hbox.getChildren().add(op);
                     }
                     cell.setGraphic(hbox);
@@ -102,6 +108,12 @@ public class TableViewUtils {
                         iv.setFitHeight(img.getHeight());
                     }
                     cell.setGraphic(iv);
+                } else if(nv instanceof StringProperty){
+                    StringProperty sp = (StringProperty) nv;
+                    cell.setText(sp.getValue());
+                    sp.addListener((x, o, n) -> {
+                        cell.setText(n);
+                    });
                 } else {
                     cell.textProperty().set(CommonUtils.stringify(nv));
                 }

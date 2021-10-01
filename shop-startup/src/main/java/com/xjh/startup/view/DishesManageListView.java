@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.ImageHelper;
 import com.xjh.common.utils.cellvalue.ImageSrc;
 import com.xjh.common.utils.cellvalue.Money;
@@ -23,6 +24,8 @@ import com.xjh.startup.view.base.SimpleForm;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -60,31 +63,32 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         List<Dishes> list = dishesService.pageQuery(new Dishes(), page);
         Platform.runLater(() -> {
             items.clear();
-            items.addAll(list.stream().map(it -> {
+            items.addAll(list.stream().map(dishes -> {
                 BO bo = new BO();
-                bo.setDishesId(it.getDishesId());
-                bo.setDishesName(it.getDishesName());
-                bo.setDishesPrice(new Money(it.getDishesPrice()));
-                if (it.getDishesStock() != null && it.getDishesStock() >= 0) {
-                    bo.setDishesStock(it.getDishesStock().toString());
+                bo.setDishesId(dishes.getDishesId());
+                bo.setDishesName(dishes.getDishesName());
+                bo.setDishesPrice(new Money(dishes.getDishesPrice()));
+                if (dishes.getDishesStock() != null && dishes.getDishesStock() >= 0) {
+                    bo.setDishesStock(dishes.getDishesStock().toString());
                 } else {
                     bo.setDishesStock("不限");
                 }
-                if (it.getDishesStatus() != null && it.getDishesStatus() == 1) {
-                    bo.setDishesStatus("上架");
+                if (dishes.getDishesStatus() != null && dishes.getDishesStatus() == 1) {
+                    bo.getDishesStatus().set("上架");
                 } else {
-                    bo.setDishesStatus("下架");
+                    bo.getDishesStatus().set("下架");
                 }
                 Operations operations = new Operations();
                 OperationButton edit = new OperationButton("编辑", () -> {
                     Window window = this.getScene().getWindow();
                     ModelWindow mw = new ModelWindow(window, "编辑菜品");
-                    DishesEditView view = new DishesEditView(it);
+                    DishesEditView view = new DishesEditView(dishes);
                     view.setPrefWidth(window.getWidth() * 0.75);
                     mw.setScene(new Scene(view));
                     mw.showAndWait();
                 });
-                OperationButton onoff = new OperationButton("上下架", () -> {
+                OperationButton onoff = new OperationButton("上下架", obv -> {
+                    obv.getValue();
                 });
                 OperationButton del = new OperationButton("删除", () -> {
                 });
@@ -92,7 +96,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 operations.add(onoff);
                 operations.add(del);
                 bo.setOperations(operations);
-                ImageHelper.resolveImgs(it.getDishesImgs()).stream()
+                ImageHelper.resolveImgs(dishes.getDishesImgs()).stream()
                         .findFirst().ifPresent(x -> {
                     ImageSrc img = new ImageSrc(x.getImageSrc());
                     img.setWidth(100);
@@ -199,7 +203,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         String dishesDescription;
         ImageSrc dishesImgs;
         String dishesUnitName;
-        String dishesStatus;
+        StringProperty dishesStatus = new SimpleStringProperty();
         Long creatTime;
         Integer ifNeedMergePrint;
         Integer ifNeedPrint;

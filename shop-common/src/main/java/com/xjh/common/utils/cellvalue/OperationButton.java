@@ -1,8 +1,15 @@
 package com.xjh.common.utils.cellvalue;
 
+import javafx.beans.value.ObservableValue;
+import lombok.Data;
+
+import java.util.function.Consumer;
+
+@Data
 public class OperationButton {
     String title;
     Runnable action;
+    Consumer<ObservableValue<?>> consumer;
 
     public OperationButton() {
     }
@@ -12,19 +19,8 @@ public class OperationButton {
         this.action = action;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
+    public OperationButton(String title, Consumer<ObservableValue<?>> action) {
         this.title = title;
-    }
-
-    public Runnable getAction() {
-        return action;
-    }
-
-    public void setAction(Runnable action) {
-        this.action = action;
+        this.consumer = action;
     }
 }
