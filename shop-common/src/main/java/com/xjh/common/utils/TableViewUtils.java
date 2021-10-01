@@ -80,6 +80,9 @@ public class TableViewUtils {
                 } else if (nv instanceof OperationButton) {
                     OperationButton ob = (OperationButton) nv;
                     Button op = new Button(ob.getTitle());
+                    if (ob.getTitleProperty() != null) {
+                        op.textProperty().bind(ob.getTitleProperty());
+                    }
                     op.setOnMouseClicked(evt -> CommonUtils.safeRun(ob.getAction()));
                     cell.setGraphic(op);
                 } else if (nv instanceof Operations) {
@@ -88,9 +91,12 @@ public class TableViewUtils {
                     hbox.setSpacing(3);
                     for (OperationButton ob : ops.getOperations()) {
                         Button op = new Button(ob.getTitle());
+                        if (ob.getTitleProperty() != null) {
+                            op.textProperty().bind(ob.getTitleProperty());
+                        }
                         op.setOnMouseClicked(evt -> {
                             CommonUtils.safeRun(ob.getAction());
-                            if(ob.getConsumer() != null){
+                            if (ob.getConsumer() != null) {
                                 ob.getConsumer().accept(obs);
                             }
                         });
@@ -108,12 +114,9 @@ public class TableViewUtils {
                         iv.setFitHeight(img.getHeight());
                     }
                     cell.setGraphic(iv);
-                } else if(nv instanceof StringProperty){
+                } else if (nv instanceof StringProperty) {
                     StringProperty sp = (StringProperty) nv;
-                    cell.setText(sp.getValue());
-                    sp.addListener((x, o, n) -> {
-                        cell.setText(n);
-                    });
+                    cell.textProperty().bind(sp);
                 } else {
                     cell.textProperty().set(CommonUtils.stringify(nv));
                 }

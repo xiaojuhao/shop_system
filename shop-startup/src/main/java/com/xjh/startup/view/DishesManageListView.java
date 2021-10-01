@@ -73,10 +73,13 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 } else {
                     bo.setDishesStock("不限");
                 }
+                StringProperty onOffTitle = new SimpleStringProperty();
                 if (dishes.getDishesStatus() != null && dishes.getDishesStatus() == 1) {
                     bo.getDishesStatus().set("上架");
+                    onOffTitle.set("下架");
                 } else {
                     bo.getDishesStatus().set("下架");
+                    onOffTitle.set("上架");
                 }
                 Operations operations = new Operations();
                 OperationButton edit = new OperationButton("编辑", () -> {
@@ -87,9 +90,15 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                     mw.setScene(new Scene(view));
                     mw.showAndWait();
                 });
-                OperationButton onoff = new OperationButton("上下架", obv -> {
-                    obv.getValue();
+                OperationButton onoff = new OperationButton("上下架", cv -> {
+                    bo.getDishesStatus().set(DateBuilder.now().timeStr());
+                    if(onOffTitle.get().equals("上架")){
+                        onOffTitle.set("下架");
+                    }else {
+                        onOffTitle.set("上架");
+                    }
                 });
+                onoff.setTitleProperty(onOffTitle);
                 OperationButton del = new OperationButton("删除", () -> {
                 });
                 operations.add(edit);
