@@ -11,9 +11,7 @@ import java.util.Map;
 import com.alibaba.fastjson.JSONArray;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.DateBuilder;
-import com.xjh.common.utils.ImageHelper;
+import com.xjh.common.utils.*;
 import com.xjh.common.valueobject.DishesImgVO;
 import com.xjh.common.valueobject.PageCond;
 import com.xjh.dao.dataobject.Dishes;
@@ -30,19 +28,26 @@ public class DishesService {
     @Inject
     DishesPriceDAO dishesPriceDAO;
 
-    public int save(Dishes dishes) throws Exception {
-        if(dishes.getDishesStatus() == null){
-            dishes.setDishesStatus(1);
-        }
-        if(dishes.getCreatTime() == null){
-            dishes.setCreatTime(DateBuilder.now().mills());
-        }
-        if (dishes.getDishesId() != null) {
-            return dishesDAO.updateByDishesId(dishes);
-        } else {
-            int maxId = dishesDAO.maxDishesId();
-            dishes.setDishesId(maxId + 1);
-            return dishesDAO.insert(dishes);
+    public Result<Integer> save(Dishes dishes) {
+        try {
+            if (dishes.getDishesStatus() == null) {
+                dishes.setDishesStatus(1);
+            }
+            if (dishes.getCreatTime() == null) {
+                dishes.setCreatTime(DateBuilder.now().mills());
+            }
+            if (dishes.getDishesId() != null) {
+                int i = dishesDAO.updateByDishesId(dishes);
+                return Result.success(i);
+            } else {
+                int maxId = dishesDAO.maxDishesId();
+                dishes.setDishesId(maxId + 1);
+                int i = dishesDAO.insert(dishes);
+                return Result.success(i);
+            }
+        } catch (Exception ex) {
+            Logger.error("异常" + ex.getMessage());
+            return Result.fail(ex.getMessage());
         }
     }
 

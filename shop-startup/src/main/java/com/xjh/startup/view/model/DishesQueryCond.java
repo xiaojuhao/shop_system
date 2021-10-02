@@ -1,5 +1,6 @@
 package com.xjh.startup.view.model;
 
+import com.xjh.common.utils.CommonUtils;
 import lombok.Data;
 
 @Data
@@ -9,4 +10,10 @@ public class DishesQueryCond {
     String dishesName;
     Integer dishesTypeId;
     Integer ifPackage;
+    Integer version;
+
+    public DishesQueryCond newVersion(){
+        this.version = CommonUtils.randomNumber(1, 1000000);
+        return this;
+    }
 }

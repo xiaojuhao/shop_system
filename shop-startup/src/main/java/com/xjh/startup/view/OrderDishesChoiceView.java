@@ -125,7 +125,10 @@ public class OrderDishesChoiceView extends VBox {
         // 查询按钮
         Button queryBtn = new Button();
         queryBtn.setText("查 询");
-        queryBtn.setOnMouseClicked(evt -> qryDishesCond.set(CopyUtils.cloneObj(qryDishesCond.get())));
+        queryBtn.setOnAction(evt -> {
+            DishesQueryCond newCond = CopyUtils.cloneObj(qryDishesCond.get()).newVersion();
+            qryDishesCond.setValue(newCond);
+        });
         hbox.getChildren().add(queryBtn);
 
         // 分割线

@@ -9,9 +9,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.DateBuilder;
-import com.xjh.common.utils.ImageHelper;
+import com.xjh.common.enumeration.EnumDishesStatus;
+import com.xjh.common.utils.*;
 import com.xjh.common.utils.cellvalue.ImageSrc;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.OperationButton;
@@ -81,11 +80,14 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 Operations operations = new Operations();
                 OperationButton edit = new OperationButton("编辑", () -> openEditor(dishes));
                 OperationButton onoff = new OperationButton("上下架", cv -> {
-                    bo.getDishesStatus().set(DateBuilder.now().timeStr());
                     if (onOffTitle.get().equals("上架")) {
+                        changeDishesStatus(dishes.getDishesId(), EnumDishesStatus.ON);
                         onOffTitle.set("下架");
+                        bo.getDishesStatus().set("上架");
                     } else {
                         onOffTitle.set("上架");
+                        changeDishesStatus(dishes.getDishesId(), EnumDishesStatus.OFF);
+                        bo.getDishesStatus().set("下架");
                     }
                 });
                 onoff.setTitleProperty(onOffTitle);
@@ -141,10 +143,10 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         query.setOnAction(evt -> {
             DishesQuery q = deepClone(cond.get(), DishesQuery.class);
             q.setDishesName(CommonUtils.trim(nameInput.getText()));
-            Integer status = (Integer)toggleGroup.getSelectedToggle().getUserData();
-            if(status != null){
-                if(status == 1) q.setStatus(1+"");
-                if(status == 0) q.setStatus(0+"");
+            Integer status = (Integer) toggleGroup.getSelectedToggle().getUserData();
+            if (status != null) {
+                if (status == 1) q.setStatus(1 + "");
+                if (status == 0) q.setStatus(0 + "");
             }
             cond.set(q);
         });
@@ -209,6 +211,18 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         mw.setScene(new Scene(view));
         mw.showAndWait();
         loadData();
+    }
+
+    private void changeDishesStatus(Integer dishesId, EnumDishesStatus status) {
+        Dishes d = new Dishes();
+        d.setDishesId(dishesId);
+        d.setDishesStatus(status.status);
+        Result<Integer> rs = dishesService.save(d);
+        if (rs.isSuccess()) {
+            AlertBuilder.INFO("更新状态成功");
+        } else {
+            AlertBuilder.ERROR("~~系统异常了哦~~~~" + rs.getMsg());
+        }
     }
 
     @Data

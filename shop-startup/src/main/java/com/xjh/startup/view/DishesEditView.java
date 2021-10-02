@@ -12,10 +12,7 @@ import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
-import com.xjh.common.utils.AlertBuilder;
-import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.ImageHelper;
-import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.*;
 import com.xjh.common.utils.cellvalue.*;
 import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesAttributeValueVO;
@@ -372,11 +369,11 @@ public class DishesEditView extends SimpleGridForm {
         save.setOnAction(evt -> {
             CommonUtils.safeRun(collectData);
             System.out.println(JSON.toJSONString(dishes, true));
-            try {
-                dishesService.save(dishes);
+            Result<Integer> rs = dishesService.save(dishes);
+            if(rs.isSuccess()){
                 AlertBuilder.INFO("保存成功");
-            } catch (Exception e) {
-                AlertBuilder.ERROR("保存失败," + e.getMessage());
+            }else {
+                AlertBuilder.ERROR("保存失败," + rs.getMsg());
             }
         });
         addLine((Node) null, save);
