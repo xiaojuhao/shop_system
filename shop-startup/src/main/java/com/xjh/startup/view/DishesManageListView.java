@@ -137,7 +137,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         offline.setUserData(0);
 
         statusLine.getChildren().add(statusLabel);
-        statusLine.getChildren().add(newLine(online, offline));
+        statusLine.getChildren().add(newLine(all, online, offline));
 
         Button query = new Button("查询");
         query.setOnAction(evt -> {
