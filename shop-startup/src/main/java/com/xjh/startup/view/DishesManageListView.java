@@ -117,18 +117,18 @@ public class DishesManageListView extends SimpleForm implements Initializable {
 
     private void buildCond() {
         // name
-        HBox nameLine = new HBox();
+        HBox nameCondBlock = new HBox();
         Label nameLabel = new Label("名称:");
         TextField nameInput = new TextField();
-        nameLine.getChildren().add(newLine(nameLabel, nameInput));
+        nameCondBlock.getChildren().add(newLine(nameLabel, nameInput));
 
         // status
-        HBox statusLine = new HBox();
+        HBox statusCondBlock = new HBox();
         Label statusLabel = new Label("状态:");
         ObservableList<String> options = FXCollections.observableArrayList("全部", "上架", "下架");
         ComboBox<String> modelSelect = new ComboBox<>(options);
         modelSelect.getSelectionModel().selectFirst();
-        statusLine.getChildren().add(newLine(statusLabel, modelSelect));
+        statusCondBlock.getChildren().add(newLine(statusLabel, modelSelect));
 
         Button queryBtn = new Button("查询");
         queryBtn.setOnAction(evt -> {
@@ -142,7 +142,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
 
         Button addNew = new Button("新增菜品");
         addNew.setOnAction(evt -> openEditor(new Dishes()));
-        HBox line = newLine(nameLine, statusLine,
+        HBox line = newLine(nameCondBlock, statusCondBlock,
                 queryBtn,
                 new Separator(Orientation.VERTICAL),
                 addNew);
