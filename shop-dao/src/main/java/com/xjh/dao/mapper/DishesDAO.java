@@ -12,6 +12,7 @@ import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.valueobject.PageCond;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.foundation.EntityUtils;
+import com.xjh.dao.query.DishesQuery;
 import com.zaxxer.hikari.HikariDataSource;
 
 import cn.hutool.db.Db;
@@ -72,6 +73,32 @@ public class DishesDAO {
     public List<Dishes> selectList(Dishes cond) {
         try {
             List<Entity> list = Db.use(ds).find(EntityUtils.create(cond));
+            return EntityUtils.convertList(list, Dishes.class);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    public List<Dishes> pageQuery(DishesQuery query) {
+        try {
+            int pageNo = CommonUtils.orElse(query.getPageNo(), 1);
+            int pageSize = CommonUtils.orElse(query.getPageSize(), 20);
+            StringBuilder where = new StringBuilder();
+            List<Object> params = new ArrayList<>();
+            if (CommonUtils.isNotBlank(query.getDishesName())) {
+                where.append(" and dishesName like ?");
+                params.add("%" + query.getDishesName()+"%");
+            }
+            if(CommonUtils.isNotBlank(query.getStatus())){
+                where.append(" and dishesStatus = ?");
+                params.add(query.getStatus());
+            }
+            String sql = "select * from dishes_list where 1=1 " + where
+                    + " limit " + (pageNo - 1) * pageSize + "," + pageSize;
+
+            // System.out.println(sql + ", " + JSON.toJSONString(params));
+            List<Entity> list = Db.use(ds).query(sql, params.toArray(new Object[0]));
             return EntityUtils.convertList(list, Dishes.class);
         } catch (Exception ex) {
             ex.printStackTrace();

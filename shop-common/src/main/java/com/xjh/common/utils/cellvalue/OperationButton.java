@@ -1,5 +1,6 @@
 package com.xjh.common.utils.cellvalue;
 
+import javafx.beans.Observable;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import lombok.Data;
@@ -11,7 +12,7 @@ public class OperationButton {
     String title;
     StringProperty titleProperty;
     Runnable action;
-    Consumer<ObservableValue<?>> consumer;
+    Consumer<Observable> consumer;
 
     public OperationButton() {
     }
@@ -21,7 +22,7 @@ public class OperationButton {
         this.action = action;
     }
 
-    public OperationButton(String title, Consumer<ObservableValue<?>> action) {
+    public OperationButton(String title, Consumer<Observable> action) {
         this.title = title;
         this.consumer = action;
     }

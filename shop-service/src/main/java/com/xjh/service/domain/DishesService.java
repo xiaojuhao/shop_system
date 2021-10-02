@@ -12,6 +12,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.ImageHelper;
 import com.xjh.common.valueobject.DishesImgVO;
 import com.xjh.common.valueobject.PageCond;
@@ -20,6 +21,7 @@ import com.xjh.dao.dataobject.DishesPrice;
 import com.xjh.dao.dataobject.DishesType;
 import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.dao.mapper.DishesPriceDAO;
+import com.xjh.dao.query.DishesQuery;
 
 @Singleton
 public class DishesService {
@@ -29,6 +31,12 @@ public class DishesService {
     DishesPriceDAO dishesPriceDAO;
 
     public int save(Dishes dishes) throws Exception {
+        if(dishes.getDishesStatus() == null){
+            dishes.setDishesStatus(1);
+        }
+        if(dishes.getCreatTime() == null){
+            dishes.setCreatTime(DateBuilder.now().mills());
+        }
         if (dishes.getDishesId() != null) {
             return dishesDAO.updateByDishesId(dishes);
         } else {
@@ -169,5 +177,9 @@ public class DishesService {
 
     public List<Dishes> pageQuery(Dishes cond, PageCond page) {
         return dishesDAO.pageQuery(cond, page);
+    }
+
+    public List<Dishes> pageQuery(DishesQuery query) {
+        return dishesDAO.pageQuery(query);
     }
 }

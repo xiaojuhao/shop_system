@@ -9,6 +9,12 @@ public class ImageSrc {
         this.imgUrl = url;
     }
 
+    public ImageSrc(String url, double width, double height) {
+        this.imgUrl = url;
+        this.width = width;
+        this.height = height;
+    }
+
     public String getImgUrl() {
         return imgUrl;
     }

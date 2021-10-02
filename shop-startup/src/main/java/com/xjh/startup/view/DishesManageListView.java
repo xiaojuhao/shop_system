@@ -1,11 +1,14 @@
 package com.xjh.startup.view;
 
 
+import static com.xjh.common.utils.CommonUtils.deepClone;
 import static com.xjh.common.utils.TableViewUtils.newCol;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.ImageHelper;
@@ -15,6 +18,7 @@ import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.utils.cellvalue.Operations;
 import com.xjh.common.valueobject.PageCond;
 import com.xjh.dao.dataobject.Dishes;
+import com.xjh.dao.query.DishesQuery;
 import com.xjh.service.domain.DishesService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
@@ -29,13 +33,9 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.stage.Window;
 import lombok.Data;
@@ -43,7 +43,7 @@ import lombok.Data;
 public class DishesManageListView extends SimpleForm implements Initializable {
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
 
-    ObjectProperty<Condition> cond = new SimpleObjectProperty<>(new Condition());
+    ObjectProperty<DishesQuery> cond = new SimpleObjectProperty<>(new DishesQuery());
     ObservableList<BO> items = FXCollections.observableArrayList();
     TableView<BO> tableView = new TableView<>();
 
@@ -57,10 +57,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
     }
 
     private void loadData() {
-        PageCond page = new PageCond();
-        page.setPageNo(cond.get().getPageNo());
-        page.setPageSize(cond.get().getPageSize());
-        List<Dishes> list = dishesService.pageQuery(new Dishes(), page);
+        List<Dishes> list = dishesService.pageQuery(cond.get());
         Platform.runLater(() -> {
             items.clear();
             items.addAll(list.stream().map(dishes -> {
@@ -82,19 +79,12 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                     onOffTitle.set("上架");
                 }
                 Operations operations = new Operations();
-                OperationButton edit = new OperationButton("编辑", () -> {
-                    Window window = this.getScene().getWindow();
-                    ModelWindow mw = new ModelWindow(window, "编辑菜品");
-                    DishesEditView view = new DishesEditView(dishes);
-                    view.setPrefWidth(window.getWidth() * 0.75);
-                    mw.setScene(new Scene(view));
-                    mw.showAndWait();
-                });
+                OperationButton edit = new OperationButton("编辑", () -> openEditor(dishes));
                 OperationButton onoff = new OperationButton("上下架", cv -> {
                     bo.getDishesStatus().set(DateBuilder.now().timeStr());
-                    if(onOffTitle.get().equals("上架")){
+                    if (onOffTitle.get().equals("上架")) {
                         onOffTitle.set("下架");
-                    }else {
+                    } else {
                         onOffTitle.set("上架");
                     }
                 });
@@ -107,11 +97,11 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 bo.setOperations(operations);
                 ImageHelper.resolveImgs(dishes.getDishesImgs()).stream()
                         .findFirst().ifPresent(x -> {
-                    ImageSrc img = new ImageSrc(x.getImageSrc());
-                    img.setWidth(100);
-                    img.setHeight(60);
-                    bo.setDishesImgs(img);
-                });
+                            ImageSrc img = new ImageSrc(x.getImageSrc());
+                            img.setWidth(100);
+                            img.setHeight(60);
+                            bo.setDishesImgs(img);
+                        });
                 return bo;
             }).collect(Collectors.toList()));
             tableView.refresh();
@@ -147,7 +137,23 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         statusLine.getChildren().add(statusLabel);
         statusLine.getChildren().add(newLine(online, offline));
 
-        HBox line = newLine(nameLine, statusLine);
+        Button query = new Button("查询");
+        query.setOnAction(evt -> {
+            DishesQuery q = deepClone(cond.get(), DishesQuery.class);
+            q.setDishesName(CommonUtils.trim(nameInput.getText()));
+            Integer status = (Integer)toggleGroup.getSelectedToggle().getUserData();
+            if(status != null){
+                if(status == 1) q.setStatus(1+"");
+                if(status == 0) q.setStatus(0+"");
+            }
+            cond.set(q);
+        });
+
+        Button addNew = new Button("新增菜品");
+        addNew.setOnAction(evt -> openEditor(new Dishes()));
+        HBox line = newLine(nameLine, statusLine, query,
+                new Separator(Orientation.VERTICAL),
+                addNew);
         line.setSpacing(20);
         line.setPadding(new Insets(10, 0, 20, 0));
         addLine(line);
@@ -175,7 +181,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         });
         Button prev = new Button("上一页");
         prev.setOnMouseClicked(e -> {
-            Condition c = CommonUtils.deepClone(cond.get(), Condition.class);
+            DishesQuery c = deepClone(cond.get(), DishesQuery.class);
             int pageNo = c.getPageNo();
             if (pageNo <= 1) {
                 c.setPageNo(1);
@@ -186,7 +192,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         });
         Button next = new Button("下一页");
         next.setOnMouseClicked(e -> {
-            Condition c = CommonUtils.deepClone(cond.get(), Condition.class);
+            DishesQuery c = deepClone(cond.get(), DishesQuery.class);
             c.setPageNo(c.getPageNo() + 1);
             cond.set(c);
         });
@@ -195,11 +201,14 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         addLine(line);
     }
 
-    @Data
-    public static class Condition {
-        int pageNo = 1;
-        int pageSize = 20;
-        String name;
+    private void openEditor(Dishes dishes) {
+        Window window = this.getScene().getWindow();
+        ModelWindow mw = new ModelWindow(window, "编辑菜品");
+        DishesEditView view = new DishesEditView(dishes);
+        view.setPrefWidth(window.getWidth() * 0.75);
+        mw.setScene(new Scene(view));
+        mw.showAndWait();
+        loadData();
     }
 
     @Data

@@ -15,10 +15,8 @@ import com.google.common.collect.Lists;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.ImageHelper;
-import com.xjh.common.utils.cellvalue.ImageSrc;
-import com.xjh.common.utils.cellvalue.Money;
-import com.xjh.common.utils.cellvalue.OperationButton;
-import com.xjh.common.utils.cellvalue.Operations;
+import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.cellvalue.*;
 import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesAttributeValueVO;
 import com.xjh.common.valueobject.DishesImgVO;
@@ -36,6 +34,9 @@ import com.xjh.startup.view.model.DishesAttributeBO;
 import cn.hutool.core.codec.Base64;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -50,6 +51,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Window;
@@ -62,6 +64,9 @@ public class DishesEditView extends SimpleGridForm {
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
 
     List<Runnable> collectData = new ArrayList<>();
+
+    RichText isMain = RichText.create("是").with(Color.RED);
+    RichText notMain = RichText.create("否").with(Color.BLACK);
 
     public DishesEditView(Dishes dishes) {
         double labelWidth = 120;
@@ -89,7 +94,13 @@ public class DishesEditView extends SimpleGridForm {
         );
         stockTypeSelector.getSelectionModel().select("无限库存");
         addLine(stockLabel, hbox(stockTypeSelector, stockInput));
-        collectData.add(() -> dishes.setDishesStock(CommonUtils.parseInt(stockInput.getText(), 0)));
+        collectData.add(() -> {
+            if (CommonUtils.eq(stockTypeSelector.getSelectionModel().getSelectedItem(), "无限库存")) {
+                dishes.setDishesStock(-1);
+            } else {
+                dishes.setDishesStock(CommonUtils.parseInt(stockInput.getText(), 0));
+            }
+        });
 
         Label unitLabel = createLabel("库存单位:", labelWidth);
         TextField unitInput = createTextField("库存单位");
@@ -126,7 +137,7 @@ public class DishesEditView extends SimpleGridForm {
         Label imgLabel = createLabel("菜品图片:", labelWidth);
         TableView<ImgBO> imgTV = new TableView<>();
         imgTV.setPrefWidth(600);
-        imgTV.setPrefHeight(200);
+        imgTV.setPrefHeight(500);
         imgTV.getColumns().addAll(
                 newCol("序号", "sno", 60),
                 newCol("图片", "img", 150),
@@ -147,20 +158,20 @@ public class DishesEditView extends SimpleGridForm {
         CommonUtils.forEach(ImageHelper.resolveImgs(dishes.getDishesImgs()), it -> {
             ImgBO bo = new ImgBO();
             bo.setSno(imgItems.size() + 1);
-            ImageSrc img = new ImageSrc(it.getImageSrc());
-            img.setWidth(100);
-            img.setHeight(60);
-            bo.setImg(img);
-            bo.getOperations().add(new OperationButton("删除", () -> {
-
+            bo.setImg(new ImageSrc(it.getImageSrc(), 100, 60));
+            bo.getOperations().add(new OperationButton("删除", cv -> {
+                imgItems.remove(bo);
+                imgTV.refresh();
             }));
             bo.getOperations().add(new OperationButton("设为主图", () -> {
-
+                for (ImgBO b : imgItems) {
+                    b.getIsMain().set(b == bo ? isMain : notMain);
+                }
             }));
             if (it.getIsMain() != null && it.getIsMain()) {
-                bo.setIsMain("是");
+                bo.getIsMain().set(isMain);
             } else {
-                bo.setIsMain("否");
+                bo.getIsMain().set(notMain);
             }
             imgItems.add(bo);
         });
@@ -183,18 +194,23 @@ public class DishesEditView extends SimpleGridForm {
                     if (!toFile.getParentFile().exists()) {
                         toFile.getParentFile().mkdirs();
                     }
-                    System.out.println("拷贝:" + file.toPath() + " >> " + toFile.toPath());
+                    Logger.info("拷贝:" + file.toPath() + " >> " + toFile.toPath());
                     Files.copy(file.toPath(), toFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     ImgBO bo = new ImgBO();
                     bo.setSno(imgItems.size() + 1);
-                    ImageSrc img = new ImageSrc(toUrl);
-                    img.setWidth(100);
-                    img.setHeight(60);
-                    bo.setImg(img);
-                    bo.getOperations().add(new OperationButton("删除", () -> {
-
+                    bo.setImg(new ImageSrc(toUrl, 100, 60));
+                    bo.getIsMain().set(notMain);
+                    bo.getOperations().add(new OperationButton("删除", cv -> {
+                        imgItems.remove(bo);
+                        imgTV.refresh();
+                    }));
+                    bo.getOperations().add(new OperationButton("设为主图", () -> {
+                        for (ImgBO b : imgItems) {
+                            b.getIsMain().set(b == bo ? isMain : notMain);
+                        }
                     }));
                     imgItems.add(bo);
+                    imgTV.refresh();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     AlertBuilder.ERROR("上传文件失败:" + ex.getMessage());
@@ -296,6 +312,10 @@ public class DishesEditView extends SimpleGridForm {
 
         pubAttrInput.getChildren().addAll(pubAttrTV, pubAttrValTV);
         addLine(pubAttrOperations, pubAttrInput);
+        collectData.add(() -> {
+            List<String> pubAttrIds = CommonUtils.collect(pubAttrTV.getItems(), it -> it.getDishesAttributeId().toString());
+            dishes.setDishesPublicAttribute(String.join(",", pubAttrIds));
+        });
 
         addLine("", new Label("私有属性(可修改)"));
 
@@ -344,6 +364,9 @@ public class DishesEditView extends SimpleGridForm {
         );
         priAttrInput.getChildren().addAll(priAttrTV, priAttrValTV);
         addLine(priAttrOperations, priAttrInput);
+        collectData.add(() -> {
+            dishes.setDishesPrivateAttribute(Base64.encode(JSON.toJSONString(new ArrayList<>())));
+        });
 
         Button save = new Button("保 存");
         save.setOnAction(evt -> {
@@ -363,7 +386,7 @@ public class DishesEditView extends SimpleGridForm {
     public static class ImgBO {
         int sno;
         ImageSrc img;
-        String isMain;
+        ObjectProperty<RichText> isMain = new SimpleObjectProperty<>();
         Operations operations = new Operations();
     }
 }
