@@ -12,8 +12,16 @@ import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
-import com.xjh.common.utils.*;
-import com.xjh.common.utils.cellvalue.*;
+import com.xjh.common.utils.AlertBuilder;
+import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.ImageHelper;
+import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.Result;
+import com.xjh.common.utils.cellvalue.ImageSrc;
+import com.xjh.common.utils.cellvalue.Money;
+import com.xjh.common.utils.cellvalue.OperationButton;
+import com.xjh.common.utils.cellvalue.Operations;
+import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesAttributeValueVO;
 import com.xjh.common.valueobject.DishesImgVO;
@@ -31,9 +39,6 @@ import com.xjh.startup.view.model.DishesAttributeBO;
 import cn.hutool.core.codec.Base64;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -134,7 +139,7 @@ public class DishesEditView extends SimpleGridForm {
         Label imgLabel = createLabel("菜品图片:", labelWidth);
         TableView<ImgBO> imgTV = new TableView<>();
         imgTV.setPrefWidth(600);
-        imgTV.setPrefHeight(500);
+        imgTV.setPrefHeight(200);
         imgTV.getColumns().addAll(
                 newCol("序号", "sno", 60),
                 newCol("图片", "img", 150),

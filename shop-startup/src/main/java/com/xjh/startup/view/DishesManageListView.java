@@ -4,18 +4,18 @@ package com.xjh.startup.view;
 import static com.xjh.common.utils.CommonUtils.deepClone;
 import static com.xjh.common.utils.TableViewUtils.newCol;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.xjh.common.enumeration.EnumDishesStatus;
-import com.xjh.common.utils.*;
+import com.xjh.common.utils.AlertBuilder;
+import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.ImageHelper;
+import com.xjh.common.utils.Result;
 import com.xjh.common.utils.cellvalue.ImageSrc;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.utils.cellvalue.Operations;
-import com.xjh.common.valueobject.PageCond;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.query.DishesQuery;
 import com.xjh.service.domain.DishesService;
@@ -34,7 +34,12 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.stage.Window;
 import lombok.Data;
@@ -99,11 +104,11 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 bo.setOperations(operations);
                 ImageHelper.resolveImgs(dishes.getDishesImgs()).stream()
                         .findFirst().ifPresent(x -> {
-                            ImageSrc img = new ImageSrc(x.getImageSrc());
-                            img.setWidth(100);
-                            img.setHeight(60);
-                            bo.setDishesImgs(img);
-                        });
+                    ImageSrc img = new ImageSrc(x.getImageSrc());
+                    img.setWidth(100);
+                    img.setHeight(60);
+                    bo.setDishesImgs(img);
+                });
                 return bo;
             }).collect(Collectors.toList()));
             tableView.refresh();
@@ -115,45 +120,30 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         HBox nameLine = new HBox();
         Label nameLabel = new Label("名称:");
         TextField nameInput = new TextField();
-        nameLine.getChildren().add(nameLabel);
-        nameLine.getChildren().add(nameInput);
-
+        nameLine.getChildren().add(newLine(nameLabel, nameInput));
 
         // status
         HBox statusLine = new HBox();
         Label statusLabel = new Label("状态:");
-        ToggleGroup toggleGroup = new ToggleGroup();
-        RadioButton all = new RadioButton("全部");
-        all.setToggleGroup(toggleGroup);
-        all.setUserData(-1);
+        ObservableList<String> options = FXCollections.observableArrayList("全部", "上架", "下架");
+        ComboBox<String> modelSelect = new ComboBox<>(options);
+        modelSelect.getSelectionModel().selectFirst();
+        statusLine.getChildren().add(newLine(statusLabel, modelSelect));
 
-        RadioButton online = new RadioButton("上架");
-        online.setToggleGroup(toggleGroup);
-        online.setUserData(1);
-        online.setSelected(true);
-
-        RadioButton offline = new RadioButton("下架");
-        offline.setToggleGroup(toggleGroup);
-        offline.setUserData(0);
-
-        statusLine.getChildren().add(statusLabel);
-        statusLine.getChildren().add(newLine(all, online, offline));
-
-        Button query = new Button("查询");
-        query.setOnAction(evt -> {
+        Button queryBtn = new Button("查询");
+        queryBtn.setOnAction(evt -> {
             DishesQuery q = deepClone(cond.get(), DishesQuery.class);
             q.setDishesName(CommonUtils.trim(nameInput.getText()));
-            Integer status = (Integer) toggleGroup.getSelectedToggle().getUserData();
-            if (status != null) {
-                if (status == 1) q.setStatus(1 + "");
-                if (status == 0) q.setStatus(0 + "");
-            }
+            String selectedStatus = modelSelect.getSelectionModel().getSelectedItem();
+            if (CommonUtils.eq(selectedStatus, "上架")) q.setStatus(1 + "");
+            if (CommonUtils.eq(selectedStatus, "下架")) q.setStatus(0 + "");
             cond.set(q);
         });
 
         Button addNew = new Button("新增菜品");
         addNew.setOnAction(evt -> openEditor(new Dishes()));
-        HBox line = newLine(nameLine, statusLine, query,
+        HBox line = newLine(nameLine, statusLine,
+                queryBtn,
                 new Separator(Orientation.VERTICAL),
                 addNew);
         line.setSpacing(20);
