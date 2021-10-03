@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -65,12 +66,14 @@ public class DishesEditView extends SimpleGridForm {
     DishesAttributeService dishesAttributeService = GuiceContainer.getInstance(DishesAttributeService.class);
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
 
+    Dishes dishes;
     List<Runnable> collectData = new ArrayList<>();
 
     RichText isMain = RichText.create("是").with(Color.RED);
     RichText notMain = RichText.create("否").with(Color.BLACK);
 
-    public DishesEditView(Dishes dishes) {
+    public DishesEditView(Dishes param) {
+        dishes = dishesService.getById(param.getDishesId());
         double labelWidth = 120;
         Label nameLabel = createLabel("名称:", labelWidth);
         TextField nameInput = createTextField("名称", 300);
@@ -137,9 +140,7 @@ public class DishesEditView extends SimpleGridForm {
 
         ObservableList<ImgBO> imgItems = FXCollections.observableArrayList();
         Label imgLabel = createLabel("菜品图片:", labelWidth);
-        TableView<ImgBO> imgTV = new TableView<>();
-        imgTV.setPrefWidth(600);
-        imgTV.setPrefHeight(200);
+        TableView<ImgBO> imgTV = newTableView(600, 200);
         imgTV.getColumns().addAll(
                 newCol("序号", "sno", 60),
                 newCol("图片", "img", 150),
@@ -164,35 +165,39 @@ public class DishesEditView extends SimpleGridForm {
         uploadFile.setOnMouseClicked(evt -> openFileSelector(imgTV, imgItems));
         addLine((Node) null, uploadFile);
 
+        /* ************************************************************** *\
+         *    菜品公共属性
+        \* ************************************************************** */
         addLine(createLabel("菜品属性:", labelWidth), new Label("公共属性(不能修改)"));
 
-        ObservableList<DishesAttributeVO> selectedPubAttrItems = FXCollections.observableArrayList();
-        ObservableList<DishesAttributeValueVO> selectedPubAttrValueItems = FXCollections.observableArrayList();
+        ObservableList<DishesAttributeVO> pubAttrItems = FXCollections.observableArrayList();
+        if (CommonUtils.isNotBlank(dishes.getDishesPublicAttribute())) {
+            Set<Integer> attrIds = CommonUtils.splitAsSet(dishes.getDishesPublicAttribute(), ",")
+                    .stream().map(Integer::parseInt).collect(Collectors.toSet());
+            pubAttrItems.addAll(dishesAttributeService.getByAttrIds(attrIds));
+        }
+        ObservableList<DishesAttributeValueVO> pubAttrValueItems = FXCollections.observableArrayList();
         ObjectProperty<DishesAttributeVO> selectedPubAttr = new SimpleObjectProperty<>();
         VBox pubAttrOperations = new VBox();
         pubAttrOperations.setSpacing(10);
         Button addPubAttrBtn = new Button("添加公共属性");
-        addPubAttrBtn.setOnAction(evt -> openAddPubAttrView(selectedPubAttrItems));
+        addPubAttrBtn.setOnAction(evt -> openAddPubAttrView(pubAttrItems));
         Button removePubAttrBtn = new Button("移除公共属性");
         pubAttrOperations.getChildren().addAll(addPubAttrBtn, removePubAttrBtn);
         HBox pubAttrInput = new HBox();
         pubAttrInput.setSpacing(10);
-        TableView<DishesAttributeVO> pubAttrTV = new TableView<>();
-        pubAttrTV.setPrefWidth(600);
-        pubAttrTV.setPrefHeight(150);
+        TableView<DishesAttributeVO> pubAttrTV = newTableView(600, 150);
         pubAttrTV.getColumns().addAll(
                 newCol("序号", "dishesAttributeId", 100),
                 newCol("名称", "dishesAttributeName", 200)
         );
-        pubAttrTV.setItems(selectedPubAttrItems);
+        pubAttrTV.setItems(pubAttrItems);
         pubAttrTV.getSelectionModel().selectedItemProperty().addListener((x, o, n) -> {
             selectedPubAttr.set(n);
         });
-
-        TableView<DishesAttributeValueVO> pubAttrValTV = new TableView<>();
-        pubAttrValTV.setPrefWidth(200);
-        pubAttrValTV.setPrefHeight(150);
-        pubAttrValTV.setItems(selectedPubAttrValueItems);
+        // 公共属性值
+        TableView<DishesAttributeValueVO> pubAttrValTV = newTableView(200, 150);
+        pubAttrValTV.setItems(pubAttrValueItems);
         pubAttrValTV.getColumns().addAll(
                 newCol("属性值名称", "attributeValue", 200)
         );
@@ -212,41 +217,58 @@ public class DishesEditView extends SimpleGridForm {
             dishes.setDishesPublicAttribute(String.join(",", pubAttrIds));
         });
 
+        /* ************************************************************** *\
+         *    菜品私有属性
+        \* ************************************************************** */
         addLine("", new Label("私有属性(可修改)"));
 
-        ObservableList<DishesAttributeBO> priAttrList = FXCollections.observableArrayList();
+        ObservableList<DishesAttributeVO> priAttrItems = FXCollections.observableArrayList();
+        if (CommonUtils.isNotBlank(dishes.getDishesPrivateAttribute())) {
+            String s = Base64.decodeStr(dishes.getDishesPrivateAttribute());
+            priAttrItems.addAll(JSON.parseArray(s, DishesAttributeVO.class));
+        }
+        ObjectProperty<DishesAttributeVO> selectedPriAttr = new SimpleObjectProperty<>();
         VBox priAttrOperations = new VBox();
         priAttrOperations.setSpacing(10);
         Button addPriAttrBtn = new Button("添加私有属性");
-        addPriAttrBtn.setOnAction(evt -> openAddPriAttrView(priAttrList));
+        addPriAttrBtn.setOnAction(evt -> openAddPriAttrView(priAttrItems));
         Button removePriAttrBtn = new Button("移除私有属性");
         priAttrOperations.getChildren().addAll(addPriAttrBtn, removePriAttrBtn);
         HBox priAttrInput = new HBox();
         priAttrInput.setSpacing(10);
-        TableView<DishesAttributeBO> priAttrTV = new TableView<>();
-        priAttrTV.setPrefWidth(600);
-        priAttrTV.setPrefHeight(150);
-        priAttrTV.setItems(priAttrList);
+        TableView<DishesAttributeVO> priAttrTV = newTableView(600, 150);
+        priAttrTV.setItems(priAttrItems);
         priAttrTV.getColumns().addAll(
                 newCol("ID", "dishesAttributeId", 60),
                 newCol("名称", "dishesAttributeName", 150),
                 newCol("备注", "dishesAttributeMarkInfo", 150),
                 newCol("操作", "operations", 200)
         );
-        priAttrTV.setItems(priAttrList);
-
-        TableView<Dishes> priAttrValTV = new TableView<>();
-        priAttrValTV.setPrefWidth(200);
-        priAttrValTV.setPrefHeight(150);
+        priAttrTV.getSelectionModel().selectedItemProperty().addListener((x, o, n) -> {
+            selectedPriAttr.set(n);
+        });
+        // 私有属性值
+        TableView<DishesAttributeValueVO> priAttrValTV = newTableView(200, 150);
         priAttrValTV.getColumns().addAll(
                 newCol("属性值名称", "attributeValue", 200)
         );
+        selectedPriAttr.addListener((obs, old, _new) -> {
+            priAttrValTV.getItems().clear();
+            if (_new != null && _new.getAllAttributeValues() != null) {
+                priAttrValTV.getItems().addAll(
+                        FXCollections.observableArrayList(_new.getAllAttributeValues()));
+            }
+            priAttrValTV.refresh();
+        });
         priAttrInput.getChildren().addAll(priAttrTV, priAttrValTV);
         addLine(priAttrOperations, priAttrInput);
         collectData.add(() -> {
-            dishes.setDishesPrivateAttribute(Base64.encode(JSON.toJSONString(new ArrayList<>())));
+            dishes.setDishesPrivateAttribute(Base64.encode(JSON.toJSONString(priAttrItems)));
         });
 
+        /* ************************************************************** *\
+         *    保存数据
+        \* ************************************************************** */
         Button save = new Button("保 存");
         save.setOnAction(evt -> {
             CommonUtils.safeRun(collectData);
@@ -261,25 +283,20 @@ public class DishesEditView extends SimpleGridForm {
         addLine((Node) null, save);
     }
 
-    private void openAddPriAttrView(ObservableList<DishesAttributeBO> priAttrList) {
+    private void openAddPriAttrView(ObservableList<DishesAttributeVO> priAttrList) {
         Window w = this.getScene().getWindow();
         ModelWindow modelDialog = new ModelWindow(w);
         modelDialog.setWidth(600);
         modelDialog.setWidth(400);
         DishesAttributeEditView view = new DishesAttributeEditView(new DishesAttributeVO(), it -> {
-            DishesAttributeBO bo = new DishesAttributeBO();
-            bo.setAttachment(it);
-            bo.setDishesAttributeId(1);
-            bo.setDishesAttributeName(it.getDishesAttributeName());
-            bo.setDishesAttributeMarkInfo(it.getDishesAttributeMarkInfo());
-            priAttrList.add(bo);
+            priAttrList.add(it);
             modelDialog.close();
         });
         modelDialog.setScene(new Scene(view));
         modelDialog.showAndWait();
     }
 
-    private void openAddPubAttrView(ObservableList<DishesAttributeVO> selectedPubAttrItems) {
+    private void openAddPubAttrView(ObservableList<DishesAttributeVO> attrItems) {
         // 弹出公共属性选择框
         List<DishesAttributeVO> allAttrList = dishesAttributeService.selectAll();
         ObjectProperty<DishesAttributeBO> selectedAttr = new SimpleObjectProperty<>();
@@ -300,11 +317,11 @@ public class DishesEditView extends SimpleGridForm {
             bo.setAttachment(it);
             bo.setDishesAttributeId(it.getDishesAttributeId());
             bo.setDishesAttributeName(it.getDishesAttributeName());
-            if (!selectedPubAttrItems.stream()
+            if (!attrItems.stream()
                     .map(DishesAttributeVO::getDishesAttributeId).collect(Collectors.toList())
                     .contains(it.getDishesAttributeId())) {
                 bo.getOperations().add(new OperationButton("添加", () -> {
-                    selectedPubAttrItems.add(it);
+                    attrItems.add(it);
                     w.hide();
                 }));
             }
@@ -393,6 +410,13 @@ public class DishesEditView extends SimpleGridForm {
             }
             imgItems.add(bo);
         });
+    }
+
+    private <T> TableView<T> newTableView(double width, double height) {
+        TableView<T> tv = new TableView<>();
+        tv.setPrefWidth(width);
+        tv.setPrefHeight(height);
+        return tv;
     }
 
     @Data

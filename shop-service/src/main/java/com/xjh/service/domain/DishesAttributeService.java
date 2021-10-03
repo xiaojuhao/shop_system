@@ -2,6 +2,7 @@ package com.xjh.service.domain;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,20 @@ public class DishesAttributeService {
     public List<DishesAttributeVO> selectAll() {
         List<DishesAttribute> list = dishesAttributeDAO.selectList(new DishesAttribute());
         return list.stream().map(this::toVO).collect(Collectors.toList());
+    }
+
+    public List<DishesAttributeVO> getByAttrIds(Collection<Integer> attributeIds) {
+        List<DishesAttributeVO> list = new ArrayList<>();
+        if (attributeIds == null) {
+            return list;
+        }
+        attributeIds.forEach(id -> {
+            DishesAttributeVO v = getByAttrId(id);
+            if (v != null) {
+                list.add(v);
+            }
+        });
+        return list;
     }
 
     public DishesAttributeVO getByAttrId(Integer attributeId) {
