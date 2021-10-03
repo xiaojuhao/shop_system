@@ -120,6 +120,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         HBox nameCondBlock = new HBox();
         Label nameLabel = new Label("名称:");
         TextField nameInput = new TextField();
+        nameInput.setPrefWidth(130);
         nameCondBlock.getChildren().add(newLine(nameLabel, nameInput));
 
         // status
@@ -132,7 +133,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
 
         Button queryBtn = new Button("查询");
         queryBtn.setOnAction(evt -> {
-            DishesQuery q = deepClone(cond.get(), DishesQuery.class);
+            DishesQuery q = deepClone(cond.get(), DishesQuery.class).newVersion();
             q.setDishesName(CommonUtils.trim(nameInput.getText()));
             String selectedStatus = modelSelect.getSelectionModel().getSelectedItem();
             if (CommonUtils.eq(selectedStatus, "上架")) q.setStatus(1 + "");
@@ -147,7 +148,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 new Separator(Orientation.VERTICAL),
                 addNew);
         line.setSpacing(20);
-        line.setPadding(new Insets(10, 0, 20, 0));
+        line.setPadding(new Insets(5, 0, 5, 0));
         addLine(line);
     }
 

@@ -157,68 +157,11 @@ public class DishesEditView extends SimpleGridForm {
             }).collect(Collectors.toList());
             dishes.setDishesImgs(Base64.encode(JSON.toJSONString(imgs)));
         });
-        CommonUtils.forEach(ImageHelper.resolveImgs(dishes.getDishesImgs()), it -> {
-            ImgBO bo = new ImgBO();
-            bo.setSno(imgItems.size() + 1);
-            bo.setImg(new ImageSrc(it.getImageSrc(), 100, 60));
-            bo.getOperations().add(new OperationButton("删除", cv -> {
-                imgItems.remove(bo);
-                imgTV.refresh();
-            }));
-            bo.getOperations().add(new OperationButton("设为主图", () -> {
-                for (ImgBO b : imgItems) {
-                    b.getIsMain().set(b == bo ? isMain : notMain);
-                }
-            }));
-            if (it.getIsMain() != null && it.getIsMain()) {
-                bo.getIsMain().set(isMain);
-            } else {
-                bo.getIsMain().set(notMain);
-            }
-            imgItems.add(bo);
-        });
+        resolveDishesImg(imgTV, dishes, imgItems);
         imgTV.refresh();
 
         Button uploadFile = new Button("上传文件");
-        uploadFile.setOnMouseClicked(evt -> {
-            FileChooser chooser = new FileChooser();
-            chooser.setTitle("选择图片");
-            chooser.getExtensionFilters().addAll(
-                    new ExtensionFilter("所有文件", "*.*"),
-                    new ExtensionFilter("JPG", "*.jpg"),
-                    new ExtensionFilter("PNG", "*.png")
-            );
-            File file = chooser.showOpenDialog(this.getScene().getWindow());
-            if (file != null) {
-                String toUrl = "db/img/" + CommonUtils.randomStr(8) + ".jpg";
-                File toFile = new File(ImageHelper.getImageDir() + toUrl);
-                try {
-                    if (!toFile.getParentFile().exists()) {
-                        toFile.getParentFile().mkdirs();
-                    }
-                    Logger.info("拷贝:" + file.toPath() + " >> " + toFile.toPath());
-                    Files.copy(file.toPath(), toFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    ImgBO bo = new ImgBO();
-                    bo.setSno(imgItems.size() + 1);
-                    bo.setImg(new ImageSrc(toUrl, 100, 60));
-                    bo.getIsMain().set(notMain);
-                    bo.getOperations().add(new OperationButton("删除", cv -> {
-                        imgItems.remove(bo);
-                        imgTV.refresh();
-                    }));
-                    bo.getOperations().add(new OperationButton("设为主图", () -> {
-                        for (ImgBO b : imgItems) {
-                            b.getIsMain().set(b == bo ? isMain : notMain);
-                        }
-                    }));
-                    imgItems.add(bo);
-                    imgTV.refresh();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    AlertBuilder.ERROR("上传文件失败:" + ex.getMessage());
-                }
-            }
-        });
+        uploadFile.setOnMouseClicked(evt -> openFileSelector(imgTV, imgItems));
         addLine((Node) null, uploadFile);
 
         addLine(createLabel("菜品属性:", labelWidth), new Label("公共属性(不能修改)"));
@@ -229,57 +172,7 @@ public class DishesEditView extends SimpleGridForm {
         VBox pubAttrOperations = new VBox();
         pubAttrOperations.setSpacing(10);
         Button addPubAttrBtn = new Button("添加公共属性");
-        addPubAttrBtn.setOnAction(evt -> {
-            // 弹出公共属性选择框
-            List<DishesAttributeVO> allAttrList = dishesAttributeService.selectAll();
-            ObjectProperty<DishesAttributeBO> selectedAttr = new SimpleObjectProperty<>();
-            Window window = this.getScene().getWindow();
-            ModelWindow w = new ModelWindow(window);
-            HBox box = new HBox();
-            box.setSpacing(20);
-            box.setPadding(new Insets(10, 10, 10, 10));
-            TableView<DishesAttributeBO> attrsTV = new TableView<>();
-            attrsTV.setPrefWidth(window.getWidth() * 0.9 * 0.6);
-            attrsTV.getColumns().addAll(
-                    newCol("属性ID", "dishesAttributeId", 60),
-                    newCol("属性名称", "dishesAttributeName", 200),
-                    newCol("属性名称", "operations", 0)
-            );
-            attrsTV.setItems(FXCollections.observableArrayList(allAttrList.stream().map(it -> {
-                DishesAttributeBO bo = new DishesAttributeBO();
-                bo.setAttachment(it);
-                bo.setDishesAttributeId(it.getDishesAttributeId());
-                bo.setDishesAttributeName(it.getDishesAttributeName());
-                if (!selectedPubAttrItems.stream()
-                        .map(DishesAttributeVO::getDishesAttributeId).collect(Collectors.toList())
-                        .contains(it.getDishesAttributeId())) {
-                    bo.getOperations().add(new OperationButton("添加", () -> {
-                        selectedPubAttrItems.add(it);
-                        w.hide();
-                    }));
-                }
-                return bo;
-            }).collect(Collectors.toList())));
-            attrsTV.getSelectionModel().selectedItemProperty().addListener((x, o, n) -> {
-                selectedAttr.set(n);
-            });
-            attrsTV.refresh();
-            TableView<DishesAttributeValueVO> attrsValTV = new TableView<>();
-            attrsValTV.setPrefWidth(window.getWidth() * 0.9 * 0.4);
-            attrsValTV.getColumns().addAll(
-                    newCol("属性值", "attributeValue", 200)
-            );
-            selectedAttr.addListener((obs, ov, nv) -> {
-                attrsValTV.getItems().clear();
-                if (nv != null && nv.getAttachment() != null && nv.getAttachment().getAllAttributeValues() != null) {
-                    attrsValTV.setItems(FXCollections.observableArrayList(nv.getAttachment().getAllAttributeValues()));
-                }
-                attrsValTV.refresh();
-            });
-            box.getChildren().addAll(attrsTV, attrsValTV);
-            w.setScene(new Scene(box));
-            w.showAndWait();
-        });
+        addPubAttrBtn.setOnAction(evt -> openAddPubAttrView(selectedPubAttrItems));
         Button removePubAttrBtn = new Button("移除公共属性");
         pubAttrOperations.getChildren().addAll(addPubAttrBtn, removePubAttrBtn);
         HBox pubAttrInput = new HBox();
@@ -325,23 +218,7 @@ public class DishesEditView extends SimpleGridForm {
         VBox priAttrOperations = new VBox();
         priAttrOperations.setSpacing(10);
         Button addPriAttrBtn = new Button("添加私有属性");
-        addPriAttrBtn.setOnAction(evt -> {
-            Window w = this.getScene().getWindow();
-            ModelWindow modelDialog = new ModelWindow(w);
-            modelDialog.setWidth(600);
-            modelDialog.setWidth(400);
-            DishesAttributeEditView view = new DishesAttributeEditView(new DishesAttributeVO(), it -> {
-                DishesAttributeBO bo = new DishesAttributeBO();
-                bo.setAttachment(it);
-                bo.setDishesAttributeId(1);
-                bo.setDishesAttributeName(it.getDishesAttributeName());
-                bo.setDishesAttributeMarkInfo(it.getDishesAttributeMarkInfo());
-                priAttrList.add(bo);
-                modelDialog.close();
-            });
-            modelDialog.setScene(new Scene(view));
-            modelDialog.showAndWait();
-        });
+        addPriAttrBtn.setOnAction(evt -> openAddPriAttrView(priAttrList));
         Button removePriAttrBtn = new Button("移除私有属性");
         priAttrOperations.getChildren().addAll(addPriAttrBtn, removePriAttrBtn);
         HBox priAttrInput = new HBox();
@@ -375,13 +252,147 @@ public class DishesEditView extends SimpleGridForm {
             CommonUtils.safeRun(collectData);
             System.out.println(JSON.toJSONString(dishes, true));
             Result<Integer> rs = dishesService.save(dishes);
-            if(rs.isSuccess()){
+            if (rs.isSuccess()) {
                 AlertBuilder.INFO("保存成功");
-            }else {
+            } else {
                 AlertBuilder.ERROR("保存失败," + rs.getMsg());
             }
         });
         addLine((Node) null, save);
+    }
+
+    private void openAddPriAttrView(ObservableList<DishesAttributeBO> priAttrList) {
+        Window w = this.getScene().getWindow();
+        ModelWindow modelDialog = new ModelWindow(w);
+        modelDialog.setWidth(600);
+        modelDialog.setWidth(400);
+        DishesAttributeEditView view = new DishesAttributeEditView(new DishesAttributeVO(), it -> {
+            DishesAttributeBO bo = new DishesAttributeBO();
+            bo.setAttachment(it);
+            bo.setDishesAttributeId(1);
+            bo.setDishesAttributeName(it.getDishesAttributeName());
+            bo.setDishesAttributeMarkInfo(it.getDishesAttributeMarkInfo());
+            priAttrList.add(bo);
+            modelDialog.close();
+        });
+        modelDialog.setScene(new Scene(view));
+        modelDialog.showAndWait();
+    }
+
+    private void openAddPubAttrView(ObservableList<DishesAttributeVO> selectedPubAttrItems) {
+        // 弹出公共属性选择框
+        List<DishesAttributeVO> allAttrList = dishesAttributeService.selectAll();
+        ObjectProperty<DishesAttributeBO> selectedAttr = new SimpleObjectProperty<>();
+        Window window = this.getScene().getWindow();
+        ModelWindow w = new ModelWindow(window);
+        HBox box = new HBox();
+        box.setSpacing(20);
+        box.setPadding(new Insets(10, 10, 10, 10));
+        TableView<DishesAttributeBO> attrsTV = new TableView<>();
+        attrsTV.setPrefWidth(window.getWidth() * 0.9 * 0.6);
+        attrsTV.getColumns().addAll(
+                newCol("属性ID", "dishesAttributeId", 60),
+                newCol("属性名称", "dishesAttributeName", 200),
+                newCol("属性名称", "operations", 0)
+        );
+        attrsTV.setItems(FXCollections.observableArrayList(allAttrList.stream().map(it -> {
+            DishesAttributeBO bo = new DishesAttributeBO();
+            bo.setAttachment(it);
+            bo.setDishesAttributeId(it.getDishesAttributeId());
+            bo.setDishesAttributeName(it.getDishesAttributeName());
+            if (!selectedPubAttrItems.stream()
+                    .map(DishesAttributeVO::getDishesAttributeId).collect(Collectors.toList())
+                    .contains(it.getDishesAttributeId())) {
+                bo.getOperations().add(new OperationButton("添加", () -> {
+                    selectedPubAttrItems.add(it);
+                    w.hide();
+                }));
+            }
+            return bo;
+        }).collect(Collectors.toList())));
+        attrsTV.getSelectionModel().selectedItemProperty().addListener((x, o, n) -> {
+            selectedAttr.set(n);
+        });
+        attrsTV.refresh();
+        TableView<DishesAttributeValueVO> attrsValTV = new TableView<>();
+        attrsValTV.setPrefWidth(window.getWidth() * 0.9 * 0.4);
+        attrsValTV.getColumns().addAll(
+                newCol("属性值", "attributeValue", 200)
+        );
+        selectedAttr.addListener((obs, ov, nv) -> {
+            attrsValTV.getItems().clear();
+            if (nv != null && nv.getAttachment() != null && nv.getAttachment().getAllAttributeValues() != null) {
+                attrsValTV.setItems(FXCollections.observableArrayList(nv.getAttachment().getAllAttributeValues()));
+            }
+            attrsValTV.refresh();
+        });
+        box.getChildren().addAll(attrsTV, attrsValTV);
+        w.setScene(new Scene(box));
+        w.showAndWait();
+    }
+
+    private void openFileSelector(TableView<ImgBO> imgTV, ObservableList<ImgBO> imgItems) {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("选择图片");
+        chooser.getExtensionFilters().addAll(
+                new ExtensionFilter("所有文件", "*.*"),
+                new ExtensionFilter("JPG", "*.jpg"),
+                new ExtensionFilter("PNG", "*.png")
+        );
+        File file = chooser.showOpenDialog(this.getScene().getWindow());
+        if (file != null) {
+            String toUrl = "db/img/" + CommonUtils.randomStr(8) + ".jpg";
+            File toFile = new File(ImageHelper.getImageDir() + toUrl);
+            try {
+                if (!toFile.getParentFile().exists()) {
+                    toFile.getParentFile().mkdirs();
+                }
+                Logger.info("拷贝:" + file.toPath() + " >> " + toFile.toPath());
+                Files.copy(file.toPath(), toFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                ImgBO bo = new ImgBO();
+                bo.setSno(imgItems.size() + 1);
+                bo.setImg(new ImageSrc(toUrl, 100, 60));
+                bo.getIsMain().set(notMain);
+                bo.getOperations().add(new OperationButton("删除", cv -> {
+                    imgItems.remove(bo);
+                    imgTV.refresh();
+                }));
+                bo.getOperations().add(new OperationButton("设为主图", () -> {
+                    for (ImgBO b : imgItems) {
+                        b.getIsMain().set(b == bo ? isMain : notMain);
+                    }
+                }));
+                imgItems.add(bo);
+                imgTV.refresh();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                AlertBuilder.ERROR("上传文件失败:" + ex.getMessage());
+            }
+        }
+    }
+
+    private void resolveDishesImg(TableView<ImgBO> imgTV, Dishes dishes,
+            ObservableList<ImgBO> imgItems) {
+        CommonUtils.forEach(ImageHelper.resolveImgs(dishes.getDishesImgs()), it -> {
+            ImgBO bo = new ImgBO();
+            bo.setSno(imgItems.size() + 1);
+            bo.setImg(new ImageSrc(it.getImageSrc(), 100, 60));
+            bo.getOperations().add(new OperationButton("删除", cv -> {
+                imgItems.remove(bo);
+                imgTV.refresh();
+            }));
+            bo.getOperations().add(new OperationButton("设为主图", () -> {
+                for (ImgBO b : imgItems) {
+                    b.getIsMain().set(b == bo ? isMain : notMain);
+                }
+            }));
+            if (it.getIsMain() != null && it.getIsMain()) {
+                bo.getIsMain().set(isMain);
+            } else {
+                bo.getIsMain().set(notMain);
+            }
+            imgItems.add(bo);
+        });
     }
 
     @Data
