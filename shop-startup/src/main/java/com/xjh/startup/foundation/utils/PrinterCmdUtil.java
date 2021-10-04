@@ -36,7 +36,6 @@ public class PrinterCmdUtil {
 
     //------------------------打印机初始化-----------------------------
 
-
     /**
      * 打印机初始化,打印模式被设置为上电时的默认模式
      *
@@ -48,14 +47,13 @@ public class PrinterCmdUtil {
 
     //------------------------换1行-----------------------------
 
-
     /**
      * 换行
      *
      * @return rs
      */
     public static byte[] nextLine() {
-        return new byte[]{LF};
+        return nextLine(1);
     }
 
     /**
@@ -69,7 +67,6 @@ public class PrinterCmdUtil {
         for (int i = 0; i < lineNum; i++) {
             result[i] = LF;
         }
-
         return result;
     }
 
@@ -86,7 +83,6 @@ public class PrinterCmdUtil {
 
     //------------------------下划线-----------------------------
 
-
     /**
      * 绘制下划线（1点宽）
      *
@@ -95,7 +91,6 @@ public class PrinterCmdUtil {
     public static byte[] underlineWithOneDotWidthOn() {
         return new byte[]{ESC, 45, 1};
     }
-
 
     /**
      * 绘制下划线（2点宽）
@@ -116,9 +111,7 @@ public class PrinterCmdUtil {
         return new byte[]{ESC, 45, 0};
     }
 
-
     //------------------------加粗-----------------------------
-
 
     /**
      * 选择加粗模式
@@ -139,28 +132,7 @@ public class PrinterCmdUtil {
         return new byte[]{ESC, 69, 0};
     }
 
-    //------------------------得到指定的对齐-----------------------------
-
-
-    /**
-     * 得到指定的对齐
-     *
-     * @param align 指定的对齐方式
-     * @return rs
-     */
-    public static byte[] getAlign(String align) {
-        if ("center".equals(align)) {
-            return alignCenter();
-        } else if ("right".equals(align)) {
-            return alignRight();
-        } else {
-            return alignLeft();
-        }
-    }
-
-
     //------------------------对齐-----------------------------
-
 
     /**
      * 左对齐,
@@ -220,12 +192,11 @@ public class PrinterCmdUtil {
     /**
      * 设置行间距,先将移动单位设置成默认移动单位，设置行高
      *
-     * @param n， n的取值范围是0~20,n=1时，单位是1/4字符高，当行高小于实际字符高度时以字符高度为准
+     * @param n n的取值范围是0~20,n=1时，单位是1/4字符高，当行高小于实际字符高度时以字符高度为准
      * @return rs
      */
     public static byte[] lineDistance(int n) {
-        int realLineSpace = 12 * n;
-        return new byte[]{ESC, 51, (byte) realLineSpace};
+        return new byte[]{ESC, 51, (byte) (12 * n)};
     }
 
     /*
@@ -388,7 +359,10 @@ public class PrinterCmdUtil {
     /**
      * 打印二维码,goole-QRCode生成的颜色只有纯黑白两种
      */
-    public static byte[] printQRCode(String content, int width, int height) throws WriterException {
+    public static byte[] printQRCode(
+            String content,
+            int width,
+            int height) throws WriterException {
         HashMap<EncodeHintType, Object> hints = new HashMap<>();
         hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
         hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);//纠错等级L,M,Q,H
