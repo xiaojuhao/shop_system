@@ -18,6 +18,7 @@ import java.util.List;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.zxing.WriterException;
+import com.xjh.common.utils.CommonUtils;
 import com.xjh.startup.foundation.constants.EnumAlign;
 import com.xjh.startup.foundation.constants.EnumComType;
 
@@ -109,8 +110,8 @@ public class PrinterImpl implements Printer {
     }
 
     @Override
-    public PrintResult print(JSONArray jSONArray, boolean isVoicce) throws Exception {
-        PrintResultImpl printResultImpl = new PrintResultImpl(this, jSONArray);
+    public PrintResult print(JSONArray contentItems, boolean isVoicce) throws Exception {
+        PrintResultImpl printResultImpl = new PrintResultImpl(this, contentItems);
         SocketAddress socketAddress = new InetSocketAddress(ip, port);
         byte[] dataRead = new byte[0];
         try (Socket s = new Socket()) {
@@ -126,23 +127,23 @@ public class PrinterImpl implements Printer {
                 // 如果true，要加，否则后一个模块会接在文本后面；
                 // 如果不是，不加，否则会多一个空行。
                 boolean isText = true;
-                for (int i = 0; i < jSONArray.size(); i++) {
-                    JSONObject jsonObject = jSONArray.getJSONObject(i);
-                    EnumComType comType = EnumComType.of(jsonObject.getInteger("ComType"));
+                for (int i = 0; i < contentItems.size(); i++) {
+                    JSONObject contentItem = contentItems.getJSONObject(i);
+                    EnumComType comType = EnumComType.of(contentItem.getInteger("ComType"));
                     if (comType == EnumComType.TEXT) {
-                        printText(outputStream, jsonObject);
+                        printText(outputStream, contentItem);
                         isText = true;
                     } else if (comType == EnumComType.TABLE) {
-                        printTable(outputStream, jsonObject, isText);
+                        printTable(outputStream, contentItem, isText);
                         isText = false;
                     } else if (comType == EnumComType.QRCODE) {
-                        printQRCode(outputStream, jsonObject, isText);
+                        printQRCode(outputStream, contentItem, isText);
                         isText = false;
                     } else if (comType == EnumComType.QRCODE2) {
-                        printQRCode2(outputStream, jsonObject, isText);
+                        printQRCode2(outputStream, contentItem, isText);
                         isText = false;
                     } else if (comType == EnumComType.LINE) {
-                        printDotLine(outputStream, jsonObject);
+                        printDotLine(outputStream, contentItem);
                         isText = false;
                     } else {
                         String detailedInfo = "json第 " + i + " 个元素的type属性错误,错误类型为：type = " + comType;
@@ -163,8 +164,7 @@ public class PrinterImpl implements Printer {
                         len = inputStream.read(inputData);
                     } catch (java.net.SocketTimeoutException e) {
                         openPreventLost(outputStream);
-                        printResultImpl.setSuccess(false);
-                        printResultImpl.setResultCode(PrintResult.DATAREADTTIMEOUT);
+                        printResultImpl.toFailure(StatusUtil.DATA_READ_TIMEOUT);
                         break;
                     }
                     dataRead = PrinterCmdUtil.byteMerger(dataRead, inputData);
@@ -173,17 +173,13 @@ public class PrinterImpl implements Printer {
                         if (StatusUtil.checkDetailedStatus(inputData) == StatusUtil.PRINTING) {
                             printingFlag = true;
                         }
-
                         if (StatusUtil.checkDetailedStatus(inputData) == StatusUtil.NORMAL && printingFlag) {
                             successFlag = true;
-                            printResultImpl.setSuccess(true);
-                            printResultImpl.setResultCode(PrintResult.NORMAL);
+                            printResultImpl.toSuccess(StatusUtil.NORMAL);
                         }
-
                     } else {
                         int resultCode = StatusUtil.checkDetailedStatus(inputData);
-                        printResultImpl.setSuccess(false);
-                        printResultImpl.setResultCode(resultCode);
+                        printResultImpl.toFailure(resultCode);
                         status = resultCode;
                         //查看输入流是否还有字节，有的话，一起全部都读出来
                         while (len != -1) {
@@ -194,17 +190,17 @@ public class PrinterImpl implements Printer {
                         }
                         break;
                     }
-
                 }
             }
         } catch (IOException e) {
             printResultImpl.setSuccess(false);
-            if (printResultImpl.getResultCode() == PrintResult.INIT) {
-                printResultImpl.setResultCode(PrintResult.SOCKETTIMEOUT);
+            if (printResultImpl.getResultCode() == StatusUtil.INIT) {
+                printResultImpl.setResultCode(StatusUtil.SOCKET_TIMEOUT);
             }
             return printResultImpl;
         } catch (Exception e) {
             e.printStackTrace();
+            printResultImpl.toFailure(StatusUtil.UNKNOWN);
         }
         ////////////////////事件处理////////////////////
         return printResultImpl;
@@ -236,10 +232,10 @@ public class PrinterImpl implements Printer {
     }
 
     private void feedPaperCut(OutputStream outputStream) throws IOException {
-        byte[] nextLine = PrinterCmdUtil.nextLine();
-        byte[] feedPaperCut = PrinterCmdUtil.feedPaperCut();
         // 切纸行首有效，所以前面添加一个换行符
-        byte[][] byteList = new byte[][]{nextLine, feedPaperCut};
+        byte[][] byteList = new byte[][]{
+                PrinterCmdUtil.nextLine(),
+                PrinterCmdUtil.feedPaperCut()};
         byte[] byteMerger = PrinterCmdUtil.byteMerger(byteList);
         outputStream.write(byteMerger);
         outputStream.flush();
@@ -266,58 +262,40 @@ public class PrinterImpl implements Printer {
         int frontLen = jsonObject.getInteger("FrontLen");
         int behindLen = jsonObject.getInteger("BehindLen");
 
-        byte[] byteFrontWrap = PrinterCmdUtil.nextLine(frontEnterNum);
-        byte[] byteFrontSpace = PrinterCmdUtil.printSpace(frontLen);
-        byte[] byteSize = PrinterCmdUtil.fontSizeSetBig(size);
-        byte[] byteContent = PrinterCmdUtil.printText(sampleContent);
-        byte[] byteSizeDefault = PrinterCmdUtil.fontSizeSetBig(1);
-        byte[] byteBackSpace = PrinterCmdUtil.printSpace(behindLen);
-        byte[] byteBackWrap = PrinterCmdUtil.nextLine(behindEnterNum);
         byte[][] byteList = new byte[][]{
-                byteFrontWrap,
-                byteFrontSpace,
-                byteSize,
-                byteContent,
-                byteSizeDefault,
-                byteBackSpace,
-                byteBackWrap
+                PrinterCmdUtil.nextLine(frontEnterNum),
+                PrinterCmdUtil.printSpace(frontLen),
+                PrinterCmdUtil.fontSizeSetBig(size), // 设置字体大小
+                PrinterCmdUtil.printText(sampleContent), // 打印内容
+                PrinterCmdUtil.fontSizeSetBig(1), // 恢复字体大小
+                PrinterCmdUtil.printSpace(behindLen),
+                PrinterCmdUtil.nextLine(behindEnterNum)
         };
-        byte[] byteMerger = PrinterCmdUtil.byteMerger(byteList);
-        outputStream.write(byteMerger);
+        outputStream.write(PrinterCmdUtil.byteMerger(byteList));
         outputStream.flush();
     }
 
     private void printQRCode(OutputStream outputStream, JSONObject jsonObject, boolean isText) throws IOException, WriterException {
-        int maxSize = 32;
-        if (printerType == 1) {
-            maxSize = 48;
-        }
+        int maxSize = (printerType == 1 ? 48 : 32);
         String content = jsonObject.getString("Content");
         double width = jsonObject.getDouble("Size");
         int frontEnterNum = jsonObject.getInteger("FrontEnterNum");
         int behindEnterNum = jsonObject.getInteger("BehindEnterNum");
+        int size = Math.min((int) (charCount * width / 100), maxSize);
 
-        int size = (int) (charCount * width / 100);
-        if (size > maxSize) {
-            size = maxSize;
-        }
         if (isText) {
             outputStream.write(PrinterCmdUtil.nextLine());
         }
-        byte[] byteFrontWrap = PrinterCmdUtil.nextLine(frontEnterNum);
-        byte[] alignCenter = PrinterCmdUtil.alignCenter();
+        // 二维码内容
         byte[] byteQRCode = PrinterCmdUtil.printQRCode(content, size * 12, size * 12);
-        byte[] alignLeft = PrinterCmdUtil.alignLeft();
-        byte[] byteBackWrap = PrinterCmdUtil.nextLine(behindEnterNum);
         byte[][] byteList = new byte[][]{
-                byteFrontWrap,
-                alignCenter,
+                PrinterCmdUtil.nextLine(frontEnterNum),
+                PrinterCmdUtil.alignCenter(), // 设置居中对齐
                 byteQRCode,
-                byteBackWrap,
-                alignLeft
+                PrinterCmdUtil.nextLine(behindEnterNum),
+                PrinterCmdUtil.alignLeft() // 恢复左对齐
         };
-        byte[] byteMerger = PrinterCmdUtil.byteMerger(byteList);
-        outputStream.write(byteMerger);
+        outputStream.write(PrinterCmdUtil.byteMerger(byteList));
         outputStream.flush();
         print1_5Distance(outputStream);
     }
@@ -337,13 +315,17 @@ public class PrinterImpl implements Printer {
         if (isText) {
             outputStream.write(PrinterCmdUtil.nextLine());
         }
-        byte[] byteFrontWrap = PrinterCmdUtil.nextLine(frontEnterNum);
-        byte[] byteQRCode = PrinterCmdUtil.printQRCode2(width, height, qrWidth, qrHeight, leftPadding1, leftPadding2, text1, text2);
-        byte[] byteBackWrap = PrinterCmdUtil.nextLine(behindEnterNum);
+
+        byte[] byteQRCode = PrinterCmdUtil.printQRCode2(
+                width, height,
+                qrWidth, qrHeight,
+                leftPadding1, leftPadding2,
+                text1, text2);
+
         byte[][] byteList = new byte[][]{
-                byteFrontWrap,
+                PrinterCmdUtil.nextLine(frontEnterNum),
                 byteQRCode,
-                byteBackWrap
+                PrinterCmdUtil.nextLine(behindEnterNum)
         };
         byte[] byteMerger = PrinterCmdUtil.byteMerger(byteList);
         outputStream.write(byteMerger);
@@ -353,8 +335,7 @@ public class PrinterImpl implements Printer {
 
     private void printRowDistance(OutputStream outputStream, JSONObject jsonObject) throws IOException {
         int rowDistance = jsonObject.getInteger("rowDistance");
-        byte[] byteRowDistance = PrinterCmdUtil.lineDistance(rowDistance);
-        outputStream.write(byteRowDistance);
+        outputStream.write(PrinterCmdUtil.lineDistance(rowDistance));
         outputStream.flush();
     }
 
@@ -364,7 +345,6 @@ public class PrinterImpl implements Printer {
         outputStream.flush();
     }
 
-
     private void printDotLine(OutputStream outputStream, JSONObject jsonObject) throws IOException {
         int size = jsonObject.getInteger("Size");
         int frontEnterNum = jsonObject.getInteger("FrontEnterNum");
@@ -372,25 +352,17 @@ public class PrinterImpl implements Printer {
 
         byte[] byteSize = PrinterCmdUtil.fontSizeSetBig(size);
         int realCount = charCount / size;
-        String oneDotLine = "- ";
-        StringBuilder stringBuffer = new StringBuilder();
-        for (int i = 0; i < realCount / 2; i++) {
-            stringBuffer.append(oneDotLine);
-        }
-        byte[] dotLine = PrinterCmdUtil.printText(stringBuffer.toString());
+        byte[] hyphenLine = PrinterCmdUtil.printText(CommonUtils.repeatStr("- ", realCount / 2));
         byte[] byteSizeDefault = PrinterCmdUtil.fontSizeSetBig(1);
-
-        byte[] byteFrontEnterNum = PrinterCmdUtil.nextLine(frontEnterNum);
-        byte[] byteBehindEnterNum = PrinterCmdUtil.nextLine(behindEnterNum);
 
         byte[][] byteList = new byte[][]{
                 PrinterCmdUtil.nextLine(),
-                byteFrontEnterNum,
+                PrinterCmdUtil.nextLine(frontEnterNum),
                 byteSize,
-                dotLine,
+                hyphenLine,
                 byteSizeDefault,
                 PrinterCmdUtil.nextLine(),
-                byteBehindEnterNum
+                PrinterCmdUtil.nextLine(behindEnterNum)
         };
         byte[] byteMerger = PrinterCmdUtil.byteMerger(byteList);
         outputStream.write(byteMerger);
@@ -411,59 +383,54 @@ public class PrinterImpl implements Printer {
         if (isText) {
             outputStream.write(PrinterCmdUtil.nextLine());
         }
-        byte[] byteFrontWrap = PrinterCmdUtil.nextLine(frontEnterNum);//保证第一行不会接在上次打印结果的后面
-        outputStream.write(byteFrontWrap);
-        byte[] byteSize = PrinterCmdUtil.fontSizeSetBig(size);
-        outputStream.write(byteSize);
-        //设置行间距永远是字体大小的1.5倍
-        byte[] byteRowDistance = PrinterCmdUtil.lineDistance(4 * size + 2);
-        outputStream.write(byteRowDistance);
+        // 保证第一行不会接在上次打印结果的后面
+        outputStream.write(PrinterCmdUtil.nextLine(frontEnterNum));
+        // 设置字符大小
+        outputStream.write(PrinterCmdUtil.fontSizeSetBig(size));
+        // 设置行间距永远是字体大小的1.5倍
+        outputStream.write(PrinterCmdUtil.lineDistance(4 * size + 2));
         printTableRow(outputStream, columnNames, columnWidths, columnAligns, size);
         for (int i = 0; i < rows.size(); i++) {
             printTableRow(outputStream, rows.getJSONArray(i), columnWidths, columnAligns, size);
         }
         print1_5Distance(outputStream);
-        byte[] byteSizeDefault = PrinterCmdUtil.fontSizeSetBig(1);
-        outputStream.write(byteSizeDefault);
-        byte[] byteNextLines = PrinterCmdUtil.nextLine(behindEnterNum);
-        outputStream.write(byteNextLines);
+        // 重置字符大小
+        outputStream.write(PrinterCmdUtil.fontSizeSetBig(1));
+        // 最后的回车
+        outputStream.write(PrinterCmdUtil.nextLine(behindEnterNum));
         outputStream.flush();
-
     }
 
 
     private void printTableRow(
-            OutputStream outputStream, JSONArray oneRow,
-            JSONArray columnWidths, JSONArray columnAligns,
+            OutputStream outputStream,
+            JSONArray rowData,
+            JSONArray columnWidths,
+            JSONArray columnAligns,
             int size) throws Exception {
-        boolean printFlag = false;
-        for (int i = 0; i < oneRow.size(); i++) {
-            if (!"".equals(oneRow.getString(i))) {
-                printFlag = true;
-                break;
-            }
-        }
-
-        if (!printFlag) {
+        // 整个数据都是空，不打印
+        if (CommonUtils.collValueIsEmpty(rowData)) {
             return;
         }
-
         int maxRow = 1;
         double widthPlus = 0;
         JSONArray jsonCells = new JSONArray();
         for (int i = 0; i < columnWidths.size(); i++) {
-            JSONObject jsonObject = new JSONObject();
+            int colWidth = columnWidths.getInteger(i);
+            int colAlign = columnAligns.getInteger(i);
             int paddingLeft = (int) (widthPlus * charCount / 100 / size);
+
+            JSONObject jsonObject = new JSONObject();
             jsonObject.put("paddingLeft", paddingLeft);
-            jsonObject.put("align", columnAligns.getInteger(i));
-            int widthChar = (charCount * columnWidths.getInteger(i) / 100 / size);
+            jsonObject.put("align", colAlign);
+            int widthChar = (charCount * colWidth / 100 / size);
             if (i == columnWidths.size() - 1) {
                 widthChar = (charCount - (int) (widthPlus * charCount / 100)) / size;
             }
-            widthPlus += columnWidths.getInteger(i);
+            widthPlus += colWidth;
             jsonObject.put("widthChar", widthChar);
 
-            List<String> group = StringUtil.getGroup(oneRow.getString(i), widthChar, i + 1);
+            List<String> group = StringUtil.getGroup(rowData.getString(i), widthChar, i + 1);
             if (group.size() > maxRow) {
                 maxRow = group.size();
             }
@@ -492,81 +459,10 @@ public class PrinterImpl implements Printer {
                     };
                     byte[] byteMerger = PrinterCmdUtil.byteMerger(byteList);
                     outputStream.write(byteMerger);
-
-                }
-
-
-            }
-            byte[] nextLine = PrinterCmdUtil.nextLine();
-            outputStream.write(nextLine);
-        }
-
-    }
-
-    private void printTableRowOld(
-            OutputStream outputStream, JSONArray oneRow,
-            JSONArray columnWidths, JSONArray columnAligns,
-            int size) throws Exception {
-        boolean printFlag = false;
-        for (int i = 0; i < oneRow.size(); i++) {
-            if (!"".equals(oneRow.getString(i))) {
-                printFlag = true;
-                break;
-            }
-        }
-
-        if (!printFlag) {
-            return;
-        }
-
-        int maxRow = 1;
-        double widthPlus = 0;
-        JSONArray jsonCells = new JSONArray();
-        for (int i = 0; i < columnWidths.size(); i++) {
-            JSONObject jsonObject = new JSONObject();
-            int paddingLeft = (int) (widthPlus * charCount / 100 / size);
-            jsonObject.put("paddingLeft", paddingLeft);
-            jsonObject.put("align", columnAligns.getInteger(i));
-            int widthChar = (charCount * columnWidths.getInteger(i) / 100 / size);
-            if (i == columnWidths.size() - 1) {
-                widthChar = (charCount - (int) (widthPlus * charCount / 100)) / size;
-            }
-            widthPlus += columnWidths.getInteger(i);
-            jsonObject.put("widthChar", widthChar);
-
-            List<String> group = StringUtil.getGroup(oneRow.getString(i), widthChar, i + 1);
-            if (group.size() > maxRow) {
-                maxRow = group.size();
-            }
-            JSONArray jsonCell = new JSONArray();
-            jsonCell.add(jsonObject);
-            jsonCell.add(group);
-            jsonCells.add(jsonCell);
-        }
-
-        for (int i = 0; i < maxRow; i++) {
-            for (int j = 0; j < jsonCells.size(); j++) {
-                JSONArray jsonCell = jsonCells.getJSONArray(j);
-                JSONObject jsonObject = jsonCell.getJSONObject(0);
-                List<String> group = (List<String>) jsonCell.get(1);
-
-                if (group.size() > i) {
-                    int paddingLeft = jsonObject.getInteger("paddingLeft");
-                    int widthChar = jsonObject.getInteger("widthChar");   //12223333
-                    EnumAlign align = EnumAlign.of(jsonObject.getInteger("align"));
-
-                    byte[] bytePaddingLeft = PrinterCmdUtil.hTPositionMove(paddingLeft);
-                    byte[] byteContent = PrinterCmdUtil.printText(StringUtil.alignString(group.get(i), widthChar, align));
-                    byte[][] byteList = new byte[][]{
-                            bytePaddingLeft,    //填充会随着字号的倍增而倍增，所以左填充放在字体放大之前
-                            byteContent,
-                    };
-                    byte[] byteMerger = PrinterCmdUtil.byteMerger(byteList);
-                    outputStream.write(byteMerger);
                 }
             }
-            byte[] nextLine = PrinterCmdUtil.nextLine();
-            outputStream.write(nextLine);
+            // 换行
+            outputStream.write(PrinterCmdUtil.nextLine());
         }
     }
 }

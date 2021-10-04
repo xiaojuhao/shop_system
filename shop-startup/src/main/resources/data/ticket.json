@@ -1,29 +1,29 @@
 [
   {
-    "Size": 1,
+    "Name": "标题",
+    "Size": 2,
     "BehindLen": 0,
     "ComType": 1,
     "FrontEnterNum": 0,
     "FrontLen": 8,
     "SampleContent": "样例标题",
-    "Name": "标题",
     "BehindEnterNum": 0
   },
   {
-    "Size": 1,
+    "Name": "标题-2",
+    "Size": 2,
     "BehindLen": 0,
     "ComType": 1,
     "FrontEnterNum": 0,
     "FrontLen": 10,
     "SampleContent": "老邓",
-    "Name": "1",
     "BehindEnterNum": 0
   },
   {
+    "Name": "顶部分割线",
     "Size": 1,
     "ComType": 2,
     "FrontEnterNum": 0,
-    "Name": "顶部分割线",
     "BehindEnterNum": 0
   },
   {
@@ -42,6 +42,11 @@
       40,
       30
     ],
+    "columnAligns": [
+      2,
+      0,
+      4
+    ],
     "rows": [
       [
         "韭菜炒蛋韭菜炒蛋韭菜炒蛋韭菜炒蛋韭菜炒蛋韭菜炒蛋",
@@ -53,29 +58,31 @@
         "1",
         "20"
       ]
-    ],
-    "columnAligns": [
-      2,
-      0,
-      4
     ]
   },
   {
+    "Name": "分割线",
     "Size": 1,
     "ComType": 2,
     "FrontEnterNum": 0,
-    "Name": "分割线",
     "BehindEnterNum": 0
   },
   {
+    "Name": "任溶溶",
+    "BehindEnterNum": 0,
+    "Size": 1,
+    "ComType": 3,
+    "FrontEnterNum": 0,
     "columnNames": [
       "列1",
       "列1",
       ""
     ],
-    "Size": 1,
-    "ComType": 3,
-    "FrontEnterNum": 0,
+    "columnAligns": [
+      2,
+      0,
+      4
+    ],
     "columnWidths": [
       40,
       30,
@@ -112,53 +119,46 @@
         "皇贵妃皇贵妃",
         "和规范化广泛"
       ]
-    ],
-    "columnAligns": [
-      2,
-      0,
-      4
-    ],
-    "Name": "任溶溶",
-    "BehindEnterNum": 0
+    ]
   },
   {
+    "Name": "底部分割线",
     "Size": 1,
     "ComType": 2,
     "FrontEnterNum": 0,
-    "Name": "底部分割线",
     "BehindEnterNum": 0
   },
   {
+    "Name": "二维码内容",
     "Size": 44,
-    "Content": "a",
     "ComType": 4,
+    "Content": "http://m.baidu.com",
     "FrontEnterNum": 0,
-    "Name": "微信",
     "BehindEnterNum": 0
   },
   {
+    "Name": "风格独特的官方",
+    "BehindEnterNum": 0,
+    "Size": 1,
+    "ComType": 3,
+    "FrontEnterNum": 0,
     "columnNames": [
       "列1",
       "列1"
     ],
-    "Size": 1,
-    "ComType": 3,
-    "FrontEnterNum": 0,
     "columnWidths": [
       50,
       50
+    ],
+    "columnAligns": [
+      2,
+      2
     ],
     "rows": [
       [
         "样例(双击编辑)",
         "样例(双击编辑)"
       ]
-    ],
-    "columnAligns": [
-      2,
-      2
-    ],
-    "Name": "风格独特的官方",
-    "BehindEnterNum": 0
+    ]
   }
 ]

@@ -27,7 +27,7 @@ public class PrinterTest extends Application {
         Button btn = new Button("打印");
         btn.setOnAction(evt -> {
             try {
-                PrintResult ps = printer.print(loadJson(), true);
+                PrintResult ps = printer.print(loadJson("/data/ticket.json"), true);
                 System.out.println("打印结果:" + JSON.toJSONString(ps));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -38,8 +38,8 @@ public class PrinterTest extends Application {
         primaryStage.show();
     }
 
-    static JSONArray loadJson() throws Exception {
-        String url = PrinterTest.class.getResource("/data/ticket.json")
+    static JSONArray loadJson(String resource) throws Exception {
+        String url = PrinterTest.class.getResource(resource)
                 .toURI().toURL().getPath();
         File file = new File(url);
         String content = FileUtils.readFile(file);

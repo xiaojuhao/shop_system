@@ -33,6 +33,8 @@ public class PrinterCmdUtil {
     private static final byte FF = 12;
     private static final byte CAN = 24;
 
+    public static final byte[] PRINTER_STATUS_NORMAL = new byte[]{20, 0, 0, 15}; //打印状态正常
+    public static final byte[] PRINTER_STATUS_PRINTING = new byte[]{20, 0, 64, 15}; //正在打印中
 
     //------------------------打印机初始化-----------------------------
 

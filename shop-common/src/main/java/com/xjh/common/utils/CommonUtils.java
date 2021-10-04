@@ -46,7 +46,7 @@ public class CommonUtils {
         return retList;
     }
 
-    public static <T> T deepClone(T v, Class<T> clz){
+    public static <T> T deepClone(T v, Class<T> clz) {
         JSONObject j = JSONBuilder.toJSON(v);
         return j.toJavaObject(clz);
     }
@@ -69,13 +69,13 @@ public class CommonUtils {
     }
 
     @SafeVarargs
-    public static<T> List<T> asList(T ... ts){
-        if(ts == null){
+    public static <T> List<T> asList(T... ts) {
+        if (ts == null) {
             return new ArrayList<>();
         }
         List<T> list = new ArrayList<>();
-        for(T t : ts){
-            if(t != null){
+        for (T t : ts) {
+            if (t != null) {
                 list.add(t);
             }
         }
@@ -177,6 +177,14 @@ public class CommonUtils {
             Logger.error("序列化对象失败:" + ex.getMessage());
             return "error:" + ex.getMessage();
         }
+    }
+
+    public static String repeatStr(String str, int size) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < size; i++) {
+            sb.append(str);
+        }
+        return sb.toString();
     }
 
     public static String readFile(String file) throws Exception {
@@ -579,6 +587,18 @@ public class CommonUtils {
 
     public static boolean isNotEmpty(Collection<?> coll) {
         return !isEmpty(coll);
+    }
+
+    public static boolean collValueIsEmpty(Collection<?> coll) {
+        if (coll == null) {
+            return true;
+        }
+        for (Object v : coll) {
+            if (Objects.nonNull(v)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static String stringify(Object value) {

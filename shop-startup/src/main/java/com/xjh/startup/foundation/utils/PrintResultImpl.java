@@ -17,7 +17,7 @@ public class PrintResultImpl implements PrintResult {
     private Printer printer;
     private JSONArray jSONArray;
     private boolean isSuccess;
-    private int resultCode = PrintResult.INIT;
+    private int resultCode = StatusUtil.INIT;
 
     public PrintResultImpl(Printer printer, JSONArray jSONArray) {
         this.printer = printer;
@@ -29,4 +29,13 @@ public class PrintResultImpl implements PrintResult {
         return jSONArray;
     }
 
+    public void toFailure(int code) {
+        setSuccess(false);
+        setResultCode(code);
+    }
+
+    public void toSuccess(int code) {
+        setSuccess(false);
+        setResultCode(code);
+    }
 }
