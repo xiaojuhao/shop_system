@@ -35,10 +35,6 @@ import lombok.Data;
 @Data
 @SuppressWarnings("unused")
 public class PrinterImpl implements Printer {
-    //    public static int BENPAO_ALIGN_CENTER = 0;
-    //    public static int BENPAO_ALIGN_LEFT = 2;
-    //    public static int BENPAO_ALIGN_RIGHT = 4;
-
     private int id;
     private String name;
     private String ip;
@@ -172,7 +168,6 @@ public class PrinterImpl implements Printer {
                         break;
                     }
                     dataRead = PrinterCmdUtil.byteMerger(dataRead, inputData);
-                    // System.out.println("api.print.PrinterImpl.print()" + Arrays.toString(inputData));
 
                     if (StatusUtil.checkStatus(inputData)) {
                         if (StatusUtil.checkDetailedStatus(inputData) == StatusUtil.PRINTING) {
@@ -215,9 +210,11 @@ public class PrinterImpl implements Printer {
         return printResultImpl;
     }
 
+    /**
+     * 激活自动返回功能，应立即收到一条返回
+     */
     private void openAutoReturn(OutputStream outputStream) throws IOException {
-        byte[] asb = new byte[]{0x1D, 0x61, 0x0F};//激活自动返回功能，应立即收到一条返回
-        outputStream.write(asb);
+        outputStream.write(PrinterCmdUtil.openAutoReturn());
         outputStream.flush();
     }
 
@@ -226,23 +223,16 @@ public class PrinterImpl implements Printer {
      * 激活免丢单功能和自动返回功能
      */
     private void openPreventLost(OutputStream outputStream) throws IOException, InterruptedException {
-        byte[] activeLost = new byte[]{0x1B, 0x73, 0x42, 0x45, -110, -102, 0x01, 0x00, 0x5F, 0x0A};// 激活免丢单功能
-
-        outputStream.write(activeLost);
+        outputStream.write(PrinterCmdUtil.openPreventLost());
         outputStream.flush();
         //打印机会有一段反应时间
         Thread.sleep(1000);
     }
 
-    private void closePreventLost() throws IOException {
-        try (Socket socket = new Socket(ip, port);
-             OutputStream outputStream = socket.getOutputStream()) {
-            byte[] closeActiveLost = new byte[]{
-                    0x1B, 0x73, 0x42, 0x45, -110, -102, 0x00, 0x00, 0x5F, 0x0A
-            };// 关闭免丢单功能
-            outputStream.write(closeActiveLost);
-            outputStream.flush();
-        }
+    private void closePreventLost(OutputStream outputStream) throws IOException {
+        // 关闭免丢单功能
+        outputStream.write(PrinterCmdUtil.closeActiveLost());
+        outputStream.flush();
     }
 
     private void feedPaperCut(OutputStream outputStream) throws IOException {

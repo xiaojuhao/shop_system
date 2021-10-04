@@ -199,6 +199,11 @@ public class PrinterCmdUtil {
         return new byte[]{ESC, 51, (byte) (12 * n)};
     }
 
+    //激活自动返回功能，应立即收到一条返回
+    public static byte[] openAutoReturn() {
+        return new byte[]{0x1D, 0x61, 0x0F};
+    }
+
     /*
      * 这种58，80对待移动单位不一样
      */
@@ -428,6 +433,13 @@ public class PrinterCmdUtil {
      */
     public static byte[] openPreventLost() {
         return new byte[]{0x1B, 0x73, 0x42, 0x45, -110, -102, 0x01, 0x00, 0x5F, 0x0A};// 激活免丢单功能
+    }
+
+    /**
+     * 关闭免丢单功能
+     */
+    public static byte[] closeActiveLost() {
+        return new byte[]{0x1B, 0x73, 0x42, 0x45, -110, -102, 0x00, 0x00, 0x5F, 0x0A};
     }
 
     /**
