@@ -289,23 +289,22 @@ public class PrinterCmdUtil {
      * @return rs
      */
     public static byte[] printImage(BufferedImage bmp) {
-        byte[] result = new byte[]{ESC, 0x33, 0x00}; // ESC 3	设置行间距为最小间距
+        byte[] result = new byte[]{ESC, 0x33, 0x00}; // ESC 3 设置行间距为最小间距
         // ESC * m nL nH 点阵图
-        byte[] escBmp = new byte[]{ESC, 0x2A, 0x00, 0x00, 0x00};
-        escBmp[2] = (byte) 0x21;
+        byte[] escBmp = new byte[]{ESC, 0x2A, 0x21, 0x00, 0x00};
         //nL, nH
         escBmp[3] = (byte) (bmp.getWidth() % 256);
         escBmp[4] = (byte) (bmp.getWidth() / 256);
 
-        int printHight;
+        int printHeight;
         if (bmp.getHeight() % 24 == 0) {
-            printHight = bmp.getHeight() / 24;
+            printHeight = bmp.getHeight() / 24;
         } else {
-            printHight = bmp.getHeight() / 24 + 1;
+            printHeight = bmp.getHeight() / 24 + 1;
         }
         // 每行进行打印
         int pixelColor;
-        for (int i = 0; i < printHight; i++) {
+        for (int i = 0; i < printHeight; i++) {
             result = byteMerger(result, escBmp);
             for (int j = 0; j < bmp.getWidth(); j++) {
                 byte[] data = new byte[]{(byte) 0x00, (byte) 0x00, (byte) 0x00};
@@ -320,13 +319,11 @@ public class PrinterCmdUtil {
                 result = byteMerger(result, data);
             }
             //换行
-            byte[] byte_send1 = new byte[]{CR, LF};
-            result = byteMerger(result, byte_send1);
+            result = byteMerger(result, new byte[]{CR, LF});
         }
         // 恢复默认的行距
         byte[] defaultLineSpace = new byte[]{ESC, 50};
-        result = byteMerger(result, defaultLineSpace);
-        return result;
+        return byteMerger(result, defaultLineSpace);
     }
 
     public static void drawQRcode(
@@ -466,6 +463,7 @@ public class PrinterCmdUtil {
 
     private static final MatrixToImageConfig DEFAULT_CONFIG = new MatrixToImageConfig();
 
+    // 将 matrix 打印到 graphics2D 上
     public static void draw(Graphics2D graphics2D, BitMatrix matrix, int xStart, int yStart) {
         int width = matrix.getWidth();
         int height = matrix.getHeight();
