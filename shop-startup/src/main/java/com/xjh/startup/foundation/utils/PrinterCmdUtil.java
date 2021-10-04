@@ -329,24 +329,13 @@ public class PrinterCmdUtil {
      * @return rs
      */
     public static byte[] printImage(BufferedImage bmp) {
-
         byte[] result = new byte[]{0x1B, 0x33, 0x00}; //ESC 3	设置行间距为最小间距
-        //重置参数
-        byte[] data = new byte[]{(byte) 0x00, (byte) 0x00, (byte) 0x00};
-
-        int pixelColor;
         // ESC * m nL nH 点阵图
         byte[] escBmp = new byte[]{0x1B, 0x2A, 0x00, 0x00, 0x00};
-
         escBmp[2] = (byte) 0x21;
-
         //nL, nH
         escBmp[3] = (byte) (bmp.getWidth() % 256);
         escBmp[4] = (byte) (bmp.getWidth() / 256);
-
-        //        byte[] nextLine = nextLine();
-        //        result = byteMerger(result,nextLine);
-        //        byte[] hTPositionMove = hTPositionMove(leftPadding);
 
         int printHight;
         if (bmp.getHeight() % 24 == 0) {
@@ -355,11 +344,11 @@ public class PrinterCmdUtil {
             printHight = bmp.getHeight() / 24 + 1;
         }
         // 每行进行打印
+        int pixelColor;
         for (int i = 0; i < printHight; i++) {
-            // result = byteMerger(result,hTPositionMove);
             result = byteMerger(result, escBmp);
-
             for (int j = 0; j < bmp.getWidth(); j++) {
+                byte[] data = new byte[]{(byte) 0x00, (byte) 0x00, (byte) 0x00};
                 for (int k = 0; k < 24; k++) {
                     if (((i * 24) + k) < bmp.getHeight()) {
                         pixelColor = bmp.getRGB(j, (i * 24) + k);
@@ -368,17 +357,10 @@ public class PrinterCmdUtil {
                         }
                     }
                 }
-
                 result = byteMerger(result, data);
-                // 重置参数
-                data[0] = (byte) 0x00;
-                data[1] = (byte) 0x00;
-                data[2] = (byte) 0x00;
             }
             //换行
-            byte[] byte_send1 = new byte[2];
-            byte_send1[0] = 0x0d;
-            byte_send1[1] = 0x0a;
+            byte[] byte_send1 = new byte[]{0x0d, 0x0a};
             result = byteMerger(result, byte_send1);
         }
         // 恢复默认的行距
