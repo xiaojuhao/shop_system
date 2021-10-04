@@ -86,6 +86,12 @@ public class OrderPrinterHelper {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("Name", "换行");
         jsonObject.put("ComType", EnumComType.CRLF.type);
+        jsonObject.put("SampleContent", "");
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
         return jsonObject;
     }
 }

@@ -53,7 +53,17 @@ public class PrinterTest extends Application {
                 e.printStackTrace();
             }
         });
-        box.getChildren().addAll(btn, btn2, btn3);
+
+        Button btn4 = new Button("FONT");
+        btn4.setOnAction(evt -> {
+            try {
+                PrintResult ps = printer.print(loadJson("/data/font.json"), true);
+                System.out.println("打印结果:" + JSON.toJSONString(ps));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        box.getChildren().addAll(btn, btn2, btn3, btn4);
         primaryStage.setScene(new Scene(box, 600, 600));
         primaryStage.show();
     }
