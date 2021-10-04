@@ -57,9 +57,12 @@ public class TicketComQrCode extends TicketCom {
         int grap = ticketDesign.getMaxX() - ticketDesign.getMinX() - width;
 
         try {
-            QRcode.drawQRcode(getContent(), graphics2D, ticketDesign.getMinX() + (grap / 2), ticketDesign.getNextComStartY(), width);
+            PrinterCmdUtil.drawQRcode(getContent(), graphics2D,
+                    ticketDesign.getMinX() + (grap / 2),
+                    ticketDesign.getNextComStartY(),
+                    width, width);
         } catch (WriterException ex) {
-
+            ex.printStackTrace();
         }
 
         shape = new Rectangle(ticketDesign.getMinX() + (grap / 2), ticketDesign.getNextComStartY(), width, width);

@@ -146,13 +146,12 @@ public class PrinterImpl implements Printer {
                         printQRCode2(outputStream, jsonObject, isText);
                         isText = false;
                     } else if (comType == EnumComType.LINE) {
-                        printDotLine(outputStream, jsonObject, isText);
+                        printDotLine(outputStream, jsonObject);
                         isText = false;
                     } else {
                         String detailedInfo = "json第 " + i + " 个元素的type属性错误,错误类型为：type = " + comType;
                         throw new Exception(detailedInfo + ", " + comType);
                     }
-
                 }
                 feedPaperCut(outputStream);
                 if (isVoicce) {
@@ -248,12 +247,9 @@ public class PrinterImpl implements Printer {
 
     private void feedPaperCut(OutputStream outputStream) throws IOException {
         byte[] nextLine = PrinterCmdUtil.nextLine();
-        //切纸行首有效，所以前面添加一个换行符
         byte[] feedPaperCut = PrinterCmdUtil.feedPaperCut();
-        byte[][] byteList = new byte[][]{
-                nextLine,
-                feedPaperCut
-        };
+        // 切纸行首有效，所以前面添加一个换行符
+        byte[][] byteList = new byte[][]{nextLine, feedPaperCut};
         byte[] byteMerger = PrinterCmdUtil.byteMerger(byteList);
         outputStream.write(byteMerger);
         outputStream.flush();
@@ -306,7 +302,6 @@ public class PrinterImpl implements Printer {
         if (printerType == 1) {
             maxSize = 48;
         }
-
         String content = jsonObject.getString("Content");
         double width = jsonObject.getDouble("Size");
         int frontEnterNum = jsonObject.getInteger("FrontEnterNum");
@@ -316,10 +311,8 @@ public class PrinterImpl implements Printer {
         if (size > maxSize) {
             size = maxSize;
         }
-
-        byte[] nextLine = PrinterCmdUtil.nextLine();
         if (isText) {
-            outputStream.write(nextLine);
+            outputStream.write(PrinterCmdUtil.nextLine());
         }
         byte[] byteFrontWrap = PrinterCmdUtil.nextLine(frontEnterNum);
         byte[] alignCenter = PrinterCmdUtil.alignCenter();
@@ -351,9 +344,8 @@ public class PrinterImpl implements Printer {
         String text1 = jsonObject.getString("Text1");
         String text2 = jsonObject.getString("Text2");
 
-        byte[] nextLine = PrinterCmdUtil.nextLine();
         if (isText) {
-            outputStream.write(nextLine);
+            outputStream.write(PrinterCmdUtil.nextLine());
         }
         byte[] byteFrontWrap = PrinterCmdUtil.nextLine(frontEnterNum);
         byte[] byteQRCode = PrinterCmdUtil.printQRCode2(width, height, qrWidth, qrHeight, leftPadding1, leftPadding2, text1, text2);
@@ -383,7 +375,7 @@ public class PrinterImpl implements Printer {
     }
 
 
-    private void printDotLine(OutputStream outputStream, JSONObject jsonObject, boolean isText) throws IOException {
+    private void printDotLine(OutputStream outputStream, JSONObject jsonObject) throws IOException {
         int size = jsonObject.getInteger("Size");
         int frontEnterNum = jsonObject.getInteger("FrontEnterNum");
         int behindEnterNum = jsonObject.getInteger("BehindEnterNum");
@@ -426,9 +418,8 @@ public class PrinterImpl implements Printer {
         JSONArray columnAligns = jsonObject.getJSONArray("columnAligns");
         JSONArray rows = jsonObject.getJSONArray("rows");
 
-        byte[] nextLine = PrinterCmdUtil.nextLine();
         if (isText) {
-            outputStream.write(nextLine);
+            outputStream.write(PrinterCmdUtil.nextLine());
         }
         byte[] byteFrontWrap = PrinterCmdUtil.nextLine(frontEnterNum);//保证第一行不会接在上次打印结果的后面
         outputStream.write(byteFrontWrap);

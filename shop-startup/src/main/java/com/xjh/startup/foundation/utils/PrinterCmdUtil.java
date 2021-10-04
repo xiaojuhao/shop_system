@@ -356,7 +356,7 @@ public class PrinterCmdUtil {
         }
         // 每行进行打印
         for (int i = 0; i < printHight; i++) {
-            //            result = byteMerger(result,hTPositionMove);
+            // result = byteMerger(result,hTPositionMove);
             result = byteMerger(result, escBmp);
 
             for (int j = 0; j < bmp.getWidth(); j++) {
@@ -381,27 +381,38 @@ public class PrinterCmdUtil {
             byte_send1[1] = 0x0a;
             result = byteMerger(result, byte_send1);
         }
-        //恢复默认的行距
-        byte[] defaultLineSpace = new byte[]{27, 50};
+        // 恢复默认的行距
+        byte[] defaultLineSpace = new byte[]{ESC, 50};
         result = byteMerger(result, defaultLineSpace);
         return result;
     }
 
+    public static void drawQRcode(
+            String content,
+            Graphics2D graphics2D,
+            int xStart,
+            int yStart,
+            int width,
+            int height) throws WriterException {
+        HashMap<EncodeHintType, Object> hints = new HashMap<>();
+        hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
+        hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);//纠错等级L,M,Q,H
+        hints.put(EncodeHintType.MARGIN, 0); //边距
+        BitMatrix bitMatrix = new MultiFormatWriter().encode(
+                content, BarcodeFormat.QR_CODE, width, height, hints);
+        draw(graphics2D, bitMatrix, xStart, yStart);
+    }
+
     /**
      * 打印二维码,goole-QRCode生成的颜色只有纯黑白两种
-     *
-     * @param content 二维码得扫描后内容
-     * @param width   二维码图片的宽度
-     * @return rs
      */
     public static byte[] printQRCode(String content, int width, int height) throws WriterException {
         HashMap<EncodeHintType, Object> hints = new HashMap<>();
         hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
         hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);//纠错等级L,M,Q,H
         hints.put(EncodeHintType.MARGIN, 0); //边距
-        BitMatrix bitMatrix = null;
 
-        bitMatrix = new MultiFormatWriter().encode(content, BarcodeFormat.QR_CODE, width, height, hints);
+        BitMatrix bitMatrix = new MultiFormatWriter().encode(content, BarcodeFormat.QR_CODE, width, height, hints);
 
         BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics2D = bufferedImage.createGraphics();
@@ -410,6 +421,9 @@ public class PrinterCmdUtil {
         return printImage(bufferedImage);
     }
 
+    /**
+     * 打印二维码（一行2个）
+     */
     public static byte[] printQRCode2(
             int width, int height,
             int qrWidth, int qrHeight,
@@ -477,8 +491,8 @@ public class PrinterCmdUtil {
     /**
      * 将一个二维字节数组整合成一个一维字节数组，一组字节数组包含二维字节数组中的所有字节
      *
-     * @param byteList
-     * @return
+     * @param byteList byteList
+     * @return rs
      */
     public static byte[] byteMerger(byte[][] byteList) {
 
