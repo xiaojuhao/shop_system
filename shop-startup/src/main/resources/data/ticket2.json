@@ -1,0 +1,308 @@
+[
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "订单编号:",
+    "Name": "订单编号",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "134564646322",
+    "Name": "订单编号值",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 1,
+    "FrontLen": 0,
+    "SampleContent": "门店名称:",
+    "Name": "门店名称",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "测试店铺",
+    "Name": "门店名称值",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 1,
+    "FrontLen": 0,
+    "SampleContent": "下单时间:",
+    "Name": "下单时间",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "2017-06-15 21:21:21",
+    "Name": "下单时间值",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 1,
+    "FrontLen": 0,
+    "SampleContent": "桌台信息:",
+    "Name": "桌台信息",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "大厅-A01",
+    "Name": "桌台信息值",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 1,
+    "FrontLen": 0,
+    "SampleContent": "用餐人数:",
+    "Name": "用餐人数",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "2",
+    "Name": "用餐人数值",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 1,
+    "FrontLen": 0,
+    "SampleContent": "点菜员:",
+    "Name": "点菜员",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "服务员1",
+    "Name": "点菜员值",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 2,
+    "FrontLen": 0,
+    "SampleContent": "商品名称",
+    "Name": "商品名称",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 20,
+    "SampleContent": "数量",
+    "Name": "数量",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 8,
+    "SampleContent": "小计",
+    "Name": "小计",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "ComType": 2,
+    "FrontEnterNum": 0,
+    "Name": "分割线1",
+    "BehindEnterNum": 0
+  },
+  {
+    "columnNames": [
+      "",
+      "",
+      ""
+    ],
+    "Size": 1,
+    "ComType": 3,
+    "FrontEnterNum": 0,
+    "columnWidths": [
+      50,
+      25,
+      25
+    ],
+    "rows": [
+      [
+        "宫保鸡丁[加辣]",
+        "2",
+        "50"
+      ],
+      [
+        "鱼香茄子[不加辣]",
+        "1",
+        "18"
+      ]
+    ],
+    "columnAligns": [
+      2,
+      0,
+      0
+    ],
+    "Name": "结账菜品表",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "ComType": 2,
+    "FrontEnterNum": 0,
+    "Name": "分割线2",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 2,
+    "FrontLen": 0,
+    "SampleContent": "订单合计:",
+    "Name": "订单合计",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "68.0",
+    "Name": "订单合计值",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 1,
+    "FrontLen": 0,
+    "SampleContent": "已付:",
+    "Name": "已付",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "0.0",
+    "Name": "已付值",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 1,
+    "FrontLen": 0,
+    "SampleContent": "抹零:",
+    "Name": "抹零",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "3.0",
+    "Name": "抹零值",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 1,
+    "FrontLen": 0,
+    "SampleContent": "折扣合计:",
+    "Name": "折扣合计",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "10.0",
+    "Name": "折扣合计值",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 1,
+    "FrontLen": 0,
+    "SampleContent": "应收合计:",
+    "Name": "应收合计",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "55.0",
+    "Name": "应收合计值",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 50,
+    "Content": "二维码样例内容",
+    "ComType": 4,
+    "FrontEnterNum": 1,
+    "Name": "二维码",
+    "BehindEnterNum": 0
+  }
+]

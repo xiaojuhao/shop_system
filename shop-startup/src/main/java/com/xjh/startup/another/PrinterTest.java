@@ -33,7 +33,27 @@ public class PrinterTest extends Application {
                 e.printStackTrace();
             }
         });
-        box.getChildren().add(btn);
+
+        Button btn2 = new Button("结账80毫米");
+        btn2.setOnAction(evt -> {
+            try {
+                PrintResult ps = printer.print(loadJson("/data/ticket2.json"), true);
+                System.out.println("打印结果:" + JSON.toJSONString(ps));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        Button btn3 = new Button("后厨80毫米");
+        btn3.setOnAction(evt -> {
+            try {
+                PrintResult ps = printer.print(loadJson("/data/ticket3.json"), true);
+                System.out.println("打印结果:" + JSON.toJSONString(ps));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        box.getChildren().addAll(btn, btn2, btn3);
         primaryStage.setScene(new Scene(box, 600, 600));
         primaryStage.show();
     }

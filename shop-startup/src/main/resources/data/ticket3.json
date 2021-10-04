@@ -1,0 +1,90 @@
+[
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "桌台信息:",
+    "Name": "桌台信息",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 2,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "大厅-A01",
+    "Name": "桌号值",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 3,
+    "FrontLen": 0,
+    "SampleContent": "名称:",
+    "Name": "名称",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 2,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "宫保鸡丁",
+    "Name": "菜名值",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 2,
+    "FrontLen": 0,
+    "SampleContent": "下单时间:",
+    "Name": "下单时间",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "2017-06-15 21:22:22",
+    "Name": "下单时间值",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 2,
+    "FrontLen": 0,
+    "SampleContent": "流水号:",
+    "Name": "流水号",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "3232131321213",
+    "Name": "流水号值",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 50,
+    "Content": "二维码样例内容",
+    "ComType": 4,
+    "FrontEnterNum": 1,
+    "Name": "二维码",
+    "BehindEnterNum": 0
+  }
+]
