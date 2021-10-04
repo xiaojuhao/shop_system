@@ -5,53 +5,45 @@
  */
 package com.xjh.startup.foundation.utils;
 
-import java.util.List;
-
-import javax.print.event.PrintEvent;
-
 import com.alibaba.fastjson.JSONArray;
 
 /**
  * @author 36181
  */
 public interface Printer {
-    public static final int STATUS_NORMAL = 1;    //正常
-    public static final int STATUS_COLSE = 0;     //关闭
+    int STATUS_NORMAL = 1;    //正常
+    int STATUS_COLSE = 0;     //关闭
 
-    public static final int PRINTSTATUS_PRINTING = 0;  //正在打印中
-    public static final int PRINTSTATUS_NORMAL = 1;    //正常
-    public static final int PRINTSTATUS_NOPAPER = 2;   //缺纸
-    public static final int PRINTSTATUS_TRAPPEDPAPER = 3;  //卡纸
-    public static final int PRINTSTATUS_UNKNOW = 4;    //未知
-    public static final int PRINTSTATUS_SOCKETTIMEOUT = 5;    //socket超时
+    int PRINTSTATUS_PRINTING = 0;  //正在打印中
+    int PRINTSTATUS_NORMAL = 1;    //正常
+    int PRINTSTATUS_NOPAPER = 2;   //缺纸
+    int PRINTSTATUS_TRAPPEDPAPER = 3;  //卡纸
+    int PRINTSTATUS_UNKNOW = 4;    //未知
+    int PRINTSTATUS_SOCKETTIMEOUT = 5;    //socket超时
 
-    public static final int TYPE_80 = 1;
-    public static final int TYPE_58 = 0;
+    int TYPE_80 = 1;
+    int TYPE_58 = 0;
 
 
-    public int getId();
+    int getId();
 
-    public String getName();
+    String getName();
 
-    public String getIp();
+    String getIp();
 
-    public int getPort();
+    int getPort();
 
-    public String getInfoMark();
+    String getInfoMark();
 
-    public int getStatus();
+    int getStatus();
 
-    public int getPrinterType();
+    int getPrinterType();
 
-    public long getAddTime();
+    long getAddTime();
 
-    public int checkPrinter() throws Exception;
+    int checkPrinter() throws Exception;
 
-    public PrintResult print(JSONArray jSONArray, boolean isVoicce) throws Exception;
-
-    public PrintResult print(JSONArray jSONArray, boolean isVoicce, PrintEvent printEvent) throws Exception;
-
-    public PrintResult print(JSONArray jSONArray, boolean isVoicce, List<PrintEvent> printEvents) throws Exception;
+    PrintResult print(JSONArray jSONArray, boolean isVoicce) throws Exception;
 
 
 }

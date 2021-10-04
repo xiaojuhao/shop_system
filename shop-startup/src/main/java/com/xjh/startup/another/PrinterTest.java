@@ -1,5 +1,6 @@
 package com.xjh.startup.another;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -7,8 +8,11 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.xjh.common.utils.FileUtils;
 import com.xjh.startup.foundation.utils.PrinterCmdUtil;
+import com.xjh.startup.foundation.utils.PrinterImpl;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -20,11 +24,14 @@ public class PrinterTest extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        PrinterImpl printer = new PrinterImpl(1, "打印机", ip, port,
+                "mark", 1, 1,
+                System.currentTimeMillis());
         HBox box = new HBox();
         Button btn = new Button("打印");
         btn.setOnAction(evt -> {
             try {
-                print();
+                printer.print(loadJson(), true);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -130,7 +137,16 @@ public class PrinterTest extends Application {
         outputStream.flush();
     }
 
-    public static void main(String[] args) {
+    static JSONArray loadJson() throws Exception {
+        String url = PrinterTest.class.getResource("/data/ticket.json")
+                .toURI().toURL().getPath();
+        File file = new File(url);
+        String content = FileUtils.readFile(file);
+        return JSONArray.parseArray(content);
+    }
+
+    public static void main(String[] args) throws Exception {
+        // loadJson();
         launch(args);
     }
 }

@@ -1,0 +1,85 @@
+[
+  {
+    "Size": 3,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 10,
+    "SampleContent": "犯得上发",
+    "Name": "高浮雕",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "ComType": 2,
+    "FrontEnterNum": 0,
+    "Name": "方法",
+    "BehindEnterNum": 0
+  },
+  {
+    "columnNames": [
+      "菜名",
+      "数量",
+      "价格"
+    ],
+    "Size": 1,
+    "ComType": 3,
+    "FrontEnterNum": 0,
+    "columnWidths": [
+      40,
+      30,
+      30
+    ],
+    "rows": [
+      [
+        "番茄炒蛋",
+        "1",
+        "8"
+      ],
+      [
+        "苦瓜炒肉",
+        "1",
+        "20"
+      ],
+      [
+        "肥牛汤",
+        "1",
+        "30"
+      ],
+      [
+        "扬州炒饭",
+        "1",
+        "50"
+      ]
+    ],
+    "columnAligns": [
+      2,
+      0,
+      4
+    ],
+    "Name": "的撒旦",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "ComType": 2,
+    "FrontEnterNum": 0,
+    "Name": "1",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 46,
+    "Content": "a",
+    "ComType": 4,
+    "FrontEnterNum": 0,
+    "Name": "1111",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "ComType": 2,
+    "FrontEnterNum": 0,
+    "Name": "fgd",
+    "BehindEnterNum": 0
+  }
+]

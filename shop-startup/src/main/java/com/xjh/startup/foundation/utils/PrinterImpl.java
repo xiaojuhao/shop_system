@@ -14,10 +14,7 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-
-import javax.print.event.PrintEvent;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -109,38 +106,21 @@ public class PrinterImpl implements Printer {
         return printStatus;
     }
 
-
     @Override
     public PrintResult print(JSONArray jSONArray, boolean isVoicce) throws Exception {
-        return print(jSONArray, isVoicce, new ArrayList<>());
-    }
-
-    @Override
-    public PrintResult print(JSONArray jSONArray, boolean isVoicce, PrintEvent printEventTemporary) throws Exception {
-        if (printEventTemporary == null) {
-            return print(jSONArray, isVoicce);
-        }
-
-        List<PrintEvent> printEventsTemporary = new ArrayList<>();
-        printEventsTemporary.add(printEventTemporary);
-        return print(jSONArray, isVoicce, printEventsTemporary);
-    }
-
-    @Override
-    public PrintResult print(JSONArray jSONArray, boolean isVoicce, List<PrintEvent> printEventsTemporary) throws Exception {
         PrintResultImpl printResultImpl = new PrintResultImpl(this, jSONArray);
         SocketAddress socketAddress = new InetSocketAddress(ip, port);
         byte[] dataRead = new byte[0];
-        try (Socket s = new Socket();) {
+        try (Socket s = new Socket()) {
             s.connect(socketAddress, connectTimeout);
             s.setSoTimeout(timeout);
-            try (OutputStream outputStream = s.getOutputStream(); InputStream inputStream = s.getInputStream();) {
+            try (OutputStream outputStream = s.getOutputStream();
+                 InputStream inputStream = s.getInputStream()) {
                 initPrinter(outputStream);
                 openAutoReturn(outputStream);
                 print1_5Distance(outputStream);
-                int length = jSONArray.size();
                 boolean isText = true; //如果本模块是文本，则置为true，供下一个模块判断要不要加一个前置换行。如果true，要加，否则后一个模块会接在文本后面；如果不是，不加，否则会多一个空行。
-                for (int i = 0; i < length; i++) {
+                for (int i = 0; i < jSONArray.size(); i++) {
                     JSONObject jsonObject = jSONArray.getJSONObject(i);
                     int comType = jsonObject.getInteger("ComType");
                     if (comType == TicketCom.TYPE_TEXT) {
@@ -168,18 +148,17 @@ public class PrinterImpl implements Printer {
                 if (isVoicce) {
                     voice(outputStream);
                 }
-                //                System.out.println("api.print.PrinterImpl.print()内部");
 
                 byte[] inputData = new byte[4];
                 boolean successFlag = false;
                 boolean printingFlag = false;
                 while (!successFlag) {
-                    int len = -1;
+                    int len;
                     try {
                         len = inputStream.read(inputData);
                     } catch (java.net.SocketTimeoutException e) {
                         openPreventLost(outputStream);
-                        printResultImpl.setIsSuccess(false);
+                        printResultImpl.setSuccess(false);
                         printResultImpl.setResultCode(PrintResult.DATAREADTTIMEOUT);
                         break;
                     }
@@ -193,13 +172,13 @@ public class PrinterImpl implements Printer {
 
                         if (StatusUtil.checkDetailedStatus(inputData) == StatusUtil.NORMAL && printingFlag) {
                             successFlag = true;
-                            printResultImpl.setIsSuccess(true);
+                            printResultImpl.setSuccess(true);
                             printResultImpl.setResultCode(PrintResult.NORMAL);
                         }
 
                     } else {
                         int resultCode = StatusUtil.checkDetailedStatus(inputData);
-                        printResultImpl.setIsSuccess(false);
+                        printResultImpl.setSuccess(false);
                         printResultImpl.setResultCode(resultCode);
                         status = resultCode;
                         //查看输入流是否还有字节，有的话，一起全部都读出来
@@ -215,8 +194,7 @@ public class PrinterImpl implements Printer {
                 }
             }
         } catch (IOException e) {
-            //            System.out.println("api.print.PrinterImpl.print()" + e);
-            printResultImpl.setIsSuccess(false);
+            printResultImpl.setSuccess(false);
             if (printResultImpl.getResultCode() == PrintResult.INIT) {
                 printResultImpl.setResultCode(PrintResult.SOCKETTIMEOUT);
             }
