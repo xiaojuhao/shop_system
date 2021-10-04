@@ -20,6 +20,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.zxing.WriterException;
 
+import lombok.Data;
+
 
 /**
  * 先默认免丢单和自动返回功能是开启的
@@ -29,6 +31,8 @@ import com.google.zxing.WriterException;
  *
  * @author liangh
  */
+@Data
+@SuppressWarnings("unused")
 public class PrinterImpl implements Printer {
     public static int BENPAO_ALIGN_CENTER = 0;
     public static int BENPAO_ALIGN_LEFT = 2;
@@ -48,13 +52,13 @@ public class PrinterImpl implements Printer {
 
 
     /**
-     * @param id
-     * @param name
-     * @param ip
-     * @param port
-     * @param infoMark
-     * @param printerType,打印机类型，58mm为0,80mm为1
-     * @param addTime                         ,添加打印机的时间
+     * @param id          id
+     * @param name        name
+     * @param ip          ip
+     * @param port        port
+     * @param infoMark    mark
+     * @param printerType 打印机类型，58mm为0,80mm为1
+     * @param addTime     ,添加打印机的时间
      */
     public PrinterImpl(int id, String name, String ip, int port, String infoMark, int printerType, int status, long addTime) {
         this.id = id;
@@ -200,6 +204,7 @@ public class PrinterImpl implements Printer {
             }
             return printResultImpl;
         } catch (Exception e) {
+            e.printStackTrace();
         }
         ////////////////////事件处理////////////////////
         return printResultImpl;
@@ -225,11 +230,11 @@ public class PrinterImpl implements Printer {
     }
 
     private void closePreventLost() throws IOException {
-        try (Socket socket = new Socket(ip, port); OutputStream outputStream = socket.getOutputStream();) {
-            byte[] closeActiveLost = new byte[]
-                    {
-                            0x1B, 0x73, 0x42, 0x45, -110, -102, 0x00, 0x00, 0x5F, 0x0A
-                    };// 关闭免丢单功能
+        try (Socket socket = new Socket(ip, port);
+             OutputStream outputStream = socket.getOutputStream()) {
+            byte[] closeActiveLost = new byte[]{
+                    0x1B, 0x73, 0x42, 0x45, -110, -102, 0x00, 0x00, 0x5F, 0x0A
+            };// 关闭免丢单功能
             outputStream.write(closeActiveLost);
             outputStream.flush();
         }
@@ -362,7 +367,6 @@ public class PrinterImpl implements Printer {
         byte[] byteRowDistance = PrinterCmdUtil.lineDistance(rowDistance);
         outputStream.write(byteRowDistance);
         outputStream.flush();
-
     }
 
     private void print1_5Distance(OutputStream outputStream) throws IOException {
@@ -380,7 +384,7 @@ public class PrinterImpl implements Printer {
         byte[] byteSize = PrinterCmdUtil.fontSizeSetBig(size);
         int realCount = charCount / size;
         String oneDotLine = "- ";
-        StringBuffer stringBuffer = new StringBuffer();
+        StringBuilder stringBuffer = new StringBuilder();
         for (int i = 0; i < realCount / 2; i++) {
             stringBuffer.append(oneDotLine);
         }
@@ -464,9 +468,9 @@ public class PrinterImpl implements Printer {
             int paddingLeft = (int) (widthPlus * charCount / 100 / size);
             jsonObject.put("paddingLeft", paddingLeft);
             jsonObject.put("align", columnAligns.getInteger(i));
-            int widthChar = (int) (charCount * columnWidths.getInteger(i) / 100 / size);
+            int widthChar = (charCount * columnWidths.getInteger(i) / 100 / size);
             if (i == columnWidths.size() - 1) {
-                widthChar = (int) (charCount - (int) (widthPlus * charCount / 100)) / size;
+                widthChar = (charCount - (int) (widthPlus * charCount / 100)) / size;
             }
             widthPlus += columnWidths.getInteger(i);
             jsonObject.put("widthChar", widthChar);
@@ -584,116 +588,10 @@ public class PrinterImpl implements Printer {
                     };
                     byte[] byteMerger = PrinterCmdUtil.byteMerger(byteList);
                     outputStream.write(byteMerger);
-
                 }
-
-
             }
             byte[] nextLine = PrinterCmdUtil.nextLine();
             outputStream.write(nextLine);
         }
-
     }
-
-
-    @Override
-    public int getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getIp() {
-        return ip;
-    }
-
-    @Override
-    public int getPort() {
-        return port;
-    }
-
-    @Override
-    public String getInfoMark() {
-        return infoMark;
-    }
-
-    @Override
-    public int getStatus() {
-        return status;
-    }
-
-    @Override
-    public long getAddTime() {
-        return addTime;
-    }
-
-    public int getTimeout() {
-        return timeout;
-    }
-
-    @Override
-    public int getPrinterType() {
-        return printerType;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setInfoMark(String infoMark) {
-        this.infoMark = infoMark;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public void setAddTime(long addTime) {
-        this.addTime = addTime;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    public void setPrinterType(int printerType) {
-        this.printerType = printerType;
-    }
-
-    public void setTimeout(int timeout) {
-        this.timeout = timeout;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 97 * hash + this.id;
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        if (id != ((PrinterImpl) obj).getId()) {
-            return false;
-        }
-        return true;
-    }
-
 }

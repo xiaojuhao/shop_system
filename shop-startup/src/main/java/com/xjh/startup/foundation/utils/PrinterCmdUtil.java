@@ -255,10 +255,7 @@ public class PrinterCmdUtil {
      * @return rs
      */
     public static byte[] defaultLineDistance() {
-        byte[] result = new byte[2];
-        result[0] = ESC;
-        result[1] = 50;
-        return result;
+        return new byte[]{ESC, 50};
     }
 
     /**
@@ -269,11 +266,7 @@ public class PrinterCmdUtil {
      */
     public static byte[] lineDistance(int n) {
         int realLineSpace = 12 * n;
-        byte[] result = new byte[3];
-        result[0] = ESC;
-        result[1] = 51;
-        result[2] = (byte) realLineSpace;
-        return result;
+        return new byte[]{ESC, 51, (byte) realLineSpace};
     }
 
     /**
@@ -300,12 +293,12 @@ public class PrinterCmdUtil {
     /**
      * 字体变大为标准的n倍
      *
-     * @param num x
+     * @param sizeLevel sizeLevel
      * @return rs
      */
-    public static byte[] fontSizeSetBig(int num) {
+    public static byte[] fontSizeSetBig(int sizeLevel) {
         byte realSize = 0;
-        switch (num) {
+        switch (sizeLevel) {
             case 1:
                 realSize = 0;
                 break;
@@ -331,11 +324,7 @@ public class PrinterCmdUtil {
                 realSize = 119;
                 break;
         }
-        byte[] result = new byte[3];
-        result[0] = 29;
-        result[1] = 33;
-        result[2] = realSize;
-        return result;
+        return new byte[]{GS, 33, realSize};
     }
 
     /**
