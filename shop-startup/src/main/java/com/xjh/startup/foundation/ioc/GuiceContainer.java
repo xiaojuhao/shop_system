@@ -8,6 +8,7 @@ import com.xjh.common.utils.TimeRecord;
 import com.xjh.dao.DaoModule;
 import com.xjh.dao.DataSourceModule;
 import com.xjh.service.ServiceModule;
+import com.xjh.startup.foundation.helper.HelperModule;
 import com.xjh.ws.WsHandlerModule;
 
 public class GuiceContainer {
@@ -26,7 +27,8 @@ public class GuiceContainer {
                     new DaoModule(),
                     new ServiceModule(),
                     new DataSourceModule(),
-                    new WsHandlerModule()
+                    new WsHandlerModule(),
+                    new HelperModule()
             );
             injector.hold(ij);
             Logger.info("初始化Guice, 耗时:" + timeRecord.getCost());

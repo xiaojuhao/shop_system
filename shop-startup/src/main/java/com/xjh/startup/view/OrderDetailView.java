@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import com.alibaba.fastjson.JSONArray;
 import com.xjh.common.enumeration.EnumChoiceAction;
 import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
@@ -36,7 +37,9 @@ import com.xjh.service.domain.DishesPackageService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
+import com.xjh.startup.foundation.helper.OrderPrinterHelper;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
+import com.xjh.startup.foundation.utils.PrinterImpl;
 import com.xjh.startup.view.base.MediumForm;
 import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
@@ -79,6 +82,7 @@ public class OrderDetailView extends VBox {
     OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
     DishesPackageService dishesPackageService = GuiceContainer.getInstance(DishesPackageService.class);
+    OrderPrinterHelper orderPrinterHelper = GuiceContainer.getInstance(OrderPrinterHelper.class);
 
     ObjectProperty<OrderOverviewVO> orderView = new SimpleObjectProperty<>();
 
@@ -242,9 +246,11 @@ public class OrderDetailView extends VBox {
             FlowPane.setMargin(orderErase, new Insets(0, 0, 0, 100));
             Button reduction = createButton("店长减免", width, evt -> openOrderReductionDialog(deskOrderParam));
             Button discount = createButton("选择折扣", width, evt -> openDiscountSelectionDialog(deskOrderParam));
+            Button printOrder = createButton("打印账单", width, evt -> submitPrintOrderInfo(deskOrderParam));
             // add all buttons
-            operationButtonPane.getChildren().addAll(orderBtn, sendBtn, returnBtn, transferBtn, splitBtn, payBillBtn,
-                    orderErase, reduction, discount);
+            operationButtonPane.getChildren().addAll(
+                    orderBtn, sendBtn, returnBtn, transferBtn, splitBtn, payBillBtn,
+                    orderErase, reduction, discount, printOrder);
             addLine(operationButtonPane);
         }
         Logger.info("OrderDetail构建页面耗时: " + cost.getCostAndReset());
@@ -469,6 +475,22 @@ public class OrderDetailView extends VBox {
         String title = "选择折扣[桌号:" + param.getDeskName() + "]";
         VBox view = new OrderDiscountSelectionView(param);
         openView(title, param, view);
+    }
+
+    String ip = "192.168.1.4";
+    int port = 9100;
+
+    private void submitPrintOrderInfo(DeskOrderParam param) {
+        try {
+            PrinterImpl printer = new PrinterImpl(1, "打印机", ip, port,
+                    "mark", 1, 1,
+                    System.currentTimeMillis());
+
+            JSONArray printData = orderPrinterHelper.buildOrderPrintData(param);
+            printer.print(printData, true);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void openView(String title, DeskOrderParam param, Parent node) {

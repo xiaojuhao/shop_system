@@ -11,6 +11,8 @@ public enum EnumComType {
 
     QRCODE2(5, "2个二维码"),
 
+    CRLF(6, "换行"),
+
     ;
 
     public int type;

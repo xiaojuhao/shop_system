@@ -72,7 +72,6 @@ public class PrinterCmdUtil {
         return result;
     }
 
-
     /**
      * 打印并向前走纸n行
      *
@@ -215,7 +214,10 @@ public class PrinterCmdUtil {
      * @param sizeLevel sizeLevel
      * @return rs
      */
-    public static byte[] fontSizeSetBig(int sizeLevel) {
+    public static byte[] fontSizeSetBig(Integer sizeLevel) {
+        if (sizeLevel == null) {
+            sizeLevel = 1;
+        }
         byte realSize = 0;
         switch (sizeLevel) {
             case 1:

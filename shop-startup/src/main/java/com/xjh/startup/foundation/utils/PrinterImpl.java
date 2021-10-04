@@ -145,6 +145,9 @@ public class PrinterImpl implements Printer {
                     } else if (comType == EnumComType.LINE) {
                         printDotLine(outputStream, contentItem);
                         isText = false;
+                    } else if (comType == EnumComType.CRLF) {
+                        printCRLF(outputStream);
+                        isText = false;
                     } else {
                         String detailedInfo = "json第 " + i + " 个元素的type属性错误,错误类型为：type = " + comType;
                         throw new Exception(detailedInfo + ", " + comType);
@@ -193,6 +196,7 @@ public class PrinterImpl implements Printer {
                 }
             }
         } catch (IOException e) {
+            e.printStackTrace();
             printResultImpl.setSuccess(false);
             if (printResultImpl.getResultCode() == StatusUtil.INIT) {
                 printResultImpl.setResultCode(StatusUtil.SOCKET_TIMEOUT);
@@ -253,14 +257,19 @@ public class PrinterImpl implements Printer {
         outputStream.flush();
     }
 
+    private void printCRLF(OutputStream outputStream) throws IOException {
+        byte[][] byteList = new byte[][]{PrinterCmdUtil.nextLine()};
+        outputStream.write(PrinterCmdUtil.byteMerger(byteList));
+        outputStream.flush();
+    }
 
     private void printText(OutputStream outputStream, JSONObject jsonObject) throws IOException {
         String sampleContent = jsonObject.getString("SampleContent");
-        int size = jsonObject.getInteger("Size");
-        int frontEnterNum = jsonObject.getInteger("FrontEnterNum");
-        int behindEnterNum = jsonObject.getInteger("BehindEnterNum");
-        int frontLen = jsonObject.getInteger("FrontLen");
-        int behindLen = jsonObject.getInteger("BehindLen");
+        Integer size = jsonObject.getInteger("Size");
+        Integer frontEnterNum = jsonObject.getInteger("FrontEnterNum");
+        Integer behindEnterNum = jsonObject.getInteger("BehindEnterNum");
+        Integer frontLen = jsonObject.getInteger("FrontLen");
+        Integer behindLen = jsonObject.getInteger("BehindLen");
 
         byte[][] byteList = new byte[][]{
                 PrinterCmdUtil.nextLine(frontEnterNum),
