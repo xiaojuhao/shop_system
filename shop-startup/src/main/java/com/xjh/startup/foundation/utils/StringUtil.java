@@ -16,32 +16,27 @@ public class StringUtil {
     public static List<String> getGroup(String s, int width, int columnIndex) throws Exception {
         List<String> list = new ArrayList<>();
         int widthCount = 0;
-        StringBuffer stringBuffer = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
-            if (c <= 127) {
-                widthCount++;
-            } else {
-                widthCount = widthCount + 2;
-            }
+            // 数组和字母：长度+1， 其他：长度+2
+            widthCount += (c <= 127 ? 1 : 2);
 
             if (widthCount <= width) {
-                stringBuffer.append(c);
+                sb.append(c);
                 if (i == s.length() - 1) {
-                    list.add(stringBuffer.toString());
+                    list.add(sb.toString());
                 }
             } else {
-                if (stringBuffer.length() == 0) {
+                if (sb.length() == 0) {
                     throw new Exception(columnIndex + "");
                 }
-                list.add(stringBuffer.toString());
-                stringBuffer = new StringBuffer();
+                list.add(sb.toString());
+                sb = new StringBuilder();
                 widthCount = 0;
                 i--;
             }
-
         }
-
         return list;
     }
 
@@ -49,12 +44,8 @@ public class StringUtil {
         int charCount = 0;
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
-            if (c <= 127) {
-                charCount++;
-            } else {
-                charCount = charCount + 2;
-            }
-
+            // 数组和字母：长度+1， 其他：长度+2
+            charCount += (c <= 127 ? 1 : 2);
         }
         return charCount;
     }

@@ -1,85 +1,169 @@
 [
   {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "单号:",
+    "Name": "单号:",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "123456789",
+    "Name": "单号",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 1,
+    "FrontLen": 0,
+    "SampleContent": "门店名称:",
+    "Name": "门店名称:",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "牛王府",
+    "Name": "门店名称",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 1,
+    "FrontLen": 0,
+    "SampleContent": "下单时间:",
+    "Name": "下单时间:",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "2017-01-01 01:01:01",
+    "Name": "下单时间",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 2,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 1,
+    "FrontLen": 0,
+    "SampleContent": "桌台信息:",
+    "Name": "桌台信息:",
+    "BehindEnterNum": 0
+  },
+  {
     "Size": 2,
     "BehindLen": 0,
     "ComType": 1,
     "FrontEnterNum": 0,
-    "FrontLen": 15,
-    "SampleContent": "点菜清单",
-    "Name": "大标题",
+    "FrontLen": 0,
+    "SampleContent": "12",
+    "Name": "桌台信息",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 2,
+    "FrontLen": 0,
+    "SampleContent": "用餐人数:",
+    "Name": "用餐人数:",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "2",
+    "Name": "用餐人数",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 1,
+    "FrontLen": 0,
+    "SampleContent": "点菜员:",
+    "Name": "点菜员:",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 1,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "test",
+    "Name": "点菜员",
     "BehindEnterNum": 0
   },
   {
     "Size": 1,
     "ComType": 2,
-    "FrontEnterNum": 0,
-    "Name": "行分隔符",
+    "FrontEnterNum": 1,
+    "Name": "菜表顶部分割线",
     "BehindEnterNum": 0
   },
   {
-    "Name": "菜单明细",
-    "BehindEnterNum": 0,
+    "columnNames": [
+      "菜品名称",
+      "数量"
+    ],
     "Size": 1,
     "ComType": 3,
     "FrontEnterNum": 0,
-    "columnNames": [
-      "菜名",
-      "数量",
-      "价格"
-    ],
     "columnWidths": [
-      40,
-      30,
-      30
+      85,
+      15
     ],
     "rows": [
       [
-        "番茄炒蛋",
-        "1",
-        "8"
-      ],
-      [
-        "苦瓜炒肉",
-        "1",
-        "20"
-      ],
-      [
-        "肥牛汤",
-        "1",
-        "30"
-      ],
-      [
-        "扬州炒饭",
-        "1",
-        "50"
+        "西红柿炒蛋",
+        "1"
       ]
     ],
     "columnAligns": [
       2,
-      0,
-      4
-    ]
-  },
-  {
-    "Name": "行分隔符",
-    "Size": 1,
-    "ComType": 2,
-    "FrontEnterNum": 0,
+      0
+    ],
+    "Name": "点菜列表",
     "BehindEnterNum": 0
   },
   {
-    "Name": "二维码",
-    "Size": 46,
-    "Content": "http://m.baidu.com",
+    "Size": 1,
+    "ComType": 2,
+    "FrontEnterNum": 0,
+    "Name": "菜品下分割线",
+    "BehindEnterNum": 0
+  },
+  {
+    "Size": 34,
+    "Content": "二维码样例内容",
     "ComType": 4,
     "FrontEnterNum": 0,
-    "BehindEnterNum": 0
-  },
-  {
-    "Name": "行分隔符",
-    "Size": 1,
-    "ComType": 2,
-    "FrontEnterNum": 0,
+    "Name": "二维码",
     "BehindEnterNum": 0
   }
 ]

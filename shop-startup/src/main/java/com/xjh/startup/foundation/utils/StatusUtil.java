@@ -52,7 +52,7 @@ public class StatusUtil {
     /**
      * 判断打印机的详细状态
      *
-     * @param data
+     * @param data data
      */
     public static int checkDetailedStatus(byte[] data) {
         byte d0 = data[0];

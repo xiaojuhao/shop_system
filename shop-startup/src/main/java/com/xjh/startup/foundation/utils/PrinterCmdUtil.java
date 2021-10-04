@@ -43,10 +43,7 @@ public class PrinterCmdUtil {
      * @return rs
      */
     public static byte[] initPrinter() {
-        byte[] result = new byte[2];
-        result[0] = ESC;
-        result[1] = 64;
-        return result;
+        return new byte[]{ESC, 64};
     }
 
     //------------------------换1行-----------------------------
@@ -58,9 +55,7 @@ public class PrinterCmdUtil {
      * @return rs
      */
     public static byte[] nextLine() {
-        byte[] result = new byte[1];
-        result[0] = LF;
-        return result;
+        return new byte[]{LF};
     }
 
     /**
@@ -86,11 +81,7 @@ public class PrinterCmdUtil {
      * @return rs
      */
     public static byte[] printAndNextLines(int n) {
-        byte[] result = new byte[3];
-        result[0] = ESC;
-        result[1] = 100;
-        result[2] = (byte) n;
-        return result;
+        return new byte[]{ESC, 100, (byte) n};
     }
 
     //------------------------下划线-----------------------------
@@ -102,11 +93,7 @@ public class PrinterCmdUtil {
      * @return rs
      */
     public static byte[] underlineWithOneDotWidthOn() {
-        byte[] result = new byte[3];
-        result[0] = ESC;
-        result[1] = 45;
-        result[2] = 1;
-        return result;
+        return new byte[]{ESC, 45, 1};
     }
 
 
@@ -116,11 +103,7 @@ public class PrinterCmdUtil {
      * @return rs
      */
     public static byte[] underlineWithTwoDotWidthOn() {
-        byte[] result = new byte[3];
-        result[0] = ESC;
-        result[1] = 45;
-        result[2] = 2;
-        return result;
+        return new byte[]{ESC, 45, 2};
     }
 
 
@@ -130,11 +113,7 @@ public class PrinterCmdUtil {
      * @return rs
      */
     public static byte[] underlineOff() {
-        byte[] result = new byte[3];
-        result[0] = ESC;
-        result[1] = 45;
-        result[2] = 0;
-        return result;
+        return new byte[]{ESC, 45, 0};
     }
 
 
@@ -147,11 +126,7 @@ public class PrinterCmdUtil {
      * @return rs
      */
     public static byte[] boldOn() {
-        byte[] result = new byte[3];
-        result[0] = ESC;
-        result[1] = 69;
-        result[2] = 0xF;
-        return result;
+        return new byte[]{ESC, 69, 0xF};
     }
 
 
@@ -161,11 +136,7 @@ public class PrinterCmdUtil {
      * @return rs
      */
     public static byte[] boldOff() {
-        byte[] result = new byte[3];
-        result[0] = ESC;
-        result[1] = 69;
-        result[2] = 0;
-        return result;
+        return new byte[]{ESC, 69, 0};
     }
 
     //------------------------得到指定的对齐-----------------------------
@@ -197,11 +168,7 @@ public class PrinterCmdUtil {
      * @return rs
      */
     public static byte[] alignLeft() {
-        byte[] result = new byte[3];
-        result[0] = ESC;
-        result[1] = 97;
-        result[2] = 0;
-        return result;
+        return new byte[]{ESC, 97, 0};
     }
 
 
@@ -211,11 +178,7 @@ public class PrinterCmdUtil {
      * @return rs
      */
     public static byte[] alignCenter() {
-        byte[] result = new byte[3];
-        result[0] = ESC;
-        result[1] = 97;
-        result[2] = 1;
-        return result;
+        return new byte[]{ESC, 97, 1};
     }
 
 
@@ -225,11 +188,7 @@ public class PrinterCmdUtil {
      * @return rs
      */
     public static byte[] alignRight() {
-        byte[] result = new byte[3];
-        result[0] = ESC;
-        result[1] = 97;
-        result[2] = 2;
-        return result;
+        return new byte[]{ESC, 97, 2};
     }
 
 
@@ -269,7 +228,7 @@ public class PrinterCmdUtil {
         return new byte[]{ESC, 51, (byte) realLineSpace};
     }
 
-    /**
+    /*
      * 这种58，80对待移动单位不一样
      */
     //    public static byte[] lineDistance( int n )
@@ -335,9 +294,7 @@ public class PrinterCmdUtil {
      * @throws UnsupportedEncodingException ex
      */
     public static byte[] printText(String text) throws UnsupportedEncodingException {
-        byte[] byteText = null;
-        byteText = text.getBytes("gb18030");
-        return byteText;
+        return text.getBytes("gb18030");
     }
 
     /**
@@ -345,13 +302,11 @@ public class PrinterCmdUtil {
      * @return rs
      */
     public static byte[] printSpace(int n) throws UnsupportedEncodingException {
-        byte[] byteText = null;
-        StringBuffer text = new StringBuffer();
+        StringBuilder text = new StringBuilder();
         for (int i = 0; i < n; i++) {
             text.append(" ");
         }
-        byteText = text.toString().getBytes("gb18030");
-        return byteText;
+        return text.toString().getBytes("gb18030");
     }
 
     /**
@@ -375,23 +330,13 @@ public class PrinterCmdUtil {
      */
     public static byte[] printImage(BufferedImage bmp) {
 
-        byte[] result = new byte[]
-                {
-                        0x1B, 0x33, 0x00
-                }; //ESC 3	设置行间距为最小间距
-
-        byte[] data = new byte[3];
-        data[0] = (byte) 0x00;
-        data[1] = (byte) 0x00;
-        data[2] = (byte) 0x00;    //重置参数
+        byte[] result = new byte[]{0x1B, 0x33, 0x00}; //ESC 3	设置行间距为最小间距
+        //重置参数
+        byte[] data = new byte[]{(byte) 0x00, (byte) 0x00, (byte) 0x00};
 
         int pixelColor;
-
         // ESC * m nL nH 点阵图
-        byte[] escBmp = new byte[]
-                {
-                        0x1B, 0x2A, 0x00, 0x00, 0x00
-                };
+        byte[] escBmp = new byte[]{0x1B, 0x2A, 0x00, 0x00, 0x00};
 
         escBmp[2] = (byte) 0x21;
 
@@ -449,29 +394,33 @@ public class PrinterCmdUtil {
      * @param width   二维码图片的宽度
      * @return rs
      */
-    public static byte[] printQRCode(String content, int width) throws WriterException {
+    public static byte[] printQRCode(String content, int width, int height) throws WriterException {
         HashMap<EncodeHintType, Object> hints = new HashMap<>();
         hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
         hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);//纠错等级L,M,Q,H
         hints.put(EncodeHintType.MARGIN, 0); //边距
         BitMatrix bitMatrix = null;
 
-        bitMatrix = new MultiFormatWriter().encode(content, BarcodeFormat.QR_CODE, width, width, hints);
+        bitMatrix = new MultiFormatWriter().encode(content, BarcodeFormat.QR_CODE, width, height, hints);
 
-        BufferedImage bufferedImage = new BufferedImage(width, width, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics2D = bufferedImage.createGraphics();
         draw(graphics2D, bitMatrix, 0, 0);
 
         return printImage(bufferedImage);
     }
 
-    public static byte[] printQRCode2(int width, int height, int qrWidth, int leftPadding1, int leftPadding2, String text1, String text2) throws WriterException {
+    public static byte[] printQRCode2(
+            int width, int height,
+            int qrWidth, int qrHeight,
+            int leftPadding1, int leftPadding2,
+            String text1, String text2) throws WriterException {
         HashMap<EncodeHintType, Object> hints = new HashMap<>();
         hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
         hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);//纠错等级L,M,Q,H
         hints.put(EncodeHintType.MARGIN, 0); //边距
-        BitMatrix bitMatrix1 = new MultiFormatWriter().encode(text1, BarcodeFormat.QR_CODE, qrWidth, qrWidth, hints);
-        BitMatrix bitMatrix2 = new MultiFormatWriter().encode(text2, BarcodeFormat.QR_CODE, qrWidth, qrWidth, hints);
+        BitMatrix bitMatrix1 = new MultiFormatWriter().encode(text1, BarcodeFormat.QR_CODE, qrWidth, qrHeight, hints);
+        BitMatrix bitMatrix2 = new MultiFormatWriter().encode(text2, BarcodeFormat.QR_CODE, qrWidth, qrHeight, hints);
 
         BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics2D = bufferedImage.createGraphics();
@@ -492,12 +441,7 @@ public class PrinterCmdUtil {
      */
 
     public static byte[] feedPaperCut() {
-        byte[] result = new byte[4];
-        result[0] = GS;
-        result[1] = 86;
-        result[2] = 66;
-        result[3] = 0;
-        return result;
+        return new byte[]{GS, 86, 66, 0};
     }
 
     public static byte[] voice() {

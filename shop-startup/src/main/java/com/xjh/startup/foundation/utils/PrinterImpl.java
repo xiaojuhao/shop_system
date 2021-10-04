@@ -8,7 +8,6 @@ package com.xjh.startup.foundation.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -93,21 +92,22 @@ public class PrinterImpl implements Printer {
 
     @Override
     public int checkPrinter() {
-        int printStatus = Printer.PRINTSTATUS_NORMAL;
+        int printerStatus;
         SocketAddress socketAddress = new InetSocketAddress(ip, port);
-        try (Socket s = new Socket();) {
+        try (Socket s = new Socket()) {
             s.connect(socketAddress, connectTimeout);
             s.setSoTimeout(timeout);
-            try (OutputStream outputStream = s.getOutputStream(); InputStream inputStream = s.getInputStream();) {
+            try (OutputStream outputStream = s.getOutputStream();
+                 InputStream inputStream = s.getInputStream()) {
                 openAutoReturn(outputStream);
                 byte[] inputData = new byte[4];
-                inputStream.read(inputData);
-                printStatus = StatusUtil.checkDetailedStatus(inputData);
+                int readSize = inputStream.read(inputData);
+                printerStatus = StatusUtil.checkDetailedStatus(inputData);
             }
         } catch (IOException ex) {
-            printStatus = Printer.PRINTSTATUS_SOCKETTIMEOUT;
+            printerStatus = Printer.PRINTSTATUS_SOCKETTIMEOUT;
         }
-        return printStatus;
+        return printerStatus;
     }
 
     @Override
@@ -317,7 +317,7 @@ public class PrinterImpl implements Printer {
         }
         byte[] byteFrontWrap = PrinterCmdUtil.nextLine(frontEnterNum);
         byte[] alignCenter = PrinterCmdUtil.alignCenter();
-        byte[] byteQRCode = PrinterCmdUtil.printQRCode(content, size * 12);
+        byte[] byteQRCode = PrinterCmdUtil.printQRCode(content, size * 12, size * 12);
         byte[] alignLeft = PrinterCmdUtil.alignLeft();
         byte[] byteBackWrap = PrinterCmdUtil.nextLine(behindEnterNum);
         byte[][] byteList = new byte[][]{
@@ -337,8 +337,9 @@ public class PrinterImpl implements Printer {
         int frontEnterNum = jsonObject.getInteger("FrontEnterNum");
         int behindEnterNum = jsonObject.getInteger("BehindEnterNum");
         int width = jsonObject.getInteger("Width");
-        int heigth = jsonObject.getInteger("Height");
+        int height = jsonObject.getInteger("Height");
         int qrWidth = jsonObject.getInteger("QrWidth");
+        int qrHeight = jsonObject.getInteger("QrWidth");
         int leftPadding1 = jsonObject.getInteger("LeftPadding1");
         int leftPadding2 = jsonObject.getInteger("LeftPadding2");
         String text1 = jsonObject.getString("Text1");
@@ -349,7 +350,7 @@ public class PrinterImpl implements Printer {
             outputStream.write(nextLine);
         }
         byte[] byteFrontWrap = PrinterCmdUtil.nextLine(frontEnterNum);
-        byte[] byteQRCode = PrinterCmdUtil.printQRCode2(width, heigth, qrWidth, leftPadding1, leftPadding2, text1, text2);
+        byte[] byteQRCode = PrinterCmdUtil.printQRCode2(width, height, qrWidth, qrHeight, leftPadding1, leftPadding2, text1, text2);
         byte[] byteBackWrap = PrinterCmdUtil.nextLine(behindEnterNum);
         byte[][] byteList = new byte[][]{
                 byteFrontWrap,
@@ -447,7 +448,10 @@ public class PrinterImpl implements Printer {
     }
 
 
-    private void printTableRow(OutputStream outputStream, JSONArray oneRow, JSONArray columnWidths, JSONArray columnAligns, int size) throws Exception {
+    private void printTableRow(
+            OutputStream outputStream, JSONArray oneRow,
+            JSONArray columnWidths, JSONArray columnAligns,
+            int size) throws Exception {
         boolean printFlag = false;
         for (int i = 0; i < oneRow.size(); i++) {
             if (!"".equals(oneRow.getString(i))) {
@@ -515,7 +519,10 @@ public class PrinterImpl implements Printer {
 
     }
 
-    private void printTableRowOld(OutputStream outputStream, JSONArray oneRow, JSONArray columnWidths, JSONArray columnAligns, int size) throws UnsupportedEncodingException, Exception {
+    private void printTableRowOld(
+            OutputStream outputStream, JSONArray oneRow,
+            JSONArray columnWidths, JSONArray columnAligns,
+            int size) throws Exception {
         boolean printFlag = false;
         for (int i = 0; i < oneRow.size(); i++) {
             if (!"".equals(oneRow.getString(i))) {
@@ -536,9 +543,9 @@ public class PrinterImpl implements Printer {
             int paddingLeft = (int) (widthPlus * charCount / 100 / size);
             jsonObject.put("paddingLeft", paddingLeft);
             jsonObject.put("align", columnAligns.getInteger(i));
-            int widthChar = (int) (charCount * columnWidths.getInteger(i) / 100 / size);
+            int widthChar = (charCount * columnWidths.getInteger(i) / 100 / size);
             if (i == columnWidths.size() - 1) {
-                widthChar = (int) (charCount - (int) (widthPlus * charCount / 100)) / size;
+                widthChar = (charCount - (int) (widthPlus * charCount / 100)) / size;
             }
             widthPlus += columnWidths.getInteger(i);
             jsonObject.put("widthChar", widthChar);
