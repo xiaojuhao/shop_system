@@ -97,10 +97,10 @@ public class StringUtil {
         return sb.toString();
     }
 
-    public static String alignString(String s, int width, String align) {
-        if ("center".equals(align)) {
+    public static String alignString(String s, int width, AlignEnum align) {
+        if (align == AlignEnum.CENTER) {
             return centerString(s, width);
-        } else if ("right".equals(align)) {
+        } else if (align == AlignEnum.RIGHT) {
             return rightString(s, width);
         } else {
             return leftString(s, width);

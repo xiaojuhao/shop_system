@@ -5,9 +5,6 @@
  */
 package com.xjh.startup.foundation.utils;
 
-import static com.xjh.startup.foundation.utils.PrinterImpl.BENPAO_ALIGN_CENTER;
-import static com.xjh.startup.foundation.utils.PrinterImpl.BENPAO_ALIGN_RIGHT;
-
 import java.awt.*;
 
 /**
@@ -85,9 +82,9 @@ public class TicketComTable extends TicketCom {
             } else {
                 widthNow = widthAll * jComboBoxItemIntWidthPercentage.getValue() / 100;
             }
-            if (jComboBoxItemIntAlign.getValue() == BENPAO_ALIGN_CENTER) {
+            if (jComboBoxItemIntAlign.getValue() == AlignEnum.CENTER.level) {
                 colAlign[i] = FontTool.ALIGN_TYPE_CENTER;
-            } else if (jComboBoxItemIntAlign.getValue() == BENPAO_ALIGN_RIGHT) {
+            } else if (jComboBoxItemIntAlign.getValue() == AlignEnum.RIGHT.level) {
                 colAlign[i] = FontTool.ALIGN_TYPE_RIGHT;
             } else {
                 colAlign[i] = FontTool.ALIGN_TYPE_LEFT;

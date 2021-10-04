@@ -34,9 +34,9 @@ import lombok.Data;
 @Data
 @SuppressWarnings("unused")
 public class PrinterImpl implements Printer {
-    public static int BENPAO_ALIGN_CENTER = 0;
-    public static int BENPAO_ALIGN_LEFT = 2;
-    public static int BENPAO_ALIGN_RIGHT = 4;
+    //    public static int BENPAO_ALIGN_CENTER = 0;
+    //    public static int BENPAO_ALIGN_LEFT = 2;
+    //    public static int BENPAO_ALIGN_RIGHT = 4;
 
     private int id;
     private String name;
@@ -494,20 +494,12 @@ public class PrinterImpl implements Printer {
                 if (group.size() > i) {
                     int paddingLeft = jsonObject.getInteger("paddingLeft");
                     int widthChar = jsonObject.getInteger("widthChar");   //12223333
-                    int align = jsonObject.getInteger("align");
+                    AlignEnum align = AlignEnum.of(jsonObject.getInteger("align"));
 
-                    String stringAlign = "left";
-                    if (align == BENPAO_ALIGN_CENTER) {
-                        stringAlign = "center";
-                    } else if (align == BENPAO_ALIGN_RIGHT) {
-                        stringAlign = "right";
-                    }
-
-
-                    //                    byte[] bytePaddingLeft = PrinterCmdUtil.hTPositionMove(paddingLeft);
-                    byte[] byteContent = PrinterCmdUtil.printText(StringUtil.alignString(group.get(i), widthChar, stringAlign));
+                    //byte[] bytePaddingLeft = PrinterCmdUtil.hTPositionMove(paddingLeft);
+                    byte[] byteContent = PrinterCmdUtil.printText(StringUtil.alignString(group.get(i), widthChar, align));
                     byte[][] byteList = new byte[][]{
-                            //                            bytePaddingLeft,    //填充会随着字号的倍增而倍增，所以左填充放在字体放大之前
+                            //bytePaddingLeft,    //填充会随着字号的倍增而倍增，所以左填充放在字体放大之前
                             byteContent,
                     };
                     byte[] byteMerger = PrinterCmdUtil.byteMerger(byteList);
@@ -570,18 +562,10 @@ public class PrinterImpl implements Printer {
                 if (group.size() > i) {
                     int paddingLeft = jsonObject.getInteger("paddingLeft");
                     int widthChar = jsonObject.getInteger("widthChar");   //12223333
-                    int align = jsonObject.getInteger("align");
-
-                    String stringAlign = "left";
-                    if (align == BENPAO_ALIGN_CENTER) {
-                        stringAlign = "center";
-                    } else if (align == BENPAO_ALIGN_RIGHT) {
-                        stringAlign = "right";
-                    }
-
+                    AlignEnum align = AlignEnum.of(jsonObject.getInteger("align"));
 
                     byte[] bytePaddingLeft = PrinterCmdUtil.hTPositionMove(paddingLeft);
-                    byte[] byteContent = PrinterCmdUtil.printText(StringUtil.alignString(group.get(i), widthChar, stringAlign));
+                    byte[] byteContent = PrinterCmdUtil.printText(StringUtil.alignString(group.get(i), widthChar, align));
                     byte[][] byteList = new byte[][]{
                             bytePaddingLeft,    //填充会随着字号的倍增而倍增，所以左填充放在字体放大之前
                             byteContent,
