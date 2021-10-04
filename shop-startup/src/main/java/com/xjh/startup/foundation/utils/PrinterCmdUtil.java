@@ -203,26 +203,8 @@ public class PrinterCmdUtil {
 
     //激活自动返回功能，应立即收到一条返回
     public static byte[] openAutoReturn() {
-        return new byte[]{0x1D, 0x61, 0x0F};
+        return new byte[]{GS, 0x61, 0x0F};
     }
-
-    /*
-     * 这种58，80对待移动单位不一样
-     */
-    //    public static byte[] lineDistance( int n )
-    //    {
-    //        int realLineSpace = 6 * n;
-    //        byte[] result = new byte[7];
-    //        result[0] = 29;
-    //        result[1] = 80;
-    //        result[2] = 0;
-    //        result[3] = 0;
-    //        result[4] = ESC;
-    //        result[5] = 51;
-    //        result[6] = (byte) realLineSpace;
-    //        return result;
-    //    }
-
 
     //------------------------字体变大-----------------------------
 
@@ -307,9 +289,9 @@ public class PrinterCmdUtil {
      * @return rs
      */
     public static byte[] printImage(BufferedImage bmp) {
-        byte[] result = new byte[]{0x1B, 0x33, 0x00}; //ESC 3	设置行间距为最小间距
+        byte[] result = new byte[]{ESC, 0x33, 0x00}; // ESC 3	设置行间距为最小间距
         // ESC * m nL nH 点阵图
-        byte[] escBmp = new byte[]{0x1B, 0x2A, 0x00, 0x00, 0x00};
+        byte[] escBmp = new byte[]{ESC, 0x2A, 0x00, 0x00, 0x00};
         escBmp[2] = (byte) 0x21;
         //nL, nH
         escBmp[3] = (byte) (bmp.getWidth() % 256);
@@ -338,7 +320,7 @@ public class PrinterCmdUtil {
                 result = byteMerger(result, data);
             }
             //换行
-            byte[] byte_send1 = new byte[]{0x0d, 0x0a};
+            byte[] byte_send1 = new byte[]{CR, LF};
             result = byteMerger(result, byte_send1);
         }
         // 恢复默认的行距
@@ -364,7 +346,7 @@ public class PrinterCmdUtil {
     }
 
     /**
-     * 打印二维码,goole-QRCode生成的颜色只有纯黑白两种
+     * 打印二维码,google-QRCode生成的颜色只有纯黑白两种
      */
     public static byte[] printQRCode(
             String content,
@@ -434,14 +416,14 @@ public class PrinterCmdUtil {
      * 激活免丢单功能和自动返回功能
      */
     public static byte[] openPreventLost() {
-        return new byte[]{0x1B, 0x73, 0x42, 0x45, -110, -102, 0x01, 0x00, 0x5F, 0x0A};// 激活免丢单功能
+        return new byte[]{ESC, 0x73, 0x42, 0x45, -110, -102, 0x01, 0x00, 0x5F, 0x0A};// 激活免丢单功能
     }
 
     /**
      * 关闭免丢单功能
      */
     public static byte[] closeActiveLost() {
-        return new byte[]{0x1B, 0x73, 0x42, 0x45, -110, -102, 0x00, 0x00, 0x5F, 0x0A};
+        return new byte[]{ESC, 0x73, 0x42, 0x45, -110, -102, 0x00, 0x00, 0x5F, 0x0A};
     }
 
     /**
