@@ -67,7 +67,7 @@ public class TicketComText extends TicketCom implements LineGrap {
         downLine(getBehindEnterNum(), graphics2D, font);
         moveDistance(getBehindLen(), graphics2D);
 
-        //graphics2D.drawLine(ticketDesign.getNextComStartX(), ticketDesign.getNextComStartY(), ticketDesign.getNextComStartX() + 100, ticketDesign.getNextComStartY());
+        graphics2D.drawLine(ticketDesign.getNextComStartX(), ticketDesign.getNextComStartY(), ticketDesign.getNextComStartX() + 100, ticketDesign.getNextComStartY());
     }
 
     public void setSampleContent(String sampleContent) {

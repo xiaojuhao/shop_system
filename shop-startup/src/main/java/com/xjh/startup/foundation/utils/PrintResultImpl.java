@@ -7,9 +7,12 @@ package com.xjh.startup.foundation.utils;
 
 import com.alibaba.fastjson.JSONArray;
 
+import lombok.Data;
+
 /**
  * @author liangh
  */
+@Data
 public class PrintResultImpl implements PrintResult {
     private Printer printer;
     private JSONArray jSONArray;
@@ -22,31 +25,8 @@ public class PrintResultImpl implements PrintResult {
     }
 
     @Override
-    public boolean isSuccess() {
-        return isSuccess;
-    }
-
-    @Override
-    public int getResultCode() {
-        return resultCode;
-    }
-
-    @Override
-    public Printer getPrinter() {
-        return printer;
-    }
-
-    @Override
     public JSONArray getPrintContent() {
         return jSONArray;
-    }
-
-    public void setResultCode(int resultCode) {
-        this.resultCode = resultCode;
-    }
-
-    public void setIsSuccess(boolean isSuccess) {
-        this.isSuccess = isSuccess;
     }
 
 }

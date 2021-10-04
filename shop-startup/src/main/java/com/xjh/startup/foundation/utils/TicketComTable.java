@@ -5,6 +5,9 @@
  */
 package com.xjh.startup.foundation.utils;
 
+import static com.xjh.startup.foundation.utils.PrinterImpl.BENPAO_ALIGN_CENTER;
+import static com.xjh.startup.foundation.utils.PrinterImpl.BENPAO_ALIGN_RIGHT;
+
 import java.awt.*;
 
 /**
@@ -74,24 +77,24 @@ public class TicketComTable extends TicketCom {
         String[] titleName = new String[columns.length];
         for (int i = 0; i < columns.length; i++) {
             titleName[i] = (String) columns[i][0];
-            //            JComboBoxItemInt jComboBoxItemIntWidthPercentage = (JComboBoxItemInt) columns[i][1];
-            //            JComboBoxItemInt jComboBoxItemIntAlign = (JComboBoxItemInt) columns[i][2];
-            //            int widthNow;
-            //            if (i == columns.length - 1) {
-            //                widthNow = widthLeft;
-            //            } else {
-            //                widthNow = widthAll * jComboBoxItemIntWidthPercentage.getValue() / 100;
-            //            }
-            //            if (jComboBoxItemIntAlign.getValue() == BenPaoJTable.BENPAO_ALIGN_CENTER) {
-            //                colAlign[i] = FontTool.ALIGN_TYPE_CENTER;
-            //            } else if (jComboBoxItemIntAlign.getValue() == BenPaoJTable.BENPAO_ALIGN_RIGHT) {
-            //                colAlign[i] = FontTool.ALIGN_TYPE_RIGHT;
-            //            } else {
-            //                colAlign[i] = FontTool.ALIGN_TYPE_LEFT;
-            //            }
-            //
-            //            colWidths[i] = widthNow;
-            //            widthLeft = widthLeft - widthNow;
+            JComboBoxItemInt jComboBoxItemIntWidthPercentage = (JComboBoxItemInt) columns[i][1];
+            JComboBoxItemInt jComboBoxItemIntAlign = (JComboBoxItemInt) columns[i][2];
+            int widthNow;
+            if (i == columns.length - 1) {
+                widthNow = widthLeft;
+            } else {
+                widthNow = widthAll * jComboBoxItemIntWidthPercentage.getValue() / 100;
+            }
+            if (jComboBoxItemIntAlign.getValue() == BENPAO_ALIGN_CENTER) {
+                colAlign[i] = FontTool.ALIGN_TYPE_CENTER;
+            } else if (jComboBoxItemIntAlign.getValue() == BENPAO_ALIGN_RIGHT) {
+                colAlign[i] = FontTool.ALIGN_TYPE_RIGHT;
+            } else {
+                colAlign[i] = FontTool.ALIGN_TYPE_LEFT;
+            }
+
+            colWidths[i] = widthNow;
+            widthLeft = widthLeft - widthNow;
         }
         graphics2D.setFont(getFont());
 

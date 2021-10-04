@@ -7,9 +7,9 @@ package com.xjh.startup.foundation.utils;
 
 import java.awt.*;
 
-/**
- * @author 36181
- */
+import lombok.Data;
+
+@Data
 public abstract class TicketCom {
     public static int TYPE_TEXT = 1;
     public static int TYPE_LINE = 2;
@@ -85,54 +85,6 @@ public abstract class TicketCom {
         graphics2D.fill(getComShape());
         graphics2D.setColor(new Color(102, 102, 255, 100));
         graphics2D.draw(getComShape());
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getFrontEnterNum() {
-        return frontEnterNum;
-    }
-
-    public int getBehindEnterNum() {
-        return behindEnterNum;
-    }
-
-    public int getFrontLen() {
-        return frontLen;
-    }
-
-    public int getBehindLen() {
-        return behindLen;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setFrontEnterNum(int frontEnterNum) {
-        this.frontEnterNum = frontEnterNum;
-    }
-
-    public void setBehindEnterNum(int behindEnterNum) {
-        this.behindEnterNum = behindEnterNum;
-    }
-
-    public void setFrontLen(int frontLen) {
-        this.frontLen = frontLen;
-    }
-
-    public void setBehindLen(int behindLen) {
-        this.behindLen = behindLen;
     }
 
     protected void downLine(int lineNum, Graphics2D graphics2D, Font font) {

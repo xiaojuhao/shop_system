@@ -22,7 +22,7 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
  */
 public class QRcode {
     public static void drawQRcode(String content, Graphics2D graphics2D, int x, int y, int width) throws WriterException {
-        HashMap hints = new HashMap();
+        HashMap<EncodeHintType, Object> hints = new HashMap<>();
         hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
         hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);//纠错等级L,M,Q,H
         hints.put(EncodeHintType.MARGIN, 0); //边距
