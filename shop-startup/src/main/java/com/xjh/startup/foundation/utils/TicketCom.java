@@ -11,12 +11,6 @@ import lombok.Data;
 
 @Data
 public abstract class TicketCom {
-    public static int TYPE_TEXT = 1;
-    public static int TYPE_LINE = 2;
-    public static int TYPE_TABLE = 3;
-    public static int TYPE_QRCODE = 4;
-    public static int TYPE_QRCODE2 = 5; //一行两个二维码
-
     private int size;
     private String name;
     private int frontEnterNum;
@@ -26,21 +20,6 @@ public abstract class TicketCom {
     protected final TicketDesign ticketDesign = new TicketDesign();
     //protected final int ticketDesign.getMinX();
     //protected final int ticketDesign.getMaxX();
-
-
-    public static String getComType(int type) {
-        if (type == TYPE_TEXT) {
-            return "文字";
-        } else if (type == TYPE_LINE) {
-            return "分割线";
-        } else if (type == TYPE_TABLE) {
-            return "表格";
-        } else if (type == TYPE_QRCODE) {
-            return "二维码";
-        }
-
-        return "未知";
-    }
 
     public abstract int getComType();
 

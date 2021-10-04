@@ -8,6 +8,8 @@ package com.xjh.startup.foundation.utils;
 import java.awt.*;
 import java.util.List;
 
+import com.xjh.startup.foundation.constants.EnumComType;
+
 /**
  * @author 36181
  */
@@ -26,7 +28,7 @@ public class TicketComText extends TicketCom implements LineGrap {
     //new Font("新宋体", Font.PLAIN, 95) => 对应一行6个字母
     @Override
     public int getComType() {
-        return TicketCom.TYPE_TEXT;
+        return EnumComType.TEXT.type;
     }
 
     @Override

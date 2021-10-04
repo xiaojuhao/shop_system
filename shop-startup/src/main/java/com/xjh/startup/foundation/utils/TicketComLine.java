@@ -7,6 +7,8 @@ package com.xjh.startup.foundation.utils;
 
 import java.awt.*;
 
+import com.xjh.startup.foundation.constants.EnumComType;
+
 
 /**
  * @author 36181
@@ -15,7 +17,7 @@ public class TicketComLine extends TicketCom {
 
     @Override
     public int getComType() {
-        return TYPE_LINE;
+        return EnumComType.LINE.type;
     }
 
     private Shape shape;

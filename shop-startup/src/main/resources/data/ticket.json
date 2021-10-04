@@ -4,9 +4,9 @@
     "BehindLen": 0,
     "ComType": 1,
     "FrontEnterNum": 0,
-    "FrontLen": 0,
-    "SampleContent": "单号:",
-    "Name": "单号:",
+    "FrontLen": 8,
+    "SampleContent": "样例标题",
+    "Name": "标题",
     "BehindEnterNum": 0
   },
   {
@@ -14,156 +14,151 @@
     "BehindLen": 0,
     "ComType": 1,
     "FrontEnterNum": 0,
-    "FrontLen": 0,
-    "SampleContent": "123456789",
-    "Name": "单号",
-    "BehindEnterNum": 0
-  },
-  {
-    "Size": 1,
-    "BehindLen": 0,
-    "ComType": 1,
-    "FrontEnterNum": 1,
-    "FrontLen": 0,
-    "SampleContent": "门店名称:",
-    "Name": "门店名称:",
-    "BehindEnterNum": 0
-  },
-  {
-    "Size": 1,
-    "BehindLen": 0,
-    "ComType": 1,
-    "FrontEnterNum": 0,
-    "FrontLen": 0,
-    "SampleContent": "牛王府",
-    "Name": "门店名称",
-    "BehindEnterNum": 0
-  },
-  {
-    "Size": 1,
-    "BehindLen": 0,
-    "ComType": 1,
-    "FrontEnterNum": 1,
-    "FrontLen": 0,
-    "SampleContent": "下单时间:",
-    "Name": "下单时间:",
-    "BehindEnterNum": 0
-  },
-  {
-    "Size": 1,
-    "BehindLen": 0,
-    "ComType": 1,
-    "FrontEnterNum": 0,
-    "FrontLen": 0,
-    "SampleContent": "2017-01-01 01:01:01",
-    "Name": "下单时间",
-    "BehindEnterNum": 0
-  },
-  {
-    "Size": 2,
-    "BehindLen": 0,
-    "ComType": 1,
-    "FrontEnterNum": 1,
-    "FrontLen": 0,
-    "SampleContent": "桌台信息:",
-    "Name": "桌台信息:",
-    "BehindEnterNum": 0
-  },
-  {
-    "Size": 2,
-    "BehindLen": 0,
-    "ComType": 1,
-    "FrontEnterNum": 0,
-    "FrontLen": 0,
-    "SampleContent": "12",
-    "Name": "桌台信息",
-    "BehindEnterNum": 0
-  },
-  {
-    "Size": 1,
-    "BehindLen": 0,
-    "ComType": 1,
-    "FrontEnterNum": 2,
-    "FrontLen": 0,
-    "SampleContent": "用餐人数:",
-    "Name": "用餐人数:",
-    "BehindEnterNum": 0
-  },
-  {
-    "Size": 1,
-    "BehindLen": 0,
-    "ComType": 1,
-    "FrontEnterNum": 0,
-    "FrontLen": 0,
-    "SampleContent": "2",
-    "Name": "用餐人数",
-    "BehindEnterNum": 0
-  },
-  {
-    "Size": 1,
-    "BehindLen": 0,
-    "ComType": 1,
-    "FrontEnterNum": 1,
-    "FrontLen": 0,
-    "SampleContent": "点菜员:",
-    "Name": "点菜员:",
-    "BehindEnterNum": 0
-  },
-  {
-    "Size": 1,
-    "BehindLen": 0,
-    "ComType": 1,
-    "FrontEnterNum": 0,
-    "FrontLen": 0,
-    "SampleContent": "test",
-    "Name": "点菜员",
+    "FrontLen": 10,
+    "SampleContent": "老邓",
+    "Name": "1",
     "BehindEnterNum": 0
   },
   {
     "Size": 1,
     "ComType": 2,
-    "FrontEnterNum": 1,
-    "Name": "菜表顶部分割线",
+    "FrontEnterNum": 0,
+    "Name": "顶部分割线",
+    "BehindEnterNum": 0
+  },
+  {
+    "Name": "样例表",
+    "BehindEnterNum": 0,
+    "Size": 1,
+    "ComType": 3,
+    "FrontEnterNum": 0,
+    "columnNames": [
+      "靠左列",
+      "居中列",
+      "列3"
+    ],
+    "columnWidths": [
+      30,
+      40,
+      30
+    ],
+    "rows": [
+      [
+        "韭菜炒蛋",
+        "1",
+        "15"
+      ],
+      [
+        "番茄操蛋",
+        "1",
+        "20"
+      ]
+    ],
+    "columnAligns": [
+      2,
+      0,
+      4
+    ]
+  },
+  {
+    "Size": 1,
+    "ComType": 2,
+    "FrontEnterNum": 0,
+    "Name": "分割线",
     "BehindEnterNum": 0
   },
   {
     "columnNames": [
-      "菜品名称",
-      "数量"
+      "列1",
+      "列1",
+      ""
     ],
     "Size": 1,
     "ComType": 3,
     "FrontEnterNum": 0,
     "columnWidths": [
-      85,
-      15
+      40,
+      30,
+      30
     ],
     "rows": [
       [
-        "西红柿炒蛋",
-        "1"
+        "样例(双击编辑)",
+        "样例(双击编辑)",
+        "很广泛化工"
+      ],
+      [
+        "高浮雕高浮雕",
+        "广泛大概",
+        "和规范化"
+      ],
+      [
+        "广泛大概",
+        "广泛大概",
+        "和和规范化"
+      ],
+      [
+        "高浮雕高浮雕",
+        "广泛大概",
+        "很过分"
+      ],
+      [
+        "广泛大概",
+        "和规划规范",
+        "很过分"
+      ],
+      [
+        "广泛大概",
+        "皇贵妃皇贵妃",
+        "和规范化广泛"
       ]
     ],
     "columnAligns": [
       2,
-      0
+      0,
+      4
     ],
-    "Name": "点菜列表",
+    "Name": "任溶溶",
     "BehindEnterNum": 0
   },
   {
     "Size": 1,
     "ComType": 2,
     "FrontEnterNum": 0,
-    "Name": "菜品下分割线",
+    "Name": "底部分割线",
     "BehindEnterNum": 0
   },
   {
-    "Size": 34,
-    "Content": "二维码样例内容",
+    "Size": 44,
+    "Content": "a",
     "ComType": 4,
     "FrontEnterNum": 0,
-    "Name": "二维码",
+    "Name": "微信",
+    "BehindEnterNum": 0
+  },
+  {
+    "columnNames": [
+      "列1",
+      "列1"
+    ],
+    "Size": 1,
+    "ComType": 3,
+    "FrontEnterNum": 0,
+    "columnWidths": [
+      50,
+      50
+    ],
+    "rows": [
+      [
+        "样例(双击编辑)",
+        "样例(双击编辑)"
+      ]
+    ],
+    "columnAligns": [
+      2,
+      2
+    ],
+    "Name": "风格独特的官方",
     "BehindEnterNum": 0
   }
 ]

@@ -12,6 +12,7 @@ import java.util.List;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.xjh.startup.foundation.constants.EnumComType;
 
 
 /**
@@ -464,16 +465,17 @@ public class TicketDesign {
     private void loadJSONArray(JSONArray jSONArray) {
         for (int i = 0; i < jSONArray.size(); i++) {
             JSONObject jSONObject = jSONArray.getJSONObject(i);
+            EnumComType comType = EnumComType.of(jSONObject.getInteger("ComType"));
             TicketCom ticketCom = null;
-            if (jSONObject.getInteger("ComType") == TicketCom.TYPE_LINE) {
+            if (comType == EnumComType.LINE) {
                 ticketCom = getTicketComLineFromJSONObject(jSONObject);
-            } else if (jSONObject.getInteger("ComType") == TicketCom.TYPE_QRCODE) {
+            } else if (comType == EnumComType.QRCODE) {
                 ticketCom = getTicketComQrCodeFromJSONObject(jSONObject);
-            } else if (jSONObject.getInteger("ComType") == TicketCom.TYPE_TABLE) {
+            } else if (comType == EnumComType.TABLE) {
                 ticketCom = getTicketComTableFromJSONObject(jSONObject);
-            } else if (jSONObject.getInteger("ComType") == TicketCom.TYPE_TEXT) {
+            } else if (comType == EnumComType.TEXT) {
                 ticketCom = getTicketComTextFromJSONObject(jSONObject);
-            } else if (jSONObject.getInteger("ComType") == TicketCom.TYPE_QRCODE2) {
+            } else if (comType == EnumComType.QRCODE2) {
                 ticketCom = getTicketComQrCode2FromJSONObject(jSONObject);
             }
 

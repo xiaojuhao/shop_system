@@ -7,6 +7,9 @@ package com.xjh.startup.foundation.utils;
 
 import java.awt.*;
 
+import com.xjh.startup.foundation.constants.EnumAlign;
+import com.xjh.startup.foundation.constants.EnumComType;
+
 /**
  * @author 36181
  */
@@ -48,7 +51,7 @@ public class TicketComTable extends TicketCom {
 
     @Override
     public int getComType() {
-        return TicketCom.TYPE_TABLE;
+        return EnumComType.TABLE.type;
     }
 
     private Shape shape;
@@ -82,9 +85,9 @@ public class TicketComTable extends TicketCom {
             } else {
                 widthNow = widthAll * jComboBoxItemIntWidthPercentage.getValue() / 100;
             }
-            if (jComboBoxItemIntAlign.getValue() == AlignEnum.CENTER.level) {
+            if (jComboBoxItemIntAlign.getValue() == EnumAlign.CENTER.level) {
                 colAlign[i] = FontTool.ALIGN_TYPE_CENTER;
-            } else if (jComboBoxItemIntAlign.getValue() == AlignEnum.RIGHT.level) {
+            } else if (jComboBoxItemIntAlign.getValue() == EnumAlign.RIGHT.level) {
                 colAlign[i] = FontTool.ALIGN_TYPE_RIGHT;
             } else {
                 colAlign[i] = FontTool.ALIGN_TYPE_LEFT;

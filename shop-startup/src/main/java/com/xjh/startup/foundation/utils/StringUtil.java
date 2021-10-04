@@ -8,6 +8,8 @@ package com.xjh.startup.foundation.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.xjh.startup.foundation.constants.EnumAlign;
+
 /**
  * @author liangh
  */
@@ -88,10 +90,10 @@ public class StringUtil {
         return sb.toString();
     }
 
-    public static String alignString(String s, int width, AlignEnum align) {
-        if (align == AlignEnum.CENTER) {
+    public static String alignString(String s, int width, EnumAlign align) {
+        if (align == EnumAlign.CENTER) {
             return centerString(s, width);
-        } else if (align == AlignEnum.RIGHT) {
+        } else if (align == EnumAlign.RIGHT) {
             return rightString(s, width);
         } else {
             return leftString(s, width);

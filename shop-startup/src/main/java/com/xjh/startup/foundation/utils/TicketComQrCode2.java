@@ -7,6 +7,8 @@ package com.xjh.startup.foundation.utils;
 
 import java.awt.*;
 
+import com.xjh.startup.foundation.constants.EnumComType;
+
 /**
  * @author 36181
  */
@@ -28,7 +30,7 @@ public class TicketComQrCode2 extends TicketCom {
 
     @Override
     public int getComType() {
-        return TYPE_QRCODE2;
+        return EnumComType.QRCODE2.type;
     }
 
     private Shape shape;

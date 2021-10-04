@@ -1,21 +1,21 @@
-package com.xjh.startup.foundation.utils;
+package com.xjh.startup.foundation.constants;
 
-public enum AlignEnum {
+public enum EnumAlign {
     CENTER(0),
     LEFT(2),
     RIGHT(4),
     ;
-    int level;
+    public int level;
 
-    AlignEnum(int level) {
+    EnumAlign(int level) {
 
     }
 
-    public static AlignEnum of(Integer level) {
+    public static EnumAlign of(Integer level) {
         if (level == null) {
             return LEFT;
         }
-        for (AlignEnum e : AlignEnum.values()) {
+        for (EnumAlign e : EnumAlign.values()) {
             if (e.level == level) {
                 return e;
             }

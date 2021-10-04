@@ -18,6 +18,8 @@ import java.util.List;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.zxing.WriterException;
+import com.xjh.startup.foundation.constants.EnumAlign;
+import com.xjh.startup.foundation.constants.EnumComType;
 
 import lombok.Data;
 
@@ -123,27 +125,31 @@ public class PrinterImpl implements Printer {
                 initPrinter(outputStream);
                 openAutoReturn(outputStream);
                 print1_5Distance(outputStream);
-                boolean isText = true; //如果本模块是文本，则置为true，供下一个模块判断要不要加一个前置换行。如果true，要加，否则后一个模块会接在文本后面；如果不是，不加，否则会多一个空行。
+
+                // 如果本模块是文本，则置为true，供下一个模块判断要不要加一个前置换行。
+                // 如果true，要加，否则后一个模块会接在文本后面；
+                // 如果不是，不加，否则会多一个空行。
+                boolean isText = true;
                 for (int i = 0; i < jSONArray.size(); i++) {
                     JSONObject jsonObject = jSONArray.getJSONObject(i);
-                    int comType = jsonObject.getInteger("ComType");
-                    if (comType == TicketCom.TYPE_TEXT) {
+                    EnumComType comType = EnumComType.of(jsonObject.getInteger("ComType"));
+                    if (comType == EnumComType.TEXT) {
                         printText(outputStream, jsonObject);
                         isText = true;
-                    } else if (comType == TicketCom.TYPE_TABLE) {
+                    } else if (comType == EnumComType.TABLE) {
                         printTable(outputStream, jsonObject, isText);
                         isText = false;
-                    } else if (comType == TicketCom.TYPE_QRCODE) {
+                    } else if (comType == EnumComType.QRCODE) {
                         printQRCode(outputStream, jsonObject, isText);
                         isText = false;
-                    } else if (comType == TicketCom.TYPE_QRCODE2) {
+                    } else if (comType == EnumComType.QRCODE2) {
                         printQRCode2(outputStream, jsonObject, isText);
                         isText = false;
-                    } else if (comType == TicketCom.TYPE_LINE) {
+                    } else if (comType == EnumComType.LINE) {
                         printDotLine(outputStream, jsonObject, isText);
                         isText = false;
                     } else {
-                        String detailedInfo = "json第 " + i + " 个元素的type属性错误,错误类型为：type = " + TicketCom.getComType(comType);
+                        String detailedInfo = "json第 " + i + " 个元素的type属性错误,错误类型为：type = " + comType;
                         throw new Exception(detailedInfo + ", " + comType);
                     }
 
@@ -167,7 +173,7 @@ public class PrinterImpl implements Printer {
                         break;
                     }
                     dataRead = PrinterCmdUtil.byteMerger(dataRead, inputData);
-                    //                    System.out.println("api.print.PrinterImpl.print()" + Arrays.toString(inputData));
+                    // System.out.println("api.print.PrinterImpl.print()" + Arrays.toString(inputData));
 
                     if (StatusUtil.checkStatus(inputData)) {
                         if (StatusUtil.checkDetailedStatus(inputData) == StatusUtil.PRINTING) {
@@ -391,20 +397,17 @@ public class PrinterImpl implements Printer {
         }
         byte[] dotLine = PrinterCmdUtil.printText(stringBuffer.toString());
         byte[] byteSizeDefault = PrinterCmdUtil.fontSizeSetBig(1);
-        byte[] byteNextLine = PrinterCmdUtil.nextLine();
-        if (isText) {
-            outputStream.write(byteNextLine);
-        }
 
         byte[] byteFrontEnterNum = PrinterCmdUtil.nextLine(frontEnterNum);
         byte[] byteBehindEnterNum = PrinterCmdUtil.nextLine(behindEnterNum);
 
         byte[][] byteList = new byte[][]{
+                PrinterCmdUtil.nextLine(),
                 byteFrontEnterNum,
                 byteSize,
                 dotLine,
                 byteSizeDefault,
-                byteNextLine,
+                PrinterCmdUtil.nextLine(),
                 byteBehindEnterNum
         };
         byte[] byteMerger = PrinterCmdUtil.byteMerger(byteList);
@@ -498,7 +501,7 @@ public class PrinterImpl implements Printer {
                 if (group.size() > i) {
                     int paddingLeft = jsonObject.getInteger("paddingLeft");
                     int widthChar = jsonObject.getInteger("widthChar");   //12223333
-                    AlignEnum align = AlignEnum.of(jsonObject.getInteger("align"));
+                    EnumAlign align = EnumAlign.of(jsonObject.getInteger("align"));
 
                     //byte[] bytePaddingLeft = PrinterCmdUtil.hTPositionMove(paddingLeft);
                     byte[] byteContent = PrinterCmdUtil.printText(StringUtil.alignString(group.get(i), widthChar, align));
@@ -569,7 +572,7 @@ public class PrinterImpl implements Printer {
                 if (group.size() > i) {
                     int paddingLeft = jsonObject.getInteger("paddingLeft");
                     int widthChar = jsonObject.getInteger("widthChar");   //12223333
-                    AlignEnum align = AlignEnum.of(jsonObject.getInteger("align"));
+                    EnumAlign align = EnumAlign.of(jsonObject.getInteger("align"));
 
                     byte[] bytePaddingLeft = PrinterCmdUtil.hTPositionMove(paddingLeft);
                     byte[] byteContent = PrinterCmdUtil.printText(StringUtil.alignString(group.get(i), widthChar, align));
