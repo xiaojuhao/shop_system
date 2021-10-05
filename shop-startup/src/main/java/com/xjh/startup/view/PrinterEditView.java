@@ -11,9 +11,13 @@ import com.xjh.dao.dataobject.Printer;
 import com.xjh.service.domain.PrinterService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SimpleGridForm;
+import com.xjh.startup.view.model.IntStringPair;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -46,7 +50,18 @@ public class PrinterEditView extends SimpleGridForm {
         TextField portInput = new TextField();
         portInput.setText(CommonUtils.stringify(printer.getPrinterPort()));
         addLine(portLabel, portInput);
-        collectData.add(() -> printer.setPrinterPort(CommonUtils.parseInt(portInput.getText(), null)));
+        collectData.add(() ->
+                printer.setPrinterPort(CommonUtils.parseInt(portInput.getText(), null)));
+
+        Label typeLabel = createLabel("类型:", labelWidth);
+        ComboBox<IntStringPair> typeInput = printerTypeOptions(printer.getPrinterType());
+        addLine(typeLabel, typeInput);
+        collectData.add(() -> printer.setPrinterType(getComboValue(typeInput)));
+
+        Label statusLabel = createLabel("状态:", labelWidth);
+        ComboBox<IntStringPair> statusInput = printerStatusOptions(printer.getPrinterStatus());
+        addLine(statusLabel, statusInput);
+        collectData.add(() -> printer.setPrinterStatus(getComboValue(statusInput)));
 
         Label descLabel = createLabel("打印机描述:", labelWidth);
         TextArea descInput = new TextArea();
@@ -72,6 +87,35 @@ public class PrinterEditView extends SimpleGridForm {
             this.getScene().getWindow().hide();
         });
         addLine((Node) null, save);
+    }
+
+    private ComboBox<IntStringPair> printerTypeOptions(Integer selected) {
+        ObservableList<IntStringPair> options = FXCollections.observableArrayList(
+                new IntStringPair(0, "58毫米"),
+                new IntStringPair(1, "80毫米")
+        );
+        ComboBox<IntStringPair> combo = new ComboBox<>(options);
+        // 默认选中项
+        IntStringPair.select(combo, selected, 0);
+        return combo;
+    }
+
+    private ComboBox<IntStringPair> printerStatusOptions(Integer selected) {
+        ObservableList<IntStringPair> options = FXCollections.observableArrayList(
+                new IntStringPair(0, "关闭"),
+                new IntStringPair(1, "正常")
+        );
+        ComboBox<IntStringPair> combo = new ComboBox<>(options);
+        // 默认选中项
+        IntStringPair.select(combo, selected, 1);
+        return combo;
+    }
+
+    private Integer getComboValue(ComboBox<IntStringPair> combo) {
+        if (combo.getSelectionModel().getSelectedItem() == null) {
+            return null;
+        }
+        return combo.getSelectionModel().getSelectedItem().getKey();
     }
 
 }

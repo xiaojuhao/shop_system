@@ -4,8 +4,11 @@ package com.xjh.startup.view;
 import static com.xjh.common.utils.TableViewUtils.newCol;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.xjh.common.utils.AlertBuilder;
+import com.xjh.common.utils.Result;
 import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.utils.cellvalue.Operations;
 import com.xjh.dao.dataobject.Printer;
@@ -13,6 +16,7 @@ import com.xjh.service.domain.PrinterService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.ModelWindow;
+import com.xjh.startup.view.base.OkCancelDialog;
 import com.xjh.startup.view.base.SimpleForm;
 
 import javafx.application.Platform;
@@ -21,6 +25,8 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
 import javafx.stage.Window;
@@ -55,7 +61,18 @@ public class PrinterManageListView extends SimpleForm implements Initializable {
                 bo.setPrinterType(dd.getPrinterType());
                 bo.getOperations().add(new OperationButton("编辑", () -> openEditor(dd)));
                 bo.getOperations().add(new OperationButton("删除", () -> {
-
+                    OkCancelDialog dialog = new OkCancelDialog(
+                            "删除打印机", "是否删除打印机？");
+                    Optional<ButtonType> rs = dialog.showAndWait();
+                    if (rs.isPresent() && rs.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                        Result<Integer> deleteRs = printerService.deleteById(dd.getPrinterId());
+                        if (deleteRs.isSuccess()) {
+                            AlertBuilder.INFO("删除成功");
+                        } else {
+                            AlertBuilder.ERROR(deleteRs.getMsg());
+                        }
+                        loadData();
+                    }
                 }));
                 return bo;
             }).collect(Collectors.toList()));

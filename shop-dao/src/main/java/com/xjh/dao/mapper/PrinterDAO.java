@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.google.inject.name.Named;
+import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Printer;
 import com.xjh.dao.foundation.EntityUtils;
 import com.zaxxer.hikari.HikariDataSource;
@@ -20,6 +21,24 @@ public class PrinterDAO {
     @Inject
     @Named("mysql")
     HikariDataSource ds;
+
+    public Result<Integer> deleteById(Integer printerId) {
+        if (printerId == null) {
+            return Result.fail("参数错误");
+        }
+        try {
+            Printer id = new Printer();
+            id.setPrinterId(printerId);
+            int i = Db.use(ds).del(EntityUtils.idCond(id));
+            if (i == 0) {
+                return Result.fail("删除失败");
+            }
+            return Result.success(i);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail(ex.getMessage());
+        }
+    }
 
     public int updateById(Printer printer) {
         try {

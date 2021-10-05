@@ -5,6 +5,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Printer;
 import com.xjh.dao.mapper.PrinterDAO;
@@ -41,9 +42,16 @@ public class PrinterService {
         return printerDAO.updateById(printer);
     }
 
+    public Result<Integer> deleteById(Integer printerId) {
+        return printerDAO.deleteById(printerId);
+    }
+
     public Result<Integer> save(Printer printer) {
         try {
             if (printer.getPrinterId() == null) {
+                if (printer.getAddTime() == null) {
+                    printer.setAddTime(DateBuilder.now().mills());
+                }
                 return Result.success(printerDAO.insert(printer));
             }
             return Result.success(printerDAO.updateById(printer));
