@@ -89,7 +89,6 @@ public class PrinterImpl implements Printer {
         }
     }
 
-    @Override
     public int checkPrinter() {
         int printerStatus;
         SocketAddress socketAddress = new InetSocketAddress(ip, port);
@@ -104,7 +103,7 @@ public class PrinterImpl implements Printer {
                 printerStatus = StatusUtil.checkDetailedStatus(inputData);
             }
         } catch (IOException ex) {
-            printerStatus = Printer.PRINTSTATUS_SOCKETTIMEOUT;
+            printerStatus = StatusUtil.SOCKET_TIMEOUT;
         }
         return printerStatus;
     }
