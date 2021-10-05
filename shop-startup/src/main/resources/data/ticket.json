@@ -17,18 +17,18 @@
     "FrontEnterNum": 0,
     "FrontLen": 10,
     "SampleContent": "老邓",
-    "BehindEnterNum": 0
+    "BehindEnterNum": 1
   },
   {
     "Name": "顶部分割线",
     "Size": 1,
     "ComType": 2,
     "FrontEnterNum": 0,
-    "BehindEnterNum": 0
+    "BehindEnterNum": 1
   },
   {
     "Name": "样例表",
-    "BehindEnterNum": 0,
+    "BehindEnterNum": 1,
     "Size": 1,
     "ComType": 3,
     "FrontEnterNum": 0,
@@ -65,11 +65,11 @@
     "Size": 1,
     "ComType": 2,
     "FrontEnterNum": 0,
-    "BehindEnterNum": 0
+    "BehindEnterNum": 1
   },
   {
     "Name": "任溶溶",
-    "BehindEnterNum": 0,
+    "BehindEnterNum": 1,
     "Size": 1,
     "ComType": 3,
     "FrontEnterNum": 0,
@@ -126,7 +126,7 @@
     "Size": 1,
     "ComType": 2,
     "FrontEnterNum": 0,
-    "BehindEnterNum": 0
+    "BehindEnterNum": 1
   },
   {
     "Name": "二维码内容",
@@ -134,11 +134,11 @@
     "ComType": 4,
     "Content": "http://m.baidu.com",
     "FrontEnterNum": 0,
-    "BehindEnterNum": 0
+    "BehindEnterNum": 1
   },
   {
     "Name": "风格独特的官方",
-    "BehindEnterNum": 0,
+    "BehindEnterNum": 1,
     "Size": 1,
     "ComType": 3,
     "FrontEnterNum": 0,
