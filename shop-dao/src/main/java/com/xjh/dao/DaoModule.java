@@ -19,6 +19,7 @@ import com.xjh.dao.mapper.DishesUpdateDAO;
 import com.xjh.dao.mapper.OrderDAO;
 import com.xjh.dao.mapper.OrderDishesDAO;
 import com.xjh.dao.mapper.OrderPayDAO;
+import com.xjh.dao.mapper.PrinterDAO;
 import com.xjh.dao.mapper.StoreDAO;
 import com.xjh.dao.mapper.SubOrderDAO;
 
@@ -44,6 +45,7 @@ public class DaoModule extends AbstractModule {
         bind(DishesTypeUpdateDAO.class);
         bind(DishesUpdateDAO.class);
         bind(DishesPackageUpdateDAO.class);
+        bind(PrinterDAO.class);
         Logger.info("DaoModule 耗时: " + timeRecord.getCost());
     }
 }

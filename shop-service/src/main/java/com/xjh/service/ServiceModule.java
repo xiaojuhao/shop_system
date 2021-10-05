@@ -11,6 +11,7 @@ import com.xjh.service.domain.DishesPackageService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
+import com.xjh.service.domain.PrinterService;
 
 public class ServiceModule extends AbstractModule {
     @Override
@@ -24,6 +25,7 @@ public class ServiceModule extends AbstractModule {
         bind(DishesPackageService.class);
         bind(AccountService.class);
         bind(DishesAttributeService.class);
+        bind(PrinterService.class);
         Logger.info("ServiceModule 耗时:" + timeRecord.getCost());
     }
 }

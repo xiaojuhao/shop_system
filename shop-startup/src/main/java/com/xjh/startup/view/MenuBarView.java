@@ -87,10 +87,11 @@ public class MenuBarView {
 
     private Menu createPrintMenu() {
         Menu menu = new Menu("打印管理");
-        MenuItem updatePassword = new MenuItem("打印机管理");
+        MenuItem printerList = new MenuItem("打印机管理");
+        printerList.setOnAction(evt -> openView("打印机管理", new PrinterManageListView()));
         MenuItem updateName = new MenuItem("小票样式管理");
         MenuItem printJobMenu = new MenuItem("打印任务管理");
-        menu.getItems().addAll(updatePassword, updateName, printJobMenu);
+        menu.getItems().addAll(printerList, updateName, printJobMenu);
         return menu;
     }
 

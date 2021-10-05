@@ -74,6 +74,9 @@ public class DishesEditView extends SimpleGridForm {
 
     public DishesEditView(Dishes param) {
         dishes = dishesService.getById(param.getDishesId());
+        if (dishes == null) {
+            dishes = new Dishes();
+        }
         double labelWidth = 120;
         Label nameLabel = createLabel("名称:", labelWidth);
         TextField nameInput = createTextField("名称", 300);
