@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.xjh.startup.foundation.utils;
+package com.xjh.startup.foundation.printers;
 
-import static com.xjh.startup.foundation.utils.PrinterCmdUtil.PRINTER_STATUS_NORMAL;
-import static com.xjh.startup.foundation.utils.PrinterCmdUtil.PRINTER_STATUS_PRINTING;
+import static com.xjh.startup.foundation.printers.PrinterCmdUtil.PRINTER_STATUS_NORMAL;
+import static com.xjh.startup.foundation.printers.PrinterCmdUtil.PRINTER_STATUS_PRINTING;
 
 import java.util.Arrays;
 

@@ -5,8 +5,8 @@ import java.io.File;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.xjh.common.utils.FileUtils;
-import com.xjh.startup.foundation.utils.PrintResult;
-import com.xjh.startup.foundation.utils.PrinterImpl;
+import com.xjh.startup.foundation.printers.PrintResult;
+import com.xjh.startup.foundation.printers.PrinterImpl;
 
 import javafx.application.Application;
 import javafx.scene.Scene;

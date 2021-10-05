@@ -9,7 +9,7 @@ import javax.inject.Singleton;
 
 import com.google.inject.name.Named;
 import com.xjh.common.utils.Result;
-import com.xjh.dao.dataobject.Printer;
+import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.dao.foundation.EntityUtils;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -27,7 +27,7 @@ public class PrinterDAO {
             return Result.fail("参数错误");
         }
         try {
-            Printer id = new Printer();
+            PrinterDO id = new PrinterDO();
             id.setPrinterId(printerId);
             int i = Db.use(ds).del(EntityUtils.idCond(id));
             if (i == 0) {
@@ -40,7 +40,7 @@ public class PrinterDAO {
         }
     }
 
-    public int updateById(Printer printer) {
+    public int updateById(PrinterDO printer) {
         try {
             return Db.use(ds).update(EntityUtils.create(printer),
                     EntityUtils.idCond(printer));
@@ -50,14 +50,14 @@ public class PrinterDAO {
         }
     }
 
-    public int insert(Printer printer) throws SQLException {
+    public int insert(PrinterDO printer) throws SQLException {
         return Db.use(ds).insert(EntityUtils.create(printer));
     }
 
-    public List<Printer> selectList(Printer cond) {
+    public List<PrinterDO> selectList(PrinterDO cond) {
         try {
             List<Entity> list = Db.use(ds).find(EntityUtils.create(cond));
-            return EntityUtils.convertList(list, Printer.class);
+            return EntityUtils.convertList(list, PrinterDO.class);
         } catch (Exception ex) {
             ex.printStackTrace();
             return new ArrayList<>();

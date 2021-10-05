@@ -13,7 +13,7 @@ import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.Result;
 import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.utils.cellvalue.Operations;
-import com.xjh.dao.dataobject.Printer;
+import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.service.domain.PrinterService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
@@ -49,7 +49,7 @@ public class PrinterManageListView extends SimpleForm implements Initializable {
     }
 
     private void loadData() {
-        List<Printer> list = printerService.query(new Printer()).getData();
+        List<PrinterDO> list = printerService.query(new PrinterDO()).getData();
         Platform.runLater(() -> {
             items.clear();
             items.addAll(list.stream().map(dd -> {
@@ -103,13 +103,13 @@ public class PrinterManageListView extends SimpleForm implements Initializable {
 
     private void buildFoot() {
         Button addNew = new Button("增 加");
-        addNew.setOnAction(e -> openEditor(new Printer()));
+        addNew.setOnAction(e -> openEditor(new PrinterDO()));
         HBox line = newLine(addNew);
         line.setPadding(new Insets(10, 0, 0, 0));
         addLine(line);
     }
 
-    private void openEditor(Printer printer) {
+    private void openEditor(PrinterDO printer) {
         Window window = this.getScene().getWindow();
         ModelWindow mw = new ModelWindow(window, "编辑打印机");
         PrinterEditView view = new PrinterEditView(printer);

@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @Table("printer_list")
-public class Printer {
+public class PrinterDO {
     @Id
     @Column("printerId")
     Integer printerId;

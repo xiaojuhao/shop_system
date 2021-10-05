@@ -1,4 +1,4 @@
-package com.xjh.startup.foundation.utils;
+package com.xjh.startup.foundation.printers;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

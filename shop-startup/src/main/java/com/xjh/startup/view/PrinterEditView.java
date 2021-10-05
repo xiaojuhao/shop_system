@@ -9,7 +9,7 @@ import com.xjh.common.enumeration.EnumPrinterType;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Result;
-import com.xjh.dao.dataobject.Printer;
+import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.service.domain.PrinterService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SimpleGridForm;
@@ -27,13 +27,13 @@ import javafx.scene.control.TextField;
 public class PrinterEditView extends SimpleGridForm {
     PrinterService printerService = GuiceContainer.getInstance(PrinterService.class);
 
-    Printer printer;
+    PrinterDO printer;
     List<Runnable> collectData = new ArrayList<>();
 
-    public PrinterEditView(Printer param) {
+    public PrinterEditView(PrinterDO param) {
         printer = printerService.getById(param.getPrinterId());
         if (printer == null) {
-            printer = new Printer();
+            printer = new PrinterDO();
         }
         double labelWidth = 120;
         Label nameLabel = createLabel("名称:", labelWidth);

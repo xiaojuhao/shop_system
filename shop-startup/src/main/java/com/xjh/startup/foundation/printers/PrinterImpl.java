@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.xjh.startup.foundation.utils;
+package com.xjh.startup.foundation.printers;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,13 +11,12 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.zxing.WriterException;
+import com.xjh.common.enumeration.EnumPrinterType;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.startup.foundation.constants.EnumAlign;
 import com.xjh.startup.foundation.constants.EnumComType;
@@ -67,24 +66,8 @@ public class PrinterImpl implements Printer {
         this.printerType = printerType;
         this.status = status;
         this.addTime = addTime;
-
-        if (printerType == 1) {
-            charCount = 48;
-        }
-    }
-
-
-    public PrinterImpl(ResultSet resultSet) throws SQLException {
-        this.id = resultSet.getInt("printerId");
-        this.name = resultSet.getString("printerName");
-        this.ip = resultSet.getString("printerIp");
-        this.port = resultSet.getInt("printerPort");
-        this.infoMark = resultSet.getString("printerInfo");
-        this.printerType = resultSet.getInt("printerType");
-        this.status = resultSet.getInt("printerStatus");
-        this.addTime = resultSet.getLong("addTime");
-
-        if (printerType == 1) {
+        // 80毫米
+        if (printerType == EnumPrinterType.T80.code) {
             charCount = 48;
         }
     }
@@ -394,7 +377,7 @@ public class PrinterImpl implements Printer {
         // 重置字符大小
         outputStream.write(PrinterCmdUtil.fontSizeSetBig(1));
         // 最后的回车
-         outputStream.write(PrinterCmdUtil.nextLine(behindEnterNum));
+        outputStream.write(PrinterCmdUtil.nextLine(behindEnterNum));
         outputStream.flush();
     }
 

@@ -7,7 +7,7 @@ import javax.inject.Singleton;
 
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Result;
-import com.xjh.dao.dataobject.Printer;
+import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.dao.mapper.PrinterDAO;
 
 @Singleton
@@ -15,9 +15,9 @@ public class PrinterService {
     @Inject
     PrinterDAO printerDAO;
 
-    public Result<List<Printer>> query(Printer cond) {
+    public Result<List<PrinterDO>> query(PrinterDO cond) {
         try {
-            List<Printer> list = printerDAO.selectList(cond);
+            List<PrinterDO> list = printerDAO.selectList(cond);
             return Result.success(list);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -25,17 +25,17 @@ public class PrinterService {
         }
     }
 
-    public Printer getById(Integer printerId) {
+    public PrinterDO getById(Integer printerId) {
         if (printerId == null) {
             return null;
         }
-        Printer cond = new Printer();
+        PrinterDO cond = new PrinterDO();
         cond.setPrinterId(printerId);
         return printerDAO.selectList(cond)
                 .stream().findFirst().orElse(null);
     }
 
-    public int updateById(Printer printer) {
+    public int updateById(PrinterDO printer) {
         if (printer.getPrinterId() == null) {
             return 0;
         }
@@ -46,7 +46,7 @@ public class PrinterService {
         return printerDAO.deleteById(printerId);
     }
 
-    public Result<Integer> save(Printer printer) {
+    public Result<Integer> save(PrinterDO printer) {
         try {
             if (printer.getPrinterId() == null) {
                 if (printer.getAddTime() == null) {
