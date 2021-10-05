@@ -207,7 +207,7 @@ public class OrderPrinterHelper {
         sumItem.put("FrontLen", 22);
         sumItem.put("BehindLen", 0);
         sumItem.put("FrontEnterNum", 0);
-        sumItem.put("BehindEnterNum", 2);
+        sumItem.put("BehindEnterNum", 1);
         list.add(sumItem);
 
         return list;

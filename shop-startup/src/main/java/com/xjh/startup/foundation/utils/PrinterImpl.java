@@ -405,7 +405,7 @@ public class PrinterImpl implements Printer {
         // 重置字符大小
         outputStream.write(PrinterCmdUtil.fontSizeSetBig(1));
         // 最后的回车
-        outputStream.write(PrinterCmdUtil.nextLine(behindEnterNum));
+         outputStream.write(PrinterCmdUtil.nextLine(behindEnterNum));
         outputStream.flush();
     }
 
@@ -469,8 +469,6 @@ public class PrinterImpl implements Printer {
                     outputStream.write(byteMerger);
                 }
             }
-            // 换行
-            outputStream.write(PrinterCmdUtil.nextLine());
         }
     }
 }
