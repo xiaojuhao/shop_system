@@ -303,7 +303,7 @@ public class OrderPrinterHelper {
         jsonObject.put("Name", "应收合计");
         jsonObject.put("ComType", EnumComType.TEXT.type);
         jsonObject.put("SampleContent", "应收合计:" +
-                CommonUtils.formatMoney(bill.getTotalPrice(), "0.0"));
+                CommonUtils.formatMoney(bill.getOrderNeedPay(), "0.0"));
         jsonObject.put("Size", 1);
         jsonObject.put("FrontLen", 0);
         jsonObject.put("BehindLen", 0);
