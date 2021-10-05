@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.fastjson.JSON;
+import com.xjh.common.enumeration.EnumPrinterStatus;
+import com.xjh.common.enumeration.EnumPrinterType;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Result;
@@ -91,23 +93,23 @@ public class PrinterEditView extends SimpleGridForm {
 
     private ComboBox<IntStringPair> printerTypeOptions(Integer selected) {
         ObservableList<IntStringPair> options = FXCollections.observableArrayList(
-                new IntStringPair(0, "58毫米"),
-                new IntStringPair(1, "80毫米")
+                new IntStringPair(EnumPrinterType.T58.code, EnumPrinterType.T58.name),
+                new IntStringPair(EnumPrinterType.T80.code, EnumPrinterType.T80.name)
         );
         ComboBox<IntStringPair> combo = new ComboBox<>(options);
         // 默认选中项
-        IntStringPair.select(combo, selected, 0);
+        IntStringPair.select(combo, selected, EnumPrinterType.T58.code);
         return combo;
     }
 
     private ComboBox<IntStringPair> printerStatusOptions(Integer selected) {
         ObservableList<IntStringPair> options = FXCollections.observableArrayList(
-                new IntStringPair(0, "关闭"),
-                new IntStringPair(1, "正常")
+                new IntStringPair(EnumPrinterStatus.CLOSED.code, EnumPrinterStatus.CLOSED.name),
+                new IntStringPair(EnumPrinterStatus.OPENED.code, EnumPrinterStatus.OPENED.name)
         );
         ComboBox<IntStringPair> combo = new ComboBox<>(options);
         // 默认选中项
-        IntStringPair.select(combo, selected, 1);
+        IntStringPair.select(combo, selected, EnumPrinterStatus.OPENED.code);
         return combo;
     }
 

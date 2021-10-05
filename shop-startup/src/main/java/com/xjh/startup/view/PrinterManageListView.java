@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.xjh.common.enumeration.EnumPrinterStatus;
+import com.xjh.common.enumeration.EnumPrinterType;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.Result;
 import com.xjh.common.utils.cellvalue.OperationButton;
@@ -56,9 +58,10 @@ public class PrinterManageListView extends SimpleForm implements Initializable {
                 bo.setPrinterName(dd.getPrinterName());
                 bo.setPrinterIp(dd.getPrinterIp());
                 bo.setPrinterPort(dd.getPrinterPort());
-                bo.setPrinterStatus(dd.getPrinterStatus());
+                bo.setPrinterInfo(dd.getPrinterInfo());
+                bo.setPrinterStatus(EnumPrinterStatus.of(dd.getPrinterStatus()).name);
                 bo.setAddTime(dd.getAddTime());
-                bo.setPrinterType(dd.getPrinterType());
+                bo.setPrinterType(EnumPrinterType.of(dd.getPrinterType()).name);
                 bo.getOperations().add(new OperationButton("编辑", () -> openEditor(dd)));
                 bo.getOperations().add(new OperationButton("删除", () -> {
                     OkCancelDialog dialog = new OkCancelDialog(
@@ -85,8 +88,8 @@ public class PrinterManageListView extends SimpleForm implements Initializable {
 
         tableView.getColumns().addAll(
                 newCol("ID", "printerId", 100),
-                newCol("名称", "printerName", 200),
-                newCol("IP", "printerIp", 200),
+                newCol("名称", "printerName", 100),
+                newCol("IP", "printerIp", 120),
                 newCol("端口", "printerPort", 80),
                 newCol("备注", "printerInfo", 100),
                 newCol("类型", "printerType", 100),
@@ -124,8 +127,8 @@ public class PrinterManageListView extends SimpleForm implements Initializable {
         Integer printerPort;
         String printerInfo;
         // 1:80mm;  0:58mm
-        Integer printerType;
-        Integer printerStatus;
+        String printerType;
+        String printerStatus;
         Long addTime;
         Operations operations = new Operations();
     }
