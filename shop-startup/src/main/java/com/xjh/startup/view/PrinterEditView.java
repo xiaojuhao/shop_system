@@ -2,6 +2,8 @@ package com.xjh.startup.view;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.alibaba.fastjson.JSON;
 import com.xjh.common.enumeration.EnumPrinterStatus;
@@ -80,13 +82,23 @@ public class PrinterEditView extends SimpleGridForm {
         save.setOnAction(evt -> {
             CommonUtils.safeRun(collectData);
             System.out.println(JSON.toJSONString(printer, true));
+            if (!checkIp(printer.getPrinterIp())) {
+                AlertBuilder.ERROR("打印机IP地址格式错误！");
+                return;
+            }
+            if (printer.getPrinterPort() == null ||
+                    printer.getPrinterPort() <= 0
+                    || printer.getPrinterPort() >= 65535) {
+                AlertBuilder.ERROR("打印机端口错误！");
+                return;
+            }
             Result<Integer> rs = printerService.save(printer);
             if (rs.isSuccess()) {
                 AlertBuilder.INFO("保存成功");
+                this.getScene().getWindow().hide();
             } else {
                 AlertBuilder.ERROR("保存失败," + rs.getMsg());
             }
-            this.getScene().getWindow().hide();
         });
         addLine((Node) null, save);
     }
@@ -118,6 +130,16 @@ public class PrinterEditView extends SimpleGridForm {
             return null;
         }
         return combo.getSelectionModel().getSelectedItem().getKey();
+    }
+
+    private static boolean checkIp(String ip) {
+        if (CommonUtils.isBlank(ip)) {
+            return false;
+        }
+        String patternString = "(([0,1]?\\d?\\d|2[0-4]\\d|25[0-5])\\.){3}([0,1]?\\d?\\d|2[0-4]\\d|25[0-5])";
+        Pattern pattern = Pattern.compile(patternString);
+        Matcher matcher = pattern.matcher(ip);
+        return matcher.matches();
     }
 
 }
