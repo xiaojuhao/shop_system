@@ -1,5 +1,6 @@
 package com.xjh.common.valueobject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
@@ -12,7 +13,7 @@ public class DishesAttributeVO {
     Boolean isValueRadio = false;
     Boolean isSync = false;
     Long createTime;
-    List<DishesAttributeValueVO> selectedAttributeValues;
-    List<DishesAttributeValueVO> allAttributeValues;
+    List<DishesAttributeValueVO> selectedAttributeValues = new ArrayList<>();
+    List<DishesAttributeValueVO> allAttributeValues = new ArrayList<>();
 
 }
