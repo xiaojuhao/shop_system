@@ -8,6 +8,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,7 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.ImageHelper;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
@@ -266,6 +268,13 @@ public class DishesEditView extends SimpleGridForm {
         priAttrInput.getChildren().addAll(priAttrTV, priAttrValTV);
         addLine(priAttrOperations, priAttrInput);
         collectData.add(() -> {
+            AtomicInteger id = new AtomicInteger(100);
+            CommonUtils.forEach(priAttrItems, it -> {
+                it.setDishesAttributeId(id.incrementAndGet());
+                it.setIsSync(CommonUtils.orElse(it.getIsSync(), false));
+                it.setIsValueRadio(CommonUtils.orElse(it.getIsValueRadio(), false));
+                it.setCreateTime(DateBuilder.now().mills());
+            });
             dishes.setDishesPrivateAttribute(Base64.encode(JSON.toJSONString(priAttrItems)));
         });
 
