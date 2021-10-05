@@ -18,6 +18,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.zxing.WriterException;
 import com.xjh.common.enumeration.EnumPrinterType;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.startup.foundation.constants.EnumAlign;
 import com.xjh.startup.foundation.constants.EnumComType;
 
@@ -35,46 +36,22 @@ import lombok.Data;
 @Data
 @SuppressWarnings("unused")
 public class PrinterImpl implements Printer {
-    private int id;
-    private String name;
-    private String ip;
-    private int port;
-    private String infoMark;
-    private int printerType;
-    private int status;
-    private long addTime;
+    PrinterDO printerDO;
     private int charCount = 32;
     private int timeout = 30 * 1000; //输入流读取超时时间
     private int connectTimeout = 5 * 1000; //socket连接超时时间
 
-
-    /**
-     * @param id          id
-     * @param name        name
-     * @param ip          ip
-     * @param port        port
-     * @param infoMark    mark
-     * @param printerType 打印机类型，58mm为0,80mm为1
-     * @param addTime     ,添加打印机的时间
-     */
-    public PrinterImpl(int id, String name, String ip, int port, String infoMark, int printerType, int status, long addTime) {
-        this.id = id;
-        this.name = name;
-        this.ip = ip;
-        this.port = port;
-        this.infoMark = infoMark;
-        this.printerType = printerType;
-        this.status = status;
-        this.addTime = addTime;
+    public PrinterImpl(PrinterDO dd) {
+        this.printerDO = dd;
         // 80毫米
-        if (printerType == EnumPrinterType.T80.code) {
+        if (EnumPrinterType.of(dd.getPrinterType()) == EnumPrinterType.T80) {
             charCount = 48;
         }
     }
 
     public int checkPrinter() {
         int printerStatus;
-        SocketAddress socketAddress = new InetSocketAddress(ip, port);
+        SocketAddress socketAddress = new InetSocketAddress(printerDO.getPrinterIp(), printerDO.getPrinterPort());
         try (Socket s = new Socket()) {
             s.connect(socketAddress, connectTimeout);
             s.setSoTimeout(timeout);
@@ -94,7 +71,7 @@ public class PrinterImpl implements Printer {
     @Override
     public PrintResult print(JSONArray contentItems, boolean isVoicce) throws Exception {
         PrintResultImpl printResultImpl = new PrintResultImpl(this, contentItems);
-        SocketAddress socketAddress = new InetSocketAddress(ip, port);
+        SocketAddress socketAddress = new InetSocketAddress(printerDO.getPrinterIp(), printerDO.getPrinterPort());
         byte[] dataRead = new byte[0];
         try (Socket s = new Socket()) {
             s.connect(socketAddress, connectTimeout);
@@ -162,7 +139,6 @@ public class PrinterImpl implements Printer {
                     } else {
                         int resultCode = StatusUtil.checkDetailedStatus(inputData);
                         printResultImpl.toFailure(resultCode);
-                        status = resultCode;
                         //查看输入流是否还有字节，有的话，一起全部都读出来
                         while (len != -1) {
                             len = inputStream.read(inputData);
@@ -258,7 +234,7 @@ public class PrinterImpl implements Printer {
     }
 
     private void printQRCode(OutputStream outputStream, JSONObject jsonObject, boolean isText) throws IOException, WriterException {
-        int maxSize = (printerType == 1 ? 48 : 32);
+        int maxSize = (printerDO.getPrinterType() == 1 ? 48 : 32);
         String content = jsonObject.getString("Content");
         double width = jsonObject.getDouble("Size");
         int frontEnterNum = jsonObject.getInteger("FrontEnterNum");

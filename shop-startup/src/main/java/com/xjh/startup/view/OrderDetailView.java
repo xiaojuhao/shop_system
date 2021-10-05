@@ -32,6 +32,7 @@ import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
+import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.DishesPackageService;
 import com.xjh.service.domain.DishesService;
@@ -477,14 +478,16 @@ public class OrderDetailView extends VBox {
         openView(title, param, view);
     }
 
-    String ip = "192.168.1.4";
-    int port = 9100;
-
     private void submitPrintOrderInfo(DeskOrderParam param) {
         try {
-            PrinterImpl printer = new PrinterImpl(1, "打印机", ip, port,
-                    "mark", 1, 1,
-                    System.currentTimeMillis());
+            PrinterDO dd = new PrinterDO();
+            dd.setPrinterId(1);
+            dd.setPrinterName("打印机");
+            dd.setPrinterIp("192.168.1.4");
+            dd.setPrinterPort(9100);
+            dd.setPrinterType(1);
+            dd.setPrinterStatus(1);
+            PrinterImpl printer = new PrinterImpl(dd);
 
             JSONArray printData = orderPrinterHelper.buildOrderPrintData(param);
             printer.print(printData, true);

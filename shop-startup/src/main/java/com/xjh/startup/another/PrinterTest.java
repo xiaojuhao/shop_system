@@ -5,6 +5,7 @@ import java.io.File;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.xjh.common.utils.FileUtils;
+import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.startup.foundation.printers.PrintResult;
 import com.xjh.startup.foundation.printers.PrinterImpl;
 
@@ -15,14 +16,18 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 public class PrinterTest extends Application {
-    String ip = "192.168.1.4";
-    int port = 9100;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        PrinterImpl printer = new PrinterImpl(1, "打印机", ip, port,
-                "mark", 1, 1,
-                System.currentTimeMillis());
+        PrinterDO dd = new PrinterDO();
+        dd.setPrinterId(1);
+        dd.setPrinterName("打印机");
+        dd.setPrinterIp("192.168.1.4");
+        dd.setPrinterPort(9100);
+        dd.setPrinterType(1);
+        dd.setPrinterStatus(1);
+
+        PrinterImpl printer = new PrinterImpl(dd);
         HBox box = new HBox();
         Button btn = new Button("打印");
         btn.setOnAction(evt -> {
