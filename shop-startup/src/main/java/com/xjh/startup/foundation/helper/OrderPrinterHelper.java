@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.DoubleAdder;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
@@ -11,6 +12,7 @@ import javax.inject.Singleton;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.util.concurrent.AtomicDouble;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.dao.dataobject.Desk;
@@ -59,9 +61,10 @@ public class OrderPrinterHelper {
         List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(param.getOrderId());
         List<OrderDishes> discountableList = CommonUtils.filter(orderDishesList, discountableChecker);
         List<OrderDishes> nonDiscountableList = CommonUtils.filter(orderDishesList, discountableChecker.negate());
-        array.addAll(dishesItems("普通菜品", discountableList));
+        DoubleAdder sumPrice = new DoubleAdder();
+        array.addAll(dishesItems("普通菜品", discountableList, sumPrice));
         array.add(crlf()); // 换行
-        array.addAll(dishesItems("特价菜及酒水", nonDiscountableList));
+        array.addAll(dishesItems("特价菜及酒水", nonDiscountableList, sumPrice));
         // 支付信息
         array.addAll(paymentInfos());
         // 二维码
@@ -156,7 +159,7 @@ public class OrderPrinterHelper {
         return jsonObject;
     }
 
-    private List<JSONObject> dishesItems(String title, List<OrderDishes> orderDishesList) {
+    private List<JSONObject> dishesItems(String title, List<OrderDishes> orderDishesList, DoubleAdder sumAdder) {
         List<JSONObject> list = new ArrayList<>();
 
         list.add(simpleLineText(title));
@@ -210,6 +213,8 @@ public class OrderPrinterHelper {
         sumItem.put("BehindEnterNum", 1);
         list.add(sumItem);
 
+        // 累计总价
+        sumAdder.add(sumPrices);
         return list;
     }
 
