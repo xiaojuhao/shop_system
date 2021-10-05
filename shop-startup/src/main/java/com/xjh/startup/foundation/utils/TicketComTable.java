@@ -85,9 +85,9 @@ public class TicketComTable extends TicketCom {
             } else {
                 widthNow = widthAll * jComboBoxItemIntWidthPercentage.getValue() / 100;
             }
-            if (jComboBoxItemIntAlign.getValue() == EnumAlign.CENTER.level) {
+            if (jComboBoxItemIntAlign.getValue() == EnumAlign.CENTER.type) {
                 colAlign[i] = FontTool.ALIGN_TYPE_CENTER;
-            } else if (jComboBoxItemIntAlign.getValue() == EnumAlign.RIGHT.level) {
+            } else if (jComboBoxItemIntAlign.getValue() == EnumAlign.RIGHT.type) {
                 colAlign[i] = FontTool.ALIGN_TYPE_RIGHT;
             } else {
                 colAlign[i] = FontTool.ALIGN_TYPE_LEFT;

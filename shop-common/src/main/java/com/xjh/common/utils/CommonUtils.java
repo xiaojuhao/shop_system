@@ -594,7 +594,7 @@ public class CommonUtils {
             return true;
         }
         for (Object v : coll) {
-            if (Objects.nonNull(v)) {
+            if (nonNull(v)) {
                 return false;
             }
         }
@@ -788,6 +788,16 @@ public class CommonUtils {
 
     public static boolean isNotBlank(String str) {
         return !isBlank(str);
+    }
+
+    public static boolean nonNull(Object val) {
+        if (val == null) {
+            return false;
+        }
+        if (val instanceof String) {
+            return isNotBlank((String) val);
+        }
+        return true;
     }
 
     public static void emptyAction() {

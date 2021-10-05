@@ -1,20 +1,28 @@
 package com.xjh.startup.foundation.helper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.dao.dataobject.Desk;
+import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.Order;
+import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.service.domain.DeskService;
+import com.xjh.service.domain.DishesService;
+import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.StoreService;
 import com.xjh.service.domain.model.StoreVO;
+import com.xjh.startup.foundation.constants.EnumAlign;
 import com.xjh.startup.foundation.constants.EnumComType;
 import com.xjh.startup.view.model.DeskOrderParam;
 
@@ -23,53 +31,89 @@ public class OrderPrinterHelper {
     @Inject
     OrderService orderService;
     @Inject
+    OrderDishesService orderDishesService;
+    @Inject
     StoreService storeService;
     @Inject
     DeskService deskService;
+    @Inject
+    DishesService dishesService;
 
     public JSONArray buildOrderPrintData(DeskOrderParam param) {
-        JSONArray array = new JSONArray();
+        List<JSONObject> array = new ArrayList<>();
         Order order = orderService.getOrder(param.getOrderId());
         StoreVO store = storeService.getStore().getData();
         Desk desk = deskService.getById(order.getDeskId());
-        array.add(simpleText("订单编号:" + order.getCreateTime() + "" + order.getOrderId()));
-        array.add(simpleText("门店名称:" + store.getName()));
-        array.add(simpleText("开台时间:" + DateBuilder.base(order.getCreateTime()).timeStr()));
-        array.add(simpleText("桌台信息:" + desk.getBelongDeskType() + desk.getDeskName()));
-        array.add(simpleText("用餐人数:" + order.getOrderCustomerNums()));
-        array.add(simpleText("点菜员:点菜员1"));
+        array.add(simpleLineText("订单编号:" + order.getCreateTime() + "" + order.getOrderId()));
+        array.add(simpleLineText("门店名称:" + store.getName()));
+        array.add(simpleLineText("开台时间:" + DateBuilder.base(order.getCreateTime()).timeStr()));
+        array.add(simpleLineText("桌台信息:" + desk.getBelongDeskType() + desk.getDeskName()));
+        array.add(simpleLineText("用餐人数:" + order.getOrderCustomerNums()));
+        array.add(simpleLineText("点菜员:点菜员1"));
         array.add(crlf()); // 换行
-        array.add(simpleText("普通菜品"));
-        return array;
+        array.add(simpleLineText("普通菜品"));
+        array.addAll(orderDishesTitle()); // 菜品标题
+        array.add(dotLine());
+        array.addAll(dishesItems(param));
+        // 支付信息
+        array.addAll(paymentInfos());
+        // 二维码
+        array.addAll(qrCode());
+        JSONArray rs = new JSONArray();
+        rs.addAll(array);
+        return rs;
     }
 
-    private List<JSONObject> keyPair(String title, Object value) {
-        List<JSONObject> pair = new ArrayList<>();
+    private List<JSONObject> orderDishesTitle() {
+        List<JSONObject> titles = new ArrayList<>();
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("Name", title + "-名称");
+        jsonObject.put("Name", "商品名称");
         jsonObject.put("ComType", EnumComType.TEXT.type);
-        jsonObject.put("SampleContent", title + ":");
+        jsonObject.put("SampleContent", "商品名称");
         jsonObject.put("Size", 1);
         jsonObject.put("FrontLen", 0);
         jsonObject.put("BehindLen", 0);
         jsonObject.put("FrontEnterNum", 0);
         jsonObject.put("BehindEnterNum", 0);
-        pair.add(jsonObject);
+        titles.add(jsonObject);
 
         jsonObject = new JSONObject();
-        jsonObject.put("Name", title + "-value");
+        jsonObject.put("Name", "商品单价");
         jsonObject.put("ComType", EnumComType.TEXT.type);
-        jsonObject.put("SampleContent", value);
+        jsonObject.put("SampleContent", "单价");
         jsonObject.put("Size", 1);
-        jsonObject.put("FrontLen", 0);
+        jsonObject.put("FrontLen", 19);
         jsonObject.put("BehindLen", 0);
         jsonObject.put("FrontEnterNum", 0);
-        jsonObject.put("BehindEnterNum", 1);
-        pair.add(jsonObject);
-        return pair;
+        jsonObject.put("BehindEnterNum", 0);
+        titles.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "数量");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "数量");
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 4);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        titles.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "小计");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "小计");
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 4);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        titles.add(jsonObject);
+
+        return titles;
     }
 
-    private JSONObject simpleText(String text) {
+    private JSONObject simpleLineText(String text) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("Name", "simple-text-name");
         jsonObject.put("ComType", EnumComType.TEXT.type);
@@ -93,5 +137,118 @@ public class OrderPrinterHelper {
         jsonObject.put("FrontEnterNum", 0);
         jsonObject.put("BehindEnterNum", 0);
         return jsonObject;
+    }
+
+    private JSONObject dotLine() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("Name", "分割线");
+        jsonObject.put("ComType", EnumComType.LINE.type);
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        return jsonObject;
+    }
+
+    private List<JSONObject> dishesItems(DeskOrderParam param) {
+        List<JSONObject> list = new ArrayList<>();
+        JSONObject details = new JSONObject();
+        list.add(details);
+        details.put("Name", "结账菜单表");
+        details.put("ComType", EnumComType.TABLE.type);
+        details.put("Size", 1);
+        details.put("FrontEnterNum", 0);
+        details.put("BehindEnterNum", 0);
+        // 标题
+        details.put("columnNames", asArray("", "", "", ""));
+        // 间隔
+        details.put("columnWidths", asArray(50, 15, 15, 20));
+        // 对齐方式
+        JSONArray columnAligns = asArray(
+                EnumAlign.LEFT.type, EnumAlign.RIGHT.type,
+                EnumAlign.RIGHT.type, EnumAlign.RIGHT.type);
+        details.put("columnAligns", columnAligns);
+
+        // 内容
+        List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(param.getOrderId());
+        List<Integer> dishesIds = CommonUtils.collect(orderDishesList, OrderDishes::getDishesId);
+        Map<Integer, Dishes> dishesMap = dishesService.getByIdsAsMap(dishesIds);
+        double sumPrices = 0;
+        JSONArray rows = new JSONArray();
+        for (OrderDishes orderDishes : orderDishesList) {
+            Dishes dishes = dishesMap.get(orderDishes.getDishesId());
+            sumPrices += orderDishes.getOrderDishesPrice();
+            rows.add(asArray(
+                    dishes.getDishesName(),
+                    CommonUtils.formatMoney(orderDishes.getOrderDishesPrice()),
+                    orderDishes.getOrderDishesNums(),
+                    orderDishes.getOrderDishesPrice()));
+        }
+        details.put("rows", rows);
+
+        // 分隔符
+        list.add(dotLine());
+        // 总计
+        JSONObject sumItem = new JSONObject();
+        sumItem.put("Name", "普通菜品合计");
+        sumItem.put("ComType", EnumComType.TEXT.type);
+        sumItem.put("SampleContent", "普通菜品合计:" + CommonUtils.formatMoney(sumPrices));
+        sumItem.put("Size", 1);
+        sumItem.put("FrontLen", 27);
+        sumItem.put("BehindLen", 0);
+        sumItem.put("FrontEnterNum", 0);
+        sumItem.put("BehindEnterNum", 2);
+        list.add(sumItem);
+
+        return list;
+    }
+
+    private List<JSONObject> paymentInfos() {
+        return new ArrayList<>();
+    }
+
+    private List<JSONObject> qrCode() {
+        List<JSONObject> qrcode = new ArrayList<>();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("Name", "双二维码");
+        jsonObject.put("ComType", EnumComType.QRCODE2.type);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        jsonObject.put("Width", 560);
+        jsonObject.put("Height", 260);
+        jsonObject.put("QrWidth", 250);
+        jsonObject.put("LeftPadding1", 30);
+        jsonObject.put("LeftPadding2", 30);
+        jsonObject.put("Text1", "http://www.xiaojuhao.org/pay/?d=");
+        jsonObject.put("Text2", "LocalServerConfig.publicAddress");
+        qrcode.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "微信扫一扫");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "微信扫一扫,加菜,结账");
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 3);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        qrcode.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "关注微信公众号");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "关注微信公众号");
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 6);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 1);
+        qrcode.add(jsonObject);
+        return qrcode;
+    }
+
+    private JSONArray asArray(Object... vals) {
+        JSONArray array = new JSONArray();
+        array.addAll(Arrays.asList(vals));
+        return array;
     }
 }

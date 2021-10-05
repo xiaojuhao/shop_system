@@ -5,10 +5,10 @@ public enum EnumAlign {
     LEFT(2),
     RIGHT(4),
     ;
-    public int level;
+    public int type;
 
-    EnumAlign(int level) {
-
+    EnumAlign(int type) {
+        this.type = type;
     }
 
     public static EnumAlign of(Integer level) {
@@ -16,7 +16,7 @@ public enum EnumAlign {
             return LEFT;
         }
         for (EnumAlign e : EnumAlign.values()) {
-            if (e.level == level) {
+            if (e.type == level) {
                 return e;
             }
         }
