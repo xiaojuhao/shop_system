@@ -574,6 +574,24 @@ public class CommonUtils {
         return map;
     }
 
+    public static <K, V> Map<K, List<V>> groupBy(Collection<V> coll, Function<V, K> keyGen) {
+        Map<K, List<V>> map = new HashMap<>();
+        if (coll != null) {
+            for (V v : coll) {
+                if (v != null) {
+                    K k = keyGen.apply(v);
+                    if (k != null) {
+                        if (!map.containsKey(k)) {
+                            map.put(k, new ArrayList<>());
+                        }
+                        map.get(k).add(v);
+                    }
+                }
+            }
+        }
+        return map;
+    }
+
     public static <T> void forEach(Collection<T> coll, Consumer<T> consumer) {
         if (coll == null) {
             return;

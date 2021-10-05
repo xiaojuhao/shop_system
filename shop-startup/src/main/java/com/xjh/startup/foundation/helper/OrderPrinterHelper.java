@@ -12,16 +12,19 @@ import javax.inject.Singleton;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.util.concurrent.AtomicDouble;
+import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.valueobject.OrderOverviewVO;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
+import com.xjh.dao.dataobject.OrderPay;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.OrderDishesService;
+import com.xjh.service.domain.OrderPayService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.StoreService;
 import com.xjh.service.domain.model.StoreVO;
@@ -41,11 +44,12 @@ public class OrderPrinterHelper {
     DeskService deskService;
     @Inject
     DishesService dishesService;
+    @Inject
+    OrderPayService orderPayService;
 
     public JSONArray buildOrderPrintData(DeskOrderParam param) {
         // 可折扣的菜品信息
         Predicate<OrderDishes> discountableChecker = orderDishesService.discountableChecker();
-
         List<JSONObject> array = new ArrayList<>();
         Order order = orderService.getOrder(param.getOrderId());
         StoreVO store = storeService.getStore().getData();
@@ -66,7 +70,9 @@ public class OrderPrinterHelper {
         array.add(crlf()); // 换行
         array.addAll(dishesItems("特价菜及酒水", nonDiscountableList, sumPrice));
         // 支付信息
-        array.addAll(paymentInfos());
+        List<OrderPay> orderPays = orderPayService.selectByOrderId(param.getOrderId());
+        OrderOverviewVO billView = orderService.buildOrderOverview(order, orderDishesList).getData();
+        array.addAll(paymentInfos(orderPays, sumPrice.doubleValue(), billView));
         // 二维码
         array.addAll(qrCode());
         JSONArray rs = new JSONArray();
@@ -218,8 +224,94 @@ public class OrderPrinterHelper {
         return list;
     }
 
-    private List<JSONObject> paymentInfos() {
-        return new ArrayList<>();
+    private List<JSONObject> paymentInfos(
+            List<OrderPay> orderPays,
+            double sumPrice,
+            OrderOverviewVO bill) {
+        if (bill == null) {
+            bill = new OrderOverviewVO();
+        }
+        List<JSONObject> list = new ArrayList<>();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("Name", "订单合计值");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "订单合计:" + CommonUtils.formatMoney(sumPrice, "0.0"));
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 1);
+        list.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "已付");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "已付:" + CommonUtils.formatMoney(bill.getOrderHadpaid(), "0.0"));
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 1);
+        list.add(jsonObject);
+        // 分类统计
+        Map<Integer, List<OrderPay>> orderPayGroup = CommonUtils.groupBy(orderPays, OrderPay::getPaymentMethod);
+        for (Map.Entry<Integer, List<OrderPay>> entry : orderPayGroup.entrySet()) {
+            double sum = 0;
+            for (OrderPay pay : entry.getValue()) {
+                sum += pay.getAmount();
+            }
+            EnumPayMethod payMethod = EnumPayMethod.of(entry.getKey());
+            if (payMethod == null) {
+                payMethod = EnumPayMethod.UNKNOWN;
+            }
+            jsonObject = new JSONObject();
+            jsonObject.put("Name", "+" + payMethod.name);
+            jsonObject.put("SampleContent",
+                    "+" + payMethod.name + ":" + CommonUtils.formatMoney(sum, "0.0"));
+            jsonObject.put("FrontEnterNum", 0);
+            jsonObject.put("BehindEnterNum", 1);
+            jsonObject.put("FrontLen", 4);
+            jsonObject.put("BehindLen", 0);
+            jsonObject.put("Size", 1);
+            jsonObject.put("ComType", EnumComType.TEXT.type);
+            list.add(jsonObject);
+        }
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "抹零");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "抹零:" + CommonUtils.formatMoney(bill.getOrderErase(), "0.0"));
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 1);
+        list.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "折扣合计");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "折扣合计:" + CommonUtils.formatMoney(bill.getDiscountAmount(), "0.0"));
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 1);
+        list.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "应收合计");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "应收合计:" +
+                CommonUtils.formatMoney(bill.getTotalPrice(), "0.0"));
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 1);
+        list.add(jsonObject);
+
+        return list;
     }
 
     private List<JSONObject> qrCode() {

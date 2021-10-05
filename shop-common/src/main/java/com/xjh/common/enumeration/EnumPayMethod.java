@@ -1,7 +1,7 @@
 package com.xjh.common.enumeration;
 
 public enum EnumPayMethod {
-    UNKNOWN(-1, "未知", null),
+    UNKNOWN(-1, "其他", null),
     CASH(1, "现金", null),
     BANKCARD(2, "银行卡", "交易编号"),
     COUPON(3, "优惠券", "交易编号"),
