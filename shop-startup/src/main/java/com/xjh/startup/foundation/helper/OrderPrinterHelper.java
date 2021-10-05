@@ -75,6 +75,7 @@ public class OrderPrinterHelper {
         array.addAll(paymentInfos(orderPays, sumPrice.doubleValue(), billView));
         // 二维码
         array.addAll(qrCode());
+
         JSONArray rs = new JSONArray();
         rs.addAll(array);
         return rs;
@@ -123,7 +124,7 @@ public class OrderPrinterHelper {
         jsonObject.put("FrontLen", 4);
         jsonObject.put("BehindLen", 0);
         jsonObject.put("FrontEnterNum", 0);
-        jsonObject.put("BehindEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 1);
         titles.add(jsonObject);
 
         return titles;
@@ -145,13 +146,13 @@ public class OrderPrinterHelper {
     private JSONObject crlf() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("Name", "换行");
-        jsonObject.put("ComType", EnumComType.CRLF.type);
+        jsonObject.put("ComType", EnumComType.TEXT.type);
         jsonObject.put("SampleContent", "");
         jsonObject.put("Size", 1);
         jsonObject.put("FrontLen", 0);
         jsonObject.put("BehindLen", 0);
         jsonObject.put("FrontEnterNum", 0);
-        jsonObject.put("BehindEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 1);
         return jsonObject;
     }
 
@@ -161,7 +162,7 @@ public class OrderPrinterHelper {
         jsonObject.put("ComType", EnumComType.LINE.type);
         jsonObject.put("Size", 1);
         jsonObject.put("FrontEnterNum", 0);
-        jsonObject.put("BehindEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 1);
         return jsonObject;
     }
 
@@ -178,7 +179,7 @@ public class OrderPrinterHelper {
         details.put("ComType", EnumComType.TABLE.type);
         details.put("Size", 1);
         details.put("FrontEnterNum", 0);
-        details.put("BehindEnterNum", 0);
+        details.put("BehindEnterNum", 1);
         // 标题
         details.put("columnNames", asArray("", "", "", ""));
         // 间隔
@@ -188,7 +189,6 @@ public class OrderPrinterHelper {
                 EnumAlign.LEFT.type, EnumAlign.RIGHT.type,
                 EnumAlign.RIGHT.type, EnumAlign.RIGHT.type);
         details.put("columnAligns", columnAligns);
-
         // 内容
         List<Integer> dishesIds = CommonUtils.collect(orderDishesList, OrderDishes::getDishesId);
         Map<Integer, Dishes> dishesMap = dishesService.getByIdsAsMap(dishesIds);
@@ -199,7 +199,7 @@ public class OrderPrinterHelper {
             sumPrices += orderDishes.getOrderDishesPrice();
             rows.add(asArray(
                     dishes.getDishesName(),
-                    CommonUtils.formatMoney(orderDishes.getOrderDishesPrice(), "0.0"),
+                    formatMoney(orderDishes.getOrderDishesPrice()),
                     orderDishes.getOrderDishesNums(),
                     orderDishes.getOrderDishesPrice()));
         }
@@ -211,7 +211,7 @@ public class OrderPrinterHelper {
         JSONObject sumItem = new JSONObject();
         sumItem.put("Name", title + "合计");
         sumItem.put("ComType", EnumComType.TEXT.type);
-        sumItem.put("SampleContent", title + "合计:" + CommonUtils.formatMoney(sumPrices, "0.0"));
+        sumItem.put("SampleContent", title + "合计:" + formatMoney(sumPrices));
         sumItem.put("Size", 1);
         sumItem.put("FrontLen", 22);
         sumItem.put("BehindLen", 0);
@@ -235,7 +235,7 @@ public class OrderPrinterHelper {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("Name", "订单合计值");
         jsonObject.put("ComType", EnumComType.TEXT.type);
-        jsonObject.put("SampleContent", "订单合计:" + CommonUtils.formatMoney(sumPrice, "0.0"));
+        jsonObject.put("SampleContent", "订单合计:" + formatMoney(sumPrice));
         jsonObject.put("Size", 1);
         jsonObject.put("FrontLen", 0);
         jsonObject.put("BehindLen", 0);
@@ -246,7 +246,7 @@ public class OrderPrinterHelper {
         jsonObject = new JSONObject();
         jsonObject.put("Name", "已付");
         jsonObject.put("ComType", EnumComType.TEXT.type);
-        jsonObject.put("SampleContent", "已付:" + CommonUtils.formatMoney(bill.getOrderHadpaid(), "0.0"));
+        jsonObject.put("SampleContent", "已付:" + formatMoney(bill.getOrderHadpaid()));
         jsonObject.put("Size", 1);
         jsonObject.put("FrontLen", 0);
         jsonObject.put("BehindLen", 0);
@@ -266,8 +266,7 @@ public class OrderPrinterHelper {
             }
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+" + payMethod.name);
-            jsonObject.put("SampleContent",
-                    "+" + payMethod.name + ":" + CommonUtils.formatMoney(sum, "0.0"));
+            jsonObject.put("SampleContent", "+" + payMethod.name + ":" + formatMoney(sum));
             jsonObject.put("FrontEnterNum", 0);
             jsonObject.put("BehindEnterNum", 1);
             jsonObject.put("FrontLen", 4);
@@ -280,7 +279,7 @@ public class OrderPrinterHelper {
         jsonObject = new JSONObject();
         jsonObject.put("Name", "抹零");
         jsonObject.put("ComType", EnumComType.TEXT.type);
-        jsonObject.put("SampleContent", "抹零:" + CommonUtils.formatMoney(bill.getOrderErase(), "0.0"));
+        jsonObject.put("SampleContent", "抹零:" + formatMoney(bill.getOrderErase()));
         jsonObject.put("Size", 1);
         jsonObject.put("FrontLen", 0);
         jsonObject.put("BehindLen", 0);
@@ -291,7 +290,7 @@ public class OrderPrinterHelper {
         jsonObject = new JSONObject();
         jsonObject.put("Name", "折扣合计");
         jsonObject.put("ComType", EnumComType.TEXT.type);
-        jsonObject.put("SampleContent", "折扣合计:" + CommonUtils.formatMoney(bill.getDiscountAmount(), "0.0"));
+        jsonObject.put("SampleContent", "折扣合计:" + formatMoney(bill.getDiscountAmount()));
         jsonObject.put("Size", 1);
         jsonObject.put("FrontLen", 0);
         jsonObject.put("BehindLen", 0);
@@ -302,8 +301,7 @@ public class OrderPrinterHelper {
         jsonObject = new JSONObject();
         jsonObject.put("Name", "应收合计");
         jsonObject.put("ComType", EnumComType.TEXT.type);
-        jsonObject.put("SampleContent", "应收合计:" +
-                CommonUtils.formatMoney(bill.getOrderNeedPay(), "0.0"));
+        jsonObject.put("SampleContent", "应收合计:" + formatMoney(bill.getOrderNeedPay()));
         jsonObject.put("Size", 1);
         jsonObject.put("FrontLen", 0);
         jsonObject.put("BehindLen", 0);
@@ -358,5 +356,9 @@ public class OrderPrinterHelper {
         JSONArray array = new JSONArray();
         array.addAll(Arrays.asList(vals));
         return array;
+    }
+
+    private String formatMoney(double val) {
+        return CommonUtils.formatMoney(val, "0.0");
     }
 }

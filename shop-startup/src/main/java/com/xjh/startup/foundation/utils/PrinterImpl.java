@@ -144,9 +144,6 @@ public class PrinterImpl implements Printer {
                     } else if (comType == EnumComType.LINE) {
                         printDotLine(outputStream, contentItem);
                         isText = false;
-                    } else if (comType == EnumComType.CRLF) {
-                        printCRLF(outputStream);
-                        isText = false;
                     } else {
                         String detailedInfo = "json第 " + i + " 个元素的type属性错误,错误类型为：type = " + comType;
                         throw new Exception(detailedInfo + ", " + comType);
@@ -256,12 +253,6 @@ public class PrinterImpl implements Printer {
         outputStream.flush();
     }
 
-    private void printCRLF(OutputStream outputStream) throws IOException {
-        byte[][] byteList = new byte[][]{PrinterCmdUtil.nextLine()};
-        outputStream.write(PrinterCmdUtil.byteMerger(byteList));
-        outputStream.flush();
-    }
-
     private void printText(OutputStream outputStream, JSONObject jsonObject) throws IOException {
         String sampleContent = jsonObject.getString("SampleContent");
         Integer size = jsonObject.getInteger("Size");
@@ -364,12 +355,10 @@ public class PrinterImpl implements Printer {
         byte[] byteSizeDefault = PrinterCmdUtil.fontSizeSetBig(1);
 
         byte[][] byteList = new byte[][]{
-                PrinterCmdUtil.nextLine(),
                 PrinterCmdUtil.nextLine(frontEnterNum),
                 byteSize,
                 hyphenLine,
                 byteSizeDefault,
-                PrinterCmdUtil.nextLine(),
                 PrinterCmdUtil.nextLine(behindEnterNum)
         };
         byte[] byteMerger = PrinterCmdUtil.byteMerger(byteList);
