@@ -42,6 +42,7 @@ import lombok.Data;
 @SuppressWarnings("unused")
 public class PrinterImpl implements Printer {
     PrinterDO printerDO;
+    // 默认58毫米打印32个字符
     private int charCount = 32;
     private int timeout = 30 * 1000; //输入流读取超时时间
     private int connectTimeout = 5 * 1000; //socket连接超时时间
@@ -53,7 +54,7 @@ public class PrinterImpl implements Printer {
 
     public PrinterImpl(PrinterDO dd) {
         this.printerDO = dd;
-        // 80毫米
+        // 80毫米，每行打印48个字符
         if (EnumPrinterType.of(dd.getPrinterType()) == EnumPrinterType.T80) {
             charCount = 48;
         }

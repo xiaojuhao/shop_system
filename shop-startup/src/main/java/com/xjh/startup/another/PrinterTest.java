@@ -70,7 +70,17 @@ public class PrinterTest extends Application {
                 e.printStackTrace();
             }
         });
-        box.getChildren().addAll(btn, btn2, btn3, btn4);
+
+        Button btn5 = new Button("数字");
+        btn5.setOnAction(evt -> {
+            try {
+                Future<PrintResult> ps = printer.submitTask(loadJson("/data/text.json"), true);
+                System.out.println("打印结果:" + JSON.toJSONString(ps.get(3, TimeUnit.SECONDS)));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        box.getChildren().addAll(btn, btn2, btn3, btn4, btn5);
         primaryStage.setScene(new Scene(box, 600, 600));
         primaryStage.show();
     }

@@ -1,0 +1,22 @@
+[
+  {
+    "Name": "字体0",
+    "Size": 0,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "abcdefghijklmnopqrstuvwxyz012345678901234567890123456789012345678901234567890",
+    "BehindEnterNum": 1
+  },
+  {
+    "Name": "字体0",
+    "Size": 0,
+    "BehindLen": 0,
+    "ComType": 1,
+    "FrontEnterNum": 0,
+    "FrontLen": 0,
+    "SampleContent": "一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十",
+    "BehindEnterNum": 1
+  }
+]
