@@ -10,6 +10,8 @@ import java.util.function.Predicate;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.enumeration.EnumPayMethod;
@@ -66,9 +68,9 @@ public class OrderPrinterHelper {
         List<OrderDishes> discountableList = CommonUtils.filter(orderDishesList, discountableChecker);
         List<OrderDishes> nonDiscountableList = CommonUtils.filter(orderDishesList, discountableChecker.negate());
         DoubleAdder sumPrice = new DoubleAdder();
-        array.addAll(dishesItems("普通菜品", discountableList, sumPrice));
+        array.addAll(dishesItems("普通菜品", nonDiscountableList, sumPrice));
         array.add(crlf()); // 换行
-        array.addAll(dishesItems("特价菜及酒水", nonDiscountableList, sumPrice));
+        array.addAll(dishesItems("特价菜及酒水", discountableList, sumPrice));
         // 支付信息
         List<OrderPay> orderPays = orderPayService.selectByOrderId(param.getOrderId());
         OrderOverviewVO billView = orderService.buildOrderOverview(order, orderDishesList).getData();
@@ -168,7 +170,9 @@ public class OrderPrinterHelper {
 
     private List<JSONObject> dishesItems(String title, List<OrderDishes> orderDishesList, DoubleAdder sumAdder) {
         List<JSONObject> list = new ArrayList<>();
-
+        if (CollectionUtils.isEmpty(orderDishesList)) {
+            return list;
+        }
         list.add(simpleLineText(title));
         list.addAll(orderDishesTitle()); // 菜品标题
         list.add(dotLine());
