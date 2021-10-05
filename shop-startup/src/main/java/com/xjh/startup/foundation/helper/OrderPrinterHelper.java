@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -40,6 +41,9 @@ public class OrderPrinterHelper {
     DishesService dishesService;
 
     public JSONArray buildOrderPrintData(DeskOrderParam param) {
+        // 可折扣的菜品信息
+        Predicate<OrderDishes> discountableChecker = orderDishesService.discountableChecker();
+
         List<JSONObject> array = new ArrayList<>();
         Order order = orderService.getOrder(param.getOrderId());
         StoreVO store = storeService.getStore().getData();
@@ -51,10 +55,13 @@ public class OrderPrinterHelper {
         array.add(simpleLineText("用餐人数:" + order.getOrderCustomerNums()));
         array.add(simpleLineText("点菜员:点菜员1"));
         array.add(crlf()); // 换行
-        array.add(simpleLineText("普通菜品"));
-        array.addAll(orderDishesTitle()); // 菜品标题
-        array.add(dotLine());
-        array.addAll(dishesItems(param));
+        // 订单菜品
+        List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(param.getOrderId());
+        List<OrderDishes> discountableList = CommonUtils.filter(orderDishesList, discountableChecker);
+        List<OrderDishes> nonDiscountableList = CommonUtils.filter(orderDishesList, discountableChecker.negate());
+        array.addAll(dishesItems("普通菜品", discountableList));
+        array.add(crlf()); // 换行
+        array.addAll(dishesItems("特价菜及酒水", nonDiscountableList));
         // 支付信息
         array.addAll(paymentInfos());
         // 二维码
@@ -149,8 +156,13 @@ public class OrderPrinterHelper {
         return jsonObject;
     }
 
-    private List<JSONObject> dishesItems(DeskOrderParam param) {
+    private List<JSONObject> dishesItems(String title, List<OrderDishes> orderDishesList) {
         List<JSONObject> list = new ArrayList<>();
+
+        list.add(simpleLineText(title));
+        list.addAll(orderDishesTitle()); // 菜品标题
+        list.add(dotLine());
+
         JSONObject details = new JSONObject();
         list.add(details);
         details.put("Name", "结账菜单表");
@@ -169,7 +181,6 @@ public class OrderPrinterHelper {
         details.put("columnAligns", columnAligns);
 
         // 内容
-        List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(param.getOrderId());
         List<Integer> dishesIds = CommonUtils.collect(orderDishesList, OrderDishes::getDishesId);
         Map<Integer, Dishes> dishesMap = dishesService.getByIdsAsMap(dishesIds);
         double sumPrices = 0;
@@ -179,7 +190,7 @@ public class OrderPrinterHelper {
             sumPrices += orderDishes.getOrderDishesPrice();
             rows.add(asArray(
                     dishes.getDishesName(),
-                    CommonUtils.formatMoney(orderDishes.getOrderDishesPrice()),
+                    CommonUtils.formatMoney(orderDishes.getOrderDishesPrice(), "0.0"),
                     orderDishes.getOrderDishesNums(),
                     orderDishes.getOrderDishesPrice()));
         }
@@ -189,11 +200,11 @@ public class OrderPrinterHelper {
         list.add(dotLine());
         // 总计
         JSONObject sumItem = new JSONObject();
-        sumItem.put("Name", "普通菜品合计");
+        sumItem.put("Name", title + "合计");
         sumItem.put("ComType", EnumComType.TEXT.type);
-        sumItem.put("SampleContent", "普通菜品合计:" + CommonUtils.formatMoney(sumPrices));
+        sumItem.put("SampleContent", title + "合计:" + CommonUtils.formatMoney(sumPrices, "0.0"));
         sumItem.put("Size", 1);
-        sumItem.put("FrontLen", 27);
+        sumItem.put("FrontLen", 22);
         sumItem.put("BehindLen", 0);
         sumItem.put("FrontEnterNum", 0);
         sumItem.put("BehindEnterNum", 2);

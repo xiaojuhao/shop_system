@@ -110,10 +110,14 @@ public class CommonUtils {
     }
 
     public static String formatMoney(Number value) {
+        return formatMoney(value, "0.00");
+    }
+
+    public static String formatMoney(Number value, String format) {
         if (value == null) {
-            return "0.00";
+            return new DecimalFormat(format).format(0D);
         }
-        return new DecimalFormat("0.00").format(value);
+        return new DecimalFormat(format).format(value);
     }
 
     public static String formatSeconds(long seconds) {

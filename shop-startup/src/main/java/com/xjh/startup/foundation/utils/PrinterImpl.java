@@ -451,13 +451,13 @@ public class PrinterImpl implements Printer {
         for (int i = 0; i < maxRow; i++) {
             for (int j = 0; j < jsonCells.size(); j++) {
                 JSONArray jsonCell = jsonCells.getJSONArray(j);
-                JSONObject jsonObject = jsonCell.getJSONObject(0);
+                JSONObject cellMeta = jsonCell.getJSONObject(0);
                 List<String> group = (List<String>) jsonCell.get(1);
 
                 if (group.size() > i) {
-                    int paddingLeft = jsonObject.getInteger("paddingLeft");
-                    int widthChar = jsonObject.getInteger("widthChar");   //12223333
-                    EnumAlign align = EnumAlign.of(jsonObject.getInteger("align"));
+                    // int paddingLeft = cellMeta.getInteger("paddingLeft");
+                    int widthChar = cellMeta.getInteger("widthChar");   //12223333
+                    EnumAlign align = EnumAlign.of(cellMeta.getInteger("align"));
 
                     //byte[] bytePaddingLeft = PrinterCmdUtil.hTPositionMove(paddingLeft);
                     byte[] byteContent = PrinterCmdUtil.printText(StringUtil.alignString(group.get(i), widthChar, align));
