@@ -8,12 +8,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.xjh.common.enumeration.EnumChoiceAction;
 import com.xjh.common.enumeration.EnumDeskStatus;
@@ -40,6 +43,7 @@ import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.foundation.printers.OrderPrinterHelper;
+import com.xjh.startup.foundation.printers.PrintResult;
 import com.xjh.startup.foundation.printers.PrinterImpl;
 import com.xjh.startup.view.base.MediumForm;
 import com.xjh.startup.view.base.SmallForm;
@@ -490,7 +494,8 @@ public class OrderDetailView extends VBox {
             PrinterImpl printer = new PrinterImpl(dd);
 
             JSONArray printData = orderPrinterHelper.buildOrderPrintData(param);
-            printer.print(printData, true);
+            Future<PrintResult> rs = printer.submitTask(printData, true);
+            Logger.info(JSON.toJSONString(rs.get(3, TimeUnit.SECONDS)));
         } catch (Exception ex) {
             ex.printStackTrace();
         }

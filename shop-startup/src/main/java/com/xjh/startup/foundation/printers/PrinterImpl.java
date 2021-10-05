@@ -12,6 +12,11 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -40,6 +45,11 @@ public class PrinterImpl implements Printer {
     private int charCount = 32;
     private int timeout = 30 * 1000; //输入流读取超时时间
     private int connectTimeout = 5 * 1000; //socket连接超时时间
+    ExecutorService executorService = new ThreadPoolExecutor(
+            1, 1,
+            60, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(),
+            new ThreadPoolExecutor.CallerRunsPolicy());
 
     public PrinterImpl(PrinterDO dd) {
         this.printerDO = dd;
@@ -68,8 +78,20 @@ public class PrinterImpl implements Printer {
         return printerStatus;
     }
 
-    @Override
-    public PrintResult print(JSONArray contentItems, boolean isVoicce) throws Exception {
+    public Future<PrintResult> submitTask(JSONArray contentItems, boolean isVoicce) {
+        return executorService.submit(() -> {
+            try {
+                return print(contentItems, isVoicce);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                PrintResultImpl fail = new PrintResultImpl(this, contentItems);
+                fail.toFailure(StatusUtil.UNKNOWN);
+                return fail;
+            }
+        });
+    }
+
+    private synchronized PrintResult print(JSONArray contentItems, boolean isVoicce) throws Exception {
         PrintResultImpl printResultImpl = new PrintResultImpl(this, contentItems);
         SocketAddress socketAddress = new InetSocketAddress(printerDO.getPrinterIp(), printerDO.getPrinterPort());
         byte[] dataRead = new byte[0];

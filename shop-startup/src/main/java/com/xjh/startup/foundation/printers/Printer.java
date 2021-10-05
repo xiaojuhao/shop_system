@@ -5,6 +5,8 @@
  */
 package com.xjh.startup.foundation.printers;
 
+import java.util.concurrent.Future;
+
 import com.alibaba.fastjson.JSONArray;
 
 /**
@@ -12,6 +14,6 @@ import com.alibaba.fastjson.JSONArray;
  */
 public interface Printer {
 
-    PrintResult print(JSONArray jSONArray, boolean isVoicce) throws Exception;
+    Future<PrintResult> submitTask(JSONArray contentItems, boolean isVoicce);
 
 }

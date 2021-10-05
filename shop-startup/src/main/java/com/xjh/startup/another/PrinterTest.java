@@ -1,6 +1,8 @@
 package com.xjh.startup.another;
 
 import java.io.File;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -32,8 +34,8 @@ public class PrinterTest extends Application {
         Button btn = new Button("打印");
         btn.setOnAction(evt -> {
             try {
-                PrintResult ps = printer.print(loadJson("/data/ticket.json"), true);
-                System.out.println("打印结果:" + JSON.toJSONString(ps));
+                Future<PrintResult> ps = printer.submitTask(loadJson("/data/ticket.json"), true);
+                System.out.println("打印结果:" + JSON.toJSONString(ps.get(3, TimeUnit.SECONDS)));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -42,8 +44,8 @@ public class PrinterTest extends Application {
         Button btn2 = new Button("结账80毫米");
         btn2.setOnAction(evt -> {
             try {
-                PrintResult ps = printer.print(loadJson("/data/ticket2.json"), true);
-                System.out.println("打印结果:" + JSON.toJSONString(ps));
+                Future<PrintResult> ps = printer.submitTask(loadJson("/data/ticket2.json"), true);
+                System.out.println("打印结果:" + JSON.toJSONString(ps.get(3, TimeUnit.SECONDS)));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -52,8 +54,8 @@ public class PrinterTest extends Application {
         Button btn3 = new Button("后厨80毫米");
         btn3.setOnAction(evt -> {
             try {
-                PrintResult ps = printer.print(loadJson("/data/ticket3.json"), true);
-                System.out.println("打印结果:" + JSON.toJSONString(ps));
+                Future<PrintResult> ps = printer.submitTask(loadJson("/data/ticket3.json"), true);
+                System.out.println("打印结果:" + JSON.toJSONString(ps.get(3, TimeUnit.SECONDS)));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -62,8 +64,8 @@ public class PrinterTest extends Application {
         Button btn4 = new Button("FONT");
         btn4.setOnAction(evt -> {
             try {
-                PrintResult ps = printer.print(loadJson("/data/font.json"), true);
-                System.out.println("打印结果:" + JSON.toJSONString(ps));
+                Future<PrintResult> ps = printer.submitTask(loadJson("/data/font.json"), true);
+                System.out.println("打印结果:" + JSON.toJSONString(ps.get(3, TimeUnit.SECONDS)));
             } catch (Exception e) {
                 e.printStackTrace();
             }
