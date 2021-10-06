@@ -19,16 +19,17 @@ public class PrinterTaskManageView extends SimpleForm implements Initializable {
         Tab tab1 = new Tab("点餐打印");
         tab1.setClosable(false);
         tab1.setContent(printerOrderDishesSettings);
+        tab1.setOnSelectionChanged(evt -> printerOrderDishesSettings.initialize());
+
         Tab tab2 = new Tab("后厨打印");
         tab2.setClosable(false);
         tab2.setContent(printerKitchenSettings);
+        tab2.setOnSelectionChanged(evt -> printerKitchenSettings.initialize());
+
         Tab tab3 = new Tab("结账打印");
         tab3.setClosable(false);
         tab3.setContent(printerCheckOutSettings);
-
-        printerOrderDishesSettings.initialize();
-        printerKitchenSettings.initialize();
-        printerCheckOutSettings.initialize();
+        tab3.setOnSelectionChanged(evt -> printerCheckOutSettings.initialize());
 
         TabPane pane = new TabPane(tab1, tab2, tab3);
         HBox line = newCenterLine(pane);

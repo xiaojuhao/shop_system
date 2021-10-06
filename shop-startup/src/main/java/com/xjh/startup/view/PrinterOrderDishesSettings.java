@@ -35,6 +35,7 @@ public class PrinterOrderDishesSettings extends SimpleForm implements Initializa
 
     @Override
     public void initialize() {
+        this.getChildren().clear();
         this.setAlignment(Pos.CENTER_LEFT);
         this.setSpacing(10);
         this.setPadding(new Insets(10, 0, 10, 0));
