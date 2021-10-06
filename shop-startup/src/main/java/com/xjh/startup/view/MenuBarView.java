@@ -91,6 +91,8 @@ public class MenuBarView {
         printerList.setOnAction(evt -> openView("打印机管理", new PrinterManageListView()));
         MenuItem updateName = new MenuItem("小票样式管理");
         MenuItem printJobMenu = new MenuItem("打印任务管理");
+        printJobMenu.setOnAction(evt ->
+                openView("打印任务管理", new PrinterTaskManageView(), 600, 400));
         menu.getItems().addAll(printerList, updateName, printJobMenu);
         return menu;
     }
@@ -148,6 +150,11 @@ public class MenuBarView {
             width = sceneWindow.getWidth() * 0.6;
             height = sceneWindow.getHeight() * 0.6;
         }
+        openView(title, content, width, height);
+    }
+
+    private void openView(String title, Parent content, double width, double height) {
+        Window sceneWindow = MainStageHolder.get().getScene().getWindow();
         Stage stage = new Stage();
         stage.initOwner(sceneWindow);
         stage.initModality(Modality.WINDOW_MODAL);
