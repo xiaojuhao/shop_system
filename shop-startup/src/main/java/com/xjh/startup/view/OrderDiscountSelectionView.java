@@ -3,9 +3,9 @@ package com.xjh.startup.view;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.JSON;
-import com.google.common.collect.Lists;
 import com.xjh.common.enumeration.EnumDiscountType;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
@@ -13,8 +13,10 @@ import com.xjh.common.utils.Holder;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.OrderDiscountVO;
+import com.xjh.dao.dataobject.DiscountDO;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
+import com.xjh.dao.mapper.DiscountDAO;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.StoreService;
@@ -41,6 +43,7 @@ public class OrderDiscountSelectionView extends SmallForm {
     OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
     StoreService storeService = GuiceContainer.getInstance(StoreService.class);
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
+    DiscountDAO discountDAO = GuiceContainer.getInstance(DiscountDAO.class);
 
     public OrderDiscountSelectionView(DeskOrderParam param) {
         VBox discountContentLine = new VBox();
@@ -166,15 +169,11 @@ public class OrderDiscountSelectionView extends SmallForm {
     }
 
     private ComboBox<DiscountTypeBO> getDiscountOptions() {
-        ObservableList<DiscountTypeBO> list = FXCollections.observableArrayList(Lists.newArrayList(
-                new DiscountTypeBO("员工折扣(7折)", 0.7),
-                new DiscountTypeBO("朋友折扣(8.5折)", 0.85),
-                new DiscountTypeBO("员工补单折扣(6折)", 0.6),
-                new DiscountTypeBO("7.8折活动", 0.78),
-                new DiscountTypeBO("8.8折活动", 0.88),
-                new DiscountTypeBO("68元秒杀", 0.6),
-                new DiscountTypeBO("5折活动", 0.5)
-        ));
+        List<DiscountDO> discountList = discountDAO.selectList(new DiscountDO());
+        ObservableList<DiscountTypeBO> list =
+                FXCollections.observableArrayList(discountList.stream()
+                        .map(it -> new DiscountTypeBO(it.getDiscountName(), it.getRate()))
+                        .collect(Collectors.toSet()));
         ComboBox<DiscountTypeBO> optList = new ComboBox<>(list);
         optList.setConverter(new StringConverter<DiscountTypeBO>() {
             @Override
