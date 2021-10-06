@@ -32,6 +32,20 @@ import com.alibaba.fastjson.JSONObject;
 
 @SuppressWarnings({"unused"})
 public class CommonUtils {
+    public static <V, R> Set<R> collectSet(List<V> list, Function<V, R> mapper) {
+        if (list == null || list.size() == 0) {
+            return new HashSet<>();
+        }
+        Set<R> retList = new HashSet<>();
+        for (V v : list) {
+            R r = mapper.apply(v);
+            if (r != null) {
+                retList.add(r);
+            }
+        }
+        return retList;
+    }
+
     public static <V, R> List<R> collect(List<V> list, Function<V, R> mapper) {
         if (list == null || list.size() == 0) {
             return new ArrayList<>();
