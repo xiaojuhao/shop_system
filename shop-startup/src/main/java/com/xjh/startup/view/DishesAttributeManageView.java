@@ -31,6 +31,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
@@ -43,13 +44,14 @@ public class DishesAttributeManageView extends LargeForm implements Initializabl
 
     public DishesAttributeManageView() {
         this.setSpacing(15);
-        this.setAlignment(Pos.CENTER);
+        this.setAlignment(Pos.TOP_LEFT);
         addLine(buildAttrPane());
         addLine(buildAttrValuePane());
         Button add = new Button("增加属性");
         add.setOnAction(e -> {
             showEditView(new DishesAttributeVO(), this.getScene().getWindow());
         });
+        VBox.setMargin(add, new Insets(0,0,0,200));
         addLine(add);
     }
 
