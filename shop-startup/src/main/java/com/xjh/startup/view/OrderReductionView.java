@@ -9,6 +9,7 @@ import com.xjh.service.domain.StoreService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -22,12 +23,12 @@ public class OrderReductionView extends SmallForm {
         // 金额
         TextField reductionAmt = new TextField();
         reductionAmt.setPromptText("减免金额");
-        addLine(newLine(new Label("减免金额:"), reductionAmt));
+        addLine(newCenterLine(new Label("减免金额:"), reductionAmt));
 
         // 密码
         PasswordField pwd = new PasswordField();
         pwd.setPromptText("店长密码");
-        addLine(newLine(new Label("店长密码:"), pwd));
+        addLine(newCenterLine(new Label("店长密码:"), pwd));
         // 退菜按钮
         Button cancel = new Button("取消");
         cancel.setOnMouseClicked(evt -> this.getScene().getWindow().hide());
@@ -47,6 +48,6 @@ public class OrderReductionView extends SmallForm {
                 AlertBuilder.ERROR(reductionRs.getMsg());
             }
         });
-        addLine(newLine(cancel, okBtn));
+        addLine(newCenterLine(cancel, okBtn));
     }
 }

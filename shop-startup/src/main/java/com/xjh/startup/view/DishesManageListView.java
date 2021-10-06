@@ -121,7 +121,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         Label nameLabel = new Label("名称:");
         TextField nameInput = new TextField();
         nameInput.setPrefWidth(130);
-        nameCondBlock.getChildren().add(newLine(nameLabel, nameInput));
+        nameCondBlock.getChildren().add(newCenterLine(nameLabel, nameInput));
 
         // status
         HBox statusCondBlock = new HBox();
@@ -129,7 +129,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         ObservableList<String> options = FXCollections.observableArrayList("全部", "上架", "下架");
         ComboBox<String> modelSelect = new ComboBox<>(options);
         modelSelect.getSelectionModel().selectFirst();
-        statusCondBlock.getChildren().add(newLine(statusLabel, modelSelect));
+        statusCondBlock.getChildren().add(newCenterLine(statusLabel, modelSelect));
 
         Button queryBtn = new Button("查询");
         queryBtn.setOnAction(evt -> {
@@ -143,7 +143,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
 
         Button addNew = new Button("新增菜品");
         addNew.setOnAction(evt -> openEditor(new Dishes()));
-        HBox line = newLine(nameCondBlock, statusCondBlock,
+        HBox line = newCenterLine(nameCondBlock, statusCondBlock,
                 queryBtn,
                 new Separator(Orientation.VERTICAL),
                 addNew);
@@ -189,7 +189,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
             c.setPageNo(c.getPageNo() + 1);
             cond.set(c);
         });
-        HBox line = newLine(prev, next);
+        HBox line = newCenterLine(prev, next);
         line.setPadding(new Insets(10, 0, 0, 0));
         addLine(line);
     }

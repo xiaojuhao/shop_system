@@ -104,7 +104,7 @@ public class PrinterManageListView extends SimpleForm implements Initializable {
     private void buildFoot() {
         Button addNew = new Button("增 加");
         addNew.setOnAction(e -> openEditor(new PrinterDO()));
-        HBox line = newLine(addNew);
+        HBox line = newCenterLine(addNew);
         line.setPadding(new Insets(10, 0, 0, 0));
         addLine(line);
     }

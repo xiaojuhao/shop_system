@@ -9,6 +9,6 @@ public class PrinterCheckOutSettings extends SimpleForm implements Initializable
 
     @Override
     public void initialize() {
-        addLine(newLine(new Label("结账打印设置")));
+        addLine(newCenterLine(new Label("结账打印设置")));
     }
 }

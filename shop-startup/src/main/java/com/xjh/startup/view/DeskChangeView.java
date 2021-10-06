@@ -58,7 +58,7 @@ public class DeskChangeView extends MediumForm {
             AlertBuilder.INFO("转台成功");
             this.getScene().getWindow().hide();
         });
-        addLine(newLine(cancel, ok));
+        addLine(newCenterLine(cancel, ok));
     }
 
     public static class Item {

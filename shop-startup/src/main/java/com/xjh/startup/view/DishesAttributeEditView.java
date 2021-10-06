@@ -90,9 +90,9 @@ public class DishesAttributeEditView extends SmallForm {
             stg.setHeight(200);
             SmallForm sform = new SmallForm();
             TextField textField = createTextField("属性值", stg.getWidth() - 100);
-            sform.addLine(sform.newLine(createLabel("名称"), textField));
+            sform.addLine(sform.newCenterLine(createLabel("名称"), textField));
             Button confirm = new Button("确 定");
-            sform.addLine(sform.newLine(confirm));
+            sform.addLine(sform.newCenterLine(confirm));
             confirm.setOnAction(e -> {
                 addItem(tv, textField.getText());
                 stg.hide();

@@ -8,6 +8,7 @@ import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -23,11 +24,11 @@ public class OrderEraseView extends SmallForm {
         maxAmt.setFont(Font.font(12));
         maxAmt.setTextFill(Color.RED);
         maxAmt.setPrefWidth(200);
-        addLine(newLine(createLabel("最大抹零金额:"), maxAmt));
+        addLine(newCenterLine(createLabel("最大抹零金额:"), maxAmt));
 
         // 金额
         TextField eraseAmt = createTextField("抹零金额");
-        addLine(newLine(createLabel("抹零金额:"), eraseAmt));
+        addLine(newCenterLine(createLabel("抹零金额:"), eraseAmt));
         // 退菜按钮
         Button cancel = new Button("取消");
         cancel.setOnMouseClicked(evt -> this.getScene().getWindow().hide());
@@ -42,6 +43,6 @@ public class OrderEraseView extends SmallForm {
             }
             this.getScene().getWindow().hide();
         });
-        addLine(newLine(cancel, ok));
+        addLine(newCenterLine(cancel, ok));
     }
 }

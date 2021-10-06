@@ -85,8 +85,8 @@ public class OrderDiscountSelectionView extends SmallForm {
 
                     discountContentLine.getChildren().clear();
                     discountContentLine.getChildren().addAll(
-                            newLine(voucherLabel, voucher),
-                            newLine(cardLabel, card));
+                            newCenterLine(voucherLabel, voucher),
+                            newCenterLine(cardLabel, card));
                 } else if (select == 2) {
                     Logger.info("店长折扣");
                     ComboBox<DiscountTypeBO> optList = getDiscountOptions();
@@ -113,8 +113,8 @@ public class OrderDiscountSelectionView extends SmallForm {
 
                     discountContentLine.getChildren().clear();
                     discountContentLine.getChildren().addAll(
-                            newLine(label, optList),
-                            newLine(pwdLabel, pwd));
+                            newCenterLine(label, optList),
+                            newCenterLine(pwdLabel, pwd));
                 } else {
                     Logger.info("未知类型");
                 }
@@ -131,7 +131,7 @@ public class OrderDiscountSelectionView extends SmallForm {
             manager.setUserData(2);
             manager.setSelected(true);
 
-            addLine(newLine(discountTypeLabel, coupon, manager));
+            addLine(newCenterLine(discountTypeLabel, coupon, manager));
         }
         {
             addLine(discountContentLine);
@@ -161,7 +161,7 @@ public class OrderDiscountSelectionView extends SmallForm {
                     this.handleDiscount(param, req);
                 }
             });
-            addLine(newLine(cancel, button));
+            addLine(newCenterLine(cancel, button));
         }
     }
 

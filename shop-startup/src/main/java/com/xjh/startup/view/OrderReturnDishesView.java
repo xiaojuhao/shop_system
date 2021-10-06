@@ -1,13 +1,17 @@
 package com.xjh.startup.view;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.google.common.collect.Lists;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
 import com.xjh.dao.dataobject.OrderDishes;
-import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.service.domain.OrderDishesService;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
@@ -15,9 +19,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class OrderReturnDishesView extends SmallForm {
     OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
@@ -31,7 +32,7 @@ public class OrderReturnDishesView extends SmallForm {
         // 退菜原因
         ComboBox<String> reasonList = buildReasonCombo();
         reasonList.setPrefWidth(200);
-        addLine(newLine(new Label("退菜原因: "), reasonList));
+        addLine(newCenterLine(new Label("退菜原因: "), reasonList));
         // 退菜按钮
         Button returnBtn = new Button("退菜");
         returnBtn.setOnMouseClicked(evt -> {

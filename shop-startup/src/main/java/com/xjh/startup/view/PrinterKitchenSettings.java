@@ -9,6 +9,6 @@ public class PrinterKitchenSettings extends SimpleForm implements Initializable 
 
     @Override
     public void initialize() {
-        addLine(newLine(new Label("后厨打印设置")));
+        addLine(newCenterLine(new Label("后厨打印设置")));
     }
 }

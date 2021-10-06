@@ -31,7 +31,7 @@ public class PrinterTaskManageView extends SimpleForm implements Initializable {
         printerCheckOutSettings.initialize();
 
         TabPane pane = new TabPane(tab1, tab2, tab3);
-        HBox line = newLine(pane);
+        HBox line = newCenterLine(pane);
         line.setPrefWidth(window.getWidth() * 0.8);
         addLine(line);
     }

@@ -15,14 +15,24 @@ public class SimpleForm extends VBox {
         this.getChildren().add(node);
     }
 
-    public void addPairLine(Region title,  Region content) {
+    public void addPairLine(Region title, Region content) {
         if (title instanceof Label) {
             ((Label) title).setAlignment(Pos.CENTER_RIGHT);
         }
-        addLine(newLine(title, content));
+        addLine(newCenterLine(title, content));
     }
 
     public HBox newLine(Node... nodes) {
+        HBox line = new HBox();
+        line.setAlignment(Pos.CENTER_LEFT);
+        line.setSpacing(10);
+        for (Node n : nodes) {
+            line.getChildren().add(n);
+        }
+        return line;
+    }
+
+    public HBox newCenterLine(Node... nodes) {
         HBox line = new HBox();
         line.setAlignment(Pos.CENTER);
         line.setSpacing(10);
