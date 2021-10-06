@@ -2,9 +2,11 @@ package com.xjh.startup.view.model;
 
 import javafx.scene.control.ComboBox;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class IntStringPair {
     Integer key;

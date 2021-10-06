@@ -12,6 +12,8 @@ import com.xjh.common.utils.cellvalue.RichText;
 import javafx.beans.Observable;
 import javafx.beans.property.Property;
 import javafx.beans.property.StringProperty;
+import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
@@ -42,7 +44,11 @@ public class TableViewUtils {
     }
 
     private static void render(TableCell cell, Observable obs, Object nv) {
-        if (nv instanceof RichText) {
+        if (nv instanceof Node) {
+            Group group = new Group();
+            group.getChildren().add((Node) nv);
+            cell.setGraphic(group);
+        } else if (nv instanceof RichText) {
             RichText val = (RichText) nv;
             cell.textProperty().set(CommonUtils.stringify(val.getText()));
             if (val.getColor() != null) {
