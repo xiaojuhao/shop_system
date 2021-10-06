@@ -69,7 +69,11 @@ public class PrinterKitchenDishesSettings extends SimpleForm {
         operations.setSpacing(30);
         operations.getChildren().addAll(new Button(" <-- "), new Button(" --> "));
 
-        addLine(newCenterLine(left, operations, right));
+        VBox leftBox = new VBox();
+        VBox rightBox = new VBox();
+        leftBox.getChildren().addAll(new Label("已关联的菜品"), left);
+        rightBox.getChildren().addAll(new Label("未关联的菜品"), right);
+        addLine(newCenterLine(leftBox, operations, rightBox));
         addLine(newCenterLine(new Button("保存配置")));
     }
 
