@@ -23,6 +23,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.zxing.WriterException;
 import com.xjh.common.enumeration.EnumPrinterType;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.startup.foundation.constants.EnumAlign;
 import com.xjh.startup.foundation.constants.EnumComType;
@@ -92,7 +93,7 @@ public class PrinterImpl implements Printer {
         });
     }
 
-    private synchronized PrintResult print(JSONArray contentItems, boolean isVoicce) throws Exception {
+    public synchronized PrintResult print(JSONArray contentItems, boolean isVoicce) throws Exception {
         PrintResultImpl printResultImpl = new PrintResultImpl(this, contentItems);
         SocketAddress socketAddress = new InetSocketAddress(printerDO.getPrinterIp(), printerDO.getPrinterPort());
         byte[] dataRead = new byte[0];
@@ -122,6 +123,7 @@ public class PrinterImpl implements Printer {
                     } else if (comType == EnumComType.LINE) {
                         printDotLine(outputStream, contentItem);
                     } else {
+                        Logger.info("不支持的打印类型。。。。。。");
                         String detailedInfo = "json第 " + i + " 个元素的type属性错误,错误类型为：type = " + comType;
                         throw new Exception(detailedInfo + ", " + comType);
                     }
@@ -168,6 +170,7 @@ public class PrinterImpl implements Printer {
                 }
             }
         } catch (IOException e) {
+            Logger.info("打印出错了 .......");
             e.printStackTrace();
             printResultImpl.setSuccess(false);
             if (printResultImpl.getResultCode() == StatusUtil.INIT) {
@@ -270,6 +273,7 @@ public class PrinterImpl implements Printer {
         outputStream.write(PrinterCmdUtil.byteMerger(byteList));
         outputStream.flush();
         print1_5Distance(outputStream);
+
     }
 
     private void printQRCode2(OutputStream outputStream, JSONObject jsonObject) throws IOException, WriterException {

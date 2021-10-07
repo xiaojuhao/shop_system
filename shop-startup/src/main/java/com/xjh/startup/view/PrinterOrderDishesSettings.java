@@ -5,6 +5,7 @@ import static com.xjh.common.utils.TableViewUtils.newCol;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.AlertBuilder;
@@ -82,11 +83,12 @@ public class PrinterOrderDishesSettings extends SimpleForm implements Initializa
                 AlertBuilder.ERROR("打印任务不存在:api.print.task.PrintTaskOrderSample");
                 return;
             }
-            System.out.println(contents);
+
             // 内容
             JSONObject taskContent = new JSONObject();
             taskContent.put("printerSelectStrategy", contents.toJSONString());
             task.setPrintTaskContent(Base64.encode(taskContent.toJSONString()));
+            System.out.println("保存订单打印配置:" + JSON.toJSONString(task));
             printerTaskDAO.updateById(task);
             AlertBuilder.INFO("保存成功");
         });

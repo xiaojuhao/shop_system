@@ -54,6 +54,15 @@ public class PrinterDAO {
         return Db.use(ds).insert(EntityUtils.create(printer));
     }
 
+    public PrinterDO selectByPrinterId(Integer printerId) {
+        if (printerId == null) {
+            return null;
+        }
+        PrinterDO cond = new PrinterDO();
+        cond.setPrinterId(printerId);
+        return selectList(cond).stream().findFirst().orElse(null);
+    }
+
     public List<PrinterDO> selectList(PrinterDO cond) {
         try {
             List<Entity> list = Db.use(ds).find(EntityUtils.create(cond));

@@ -379,12 +379,10 @@ public class PrinterCmdUtil {
         hints.put(EncodeHintType.MARGIN, 0); //边距
         BitMatrix bitMatrix1 = new MultiFormatWriter().encode(text1, BarcodeFormat.QR_CODE, qrWidth, qrHeight, hints);
         BitMatrix bitMatrix2 = new MultiFormatWriter().encode(text2, BarcodeFormat.QR_CODE, qrWidth, qrHeight, hints);
-
         BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics2D = bufferedImage.createGraphics();
         draw(graphics2D, bitMatrix1, leftPadding1, 5);
         draw(graphics2D, bitMatrix2, leftPadding1 + qrWidth + leftPadding2, 5);
-
         return printImage(bufferedImage);
     }
 

@@ -63,4 +63,10 @@ public class PrinterTaskDAO {
             return new ArrayList<>();
         }
     }
+
+    public PrinterTaskDO selectByPrintTaskName(String name) {
+        PrinterTaskDO cond = new PrinterTaskDO();
+        cond.setPrintTaskName(name);
+        return selectList(cond).stream().findFirst().orElse(null);
+    }
 }

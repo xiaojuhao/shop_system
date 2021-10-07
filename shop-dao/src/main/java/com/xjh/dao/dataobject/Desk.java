@@ -21,7 +21,6 @@ public class Desk implements Serializable {
     Integer status;
     @Column("maxPersonNum")
     Integer maxPerson;
-    Integer deskType;
     @Column("orderId")
     Integer orderId;
     @Column("belongDeskType")

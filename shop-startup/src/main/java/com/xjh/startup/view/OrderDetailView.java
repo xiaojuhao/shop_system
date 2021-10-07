@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -18,12 +16,14 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.enumeration.EnumChoiceAction;
 import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.CopyUtils;
+import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
 import com.xjh.common.utils.TableViewUtils;
@@ -36,6 +36,9 @@ import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.dao.dataobject.PrinterDO;
+import com.xjh.dao.dataobject.PrinterTaskDO;
+import com.xjh.dao.mapper.PrinterDAO;
+import com.xjh.dao.mapper.PrinterTaskDAO;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.DishesPackageService;
 import com.xjh.service.domain.DishesService;
@@ -50,6 +53,7 @@ import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.OrderDishesTableItemBO;
 
+import cn.hutool.core.codec.Base64;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -88,6 +92,8 @@ public class OrderDetailView extends VBox {
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
     DishesPackageService dishesPackageService = GuiceContainer.getInstance(DishesPackageService.class);
     OrderPrinterHelper orderPrinterHelper = GuiceContainer.getInstance(OrderPrinterHelper.class);
+    PrinterDAO printerDAO = GuiceContainer.getInstance(PrinterDAO.class);
+    PrinterTaskDAO printerTaskDAO = GuiceContainer.getInstance(PrinterTaskDAO.class);
 
     ObjectProperty<OrderOverviewVO> orderView = new SimpleObjectProperty<>();
 
@@ -483,21 +489,41 @@ public class OrderDetailView extends VBox {
     }
 
     private void submitPrintOrderInfo(DeskOrderParam param) {
+        Runnable clear = CurrentRequest.resetRequestId();
         try {
-            PrinterDO dd = new PrinterDO();
-            dd.setPrinterId(1);
-            dd.setPrinterName("打印机");
-            dd.setPrinterIp("192.168.1.4");
-            dd.setPrinterPort(9100);
-            dd.setPrinterType(1);
-            dd.setPrinterStatus(1);
+            PrinterTaskDO task = printerTaskDAO.selectByPrintTaskName("api.print.task.PrintTaskOrderSample");
+            if (task == null) {
+                AlertBuilder.ERROR("打印机配置错误,请检查");
+                return;
+            }
+            JSONObject taskContent = JSON.parseObject(Base64.decodeStr(task.getPrintTaskContent()));
+            JSONArray array = JSON.parseArray(taskContent.getString("printerSelectStrategy"));
+            if (array == null) {
+                AlertBuilder.ERROR("打印机配置错误,请检查2");
+                return;
+            }
+            Desk desk = deskService.getById(param.getDeskId());
+            Integer printerId = null;
+            for (int i = 0; i < array.size(); i++) {
+                JSONObject conf = array.getJSONObject(i);
+                if (CommonUtils.eq(conf.getInteger("deskTypeId"), desk.getBelongDeskType())) {
+                    printerId = conf.getInteger("printerId");
+                }
+            }
+            PrinterDO dd = printerDAO.selectByPrinterId(printerId);
+            if (dd == null) {
+                AlertBuilder.ERROR("打印机配置错误,请检查3");
+                return;
+            }
             PrinterImpl printer = new PrinterImpl(dd);
 
             JSONArray printData = orderPrinterHelper.buildOrderPrintData(param);
-            Future<PrintResult> rs = printer.submitTask(printData, true);
-            Logger.info(JSON.toJSONString(rs.get(3, TimeUnit.SECONDS)));
+            PrintResult rs = printer.print(printData, true);
+            Logger.info(JSON.toJSONString(rs));
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            clear.run();
         }
     }
 
