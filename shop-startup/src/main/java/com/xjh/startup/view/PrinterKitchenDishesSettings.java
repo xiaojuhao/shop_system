@@ -106,7 +106,6 @@ public class PrinterKitchenDishesSettings extends SimpleForm {
         Button save = new Button("保存配置");
         save.setOnAction(evt -> {
             Result<Integer> deletedNum = printerDishDAO.deleteByPrinterId(printer.getPrinterId());
-            System.out.println("删除了: " + deletedNum.getData() + "条记录");
 
             List<PrinterDishDO> newList = new ArrayList<>();
             List<BO> items = left.getItems();
@@ -122,7 +121,6 @@ public class PrinterKitchenDishesSettings extends SimpleForm {
                 for (PrinterDishDO dd : newList) {
                     printerDishDAO.insert(dd);
                 }
-                System.out.println("增加了: " + newList.size() + "条记录");
 
             } catch (Exception ex) {
                 ex.printStackTrace();
