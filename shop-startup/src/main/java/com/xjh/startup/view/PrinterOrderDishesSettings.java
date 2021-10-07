@@ -11,6 +11,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.AlertBuilder;
+import com.xjh.common.utils.CommonUtils;
 import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.dao.dataobject.PrinterTaskDO;
 import com.xjh.dao.mapper.PrinterTaskDAO;
@@ -54,12 +55,16 @@ public class PrinterOrderDishesSettings extends SimpleForm implements Initializa
         initCond.setPrintTaskName("api.print.task.PrintTaskOrderSample");
         PrinterTaskDO init = printerTaskDAO.selectList(initCond)
                 .stream().findFirst().orElse(null);
-        JSONObject initContent = JSON.parseObject(Base64.decodeStr(init.getPrintTaskContent()));
-        String printerSelectStrategy = initContent.getString("printerSelectStrategy");
-        JSONArray strategy = JSON.parseArray(printerSelectStrategy);
-        for(int i = 0 ; i < strategy.size() ; i++){
-            JSONObject json = strategy.getJSONObject(i);
-            initMap.put(json.getInteger("deskTypeId"), json.getInteger("printerId"));
+        if (init != null) {
+            JSONObject initContent = JSON.parseObject(Base64.decodeStr(init.getPrintTaskContent()));
+            String printerSelectStrategy = initContent.getString("printerSelectStrategy");
+            if (CommonUtils.isNotBlank(printerSelectStrategy)) {
+                JSONArray strategy = JSON.parseArray(printerSelectStrategy);
+                for (int i = 0; i < strategy.size(); i++) {
+                    JSONObject json = strategy.getJSONObject(i);
+                    initMap.put(json.getInteger("deskTypeId"), json.getInteger("printerId"));
+                }
+            }
         }
         ObservableList<BO> deskTypeList = FXCollections.observableArrayList(
                 new BO(1, "小句号日料", loadPrinterOptions(initMap.get(1))),
