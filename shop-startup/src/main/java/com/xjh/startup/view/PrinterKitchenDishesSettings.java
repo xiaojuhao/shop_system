@@ -41,7 +41,7 @@ public class PrinterKitchenDishesSettings extends SimpleForm {
         List<PrinterDishDO> printerDishList = printerDishDAO.selectList(new PrinterDishDO());
         Set<Integer> printerDishIds = CommonUtils.collectSet(printerDishList, it -> {
             if (it.getPrinterId().equals(printer.getPrinterId())) {
-                return it.getPrinterId();
+                return it.getDishId();
             } else {
                 return null;
             }
