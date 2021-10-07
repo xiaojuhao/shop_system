@@ -2,7 +2,9 @@ package com.xjh.startup.view;
 
 import static com.xjh.common.utils.TableViewUtils.newCol;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.JSON;
@@ -46,10 +48,23 @@ public class PrinterOrderDishesSettings extends SimpleForm implements Initializa
         // 打印机策略
         addLine(new Label("打印机策略:"));
 
+        Map<Integer, Integer> initMap = new HashMap<>();
+
+        PrinterTaskDO initCond = new PrinterTaskDO();
+        initCond.setPrintTaskName("api.print.task.PrintTaskOrderSample");
+        PrinterTaskDO init = printerTaskDAO.selectList(initCond)
+                .stream().findFirst().orElse(null);
+        JSONObject initContent = JSON.parseObject(Base64.decodeStr(init.getPrintTaskContent()));
+        String printerSelectStrategy = initContent.getString("printerSelectStrategy");
+        JSONArray strategy = JSON.parseArray(printerSelectStrategy);
+        for(int i = 0 ; i < strategy.size() ; i++){
+            JSONObject json = strategy.getJSONObject(i);
+            initMap.put(json.getInteger("deskTypeId"), json.getInteger("printerId"));
+        }
         ObservableList<BO> deskTypeList = FXCollections.observableArrayList(
-                new BO(1, "小句号日料", loadPrinterOptions()),
-                new BO(2, "借用", loadPrinterOptions()),
-                new BO(3, "预约", loadPrinterOptions())
+                new BO(1, "小句号日料", loadPrinterOptions(initMap.get(1))),
+                new BO(2, "借用", loadPrinterOptions(initMap.get(2))),
+                new BO(3, "预约", loadPrinterOptions(initMap.get(3)))
         );
         TableView<BO> tv = new TableView<>();
         tv.getColumns().addAll(
@@ -108,7 +123,7 @@ public class PrinterOrderDishesSettings extends SimpleForm implements Initializa
         ComboBox<IntStringPair> printer;
     }
 
-    private ComboBox<IntStringPair> loadPrinterOptions() {
+    private ComboBox<IntStringPair> loadPrinterOptions(Integer selected) {
         List<PrinterDO> printers = printerService.query(new PrinterDO()).getData();
         ObservableList<IntStringPair> options = FXCollections.observableArrayList(printers.stream()
                 .map(it -> {
@@ -120,7 +135,7 @@ public class PrinterOrderDishesSettings extends SimpleForm implements Initializa
                 }).collect(Collectors.toSet()));
 
         ComboBox<IntStringPair> combo = new ComboBox<>(options);
-        IntStringPair.select(combo, null, options.get(0).getKey());
+        IntStringPair.select(combo, selected, options.get(0).getKey());
         return combo;
     }
 }
