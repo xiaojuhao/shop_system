@@ -1,9 +1,13 @@
 package com.xjh.startup.view;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.dao.dataobject.PrinterDishDO;
@@ -67,28 +71,79 @@ public class PrinterKitchenDishesSettings extends SimpleForm {
         VBox operations = new VBox();
         operations.setAlignment(Pos.CENTER);
         operations.setSpacing(30);
-        operations.getChildren().addAll(new Button(" <-- "), new Button(" --> "));
+        Button addTo = new Button(" <-- ");
+        Button removeFrom = new Button(" --> ");
+        operations.getChildren().addAll(addTo, removeFrom);
+
+        removeFrom.setOnAction(evt -> {
+            ObservableList<BO> selected = left.getSelectionModel().getSelectedItems();
+            for (BO bo : selected) {
+                right.getItems().add(new BO(bo.getDishesId(), bo.getDishesName()));
+            }
+            left.getItems().removeAll(selected);
+            right.refresh();
+            left.refresh();
+        });
+
+        addTo.setOnAction(evt -> {
+            ObservableList<BO> selected = right.getSelectionModel().getSelectedItems();
+            for (BO bo : selected) {
+                left.getItems().add(new BO(bo.getDishesId(), bo.getDishesName()));
+            }
+            right.getItems().removeAll(selected);
+            right.refresh();
+            left.refresh();
+        });
+
 
         VBox leftBox = new VBox();
         VBox rightBox = new VBox();
         leftBox.getChildren().addAll(new Label("已关联的菜品"), left);
         rightBox.getChildren().addAll(new Label("未关联的菜品"), right);
         addLine(newCenterLine(leftBox, operations, rightBox));
-        addLine(newCenterLine(new Button("保存配置")));
+
+        // 保存
+        Button save = new Button("保存配置");
+        save.setOnAction(evt -> {
+            Result<Integer> deletedNum = printerDishDAO.deleteByPrinterId(printer.getPrinterId());
+            System.out.println("删除了: " + deletedNum.getData() + "条记录");
+
+            List<PrinterDishDO> newList = new ArrayList<>();
+            List<BO> items = left.getItems();
+            for (BO bo : items) {
+                PrinterDishDO dd = new PrinterDishDO();
+                dd.setPrinterId(printer.getPrinterId());
+                dd.setDishId(bo.getDishesId());
+                dd.setCreateTime(DateBuilder.now().mills());
+                dd.setModTime(DateBuilder.now().mills());
+                newList.add(dd);
+            }
+            try {
+                for (PrinterDishDO dd : newList) {
+                    printerDishDAO.insert(dd);
+                }
+                System.out.println("增加了: " + newList.size() + "条记录");
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                AlertBuilder.ERROR("保存失败:" + ex.getMessage());
+            }
+        });
+        addLine(newCenterLine(save));
     }
 
     @Data
     public static class BO {
-        public BO(Integer printerId, String printerName) {
-            this.printerId = printerId;
-            this.printerName = printerName;
+        public BO(Integer dishesId, String dishesName) {
+            this.dishesId = dishesId;
+            this.dishesName = dishesName;
         }
 
-        Integer printerId;
-        String printerName;
+        Integer dishesId;
+        String dishesName;
 
         public String toString() {
-            return printerName;
+            return dishesName;
         }
     }
 }

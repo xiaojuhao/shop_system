@@ -31,6 +31,24 @@ public class PrinterDishDAO {
         return selectList(cond).stream().findFirst().orElse(null);
     }
 
+    public Result<Integer> deleteByPrinterId(Integer printerId) {
+        if (printerId == null) {
+            return Result.fail("参数错误");
+        }
+        try {
+            PrinterDishDO cond = new PrinterDishDO();
+            cond.setPrinterId(printerId);
+            int i = Db.use(ds).del(EntityUtils.create(cond));
+            if (i == 0) {
+                return Result.fail("删除失败");
+            }
+            return Result.success(i);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail(ex.getMessage());
+        }
+    }
+
     public Result<Integer> deleteById(Integer printerDishId) {
         if (printerDishId == null) {
             return Result.fail("参数错误");
