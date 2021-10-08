@@ -24,9 +24,16 @@ public class DishesPackageDishesDAO {
         if (dishesPackageTypeId == null) {
             return new ArrayList<>();
         }
+        DishesPackageDishes cond = new DishesPackageDishes();
+        cond.setDishesPackageTypeId(dishesPackageTypeId);
+        return selectList(cond);
+    }
+
+    public List<DishesPackageDishes> selectList(DishesPackageDishes cond) {
+        if (cond == null) {
+            return new ArrayList<>();
+        }
         try {
-            DishesPackageDishes cond = new DishesPackageDishes();
-            cond.setDishesPackageTypeId(dishesPackageTypeId);
             List<Entity> list = Db.use(ds).find(EntityUtils.create(cond));
             return EntityUtils.convertList(list, DishesPackageDishes.class);
         } catch (Exception ex) {

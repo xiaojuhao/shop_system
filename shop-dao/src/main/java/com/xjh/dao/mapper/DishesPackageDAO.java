@@ -8,9 +8,9 @@ import javax.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.valueobject.PageCond;
 import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.dao.foundation.EntityUtils;
+import com.xjh.dao.query.DishesPackageQuery;
 import com.zaxxer.hikari.HikariDataSource;
 
 import cn.hutool.db.Db;
@@ -47,16 +47,19 @@ public class DishesPackageDAO {
         }
     }
 
-    public List<DishesPackage> pageQuery(DishesPackage cond, PageCond page) {
+    public List<DishesPackage> pageQuery(DishesPackageQuery cond) {
         try {
-            int pageNo = CommonUtils.orElse(page.getPageNo(), 1);
-            int pageSize = CommonUtils.orElse(page.getPageSize(), 20);
+            int pageNo = CommonUtils.orElse(cond.getPageNo(), 1);
+            int pageSize = CommonUtils.orElse(cond.getPageSize(), 20);
             StringBuilder where = new StringBuilder();
-            if (CommonUtils.isNotBlank(cond.getDishesPackageName())) {
-                where.append(" and dishesPackageName like '%" + cond.getDishesPackageName() + "%'");
+            if (CommonUtils.isNotBlank(cond.getName())) {
+                where.append(" and dishesPackageName like '%" + cond.getName() + "%'");
             }
-            if (cond.getDishesPackageId() != null) {
-                where.append(" and dishesPackageId = " + cond.getDishesPackageId());
+            if (cond.getPackageId() != null) {
+                where.append(" and dishesPackageId = " + cond.getPackageId());
+            }
+            if (cond.getStatus() != null) {
+                where.append(" and dishesPackageStatus = " + cond.getStatus());
             }
             String sql = "select * from dishes_package_list_new where 1=1 " + where
                     + " limit " + (pageNo - 1) + "," + pageSize;

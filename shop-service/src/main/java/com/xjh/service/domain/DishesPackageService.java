@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.dao.mapper.DishesPackageDAO;
+import com.xjh.dao.query.DishesPackageQuery;
 
 @Singleton
 public class DishesPackageService {
@@ -25,5 +26,9 @@ public class DishesPackageService {
 
     public List<DishesPackage> selectAll() {
         return dishesPackageDAO.selectList(new DishesPackage());
+    }
+
+    public List<DishesPackage> pageQuery(DishesPackageQuery cond) {
+        return dishesPackageDAO.pageQuery(cond);
     }
 }

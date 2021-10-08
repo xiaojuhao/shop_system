@@ -26,6 +26,7 @@ import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.dao.dataobject.DishesType;
 import com.xjh.dao.mapper.DishesPackageDAO;
+import com.xjh.dao.query.DishesPackageQuery;
 import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.DishesTypeService;
@@ -235,12 +236,11 @@ public class OrderDishesChoiceView extends VBox {
     }
 
     private List<DishesPackage> queryPackageList(DishesQueryCond queryCond) {
-        PageCond page = new PageCond();
-        page.setPageNo(1);
-        page.setPageSize(60);
-        DishesPackage cond = new DishesPackage();
-        cond.setDishesPackageName(queryCond.getDishesName());
-        return dishesPackageDAO.pageQuery(cond, page);
+        DishesPackageQuery cond = new DishesPackageQuery();
+        cond.setName(queryCond.getDishesName());
+        cond.setPageNo(1);
+        cond.setPageSize(100);
+        return dishesPackageDAO.pageQuery(cond);
     }
 
     private DishesChoiceItemBO buildBO(Dishes dishes) {

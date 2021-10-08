@@ -78,7 +78,7 @@ public class MenuBarView {
         menuManager.setOnAction(e -> openWebView("菜单管理"));
 
         MenuItem taocan = new MenuItem("套餐管理");
-        taocan.setOnAction(evt -> openView("套餐管理", null));
+        taocan.setOnAction(evt -> openView("套餐管理", new PackageDishesManageListView()));
 
         menu.getItems().addAll(dishesAttrManger, dishesCate, dishesManager,
                 dishesCollMenu, menuManager, taocan);
