@@ -83,12 +83,12 @@ public class PackageDishesEditView extends SimpleGridForm {
         collectData.add(() -> dishesPackage.setDishesPackagePrice(CommonUtils.parseDouble(priceInput.getText(), 0D)));
 
         Label dishesTypeLabel = createLabel("报餐类型:", labelWidth);
-        ComboBox<DishesType> dishesTypeInput = new SimpleComboBox<>(
+        SimpleComboBox<DishesType> dishesTypeInput = new SimpleComboBox<>(
                 dishesTypeService.loadAllTypes(),
                 DishesType::getTypeName,
                 null
         );
-        dishesTypeInput.getSelectionModel().selectFirst();
+        dishesTypeInput.select(it -> CommonUtils.eq(it.getTypeId(), dishesPackage.getDishesPackageType()));
         addLine(dishesTypeLabel, hbox(dishesTypeInput));
         collectData.add(() -> {
             dishesPackage.setDishesPackageType(dishesTypeInput.getSelectionModel().getSelectedItem().getTypeId());
@@ -108,6 +108,7 @@ public class PackageDishesEditView extends SimpleGridForm {
                 new IntStringPair(0, "已停用")
         );
         ComboBox<IntStringPair> statusInput = new ComboBox<>(statusOptions);
+        IntStringPair.select(statusInput, dishesPackage.getDishesPackageStatus(), 1);
         addLine(statusLabel, hbox(statusInput));
 
         ObservableList<ImgBO> imgItems = FXCollections.observableArrayList();
