@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.dao.mapper.DishesPackageDAO;
 import com.xjh.dao.query.DishesPackageQuery;
@@ -30,5 +31,9 @@ public class DishesPackageService {
 
     public List<DishesPackage> pageQuery(DishesPackageQuery cond) {
         return dishesPackageDAO.pageQuery(cond);
+    }
+
+    public Result<Integer> save(DishesPackage dishesPackage) {
+        return Result.fail("");
     }
 }

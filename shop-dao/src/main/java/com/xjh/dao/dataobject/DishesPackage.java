@@ -31,4 +31,7 @@ public class DishesPackage {
 
     @Column("creatTime")
     Long creatTime;
+
+    @Column("sortby")
+    Integer sortby;
 }
