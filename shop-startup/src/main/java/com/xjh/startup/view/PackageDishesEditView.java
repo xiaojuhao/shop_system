@@ -59,8 +59,8 @@ public class PackageDishesEditView extends SimpleGridForm {
     DishesPackage dishesPackage;
     List<Runnable> collectData = new ArrayList<>();
 
-    RichText isMain = RichText.create("是").with(Color.RED);
-    RichText notMain = RichText.create("否").with(Color.BLACK);
+    RichText IS_MAIN = RichText.create("是").with(Color.RED);
+    RichText NOT_MAIN = RichText.create("否").with(Color.BLACK);
 
     public PackageDishesEditView(DishesPackage param) {
         dishesPackage = dishesPackageService.getById(param.getDishesPackageId());
@@ -125,7 +125,7 @@ public class PackageDishesEditView extends SimpleGridForm {
         collectData.add(() -> {
             List<DishesImgVO> imgs = imgItems.stream().map(it -> {
                 DishesImgVO v = new DishesImgVO();
-                v.setIsMain("是".equals(it.getIsMain()));
+                v.setIsMain(it.getIsMain().get() == IS_MAIN);
                 v.setImageSrc(it.getImg().getImgUrl());
                 return v;
             }).collect(Collectors.toList());
@@ -176,14 +176,14 @@ public class PackageDishesEditView extends SimpleGridForm {
                 ImgBO bo = new ImgBO();
                 bo.setSno(imgItems.size() + 1);
                 bo.setImg(new ImageSrc(toUrl, 100, 60));
-                bo.getIsMain().set(notMain);
+                bo.getIsMain().set(NOT_MAIN);
                 bo.getOperations().add(new OperationButton("删除", cv -> {
                     imgItems.remove(bo);
                     imgTV.refresh();
                 }));
                 bo.getOperations().add(new OperationButton("设为主图", () -> {
                     for (ImgBO b : imgItems) {
-                        b.getIsMain().set(b == bo ? isMain : notMain);
+                        b.getIsMain().set(b == bo ? IS_MAIN : NOT_MAIN);
                     }
                 }));
                 imgItems.add(bo);
@@ -207,13 +207,13 @@ public class PackageDishesEditView extends SimpleGridForm {
             }));
             bo.getOperations().add(new OperationButton("设为主图", () -> {
                 for (ImgBO b : imgItems) {
-                    b.getIsMain().set(b == bo ? isMain : notMain);
+                    b.getIsMain().set(b == bo ? IS_MAIN : NOT_MAIN);
                 }
             }));
             if (it.getIsMain() != null && it.getIsMain()) {
-                bo.getIsMain().set(isMain);
+                bo.getIsMain().set(IS_MAIN);
             } else {
-                bo.getIsMain().set(notMain);
+                bo.getIsMain().set(NOT_MAIN);
             }
             imgItems.add(bo);
         });
