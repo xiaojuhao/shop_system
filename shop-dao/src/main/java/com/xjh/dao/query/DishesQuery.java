@@ -9,7 +9,7 @@ public class DishesQuery {
     int pageNo = 1;
     int pageSize = 20;
     String dishesName;
-    String status;
+    Integer status;
     Integer version;
 
     public DishesQuery newVersion() {

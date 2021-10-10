@@ -88,9 +88,9 @@ public class DishesDAO {
             List<Object> params = new ArrayList<>();
             if (CommonUtils.isNotBlank(query.getDishesName())) {
                 where.append(" and dishesName like ?");
-                params.add("%" + query.getDishesName()+"%");
+                params.add("%" + query.getDishesName() + "%");
             }
-            if(CommonUtils.isNotBlank(query.getStatus())){
+            if (query.getStatus() != null) {
                 where.append(" and dishesStatus = ?");
                 params.add(query.getStatus());
             }

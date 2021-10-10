@@ -136,8 +136,8 @@ public class DishesManageListView extends SimpleForm implements Initializable {
             DishesQuery q = deepClone(cond.get(), DishesQuery.class).newVersion();
             q.setDishesName(CommonUtils.trim(nameInput.getText()));
             String selectedStatus = modelSelect.getSelectionModel().getSelectedItem();
-            if (CommonUtils.eq(selectedStatus, "上架")) q.setStatus(1 + "");
-            if (CommonUtils.eq(selectedStatus, "下架")) q.setStatus(0 + "");
+            if (CommonUtils.eq(selectedStatus, "上架")) q.setStatus(1);
+            if (CommonUtils.eq(selectedStatus, "下架")) q.setStatus(0);
             cond.set(q);
         });
 
