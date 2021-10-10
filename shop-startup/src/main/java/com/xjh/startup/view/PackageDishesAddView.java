@@ -78,12 +78,8 @@ public class PackageDishesAddView extends SimpleForm implements Initializable {
         List<DishesPackageDishes> packageDishesList = dishesPackageDishesDAO.getByDishesPackageTypeId(dishesPackageType.getDishesPackageTypeId());
         Set<Integer> added = CommonUtils.collectSet(packageDishesList, DishesPackageDishes::getDishesId);
         List<Dishes> dishesList = dishesService.pageQuery(cond.get());
-
         items.addAll(dishesList.stream().map(it -> {
             if (added.contains(it.getDishesId())) {
-                return null;
-            }
-            if (EnumDishesStatus.of(it.getDishesStatus()) == EnumDishesStatus.OFF) {
                 return null;
             }
             BO bo = new BO();
@@ -126,6 +122,8 @@ public class PackageDishesAddView extends SimpleForm implements Initializable {
             q.setDishesName(CommonUtils.trim(nameInput.getText()));
             if (modelSelect.getSelectionModel().getSelectedItem() != null) {
                 q.setStatus(modelSelect.getSelectionModel().getSelectedItem().getKey());
+            } else {
+                q.setStatus(null);
             }
             cond.set(q);
         });
