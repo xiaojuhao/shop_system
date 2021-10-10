@@ -60,11 +60,6 @@ public class CommonUtils {
         return retList;
     }
 
-    public static <T> T deepClone(T v, Class<T> clz) {
-        JSONObject j = JSONBuilder.toJSON(v);
-        return j.toJavaObject(clz);
-    }
-
     public static <V> List<V> filter(List<V> list, Predicate<V> test) {
         if (list == null || list.size() == 0) {
             return new ArrayList<>();

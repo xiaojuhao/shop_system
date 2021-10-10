@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.CopyUtils;
 import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesAttributeValueVO;
@@ -31,7 +32,7 @@ public class DishesAttributeEditView extends SmallForm {
     public DishesAttributeEditView(DishesAttributeVO attr, Consumer<DishesAttributeVO> onSave) {
         super();
 
-        data = CommonUtils.deepClone(attr, DishesAttributeVO.class);
+        data = CopyUtils.deepClone(attr);
         double titleWidth = 80;
         double contentWidth = 250;
 

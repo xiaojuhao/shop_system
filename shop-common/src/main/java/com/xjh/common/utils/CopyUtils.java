@@ -2,9 +2,15 @@ package com.xjh.common.utils;
 
 import java.util.Map;
 
+import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.ReflectionUtils.PropertyDescriptor;
 
 public class CopyUtils {
+    public static <T> T deepClone(T v) {
+        JSONObject j = JSONBuilder.toJSON(v);
+        return (T) j.toJavaObject(v.getClass());
+    }
+
     public static <T> T cloneObj(T obj) {
         if (obj == null) {
             return null;

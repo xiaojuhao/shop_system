@@ -1,7 +1,7 @@
 package com.xjh.startup.view;
 
 
-import static com.xjh.common.utils.CommonUtils.deepClone;
+import static com.xjh.common.utils.CopyUtils.deepClone;
 import static com.xjh.common.utils.TableViewUtils.newCol;
 
 import java.util.List;
@@ -133,7 +133,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
 
         Button queryBtn = new Button("查询");
         queryBtn.setOnAction(evt -> {
-            DishesQuery q = deepClone(cond.get(), DishesQuery.class).newVersion();
+            DishesQuery q = cond.get().newVersion();
             q.setDishesName(CommonUtils.trim(nameInput.getText()));
             String selectedStatus = modelSelect.getSelectionModel().getSelectedItem();
             if (CommonUtils.eq(selectedStatus, "上架")) q.setStatus(1);
@@ -174,7 +174,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         });
         Button prev = new Button("上一页");
         prev.setOnMouseClicked(e -> {
-            DishesQuery c = deepClone(cond.get(), DishesQuery.class);
+            DishesQuery c = cond.get().newVersion();
             int pageNo = c.getPageNo();
             if (pageNo <= 1) {
                 c.setPageNo(1);
@@ -185,7 +185,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         });
         Button next = new Button("下一页");
         next.setOnMouseClicked(e -> {
-            DishesQuery c = deepClone(cond.get(), DishesQuery.class);
+            DishesQuery c = cond.get().newVersion();
             c.setPageNo(c.getPageNo() + 1);
             cond.set(c);
         });

@@ -1,7 +1,6 @@
 package com.xjh.startup.view;
 
 
-import static com.xjh.common.utils.CommonUtils.deepClone;
 import static com.xjh.common.utils.TableViewUtils.newCol;
 
 import java.util.List;
@@ -127,7 +126,7 @@ public class PackageDishesManageListView extends SimpleForm implements Initializ
 
         Button queryBtn = new Button("查询");
         queryBtn.setOnAction(evt -> {
-            DishesPackageQuery q = deepClone(cond.get(), DishesPackageQuery.class).newVersion();
+            DishesPackageQuery q = cond.get().newVersion();
             q.setName(CommonUtils.trim(nameInput.getText()));
             String selectedStatus = modelSelect.getSelectionModel().getSelectedItem();
             if (CommonUtils.eq(selectedStatus, "已启用")) q.setStatus(1 + "");

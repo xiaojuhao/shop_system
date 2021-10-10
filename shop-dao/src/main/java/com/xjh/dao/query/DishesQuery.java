@@ -2,7 +2,10 @@ package com.xjh.dao.query;
 
 import com.xjh.common.utils.CommonUtils;
 
+import com.xjh.common.utils.CopyUtils;
 import lombok.Data;
+
+import static com.xjh.common.utils.CopyUtils.deepClone;
 
 @Data
 public class DishesQuery {
@@ -14,7 +17,7 @@ public class DishesQuery {
 
     public DishesQuery newVersion() {
         this.version = CommonUtils.randomNumber(1, 100000);
-        return this;
+        return deepClone(this);
     }
 
 }
