@@ -3,6 +3,7 @@ package com.xjh.startup.view;
 
 import static com.xjh.common.utils.TableViewUtils.newCol;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -17,6 +18,7 @@ import com.xjh.common.utils.cellvalue.ImageSrc;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.Operations;
 import com.xjh.common.utils.cellvalue.RichText;
+import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackageDishes;
 import com.xjh.dao.dataobject.DishesPackageType;
@@ -175,7 +177,8 @@ public class PackageDishesAddView extends SimpleForm implements Initializable {
         newD.setDishesPackageId(dishesPackageType.getDishesPackageId());
         newD.setDishesId(bo.getDishesId());
         newD.setDishesPackageTypeId(dishesPackageType.getDishesPackageTypeId());
-        newD.setDishesOptions(Base64.encode("[]"));
+        List<DishesAttributeVO> attrList = new ArrayList<>();
+        newD.setDishesOptions(Base64.encode(JSON.toJSONString(attrList)));
         newD.setDishesPriceId(0);
         dishesPackageDishesDAO.insert(newD);
         AlertBuilder.INFO("加入套餐成功");
