@@ -79,11 +79,12 @@ public class DishesPackageDishesDAO {
         }
     }
 
-    public List<DishesPackageDishes> getByDishesPackageTypeId(Integer dishesPackageTypeId) {
+    public List<DishesPackageDishes> getByDishesPackageTypeId(Integer packageId, Integer dishesPackageTypeId) {
         if (dishesPackageTypeId == null) {
             return new ArrayList<>();
         }
         DishesPackageDishes cond = new DishesPackageDishes();
+        cond.setDishesPackageId(packageId);
         cond.setDishesPackageTypeId(dishesPackageTypeId);
         return selectList(cond);
     }

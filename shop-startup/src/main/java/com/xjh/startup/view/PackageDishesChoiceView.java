@@ -56,7 +56,8 @@ public class PackageDishesChoiceView extends Group {
             List<DishesPackageType> types = typeDAO.getByDishesPackageId(bo.getDishesPackageId());
             for (DishesPackageType type : types) {
                 row++;
-                List<DishesPackageDishes> packageDishes = packageDishesDAO.getByDishesPackageTypeId(type.getDishesPackageTypeId());
+                List<DishesPackageDishes> packageDishes = packageDishesDAO.getByDishesPackageTypeId(
+                        type.getDishesPackageId(), type.getDishesPackageTypeId());
                 EnumChoseType chose = EnumChoseType.of(type.getIfRequired());
                 StringBuilder name = new StringBuilder(type.getDishesPackageTypeName());
                 if (chose == EnumChoseType.ALL) {

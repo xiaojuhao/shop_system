@@ -190,7 +190,9 @@ public class GetUpdateDataPackageHandler implements WsHandler {
                 jSONObjectDishesPackage.put("sku", dishesPackage.getDishesPackageId());
                 jSONObjectDishesPackage.put("date_available", dishesPackage.getCreatTime());
 
-                List<DishesPackageDishes> disheses = dishesPackageDishesDAO.getByDishesPackageTypeId(dishesPackage.getDishesPackageId());
+                DishesPackageDishes cond = new DishesPackageDishes();
+                cond.setDishesPackageId(dishesPackage.getDishesPackageId());
+                List<DishesPackageDishes> disheses = dishesPackageDishesDAO.selectList(cond);
                 JSONArray jSONArrayDishes = new JSONArray();
 
                 for (int j = 0; j < disheses.size(); j++) {

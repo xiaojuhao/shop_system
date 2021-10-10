@@ -71,7 +71,8 @@ public class PackageDishesDetailManageView extends SimpleForm implements Initial
     private void loadData() {
         items.clear();
         // 套餐选项中的菜品记录
-        List<DishesPackageDishes> dishesList = dishesPackageDishesDAO.getByDishesPackageTypeId(dishesPackageType.getDishesPackageTypeId());
+        List<DishesPackageDishes> dishesList = dishesPackageDishesDAO.getByDishesPackageTypeId(
+                dishesPackageType.getDishesPackageId(), dishesPackageType.getDishesPackageTypeId());
         List<Integer> dishesIds = CommonUtils.collect(dishesList, DishesPackageDishes::getDishesId);
         Map<Integer, Dishes> dishesMap = dishesService.getByIdsAsMap(dishesIds);
         items.addAll(dishesList.stream().map(it -> {
