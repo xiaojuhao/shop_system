@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.dao.foundation.EntityUtils;
 import com.xjh.dao.query.DishesPackageQuery;
@@ -68,6 +69,34 @@ public class DishesPackageDAO {
         } catch (Exception ex) {
             ex.printStackTrace();
             return new ArrayList<>();
+        }
+    }
+
+    public Result<Integer> updateById(DishesPackage dishesPackage) {
+        if (dishesPackage == null) {
+            return Result.fail("入参错误");
+        }
+        try {
+            int i = Db.use(ds).update(
+                    EntityUtils.create(dishesPackage),
+                    EntityUtils.idCond(dishesPackage));
+            return Result.success(i);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail(ex.getMessage());
+        }
+    }
+
+    public Result<Integer> insert(DishesPackage dishesPackage) {
+        if (dishesPackage == null) {
+            return Result.fail("入参错误");
+        }
+        try {
+            int i = Db.use(ds).insert(EntityUtils.create(dishesPackage));
+            return Result.success(i);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail(ex.getMessage());
         }
     }
 }

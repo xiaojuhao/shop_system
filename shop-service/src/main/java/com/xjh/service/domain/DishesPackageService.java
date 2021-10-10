@@ -34,6 +34,10 @@ public class DishesPackageService {
     }
 
     public Result<Integer> save(DishesPackage dishesPackage) {
-        return Result.fail("");
+        if (dishesPackage.getDishesPackageId() == null) {
+            return dishesPackageDAO.insert(dishesPackage);
+        } else {
+            return dishesPackageDAO.updateById(dishesPackage);
+        }
     }
 }

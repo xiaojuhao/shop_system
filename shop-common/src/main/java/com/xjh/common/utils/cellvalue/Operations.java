@@ -14,7 +14,17 @@ public class Operations {
         this.operations = operations;
     }
 
-    public void add(OperationButton op) {
-        this.operations.add(op);
+    public void add(OperationButton first, OperationButton... ops) {
+        if (first != null) {
+            this.operations.add(first);
+        }
+        if (ops != null) {
+            for (OperationButton op : ops) {
+                if (op != null) {
+                    this.operations.add(op);
+                }
+            }
+        }
+
     }
 }

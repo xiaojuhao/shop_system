@@ -93,10 +93,8 @@ public class PackageDishesManageListView extends SimpleForm implements Initializ
                 }
                 Operations operations = new Operations();
                 OperationButton edit = new OperationButton("编辑", () -> openEditor(dk));
-                OperationButton del = new OperationButton("删除", () -> {
-                });
-                operations.add(edit);
-                operations.add(del);
+                OperationButton typeEdit = new OperationButton("菜品维护", () -> openDishesSelectPage(dk));
+                operations.add(edit, typeEdit);
                 bo.setOperations(operations);
                 ImageHelper.resolveImgs(dk.getDishesPackageImg()).stream()
                         .findFirst().ifPresent(x -> {
@@ -177,6 +175,16 @@ public class PackageDishesManageListView extends SimpleForm implements Initializ
         Window window = this.getScene().getWindow();
         ModelWindow mw = new ModelWindow(window, "编辑套餐基础信息");
         PackageDishesEditView view = new PackageDishesEditView(dishesPkg);
+        view.setPrefWidth(window.getWidth() * 0.75);
+        mw.setScene(new Scene(view));
+        mw.showAndWait();
+        loadData();
+    }
+
+    private void openDishesSelectPage(DishesPackage dishesPkg) {
+        Window window = this.getScene().getWindow();
+        ModelWindow mw = new ModelWindow(window, "编辑套餐基础信息");
+        PackageDishesTypeMangeView view = new PackageDishesTypeMangeView(dishesPkg);
         view.setPrefWidth(window.getWidth() * 0.75);
         mw.setScene(new Scene(view));
         mw.showAndWait();

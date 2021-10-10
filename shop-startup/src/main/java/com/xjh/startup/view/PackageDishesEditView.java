@@ -100,6 +100,9 @@ public class PackageDishesEditView extends SimpleGridForm {
         sortByInput.setText(dishesPackage.getSortby() + "");
         sortByInput.setPrefWidth(60);
         addLine(printSnoLabel, hbox(sortByInput));
+        collectData.add(() -> {
+            dishesPackage.setSortby(CommonUtils.parseInt(sortByInput.getText(), 0));
+        });
 
         Label statusLabel = new Label("状态");
         statusLabel.setPadding(new Insets(0, 5, 0, 100));
@@ -110,6 +113,12 @@ public class PackageDishesEditView extends SimpleGridForm {
         ComboBox<IntStringPair> statusInput = new ComboBox<>(statusOptions);
         IntStringPair.select(statusInput, dishesPackage.getDishesPackageStatus(), 1);
         addLine(statusLabel, hbox(statusInput));
+        collectData.add(() -> {
+            IntStringPair s = statusInput.getSelectionModel().getSelectedItem();
+            if (s != null) {
+                dishesPackage.setDishesPackageStatus(s.getKey());
+            }
+        });
 
         ObservableList<ImgBO> imgItems = FXCollections.observableArrayList();
         Label imgLabel = createLabel("菜品图片:", labelWidth);
@@ -148,6 +157,7 @@ public class PackageDishesEditView extends SimpleGridForm {
             Result<Integer> rs = dishesPackageService.save(dishesPackage);
             if (rs.isSuccess()) {
                 AlertBuilder.INFO("保存成功");
+                this.getScene().getWindow().hide();
             } else {
                 AlertBuilder.ERROR("保存失败," + rs.getMsg());
             }

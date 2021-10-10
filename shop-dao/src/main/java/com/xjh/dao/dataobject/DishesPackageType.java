@@ -1,6 +1,7 @@
 package com.xjh.dao.dataobject;
 
 import com.xjh.dao.foundation.Column;
+import com.xjh.dao.foundation.Id;
 import com.xjh.dao.foundation.Table;
 
 import lombok.Data;
@@ -8,6 +9,7 @@ import lombok.Data;
 @Data
 @Table("dishes_package_type")
 public class DishesPackageType {
+    @Id
     @Column("dishesPackageTypeId")
     Integer dishesPackageTypeId;
 
