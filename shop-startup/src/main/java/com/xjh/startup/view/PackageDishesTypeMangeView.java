@@ -210,6 +210,16 @@ public class PackageDishesTypeMangeView extends SimpleGridForm {
             AlertBuilder.ERROR(selected.getMsg());
             return;
         }
+        DishesPackageType type = selected.getData().getAttachment();
+
+        Window window = this.getScene().getWindow();
+        ModelWindow mw = new ModelWindow(window, "套餐菜品管理");
+        PackageDishesDetailManageView view = new PackageDishesDetailManageView(dishesPackage, type);
+        view.setPrefWidth(window.getWidth() * 0.75);
+        mw.setScene(new Scene(view));
+        view.initialize();
+        mw.showAndWait();
+        loadData();
     }
 
     private Result<BO> getSelectedItem() {

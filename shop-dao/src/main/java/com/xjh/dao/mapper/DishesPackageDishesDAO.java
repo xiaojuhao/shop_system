@@ -7,6 +7,7 @@ import javax.inject.Inject;
 
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.DishesPackageDishes;
 import com.xjh.dao.foundation.EntityUtils;
@@ -20,6 +21,35 @@ public class DishesPackageDishesDAO {
     @Inject
     @Named("mysql")
     HikariDataSource ds;
+
+    public Result<Integer> deleteByIds(List<Integer> ids) {
+        if (CommonUtils.isEmpty(ids)) {
+            return Result.fail("入错错误");
+        }
+        int i = 0;
+        for (Integer id : ids) {
+            Result<Integer> delRs = deleteById(id);
+            if (delRs.getData() != null) {
+                i += delRs.getData();
+            }
+        }
+        return Result.success(i);
+    }
+
+    public Result<Integer> deleteById(Integer id) {
+        if (id == null) {
+            return Result.fail("入错错误");
+        }
+        DishesPackageDishes cond = new DishesPackageDishes();
+        cond.setDishesPackageDishesId(id);
+        try {
+            int i = Db.use(ds).del(EntityUtils.create(cond));
+            return Result.success(i);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail(ex.getMessage());
+        }
+    }
 
     public Result<Integer> deleteByDishesPackageTypeId(Integer dishesPackageTypeId) {
         if (dishesPackageTypeId == null) {

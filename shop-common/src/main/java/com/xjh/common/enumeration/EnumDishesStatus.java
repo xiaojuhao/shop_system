@@ -7,9 +7,21 @@ public enum EnumDishesStatus {
 
     ;
     public int status;
-    EnumDishesStatus(int status, String remark){
+
+    EnumDishesStatus(int status, String remark) {
         this.status = status;
     }
 
+    public static EnumDishesStatus of(Integer status) {
+        if (status == null) {
+            return ON;
+        }
+        for (EnumDishesStatus e : EnumDishesStatus.values()) {
+            if (e.status == status) {
+                return e;
+            }
+        }
+        return ON;
+    }
 
 }
