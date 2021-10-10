@@ -8,7 +8,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSON;
 import com.xjh.common.enumeration.EnumDishesStatus;
+import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.ImageHelper;
 import com.xjh.common.utils.cellvalue.ImageSrc;
@@ -27,6 +29,7 @@ import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.SimpleForm;
 import com.xjh.startup.view.model.IntStringPair;
 
+import cn.hutool.core.codec.Base64;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -37,6 +40,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -137,6 +141,17 @@ public class PackageDishesAddView extends SimpleForm implements Initializable {
     }
 
     private void buildContent(double height) {
+        tableView.setRowFactory(tv -> {
+            TableRow<BO> row = new TableRow<>();
+            row.setOnMouseClicked(clickEvt -> {
+                if (clickEvt.getClickCount() == 2 && !row.isEmpty()) {
+                    // 添加菜品到套餐中
+                    System.out.println("双击：" + JSON.toJSONString(row.getItem()));
+                    addToPackage(row.getItem());
+                }
+            });
+            return row;
+        });
         tableView.getColumns().addAll(
                 newCol("ID", "dishesId", 80),
                 newCol("菜品名称", "dishesName", 200),
@@ -153,6 +168,18 @@ public class PackageDishesAddView extends SimpleForm implements Initializable {
         Label remark = new Label("备注:双击加入套餐");
         remark.setTextFill(Color.RED);
         addLine(newCenterLine(remark));
+    }
+
+    private void addToPackage(BO bo) {
+        DishesPackageDishes newD = new DishesPackageDishes();
+        newD.setDishesPackageId(dishesPackageType.getDishesPackageId());
+        newD.setDishesId(bo.getDishesId());
+        newD.setDishesPackageTypeId(dishesPackageType.getDishesPackageTypeId());
+        newD.setDishesOptions(Base64.encode("[]"));
+        newD.setDishesPriceId(0);
+        dishesPackageDishesDAO.insert(newD);
+        AlertBuilder.INFO("加入套餐成功");
+        loadData();
     }
 
     @Data

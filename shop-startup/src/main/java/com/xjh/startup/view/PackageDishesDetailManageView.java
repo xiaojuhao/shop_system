@@ -127,6 +127,7 @@ public class PackageDishesDetailManageView extends SimpleForm implements Initial
         mw.setScene(new Scene(view));
         view.initialize();
         mw.showAndWait();
+        loadData();
     }
 
     private void removeSelectedDishes() {

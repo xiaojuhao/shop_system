@@ -22,6 +22,19 @@ public class DishesPackageDishesDAO {
     @Named("mysql")
     HikariDataSource ds;
 
+    public Result<Integer> insert(DishesPackageDishes dd) {
+        if (dd == null) {
+            return Result.fail("入错错误");
+        }
+        try {
+            int i = Db.use(ds).insert(EntityUtils.create(dd));
+            return Result.success(i);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail(ex.getMessage());
+        }
+    }
+
     public Result<Integer> deleteByIds(List<Integer> ids) {
         if (CommonUtils.isEmpty(ids)) {
             return Result.fail("入错错误");
