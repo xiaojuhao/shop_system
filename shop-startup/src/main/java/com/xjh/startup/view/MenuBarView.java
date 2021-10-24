@@ -6,6 +6,7 @@ import com.xjh.startup.view.base.HtmlLoader;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.LargeForm;
 import com.xjh.startup.view.base.MediumForm;
+import com.xjh.startup.view.ordermanage.OrderManageListView;
 
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -98,11 +99,12 @@ public class MenuBarView {
 
     private Menu createOrderMenu() {
         Menu menu = new Menu("订单管理");
-        MenuItem updatePassword = new MenuItem("订单列表");
+        MenuItem orderManagerListView = new MenuItem("订单列表");
+        orderManagerListView.setOnAction(evt -> openView("订单列表", new OrderManageListView()));
         MenuItem updateName = new MenuItem("菜品销售统计");
         MenuItem printJobMenu = new MenuItem("菜品分类销售统计");
         MenuItem discount = new MenuItem("退菜记录");
-        menu.getItems().addAll(updatePassword, updateName, printJobMenu, discount);
+        menu.getItems().addAll(orderManagerListView, updateName, printJobMenu, discount);
         return menu;
     }
 

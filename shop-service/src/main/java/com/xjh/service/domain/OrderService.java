@@ -31,6 +31,7 @@ import com.xjh.dao.dataobject.OrderPay;
 import com.xjh.dao.dataobject.SubOrder;
 import com.xjh.dao.mapper.OrderDAO;
 import com.xjh.dao.mapper.SubOrderDAO;
+import com.xjh.dao.query.PageQueryOrderReq;
 import com.xjh.service.domain.model.CreateOrderParam;
 
 import cn.hutool.core.codec.Base64;
@@ -47,6 +48,10 @@ public class OrderService {
     OrderPayService orderPayService;
     @Inject
     DeskService deskService;
+
+    public List<Order> pageQuery(PageQueryOrderReq req) {
+        return orderDAO.pageQuery(req);
+    }
 
     public Order getOrder(Integer orderId) {
         try {
