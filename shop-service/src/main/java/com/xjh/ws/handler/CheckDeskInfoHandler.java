@@ -89,7 +89,10 @@ public class CheckDeskInfoHandler implements WsHandler {
                     jSONObjectOrder.put("reduction", order.getOrderReduction());
                     jSONObjectOrder.put("refund", order.getOrderRefund());
 
-                    OrderOverviewVO billVO = orderService.buildOrderOverview(order, orderDishesList).getData();
+                    OrderOverviewVO billVO = orderService.buildOrderOverview(
+                            order,
+                            orderDishesList,
+                            null).getData();
                     EnumOrderStatus orderStatus = EnumOrderStatus.of(order.getOrderStatus());
                     String status = orderStatus.remark;
                     jSONObjectOrder.put("status", status);

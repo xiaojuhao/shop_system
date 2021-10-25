@@ -73,7 +73,8 @@ public class OrderPrinterHelper {
         array.addAll(dishesItems("特价菜及酒水", discountableList, sumPrice));
         // 支付信息
         List<OrderPay> orderPays = orderPayService.selectByOrderId(param.getOrderId());
-        OrderOverviewVO billView = orderService.buildOrderOverview(order, orderDishesList).getData();
+        OrderOverviewVO billView = orderService.buildOrderOverview(
+                order, orderDishesList, orderPays).getData();
         array.addAll(paymentInfos(orderPays, sumPrice.doubleValue(), billView));
         // 二维码
         array.addAll(qrCode());

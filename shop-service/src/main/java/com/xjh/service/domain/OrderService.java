@@ -160,7 +160,10 @@ public class OrderService {
         }
     }
 
-    public Result<OrderOverviewVO> buildOrderOverview(Order order, List<OrderDishes> orderDishesList) {
+    public Result<OrderOverviewVO> buildOrderOverview(
+            Order order,
+            List<OrderDishes> orderDishesList,
+            List<OrderPay> orderPays) {
         if (order != null) {
             OrderOverviewVO v = new OrderOverviewVO();
             Desk desk = deskService.getById(order.getDeskId());
@@ -189,9 +192,8 @@ public class OrderService {
             }
 
             // 支付信息
-            List<OrderPay> pays = orderPayService.selectByOrderId(order.getOrderId());
             StringBuilder payInfo = new StringBuilder();
-            CommonUtils.forEach(pays, p -> {
+            CommonUtils.forEach(orderPays, p -> {
                 payInfo.append(DateBuilder.base(p.getCreatetime()).timeStr())
                         .append(" 收到付款:")
                         .append(CommonUtils.formatMoney(p.getAmount()))

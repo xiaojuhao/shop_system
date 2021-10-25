@@ -10,10 +10,14 @@ import java.util.stream.Collectors;
 import com.xjh.common.anno.TableItemMark;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.utils.cellvalue.Money;
+import com.xjh.common.valueobject.OrderOverviewVO;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.Order;
+import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.dao.query.DishesQuery;
 import com.xjh.dao.query.PageQueryOrderReq;
+import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.DishesEditView;
@@ -41,6 +45,7 @@ import lombok.Data;
 
 public class OrderManageListView extends SimpleForm implements Initializable {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
+    OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
 
     ObjectProperty<DishesQuery> cond = new SimpleObjectProperty<>(new DishesQuery());
     ObservableList<BO> items = FXCollections.observableArrayList();
@@ -59,6 +64,7 @@ public class OrderManageListView extends SimpleForm implements Initializable {
         PageQueryOrderReq req = new PageQueryOrderReq();
         List<Order> orderList = orderService.pageQuery(req);
         AtomicInteger sno = new AtomicInteger(0);
+
         Platform.runLater(() -> {
             items.clear();
             items.addAll(orderList.stream().map(this::orderToBO)
@@ -78,7 +84,19 @@ public class OrderManageListView extends SimpleForm implements Initializable {
         bo.setAccountNickname("管理员");
         bo.setOrderCustomerNums(order.getOrderCustomerNums());
         bo.setOrderTime(DateBuilder.base(order.getCreateTime()).timeStr());
-        ;
+        List<OrderDishes> dishesList = orderDishesService.selectByOrderId(order.getOrderId());
+        OrderOverviewVO overview = orderService.buildOrderOverview(order, dishesList, null).getData();
+        if (overview != null) {
+            bo.setDeskName(overview.getDeskName());
+            bo.setNeedPayAmt(new Money(overview.getOrderNeedPay()));
+            bo.setTotalPayAmt(new Money(overview.getTotalPrice()));
+            bo.setReductionAmt(new Money(overview.getOrderReduction()));
+            bo.setReturnAmt(new Money(overview.getReturnAmount()));
+            bo.setDiscountAmt(new Money(overview.getDiscountAmount()));
+            bo.setEraseAmt(new Money(overview.getOrderErase()));
+            bo.setPaidAmt(new Money(overview.getOrderHadpaid()));
+            bo.setPaymentStatus(overview.getPayStatusName());
+        }
         return bo;
     }
 
@@ -193,14 +211,14 @@ public class OrderManageListView extends SimpleForm implements Initializable {
         String accountNickname;
         Integer orderCustomerNums;
         String orderTime;
-        Double needPayAmt;
-        Double totalPayAmt;
-        Double discountAmt;
-        Double eraseAmt;
-        Double returnAmt;
-        Double paidAmt;
-        Double reductionAmt;
-        Double returnedAmt;
+        Money needPayAmt;
+        Money totalPayAmt;
+        Money discountAmt;
+        Money eraseAmt;
+        Money returnAmt;
+        Money paidAmt;
+        Money reductionAmt;
+        Money returnedAmt;
         String paymentStatus;
     }
 }

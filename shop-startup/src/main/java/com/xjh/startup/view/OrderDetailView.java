@@ -35,6 +35,7 @@ import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
+import com.xjh.dao.dataobject.OrderPay;
 import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.dao.dataobject.PrinterTaskDO;
 import com.xjh.dao.mapper.PrinterDAO;
@@ -43,6 +44,7 @@ import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.DishesPackageService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.OrderDishesService;
+import com.xjh.service.domain.OrderPayService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.foundation.printers.OrderPrinterHelper;
@@ -87,6 +89,7 @@ import javafx.stage.StageStyle;
 public class OrderDetailView extends VBox {
     // 依赖服务
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
+    OrderPayService orderPayService = GuiceContainer.getInstance(OrderPayService.class);
     DeskService deskService = GuiceContainer.getInstance(DeskService.class);
     OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
@@ -104,8 +107,9 @@ public class OrderDetailView extends VBox {
         Runnable refreshView = () -> {
             Order order = orderService.getOrder(orderId);
             List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(orderId);
+            List<OrderPay> orderPays = orderPayService.selectByOrderId(orderId);
             // 账单数据
-            loadAndRefreshOrderBill(order, orderDishesList);
+            loadAndRefreshOrderBill(order, orderDishesList, orderPays);
             // 菜品明细
             tableView.setItems(buildTableItemList(orderDishesList));
             // 刷新列表
@@ -359,8 +363,8 @@ public class OrderDetailView extends VBox {
 
     }
 
-    private void loadAndRefreshOrderBill(Order order, List<OrderDishes> orderDishesList) {
-        Result<OrderOverviewVO> billRs = orderService.buildOrderOverview(order, orderDishesList);
+    private void loadAndRefreshOrderBill(Order order, List<OrderDishes> orderDishesList, List<OrderPay> orderPays) {
+        Result<OrderOverviewVO> billRs = orderService.buildOrderOverview(order, orderDishesList, orderPays);
         if (billRs.isSuccess()) {
             orderView.set(billRs.getData());
         } else {
