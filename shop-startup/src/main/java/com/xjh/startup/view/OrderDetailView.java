@@ -195,7 +195,7 @@ public class OrderDetailView extends VBox {
             Label discount = createLabel("折扣金额", width, c -> formatMoney(c.discountAmount));
             gridPane.add(discount, 2, row);
 
-            Label refund = createLabel("退菜金额", width, c -> formatMoney(c.returnAmount));
+            Label refund = createLabel("退菜金额", width, c -> formatMoney(c.returnDishesPrice));
             gridPane.add(refund, 3, row);
 
             Label fan = createLabel("反结账金额", width, c -> "0.00");

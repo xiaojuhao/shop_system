@@ -1,5 +1,6 @@
 package com.xjh.common.utils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -28,6 +29,14 @@ public class DateBuilder {
         DateBuilder builder = new DateBuilder();
         if (mills != null && mills > 0) {
             builder.localDateTime = base(new Date(mills)).dateTime();
+        }
+        return builder;
+    }
+
+    public static DateBuilder base(LocalDate localDate) {
+        DateBuilder builder = new DateBuilder();
+        if (localDate != null) {
+            builder.localDateTime = localDate.atStartOfDay(ZoneId.systemDefault()).toLocalDateTime();
         }
         return builder;
     }

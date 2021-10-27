@@ -1,11 +1,10 @@
 package com.xjh.dao.query;
 
+import static com.xjh.common.utils.CopyUtils.deepClone;
+
 import com.xjh.common.utils.CommonUtils;
 
-import com.xjh.common.utils.CopyUtils;
 import lombok.Data;
-
-import static com.xjh.common.utils.CopyUtils.deepClone;
 
 @Data
 public class DishesQuery {

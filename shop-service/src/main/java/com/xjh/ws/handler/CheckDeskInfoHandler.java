@@ -99,7 +99,7 @@ public class CheckDeskInfoHandler implements WsHandler {
                     jSONObjectOrder.put("statusCode", orderStatus);
                     jSONObjectOrder.put("totalPrice", CommonUtils.formatMoney(billVO.getTotalPrice()));
                     jSONObjectOrder.put("needPayPrice", CommonUtils.formatMoney(billVO.getOrderNeedPay()));
-                    jSONObjectOrder.put("returnDishesPrice", CommonUtils.formatMoney(billVO.getReturnAmount()));
+                    jSONObjectOrder.put("returnDishesPrice", CommonUtils.formatMoney(billVO.getReturnDishesPrice()));
                     jSONObjectOrder.put("discountPrice", CommonUtils.formatMoney(billVO.getDiscountAmount()));
                     jSONObjectReturn.put("orderInfo", jSONObjectOrder);
 

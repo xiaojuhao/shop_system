@@ -3,6 +3,7 @@ package com.xjh.startup.view.ordermanage;
 
 import static com.xjh.common.utils.TableViewUtils.newCol;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -15,7 +16,6 @@ import com.xjh.common.valueobject.OrderOverviewVO;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
-import com.xjh.dao.query.DishesQuery;
 import com.xjh.dao.query.PageQueryOrderReq;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
@@ -35,6 +35,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableView;
@@ -47,7 +48,7 @@ public class OrderManageListView extends SimpleForm implements Initializable {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
     OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
 
-    ObjectProperty<DishesQuery> cond = new SimpleObjectProperty<>(new DishesQuery());
+    ObjectProperty<PageQueryOrderReq> cond = new SimpleObjectProperty<>(new PageQueryOrderReq());
     ObservableList<BO> items = FXCollections.observableArrayList();
     TableView<BO> tableView = new TableView<>();
 
@@ -61,8 +62,7 @@ public class OrderManageListView extends SimpleForm implements Initializable {
     }
 
     private void loadData() {
-        PageQueryOrderReq req = new PageQueryOrderReq();
-        List<Order> orderList = orderService.pageQuery(req);
+        List<Order> orderList = orderService.pageQuery(cond.get());
         AtomicInteger sno = new AtomicInteger(0);
 
         Platform.runLater(() -> {
@@ -91,7 +91,7 @@ public class OrderManageListView extends SimpleForm implements Initializable {
             bo.setNeedPayAmt(new Money(overview.getOrderNeedPay()));
             bo.setTotalPayAmt(new Money(overview.getTotalPrice()));
             bo.setReductionAmt(new Money(overview.getOrderReduction()));
-            bo.setReturnAmt(new Money(overview.getReturnAmount()));
+            bo.setReturnDishesPrice(new Money(overview.getReturnDishesPrice()));
             bo.setDiscountAmt(new Money(overview.getDiscountAmount()));
             bo.setEraseAmt(new Money(overview.getOrderErase()));
             bo.setPaidAmt(new Money(overview.getOrderHadpaid()));
@@ -101,13 +101,26 @@ public class OrderManageListView extends SimpleForm implements Initializable {
     }
 
     private void buildCond() {
+        cond.addListener((ob, o, n) -> loadData());
         // name
         HBox nameCondBlock = new HBox();
         Label nameLabel = new Label("名称:");
         TextField nameInput = new TextField();
         nameInput.setPrefWidth(130);
         nameCondBlock.getChildren().add(newCenterLine(nameLabel, nameInput));
-
+        // 时间选择
+        HBox dateRangeBlock = new HBox();
+        Label dateRangeLabel = new Label("订单日期:");
+        DatePicker datePickerStart = new DatePicker(LocalDate.now());
+        datePickerStart.setPrefWidth(120);
+        DatePicker datePickerEnd = new DatePicker(LocalDate.now());
+        datePickerEnd.setPrefWidth(120);
+        dateRangeBlock.getChildren().add(newCenterLine(dateRangeLabel,
+                datePickerStart,
+                new Label("至"),
+                datePickerEnd));
+        cond.get().setStartDate(LocalDate.now());
+        cond.get().setEndDate(LocalDate.now());
         // status
         HBox statusCondBlock = new HBox();
         Label statusLabel = new Label("状态:");
@@ -118,17 +131,24 @@ public class OrderManageListView extends SimpleForm implements Initializable {
 
         Button queryBtn = new Button("查询");
         queryBtn.setOnAction(evt -> {
-            DishesQuery q = cond.get().newVersion();
+            PageQueryOrderReq q = cond.get().newVer();
             q.setDishesName(CommonUtils.trim(nameInput.getText()));
             String selectedStatus = modelSelect.getSelectionModel().getSelectedItem();
             if (CommonUtils.eq(selectedStatus, "上架")) q.setStatus(1);
             if (CommonUtils.eq(selectedStatus, "下架")) q.setStatus(0);
+            if (datePickerStart.getValue() != null) {
+                q.setStartDate(datePickerStart.getValue());
+            }
+            if (datePickerEnd.getValue() != null) {
+                q.setEndDate(datePickerEnd.getValue());
+            }
             cond.set(q);
         });
 
         Button addNew = new Button("新增菜品");
         addNew.setOnAction(evt -> openEditor(new Dishes()));
         HBox line = newCenterLine(nameCondBlock, statusCondBlock,
+                dateRangeBlock,
                 queryBtn,
                 new Separator(Orientation.VERTICAL),
                 addNew);
@@ -144,14 +164,14 @@ public class OrderManageListView extends SimpleForm implements Initializable {
                 newCol("编号", "sno", 50),
                 newCol("订单号", "orderId", 100),
                 newCol("桌号", "deskName", 50),
-                newCol("下单员工", "accountNickname", 100),
+                newCol("下单员工", "accountNickname", 60),
                 newCol("就餐人数", "orderCustomerNums", 50),
-                newCol("下单时间", "orderTime", 100),
+                newCol("下单时间", "orderTime", 150),
                 newCol("应付款", "needPayAmt", 50),
                 newCol("菜品总额", "totalPayAmt", 50),
                 newCol("折扣金额", "discountAmt", 50),
                 newCol("抹零金额", "eraseAmt", 50),
-                newCol("退菜金额", "returnAmt", 50),
+                newCol("退菜金额", "returnDishesPrice", 50),
                 newCol("已付金额", "paidAmt", 50),
                 newCol("店长减免", "reductionAmt", 50),
                 newCol("已退现金", "returnedAmt", 50),
@@ -164,12 +184,9 @@ public class OrderManageListView extends SimpleForm implements Initializable {
     }
 
     private void buildFoot() {
-        cond.addListener((ob, o, n) -> {
-            loadData();
-        });
         Button prev = new Button("上一页");
         prev.setOnMouseClicked(e -> {
-            DishesQuery c = cond.get().newVersion();
+            PageQueryOrderReq c = cond.get().newVer();
             int pageNo = c.getPageNo();
             if (pageNo <= 1) {
                 c.setPageNo(1);
@@ -180,7 +197,7 @@ public class OrderManageListView extends SimpleForm implements Initializable {
         });
         Button next = new Button("下一页");
         next.setOnMouseClicked(e -> {
-            DishesQuery c = cond.get().newVersion();
+            PageQueryOrderReq c = cond.get().newVer();
             c.setPageNo(c.getPageNo() + 1);
             cond.set(c);
         });
@@ -215,7 +232,7 @@ public class OrderManageListView extends SimpleForm implements Initializable {
         Money totalPayAmt;
         Money discountAmt;
         Money eraseAmt;
-        Money returnAmt;
+        Money returnDishesPrice;
         Money paidAmt;
         Money reductionAmt;
         Money returnedAmt;

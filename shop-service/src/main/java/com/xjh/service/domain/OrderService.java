@@ -180,7 +180,7 @@ public class OrderService {
             v.discountAmount = calcDiscountAmount(order, orderDishesList);
             v.payStatusName = EnumOrderStatus.of(order.getOrderStatus()).remark;
             v.deduction = order.getFullReduceDishesPrice();
-            v.returnAmount = this.sumReturnAmount(orderDishesList);
+            v.returnDishesPrice = this.sumReturnDishesPrice(orderDishesList);
             v.orderErase = CommonUtils.orElse(order.getOrderErase(), 0D);
             v.orderReduction = CommonUtils.orElse(order.getOrderReduction(), 0D);
             v.discountName = order.getDiscountReason();
@@ -281,7 +281,8 @@ public class OrderService {
         return billAmount;
     }
 
-    public double sumReturnAmount(List<OrderDishes> orderDishes) {
+    // 退菜金额
+    public double sumReturnDishesPrice(List<OrderDishes> orderDishes) {
         if (CommonUtils.isEmpty(orderDishes)) {
             return 0;
         }
@@ -312,7 +313,7 @@ public class OrderService {
         if (order == null) {
             return 0;
         }
-        double totalBillAmt = sumBillAmount(orderDishes) - sumReturnAmount(orderDishes);
+        double totalBillAmt = sumBillAmount(orderDishes) - sumReturnDishesPrice(orderDishes);
         double orderErase = CommonUtils.orElse(order.getOrderErase(), 0D);
         double orderReduction = CommonUtils.orElse(order.getOrderReduction(), 0D);
         double paidAmt = CommonUtils.orElse(order.getOrderHadpaid(), 0D);

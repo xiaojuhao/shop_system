@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.DateBuilder;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.foundation.EntityUtils;
 import com.xjh.dao.query.PageQueryOrderReq;
@@ -57,13 +58,13 @@ public class OrderDAO {
                 where.append(" and orderId = ?");
                 params.add(cond.getOrderId());
             }
-            if (cond.getStartTime() != null) {
+            if (cond.getStartDate() != null) {
                 where.append(" and createtime >= ? ");
-                params.add(cond.getStartTime());
+                params.add(DateBuilder.base(cond.getStartDate()).mills());
             }
-            if (cond.getEndTime() != null) {
+            if (cond.getEndDate() != null) {
                 where.append(" and createtime <= ? ");
-                params.add(cond.getEndTime());
+                params.add(DateBuilder.base(cond.getEndDate()).plusDays(1).mills());
             }
             String sql = "select * from order_list where 1=1 " + where
                     + " order by createtime desc "
