@@ -17,6 +17,8 @@ public class PageQueryOrderReq {
     Integer status;
     LocalDate startDate;
     LocalDate endDate;
+    Integer deskId;
+    Integer accountId;
     Integer ver;
 
     public PageQueryOrderReq newVer() {

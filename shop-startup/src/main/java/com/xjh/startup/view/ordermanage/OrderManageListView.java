@@ -9,14 +9,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import com.xjh.common.anno.TableItemMark;
-import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.valueobject.OrderOverviewVO;
+import com.xjh.dao.dataobject.Account;
+import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.dao.query.PageQueryOrderReq;
+import com.xjh.service.domain.AccountService;
+import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
@@ -24,6 +27,7 @@ import com.xjh.startup.view.DishesEditView;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SimpleForm;
+import com.xjh.startup.view.model.IntStringPair;
 
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
@@ -39,14 +43,15 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.stage.Window;
 import lombok.Data;
 
 public class OrderManageListView extends SimpleForm implements Initializable {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
+    AccountService accountService = GuiceContainer.getInstance(AccountService.class);
     OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
+    DeskService deskService = GuiceContainer.getInstance(DeskService.class);
 
     ObjectProperty<PageQueryOrderReq> cond = new SimpleObjectProperty<>(new PageQueryOrderReq());
     ObservableList<BO> items = FXCollections.observableArrayList();
@@ -103,11 +108,32 @@ public class OrderManageListView extends SimpleForm implements Initializable {
     private void buildCond() {
         cond.addListener((ob, o, n) -> loadData());
         // name
+        Account noAccount = new Account();
+        noAccount.setAccountNickName("全部");
+        List<Account> accountList = accountService.listAll();
+        accountList.add(0, noAccount);
         HBox nameCondBlock = new HBox();
-        Label nameLabel = new Label("名称:");
-        TextField nameInput = new TextField();
-        nameInput.setPrefWidth(130);
-        nameCondBlock.getChildren().add(newCenterLine(nameLabel, nameInput));
+        ObservableList<IntStringPair> accountOptions = FXCollections.observableArrayList(
+                accountList.stream().map(it -> new IntStringPair(it.getAccountId(), it.getAccountNickName()))
+                        .collect(Collectors.toList())
+        );
+        ComboBox<IntStringPair> accountSelect = new ComboBox<>(accountOptions);
+        accountSelect.getSelectionModel().selectFirst();
+        Label nameLabel = new Label("业务员:");
+        nameCondBlock.getChildren().add(newCenterLine(nameLabel, accountSelect));
+        // desk列表
+        HBox deskCondBlock = new HBox();
+        List<Desk> deskList = deskService.getAllDesks();
+        Desk noDesk = new Desk();
+        noDesk.setDeskName("全部");
+        deskList.add(0, noDesk);
+        ObservableList<IntStringPair> desksOptions = FXCollections.observableArrayList(
+                deskList.stream().map(it -> new IntStringPair(it.getDeskId(), it.getDeskName())).collect(Collectors.toList())
+        );
+        ComboBox<IntStringPair> deskCombo = new ComboBox<>(desksOptions);
+        deskCombo.getSelectionModel().selectFirst();
+        Label deskLabel = new Label("桌号:");
+        deskCondBlock.getChildren().add(newCenterLine(deskLabel, deskCombo));
         // 时间选择
         HBox dateRangeBlock = new HBox();
         Label dateRangeLabel = new Label("订单日期:");
@@ -121,21 +147,22 @@ public class OrderManageListView extends SimpleForm implements Initializable {
                 datePickerEnd));
         cond.get().setStartDate(LocalDate.now());
         cond.get().setEndDate(LocalDate.now());
-        // status
-        HBox statusCondBlock = new HBox();
-        Label statusLabel = new Label("状态:");
-        ObservableList<String> options = FXCollections.observableArrayList("全部", "上架", "下架");
-        ComboBox<String> modelSelect = new ComboBox<>(options);
-        modelSelect.getSelectionModel().selectFirst();
-        statusCondBlock.getChildren().add(newCenterLine(statusLabel, modelSelect));
 
         Button queryBtn = new Button("查询");
         queryBtn.setOnAction(evt -> {
             PageQueryOrderReq q = cond.get().newVer();
-            q.setDishesName(CommonUtils.trim(nameInput.getText()));
-            String selectedStatus = modelSelect.getSelectionModel().getSelectedItem();
-            if (CommonUtils.eq(selectedStatus, "上架")) q.setStatus(1);
-            if (CommonUtils.eq(selectedStatus, "下架")) q.setStatus(0);
+            IntStringPair selectedAccount = accountSelect.getSelectionModel().getSelectedItem();
+            if (selectedAccount != null) {
+                q.setAccountId(selectedAccount.getKey());
+            } else {
+                q.setAccountId(null);
+            }
+            IntStringPair selectedDesk = deskCombo.getSelectionModel().getSelectedItem();
+            if (selectedDesk != null) {
+                q.setDeskId(selectedDesk.getKey());
+            } else {
+                q.setDeskId(null);
+            }
             if (datePickerStart.getValue() != null) {
                 q.setStartDate(datePickerStart.getValue());
             }
@@ -147,7 +174,9 @@ public class OrderManageListView extends SimpleForm implements Initializable {
 
         Button addNew = new Button("新增菜品");
         addNew.setOnAction(evt -> openEditor(new Dishes()));
-        HBox line = newCenterLine(nameCondBlock, statusCondBlock,
+        HBox line = newCenterLine(
+                nameCondBlock,
+                deskCondBlock,
                 dateRangeBlock,
                 queryBtn,
                 new Separator(Orientation.VERTICAL),

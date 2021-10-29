@@ -1,5 +1,7 @@
 package com.xjh.service.domain;
 
+import java.util.List;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.common.utils.CommonUtils;
@@ -27,6 +29,10 @@ public class AccountService {
             ex.printStackTrace();
             return Result.fail("系统异常:" + ex.getMessage());
         }
+    }
+
+    public List<Account> listAll() {
+        return accountDAO.selectList(new Account());
     }
 
     public Result<Account> checkPwd(String username, String pwd) {

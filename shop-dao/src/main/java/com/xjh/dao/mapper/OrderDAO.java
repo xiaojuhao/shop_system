@@ -66,6 +66,14 @@ public class OrderDAO {
                 where.append(" and createtime <= ? ");
                 params.add(DateBuilder.base(cond.getEndDate()).plusDays(1).mills());
             }
+            if (cond.getDeskId() != null) {
+                where.append(" and deskId = ? ");
+                params.add(cond.getDeskId());
+            }
+            if (cond.getAccountId() != null) {
+                where.append(" and accountId = ? ");
+                params.add(cond.getAccountId());
+            }
             String sql = "select * from order_list where 1=1 " + where
                     + " order by createtime desc "
                     + " limit " + (pageNo - 1) * pageSize + "," + pageSize;
