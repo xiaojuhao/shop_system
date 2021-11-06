@@ -176,6 +176,9 @@ public class OrderManageListView extends SimpleForm implements Initializable {
             cond.set(q);
         });
 
+        Button showBill = new Button("查看报表");
+        showBill.setOnAction(evt -> showBill(cond.get()));
+
         Button modifyCustNums = new Button("修改就餐人数");
         modifyCustNums.setOnAction(evt -> doModifyOrderCustNum());
 
@@ -187,6 +190,7 @@ public class OrderManageListView extends SimpleForm implements Initializable {
                 dateRangeBlock,
                 queryBtn,
                 new Separator(Orientation.VERTICAL),
+                showBill,
                 modifyCustNums,
                 specialOperations);
         line.setSpacing(20);
@@ -260,6 +264,13 @@ public class OrderManageListView extends SimpleForm implements Initializable {
         HBox line = newCenterLine(prev, next);
         line.setPadding(new Insets(10, 0, 0, 0));
         addLine(line);
+    }
+
+    public void showBill(PageQueryOrderReq req) {
+        ModelWindow mw = new ModelWindow(this.getScene().getWindow());
+        mw.setHeight(1000);
+        mw.setScene(new Scene(new OrderManageBillView(req, mw)));
+        mw.showAndWait();
     }
 
     public void doModifyOrderCustNum() {

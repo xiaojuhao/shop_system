@@ -3,11 +3,13 @@ package com.xjh.dao.mapper;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.google.inject.name.Named;
+import com.xjh.common.utils.CommonUtils;
 import com.xjh.dao.dataobject.SubOrder;
 import com.xjh.dao.foundation.EntityUtils;
 import com.zaxxer.hikari.HikariDataSource;
@@ -60,6 +62,23 @@ public class SubOrderDAO {
     public List<SubOrder> selectList(SubOrder subOrder) {
         try {
             List<Entity> list = Db.use(ds).find(EntityUtils.create(subOrder));
+            return EntityUtils.convertList(list, SubOrder.class);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    public List<SubOrder> selectByOrderIds(List<Integer> orderIds) {
+        try {
+            if (CommonUtils.isEmpty(orderIds)) {
+                return new ArrayList<>();
+            }
+            String sql = "select * from suborder_list where orderId in (" +
+                    orderIds.stream().map(Object::toString)
+                            .collect(Collectors.joining(",", "", ""))
+                    + ")";
+            List<Entity> list = Db.use(ds).query(sql);
             return EntityUtils.convertList(list, SubOrder.class);
         } catch (Exception ex) {
             ex.printStackTrace();
