@@ -1,17 +1,19 @@
 package com.xjh.ws.handler;
 
+import org.java_websocket.WebSocket;
+
 import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Result;
+import com.xjh.common.valueobject.CartItemVO;
+import com.xjh.common.valueobject.CartVO;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.service.domain.CartService;
-import com.xjh.common.valueobject.CartItemVO;
-import com.xjh.common.valueobject.CartVO;
-import com.xjh.ws.WsHandler;
 import com.xjh.ws.WsApiType;
-import org.java_websocket.WebSocket;
+import com.xjh.ws.WsHandler;
 
 @Singleton
 @WsApiType(value = "addDishesToCart")
@@ -35,6 +37,7 @@ public class AddCartHandler implements WsHandler {
             return resp;
         }
         CartItemVO cartItem = new CartItemVO();
+        cartItem.setCartDishesId(CommonUtils.randomNumber(0, Integer.MAX_VALUE));
         cartItem.setDishesId(dishesId);
         cartItem.setDishesPriceId(0);
         cartItem.setNums(dishesNum);

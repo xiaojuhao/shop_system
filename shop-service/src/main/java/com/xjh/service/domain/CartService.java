@@ -3,12 +3,12 @@ package com.xjh.service.domain;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.enumeration.EnumOrderStatus;
@@ -69,16 +69,7 @@ public class CartService {
             CartVO cart = new CartVO();
             cart.setDeskId(deskId);
             List<CartItemVO> contentItems = getCartItems(deskId);
-            boolean exists = false;
-            for (CartItemVO vo : contentItems) {
-                if (Objects.equals(vo.getDishesId(), item.getDishesId())) {
-                    vo.setNums(vo.getNums() + item.getNums());
-                    exists = true;
-                }
-            }
-            if (!exists) {
-                contentItems.add(item);
-            }
+            contentItems.add(item);
             cart.setContents(contentItems);
             Result<String> rs = CartStore.saveCart(cart);
             if (!rs.isSuccess()) {
@@ -254,7 +245,11 @@ public class CartService {
         d.setOrderDishesIfrefund(0);
         d.setOrderDishesNums(item.getNums());
         d.setOrderDishesSaletype(EnumOrderSaleType.NORMAL.type);
-        d.setOrderDishesOptions(Base64.encode("[]"));
+        if (item.getDishesAttrs() != null) {
+            d.setOrderDishesOptions(Base64.encode(JSONObject.toJSONString(item.getDishesAttrs())));
+        } else {
+            d.setOrderDishesOptions(Base64.encode("[]"));
+        }
         d.setOrderDishesDiscountInfo(Base64.encode(""));
 
         return d;

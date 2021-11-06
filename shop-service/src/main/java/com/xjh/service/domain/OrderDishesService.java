@@ -8,11 +8,16 @@ import java.util.function.Predicate;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.alibaba.fastjson.JSONArray;
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.DishesAttributeHelper;
 import com.xjh.common.utils.Result;
+import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.dao.mapper.OrderDishesDAO;
+
+import cn.hutool.core.codec.Base64;
 
 @Singleton
 public class OrderDishesService {
@@ -22,17 +27,17 @@ public class OrderDishesService {
     StoreService storeService;
 
     public Result<Integer> updatePrimaryKey(OrderDishes update) {
-        try{
+        try {
             if (update == null) {
                 return Result.fail("入参错误");
             }
             int i = orderDishesDAO.updateByPK(update);
-            if(i == 0){
+            if (i == 0) {
                 return Result.fail("更新失败");
-            }else {
+            } else {
                 return Result.success(i);
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             return Result.fail(ex.getMessage());
         }
@@ -70,5 +75,14 @@ public class OrderDishesService {
     public Predicate<OrderDishes> discountableChecker() {
         Set<Integer> discountableDishesIds = storeService.getStoreDiscountableDishesIds();
         return o -> discountableDishesIds.contains(o.getDishesId()) && o.getIfDishesPackage() == 0;
+    }
+
+    public String generateAttrDigest(OrderDishes orderDishes) {
+        if (CommonUtils.isBlank(orderDishes.getOrderDishesOptions())) {
+            return "";
+        }
+        String options = Base64.decodeStr(orderDishes.getOrderDishesOptions());
+        List<DishesAttributeVO> attrs = JSONArray.parseArray(options, DishesAttributeVO.class);
+        return DishesAttributeHelper.generateSelectedAttrDigest(attrs);
     }
 }

@@ -2,6 +2,7 @@ package com.xjh.dao.mapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -28,6 +29,21 @@ public class DishesAttributeDAO {
         } catch (Exception ex) {
             ex.printStackTrace();
             return new ArrayList<>();
+        }
+    }
+
+    public DishesAttribute selectById(Integer dishesAttributeId) {
+        try {
+            if (dishesAttributeId == null) {
+                return null;
+            }
+            DishesAttribute cond = new DishesAttribute();
+            cond.setDishesAttributeId(dishesAttributeId);
+            List<Entity> list = Db.use(ds).find(EntityUtils.create(cond));
+            return Objects.requireNonNull(EntityUtils.convertList(list, DishesAttribute.class)).stream().findFirst().orElse(null);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
         }
     }
 

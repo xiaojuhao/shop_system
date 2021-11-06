@@ -7,23 +7,31 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.CopyUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.ImageHelper;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
+import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesImgVO;
 import com.xjh.common.valueobject.PageCond;
 import com.xjh.dao.dataobject.Dishes;
+import com.xjh.dao.dataobject.DishesAttribute;
 import com.xjh.dao.dataobject.DishesPrice;
 import com.xjh.dao.dataobject.DishesType;
+import com.xjh.dao.mapper.DishesAttributeDAO;
 import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.dao.mapper.DishesPriceDAO;
 import com.xjh.dao.query.DishesQuery;
+
+import cn.hutool.core.codec.Base64;
 
 @Singleton
 public class DishesService {
@@ -31,6 +39,8 @@ public class DishesService {
     DishesDAO dishesDAO;
     @Inject
     DishesPriceDAO dishesPriceDAO;
+    @Inject
+    DishesAttributeDAO dishesAttributeDAO;
 
     public Result<Integer> save(Dishes dishes) {
         try {
@@ -57,6 +67,35 @@ public class DishesService {
 
     public Dishes getById(Integer id) {
         return dishesDAO.getById(id);
+    }
+
+    public List<DishesAttributeVO> getDishesAttribute(Integer dishesId) {
+        List<DishesAttributeVO> rs = new ArrayList<>();
+        Dishes dishes = getById(dishesId);
+        // 公共属性
+        List<String> pubAttrIds = CommonUtils.splitNoDup(dishes.getDishesPublicAttribute(), ",");
+        for (String id : pubAttrIds) {
+            DishesAttribute pubAttr = dishesAttributeDAO.selectById(CommonUtils.parseInt(id, null));
+            if (pubAttr != null) {
+                if (CommonUtils.isNotBlank(pubAttr.getDishesAttributeObj())) {
+                    DishesAttributeVO vo = JSON.parseObject(Base64.decodeStr(pubAttr.getDishesAttributeObj()),
+                            DishesAttributeVO.class);
+                    if (vo != null) {
+                        rs.add(vo);
+                    }
+                }
+            }
+        }
+        // 私有属性
+        String priAttrs = dishes.getDishesPrivateAttribute();
+        if (CommonUtils.isNotBlank(priAttrs)) {
+            String attr = Base64.decodeStr(priAttrs);
+            List<DishesAttributeVO> priAttrVOs = JSONArray.parseArray(attr, DishesAttributeVO.class);
+            if (CommonUtils.isNotEmpty(priAttrVOs)) {
+                rs.addAll(priAttrVOs);
+            }
+        }
+        return rs.stream().map(CopyUtils::deepClone).collect(Collectors.toList());
     }
 
     public String getDishesName(Integer dishesId) {

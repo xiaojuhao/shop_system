@@ -5,11 +5,14 @@ import static com.xjh.common.utils.ImageHelper.buildImageView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import com.alibaba.fastjson.JSON;
+import com.beust.jcommander.internal.Lists;
 import com.xjh.common.enumeration.EnumChoiceAction;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.ClickHelper;
@@ -20,6 +23,8 @@ import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.CartItemVO;
 import com.xjh.common.valueobject.CartVO;
+import com.xjh.common.valueobject.DishesAttributeVO;
+import com.xjh.common.valueobject.DishesAttributeValueVO;
 import com.xjh.common.valueobject.DishesImgVO;
 import com.xjh.common.valueobject.PageCond;
 import com.xjh.dao.dataobject.Dishes;
@@ -33,6 +38,7 @@ import com.xjh.service.domain.DishesTypeService;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
 import com.xjh.service.domain.model.SendOrderRequest;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
+import com.xjh.startup.view.base.SimpleForm;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.DishesChoiceItemBO;
 import com.xjh.startup.view.model.DishesQueryCond;
@@ -50,6 +56,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -304,7 +311,7 @@ public class OrderDishesChoiceView extends VBox {
                 }
                 // 加入到购物车
                 else {
-                    addDishesToCart(bo);
+                    openAddDishesDialog(bo);
                 }
             }
         });
@@ -335,7 +342,78 @@ public class OrderDishesChoiceView extends VBox {
         stage.showAndWait();
     }
 
-    private void addDishesToCart(DishesChoiceItemBO bo) {
+    private void openAddDishesDialog(DishesChoiceItemBO bo) {
+        Stage stage = new Stage();
+        stage.initOwner(this.getScene().getWindow());
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initStyle(StageStyle.DECORATED);
+        stage.centerOnScreen();
+        stage.setWidth(this.getScene().getWindow().getWidth() / 2);
+        stage.setHeight(this.getScene().getWindow().getHeight() / 3 * 2);
+        stage.setTitle("点菜[桌号:" + param.getDeskName() + "]");
+        List<DishesAttributeVO> dishesAttrs = dishesService.getDishesAttribute(bo.getDishesId());
+        SimpleForm form = new SimpleForm();
+        form.setSpacing(10);
+        List<Runnable> collectActions = new ArrayList<>();
+        for (DishesAttributeVO attr : dishesAttrs) {
+            Label name = new Label(attr.getDishesAttributeName() + ":");
+            name.setPrefWidth(60);
+            HBox line = new HBox();
+            // 单选框
+            if (attr.getIsValueRadio() != null && attr.getIsValueRadio()) {
+                ToggleGroup group = new ToggleGroup();
+                attr.getAllAttributeValues().forEach(v -> {
+                    RadioButton radio = new RadioButton(v.getAttributeValue());
+                    radio.setToggleGroup(group);
+                    radio.setUserData(v.getAttributeValue());
+                    line.getChildren().add(radio);
+                });
+                collectActions.add(() -> {
+                    String udata = (String) group.getSelectedToggle().getUserData();
+                    attr.setSelectedAttributeValues(
+                            getSelectedAttr(attr.getAllAttributeValues(), Lists.newArrayList(udata)));
+                });
+            }
+            // 复选框
+            if (attr.getIsValueRadio() != null && !attr.getIsValueRadio()) {
+                List<CheckBox> allCbs = new ArrayList<>();
+                attr.getAllAttributeValues().forEach(v -> {
+                    CheckBox cb = new CheckBox(v.getAttributeValue());
+                    cb.setUserData(v.getAttributeValue());
+                    allCbs.add(cb);
+                });
+                line.getChildren().addAll(allCbs);
+                collectActions.add(() -> {
+                    List<String> selectedVal = allCbs.stream()
+                            .map(cb -> cb.isSelected() ? cb.getUserData().toString() : null)
+                            .filter(Objects::nonNull).collect(Collectors.toList());
+                    attr.setSelectedAttributeValues(
+                            getSelectedAttr(attr.getAllAttributeValues(), selectedVal));
+                });
+            }
+            form.addLine(form.newLine(name, line));
+        }
+        Button add = new Button("添加购物车");
+        add.setOnAction(evt -> {
+            CommonUtils.safeRun(collectActions);
+            addDishesToCart(bo, dishesAttrs);
+        });
+        form.addLine(form.newCenterLine(add));
+        stage.setScene(new Scene(form));
+        stage.showAndWait();
+    }
+
+    private List<DishesAttributeValueVO> getSelectedAttr(List<DishesAttributeValueVO> all, List<String> selectedVals) {
+        List<DishesAttributeValueVO> selected = new ArrayList<>();
+        CommonUtils.forEach(all, a -> {
+            if (selectedVals.contains(a.getAttributeValue())) {
+                selected.add(CopyUtils.deepClone(a));
+            }
+        });
+        return selected;
+    }
+
+    private void addDishesToCart(DishesChoiceItemBO bo, List<DishesAttributeVO> dishesAttrs) {
         Logger.info("添加到购物车," +
                 "DishesId=" + bo.getDishesId() + "," +
                 "PackageId=" + bo.getDishesPackageId() + "," +
@@ -343,6 +421,7 @@ public class OrderDishesChoiceView extends VBox {
                 (bo.getIfPackage() == 0 ? "普通菜品" : "套餐")
                 + CommonUtils.reflectString(param));
         CartItemVO cartItem = new CartItemVO();
+        cartItem.setCartDishesId(CommonUtils.randomNumber(0, Integer.MAX_VALUE));
         if (bo.getIfPackage() == 1) {
             cartItem.setDishesId(bo.getDishesPackageId());
         } else {
@@ -351,7 +430,7 @@ public class OrderDishesChoiceView extends VBox {
         cartItem.setIfDishesPackage(bo.getIfPackage());
         cartItem.setDishesPriceId(0);
         cartItem.setNums(1);
-
+        cartItem.setDishesAttrs(dishesAttrs);
         this.addCartItem(cartItem);
     }
 

@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 public class CartItemBO {
-    Integer seqNo;
+    Integer cartDishesId;
     Integer dishesId;
     RichText dishesTypeName;
     RichText dishesName;
@@ -17,4 +17,6 @@ public class CartItemBO {
     InputNumber nums;
     Money totalPrice;
     String ifDishesPackage;
+    String attrRemark;
+    Integer seqNo;
 }

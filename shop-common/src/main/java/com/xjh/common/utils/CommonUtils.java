@@ -567,6 +567,36 @@ public class CommonUtils {
         return set;
     }
 
+    public static List<String> splitNoDup(String str, String delimiter) {
+        List<String> set = new ArrayList<>();
+        if (isBlank(str)) {
+            return set;
+        }
+        if (isBlank(delimiter)) {
+            delimiter = ",";
+        }
+        String[] arrays = str.split(delimiter);
+        Predicate<String> predicate = distinctPredicate();
+        for (String s : arrays) {
+            if (isNotBlank(s) && predicate.test(s)) {
+                set.add(s);
+            }
+        }
+        return set;
+    }
+
+    public static <T> Predicate<T> distinctPredicate() {
+        Set<T> set = new HashSet<>();
+        return it -> {
+            if (!set.contains(it)) {
+                set.add(it);
+                return true;
+            } else {
+                return false;
+            }
+        };
+    }
+
     public static <K, V> Map<K, V> listToMap(Collection<V> coll, Function<V, K> fun) {
         Map<K, V> map = new HashMap<>();
         if (coll != null) {

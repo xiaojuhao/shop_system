@@ -1,5 +1,7 @@
 package com.xjh.startup.view;
 
+import static com.xjh.common.utils.TableViewUtils.newCol;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -9,10 +11,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.CurrentAccount;
+import com.xjh.common.utils.DishesAttributeHelper;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.OrElse;
 import com.xjh.common.utils.Result;
-import com.xjh.common.utils.TableViewUtils;
 import com.xjh.common.utils.cellvalue.InputNumber;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.RichText;
@@ -74,12 +76,13 @@ public class CartView extends VBox {
     private TableView<CartItemBO> tableList(DeskOrderParam param, TableView<CartItemBO> tv) {
         try {
             tv.getColumns().addAll(
-                    TableViewUtils.newCol("序号", "seqNo", 100),
-                    TableViewUtils.newCol("菜品类型", "dishesTypeName", 100),
-                    TableViewUtils.newCol("菜品名称", "dishesName", 200),
-                    TableViewUtils.newCol("价格", "dishesPrice", 100),
-                    TableViewUtils.newCol("数量", "nums", 150),
-                    TableViewUtils.newCol("小计", "totalPrice", 100)
+                    newCol("序号", "seqNo", 100),
+                    newCol("菜品类型", "dishesTypeName", 100),
+                    newCol("菜品名称", "dishesName", 200),
+                    newCol("价格", "dishesPrice", 100),
+                    newCol("数量", "nums", 150),
+                    newCol("小计", "totalPrice", 100),
+                    newCol("备注", "attrRemark", 100)
             );
             reloadData(param, tv);
         } catch (Exception ex) {
@@ -111,10 +114,10 @@ public class CartView extends VBox {
     private void doDeleteItem(DeskOrderParam param, TableView<CartItemBO> tv) {
         Integer deskId = param.getDeskId();
 
-        List<Integer> removedDishesIds = new ArrayList<>();
+        List<Integer> removedIds = new ArrayList<>();
         ObservableList<CartItemBO> list = tv.getSelectionModel().getSelectedItems();
-        list.forEach(x -> removedDishesIds.add(x.getDishesId()));
-        if (CommonUtils.isEmpty(removedDishesIds)) {
+        list.forEach(x -> removedIds.add(x.getCartDishesId()));
+        if (CommonUtils.isEmpty(removedIds)) {
             AlertBuilder.ERROR("删除购物车失败", "请选择删除记录");
             return;
         }
@@ -137,7 +140,7 @@ public class CartView extends VBox {
             return;
         }
         List<CartItemVO> items = cartVO.getContents();
-        items = CommonUtils.filter(items, it -> !removedDishesIds.contains(it.getDishesId()));
+        items = CommonUtils.filter(items, it -> !removedIds.contains(it.getCartDishesId()));
         cartVO.setContents(items);
         Result<CartVO> updateRs = cartService.updateCart(deskId, cartVO);
         if (updateRs.isSuccess()) {
@@ -147,11 +150,11 @@ public class CartView extends VBox {
         }
     }
 
-    private void doUpdateItemNum(Integer deskId, Integer dishesId, Integer num) {
+    private void doUpdateItemNum(Integer deskId, Integer cartDishesId, Integer num) {
         CartVO cart = cartService.getCart(deskId).getData();
         if (cart != null) {
             CommonUtils.forEach(cart.getContents(), item -> {
-                if (CommonUtils.eq(item.getDishesId(), dishesId)) {
+                if (CommonUtils.eq(item.getCartDishesId(), cartDishesId)) {
                     item.setNums(num);
                 }
             });
@@ -171,9 +174,10 @@ public class CartView extends VBox {
                 if (dishes != null) {
                     CartItemBO bo = new CartItemBO();
                     bo.setSeqNo(seqNo.incrementAndGet());
+                    bo.setCartDishesId(it.getCartDishesId());
                     bo.setDishesId(it.getDishesId());
                     InputNumber num = InputNumber.from(OrElse.orGet(it.getNums(), 1));
-                    num.setOnChange(n -> doUpdateItemNum(param.getDeskId(), it.getDishesId(), n));
+                    num.setOnChange(n -> doUpdateItemNum(param.getDeskId(), it.getCartDishesId(), n));
                     bo.setNums(num);
                     DishesType type = typeMap.get(dishes.getDishesTypeId());
                     if (type != null) {
@@ -182,6 +186,7 @@ public class CartView extends VBox {
                     bo.setDishesName(new RichText(dishes.getDishesName()));
                     bo.setDishesPrice(new Money(dishes.getDishesPrice()));
                     bo.setTotalPrice(new Money(bo.getNums().getNumber() * dishes.getDishesPrice()));
+                    bo.setAttrRemark(DishesAttributeHelper.generateSelectedAttrDigest(it.getDishesAttrs()));
                     return bo;
                 } else {
                     return null;

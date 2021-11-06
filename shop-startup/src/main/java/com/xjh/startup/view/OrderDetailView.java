@@ -1,6 +1,7 @@
 package com.xjh.startup.view;
 
 import static com.xjh.common.utils.CommonUtils.formatMoney;
+import static com.xjh.common.utils.TableViewUtils.newCol;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -27,7 +28,6 @@ import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.OrElse;
 import com.xjh.common.utils.Result;
-import com.xjh.common.utils.TableViewUtils;
 import com.xjh.common.utils.TimeRecord;
 import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.common.valueobject.OrderOverviewVO;
@@ -216,13 +216,13 @@ public class OrderDetailView extends VBox {
             }
             tableView.setPadding(new Insets(5, 0, 0, 5));
             tableView.getColumns().addAll(
-                    TableViewUtils.newCol("序号", "orderDishesId", 100),
-                    TableViewUtils.newCol("子订单", "subOrderId", 100),
-                    TableViewUtils.newCol("菜名名称", "dishesName", 300),
-                    TableViewUtils.newCol("单价", "price", 160),
-                    TableViewUtils.newCol("折后价", "discountPrice", 100),
-                    TableViewUtils.newCol("数量", "orderDishesNum", 100),
-                    TableViewUtils.newCol("类型", "saleType", 100)
+                    newCol("序号", "orderDishesId", 100),
+                    newCol("子订单", "subOrderId", 100),
+                    newCol("菜名名称", "dishesName", 300),
+                    newCol("单价", "price", 160),
+                    newCol("折后价", "discountPrice", 100),
+                    newCol("数量", "orderDishesNum", 100),
+                    newCol("类型", "saleType", 100)
             );
             addLine(tableView);
         }
@@ -583,7 +583,8 @@ public class OrderDetailView extends VBox {
                 return "(套餐)" + pkg.getDishesPackageName();
             }
         } else if (dishes != null) {
-            return dishes.getDishesName();
+            String attrInfo = orderDishesService.generateAttrDigest(orderDishes);
+            return dishes.getDishesName() + attrInfo;
         }
         return null;
     }
