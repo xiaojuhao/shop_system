@@ -393,10 +393,24 @@ public class OrderDishesChoiceView extends VBox {
             }
             form.addLine(form.newLine(name, line));
         }
+        // 添加数量
+        TextField inputNumber = new TextField();
+        inputNumber.setText("1");
+        if (dishesAttrs.isEmpty()) {
+            HBox numLine = form.newCenterLine(new Label("下单数量:"), inputNumber);
+            numLine.setPadding(new Insets(20, 0, 0, 0));
+            form.addLine(numLine);
+        } else {
+            form.addLine(form.newLine(new Label("下单数量:"), inputNumber));
+        }
+
+        // 按钮
         Button add = new Button("添加购物车");
         add.setOnAction(evt -> {
             CommonUtils.safeRun(collectActions);
+            bo.setNum(CommonUtils.parseInt(inputNumber.getText(), 1));
             addDishesToCart(bo, dishesAttrs);
+            stage.close();
         });
         form.addLine(form.newCenterLine(add));
         stage.setScene(new Scene(form));
@@ -429,7 +443,7 @@ public class OrderDishesChoiceView extends VBox {
         }
         cartItem.setIfDishesPackage(bo.getIfPackage());
         cartItem.setDishesPriceId(0);
-        cartItem.setNums(1);
+        cartItem.setNums(bo.getNum() != null ? bo.getNum() : 1);
         cartItem.setDishesAttrs(dishesAttrs);
         this.addCartItem(cartItem);
     }

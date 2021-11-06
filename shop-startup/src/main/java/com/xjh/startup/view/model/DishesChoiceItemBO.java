@@ -13,4 +13,5 @@ public class DishesChoiceItemBO {
     String dishesName;
     Double dishesPrice;
     Integer ifPackage;
+    Integer num;
 }

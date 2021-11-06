@@ -399,7 +399,7 @@ public class CommonUtils {
         if (lower == upper) {
             return lower;
         }
-        int randInt = RANDOM_NUMBER.nextInt(upper - lower + 1);
+        int randInt = RANDOM_NUMBER.nextInt(upper - lower);
         return lower + randInt;
     }
 
