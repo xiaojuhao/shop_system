@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
@@ -103,7 +104,8 @@ public class OrderManageListView extends SimpleForm implements Initializable {
             bo.setDiscountAmt(new Money(overview.getDiscountAmount()));
             bo.setEraseAmt(new Money(overview.getOrderErase()));
             bo.setPaidAmt(new Money(overview.getOrderHadpaid()));
-            bo.setPaymentStatus(overview.getPayStatusName());
+            // bo.setPaymentStatus(overview.getPayStatusName());
+            bo.setPaymentStatus(EnumOrderStatus.of(order.getOrderStatus()).remark);
             bo.setReturnedCash(new Money(overview.getReturnedCash()));
         }
         return bo;
@@ -386,13 +388,28 @@ public class OrderManageListView extends SimpleForm implements Initializable {
         //
         Button escape = new Button("逃单");
         escape.setTextFill(Color.RED);
-        escape.setOnAction(evt -> orderService.escapeOrder(bo.getOrderId()));
+        escape.setOnAction(evt -> {
+            orderService.escapeOrder(bo.getOrderId());
+            loadData();
+            AlertBuilder.INFO("设置逃单成功");
+            mw.close();
+        });
         Button free = new Button("免单");
         free.setTextFill(Color.RED);
-        free.setOnAction(evt -> orderService.freeOrder(bo.getOrderId()));
+        free.setOnAction(evt -> {
+            orderService.freeOrder(bo.getOrderId());
+            loadData();
+            AlertBuilder.INFO("设置免单成功");
+            mw.close();
+        });
         Button changePayStatus = new Button("已付款");
         form.addLine(newCenterLine(escape, free, changePayStatus));
-        changePayStatus.setOnAction(evt -> orderService.changeOrderToPaid(bo.getOrderId()));
+        changePayStatus.setOnAction(evt -> {
+            orderService.changeOrderToPaid(bo.getOrderId());
+            loadData();
+            AlertBuilder.INFO("设置订单已付款成功");
+            mw.close();
+        });
         //
         Button returnMoney = new Button("退现金");
         returnMoney.setOnAction(evt -> showOrderStatusChangeWindow(mw));
