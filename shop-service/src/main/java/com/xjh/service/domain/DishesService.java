@@ -11,7 +11,11 @@ import java.util.Map;
 import com.alibaba.fastjson.JSONArray;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.xjh.common.utils.*;
+import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.utils.ImageHelper;
+import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.DishesImgVO;
 import com.xjh.common.valueobject.PageCond;
 import com.xjh.dao.dataobject.Dishes;
@@ -53,6 +57,11 @@ public class DishesService {
 
     public Dishes getById(Integer id) {
         return dishesDAO.getById(id);
+    }
+
+    public String getDishesName(Integer dishesId) {
+        Dishes d = dishesDAO.getById(dishesId);
+        return d != null ? d.getDishesName() : "未知";
     }
 
     public List<Dishes> getByIds(List<Integer> ids) {

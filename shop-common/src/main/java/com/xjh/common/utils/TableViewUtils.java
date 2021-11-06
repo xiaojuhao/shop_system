@@ -2,6 +2,10 @@ package com.xjh.common.utils;
 
 import static com.xjh.common.utils.ImageHelper.buildImageView;
 
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 import com.xjh.common.utils.cellvalue.ImageSrc;
 import com.xjh.common.utils.cellvalue.InputNumber;
 import com.xjh.common.utils.cellvalue.Money;
@@ -11,39 +15,60 @@ import com.xjh.common.utils.cellvalue.RichText;
 
 import javafx.beans.Observable;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.util.Callback;
 
 public class TableViewUtils {
-    public static <T> TableColumn<T, Object> newCol(String name, String filed, double width) {
-        TableColumn<T, Object> c = new TableColumn<>(name);
+
+    public static Supplier<Integer> snoSp() {
+        return new AtomicInteger()::getAndIncrement;
+    }
+
+    public static <T> TableColumn<T, Object> newCol(String colTitle, Supplier<?> sp, double width) {
+        return newCol1(colTitle, p -> new SimpleObjectProperty<>(sp.get()), width);
+    }
+
+    public static <T> TableColumn<T, Object> newCol(String colTitle, Function<T, Object> converter, double width) {
+        return newCol1(colTitle, p -> new SimpleObjectProperty<>(converter.apply(p.getValue())), width);
+    }
+
+    public static <T> TableColumn<T, Object> newCol(String colTitle, String propertyName, double width) {
+        return newCol1(colTitle, new PropertyValueFactory<>(propertyName), width);
+    }
+
+    public static <T> TableColumn<T, Object> newCol1(
+            String colTitle,
+            Callback<CellDataFeatures<T, Object>, ObservableValue<Object>> value,
+            double width) {
+        TableColumn<T, Object> c = new TableColumn<>(colTitle);
         c.setStyle("-fx-border-width: 0px; ");
         if (width > 0) {
             c.setMinWidth(width);
         }
         c.setSortable(false);
-        c.setCellValueFactory(new PropertyValueFactory<>(filed));
+        // 属性
+        c.setCellValueFactory(value);
         c.setCellFactory(col -> {
             TableCell<T, Object> cell = new TableCell<>();
-            cell.itemProperty().addListener((obs, ov, nv) -> {
-                if (nv != null) {
-                    render(cell, obs, nv);
-                }
-            });
+            cell.itemProperty().addListener((obs, ov, nv) -> render(cell, obs, nv));
             return cell;
         });
         return c;
     }
 
-    private static void render(TableCell cell, Observable obs, Object nv) {
+    private static void render(TableCell<?, Object> cell, Observable obs, Object nv) {
         if (nv instanceof Node) {
             Group group = new Group();
             group.getChildren().add((Node) nv);
@@ -133,7 +158,7 @@ public class TableViewUtils {
             StringProperty sp = (StringProperty) nv;
             cell.textProperty().bind(sp);
         } else if (nv instanceof Property) {
-            Property sp = (Property) nv;
+            Property<?> sp = (Property<?>) nv;
             render(cell, obs, sp.getValue());
             sp.addListener((x, o, n) -> render(cell, obs, n));
         } else {

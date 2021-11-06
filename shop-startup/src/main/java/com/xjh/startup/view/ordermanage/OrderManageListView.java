@@ -2,13 +2,14 @@ package com.xjh.startup.view.ordermanage;
 
 
 import static com.xjh.common.utils.TableViewUtils.newCol;
+import static com.xjh.common.utils.TableViewUtils.snoSp;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import com.xjh.common.anno.TableItemMark;
+import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.valueobject.OrderOverviewVO;
@@ -42,8 +43,12 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import lombok.Data;
 
@@ -72,9 +77,7 @@ public class OrderManageListView extends SimpleForm implements Initializable {
 
         Platform.runLater(() -> {
             items.clear();
-            items.addAll(orderList.stream().map(this::orderToBO)
-                    .peek(it -> it.setSno(sno.incrementAndGet()))
-                    .collect(Collectors.toList()));
+            items.addAll(CommonUtils.collect(orderList, this::orderToBO));
             tableView.refresh();
         });
     }
@@ -94,7 +97,7 @@ public class OrderManageListView extends SimpleForm implements Initializable {
         if (overview != null) {
             bo.setDeskName(overview.getDeskName());
             bo.setNeedPayAmt(new Money(overview.getOrderNeedPay()));
-            bo.setTotalPayAmt(new Money(overview.getTotalPrice()));
+            bo.setTotalPrice(new Money(overview.getTotalPrice()));
             bo.setReductionAmt(new Money(overview.getOrderReduction()));
             bo.setReturnDishesPrice(new Money(overview.getReturnDishesPrice()));
             bo.setDiscountAmt(new Money(overview.getDiscountAmount()));
@@ -190,7 +193,7 @@ public class OrderManageListView extends SimpleForm implements Initializable {
         // "编号", "订单号", "桌号", "下单员工", "就餐人数", "下单时间",
         // "应付款", "菜品总额", "折扣金额", "抹零金额", "退菜金额", "已付金额", "店长减免", "已退现金", "支付状态"
         tableView.getColumns().addAll(
-                newCol("编号", "sno", 50),
+                newCol("编号", snoSp(), 50),
                 newCol("订单号", "orderId", 100),
                 newCol("桌号", "deskName", 50),
                 newCol("下单员工", "accountNickname", 60),
@@ -207,8 +210,27 @@ public class OrderManageListView extends SimpleForm implements Initializable {
                 newCol("支付状态", "paymentStatus", 50),
                 newCol("操作", "operations", 100)
         );
+        tableView.setRowFactory(tv -> {
+            TableRow<BO> row = new TableRow<>();
+            row.setOnMouseClicked(clickEvt -> {
+                if (clickEvt.getClickCount() == 2 && !row.isEmpty()) {
+                    Stage stage = new Stage();
+                    stage.initOwner(this.getScene().getWindow());
+                    stage.initModality(Modality.WINDOW_MODAL);
+                    stage.initStyle(StageStyle.DECORATED);
+                    stage.centerOnScreen();
+                    stage.setWidth(this.getWidth() * 0.9);
+                    stage.setHeight(this.getHeight() * 0.9);
+                    stage.setTitle("明细");
+                    stage.setScene(new Scene(new OrderManageDetailShowView(row.getItem())));
+                    stage.showAndWait();
+                }
+            });
+            return row;
+        });
         tableView.setItems(items);
         tableView.setPrefHeight(height);
+
         addLine(tableView);
     }
 
@@ -249,16 +271,13 @@ public class OrderManageListView extends SimpleForm implements Initializable {
     public static class BO {
         // "编号", "订单号", "桌号", "下单员工", "就餐人数", "下单时间",
         // "应付款", "菜品总额", "折扣金额", "抹零金额", "退菜金额", "已付金额", "店长减免", "已退现金", "支付状态"
-        @TableItemMark(name = "编号", order = 1, width = 30)
-        Integer sno;
-        @TableItemMark(name = "订单号", order = 2, width = 100)
         Integer orderId;
         String deskName;
         String accountNickname;
         Integer orderCustomerNums;
         String orderTime;
         Money needPayAmt;
-        Money totalPayAmt;
+        Money totalPrice;
         Money discountAmt;
         Money eraseAmt;
         Money returnDishesPrice;
@@ -266,5 +285,7 @@ public class OrderManageListView extends SimpleForm implements Initializable {
         Money reductionAmt;
         Money returnedAmt;
         String paymentStatus;
+
+
     }
 }

@@ -1,6 +1,7 @@
 package com.xjh.dao.mapper;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -56,9 +57,14 @@ public class SubOrderDAO {
                 EntityUtils.idCond(subOrder));
     }
 
-    public List<SubOrder> selectList(SubOrder subOrder) throws SQLException {
-        List<Entity> list = Db.use(ds).find(EntityUtils.create(subOrder));
-        return EntityUtils.convertList(list, SubOrder.class);
+    public List<SubOrder> selectList(SubOrder subOrder) {
+        try {
+            List<Entity> list = Db.use(ds).find(EntityUtils.create(subOrder));
+            return EntityUtils.convertList(list, SubOrder.class);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
 }

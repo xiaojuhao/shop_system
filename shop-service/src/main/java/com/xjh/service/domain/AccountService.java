@@ -38,6 +38,7 @@ public class AccountService {
     public Result<Account> checkPwd(String username, String pwd) {
         if ("1".equals(username)) {
             Account mock = new Account();
+            mock.setAccountId(1);
             mock.setAccountUser("mockuser");
             mock.setAccountNickName("模拟用户");
             return Result.success(mock);

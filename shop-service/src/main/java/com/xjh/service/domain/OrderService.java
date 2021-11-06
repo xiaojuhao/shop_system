@@ -18,6 +18,7 @@ import com.xjh.common.enumeration.EnumOrderType;
 import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.store.SequenceDatabase;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.CurrentAccount;
 import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Logger;
@@ -338,7 +339,7 @@ public class OrderService {
             order.setOrderRecommender(param.getRecommender());
             order.setMemberId(0L);
             order.setOrderCustomerNums(param.getCustomerNum());
-            order.setAccountId(0L);
+            order.setAccountId((long) CurrentAccount.currentAccountId());
             order.setOrderErase(0D);
             order.setOrderRefund(0D);
             order.setOrderReduction(0D);

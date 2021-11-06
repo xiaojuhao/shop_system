@@ -14,7 +14,7 @@ public class CurrentAccount {
     }
 
     public static int currentAccountId() {
-        return get() != null ? get().getAccountId() : 0;
+        return get() != null ? get().getAccountId() : 1;
     }
 
 }

@@ -2,12 +2,17 @@ package com.xjh.startup.view;
 
 import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.model.PaymentResult;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.model.DeskOrderParam;
+
 import javafx.geometry.Insets;
-import javafx.scene.control.*;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
 public class PaymentDialogOfCommon extends Dialog<PaymentResult> {
@@ -59,8 +64,7 @@ public class PaymentDialogOfCommon extends Dialog<PaymentResult> {
             if (btn == confirmPayBtn) {
                 result.setPayAction(1);
                 result.setPayAmount(CommonUtils.parseMoney(payAmountField.getText(), 0D));
-                result.setPayRemark(method.name + ":" + payAmountField.getText()
-                        + "\n" + remarkField.getText());
+                result.setPayRemark(remarkField.getText());
                 result.setCardNumber(cardNumFiled.getText());
             } else {
                 result.setPayAction(0);
