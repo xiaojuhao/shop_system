@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.OrElse;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.dao.foundation.EntityUtils;
@@ -50,8 +51,8 @@ public class DishesPackageDAO {
 
     public List<DishesPackage> pageQuery(DishesPackageQuery cond) {
         try {
-            int pageNo = CommonUtils.orElse(cond.getPageNo(), 1);
-            int pageSize = CommonUtils.orElse(cond.getPageSize(), 20);
+            int pageNo = OrElse.orGet(cond.getPageNo(), 1);
+            int pageSize = OrElse.orGet(cond.getPageSize(), 20);
             StringBuilder where = new StringBuilder();
             if (CommonUtils.isNotBlank(cond.getName())) {
                 where.append(" and dishesPackageName like '%" + cond.getName() + "%'");

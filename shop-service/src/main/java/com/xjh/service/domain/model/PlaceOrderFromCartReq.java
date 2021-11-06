@@ -6,4 +6,5 @@ import lombok.Data;
 public class PlaceOrderFromCartReq {
     Integer deskId;
     Integer orderId;
+    Integer accountId;
 }

@@ -6,6 +6,18 @@ import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.ReflectionUtils.PropertyDescriptor;
 
 public class CopyUtils {
+
+    public static <T, R> R convert(T obj, Class<R> clz) {
+        try {
+            R r = clz.newInstance();
+            copy(obj, r);
+            return r;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
     public static <T> T deepClone(T v) {
         JSONObject j = JSONBuilder.toJSON(v);
         return (T) j.toJavaObject(v.getClass());

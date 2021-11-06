@@ -1,6 +1,6 @@
 package com.xjh.startup.view;
 
-import com.xjh.startup.foundation.constants.CurrentAccount;
+import com.xjh.common.utils.CurrentAccount;
 import com.xjh.startup.foundation.constants.MainStageHolder;
 import com.xjh.startup.view.base.HtmlLoader;
 import com.xjh.startup.view.base.Initializable;

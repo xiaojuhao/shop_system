@@ -25,6 +25,7 @@ import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.CopyUtils;
 import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.OrElse;
 import com.xjh.common.utils.Result;
 import com.xjh.common.utils.TableViewUtils;
 import com.xjh.common.utils.TimeRecord;
@@ -435,7 +436,7 @@ public class OrderDetailView extends VBox {
                 AlertBuilder.ERROR("菜品已退,请检查");
                 return;
             }
-            if (CommonUtils.orElse(d.getOrderDishesIfrefund(), 0) == 1) {
+            if (OrElse.orGet(d.getOrderDishesIfrefund(), 0) == 1) {
                 AlertBuilder.ERROR("菜品不可退,请检查");
                 return;
             }

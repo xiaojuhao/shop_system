@@ -28,7 +28,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 
 @SuppressWarnings({"unused"})
 public class CommonUtils {
@@ -115,7 +114,7 @@ public class CommonUtils {
     }
 
     public static <T> T orElse(T v, T def) {
-        return v != null ? v : def;
+        return OrElse.orGet(v, def);
     }
 
     public static String formatMoney(Number value) {

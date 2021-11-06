@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.OrElse;
 import com.xjh.common.valueobject.PageCond;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.foundation.EntityUtils;
@@ -82,8 +83,8 @@ public class DishesDAO {
 
     public List<Dishes> pageQuery(DishesQuery query) {
         try {
-            int pageNo = CommonUtils.orElse(query.getPageNo(), 1);
-            int pageSize = CommonUtils.orElse(query.getPageSize(), 20);
+            int pageNo = OrElse.orGet(query.getPageNo(), 1);
+            int pageSize = OrElse.orGet(query.getPageSize(), 20);
             StringBuilder where = new StringBuilder();
             List<Object> params = new ArrayList<>();
             if (CommonUtils.isNotBlank(query.getDishesName())) {
@@ -108,8 +109,8 @@ public class DishesDAO {
 
     public List<Dishes> pageQuery(Dishes cond, PageCond page) {
         try {
-            int pageNo = CommonUtils.orElse(page.getPageNo(), 1);
-            int pageSize = CommonUtils.orElse(page.getPageSize(), 20);
+            int pageNo = OrElse.orGet(page.getPageNo(), 1);
+            int pageSize = OrElse.orGet(page.getPageSize(), 20);
             StringBuilder where = new StringBuilder();
             List<Object> params = new ArrayList<>();
             if (cond.getDishesId() != null) {

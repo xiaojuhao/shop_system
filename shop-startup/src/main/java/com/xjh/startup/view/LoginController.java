@@ -1,12 +1,18 @@
 package com.xjh.startup.view;
 
+import java.net.URL;
+import java.util.ResourceBundle;
+
 import com.xjh.common.utils.AlertBuilder;
+import com.xjh.common.utils.CopyUtils;
+import com.xjh.common.utils.CurrentAccount;
 import com.xjh.common.utils.Result;
+import com.xjh.common.valueobject.AccountVO;
 import com.xjh.dao.dataobject.Account;
-import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.service.domain.AccountService;
-import com.xjh.startup.foundation.constants.CurrentAccount;
 import com.xjh.startup.foundation.constants.MainStageHolder;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
+
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Rectangle2D;
@@ -20,9 +26,6 @@ import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-
-import java.net.URL;
-import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
     @FXML
@@ -47,7 +50,7 @@ public class LoginController implements Initializable {
         // 调用登录功能
         Result<Account> accountCheck = accountService.checkPwd(account, password);
         if (accountCheck.isSuccess()) {
-            CurrentAccount.hold(accountCheck.getData());
+            CurrentAccount.hold(CopyUtils.convert(accountCheck.getData(), AccountVO.class));
             // 创建主界面舞台
             Stage mainStage = MainStageHolder.get();
             //读入布局

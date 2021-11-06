@@ -21,6 +21,7 @@ import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.OrElse;
 import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.OrderDiscountVO;
 import com.xjh.common.valueobject.OrderOverviewVO;
@@ -181,8 +182,8 @@ public class OrderService {
             v.payStatusName = EnumOrderStatus.of(order.getOrderStatus()).remark;
             v.deduction = order.getFullReduceDishesPrice();
             v.returnDishesPrice = this.sumReturnDishesPrice(orderDishesList);
-            v.orderErase = CommonUtils.orElse(order.getOrderErase(), 0D);
-            v.orderReduction = CommonUtils.orElse(order.getOrderReduction(), 0D);
+            v.orderErase = OrElse.orGet(order.getOrderErase(), 0D);
+            v.orderReduction = OrElse.orGet(order.getOrderReduction(), 0D);
             v.discountName = order.getDiscountReason();
             if (CommonUtils.isNotBlank(order.getOrderDiscountInfo())) {
                 OrderDiscountVO d = JSON.parseObject(Base64.decodeStr(order.getOrderDiscountInfo()), OrderDiscountVO.class);
@@ -274,8 +275,8 @@ public class OrderService {
         }
         double billAmount = 0;
         for (OrderDishes od : orderDishes) {
-            double price = CommonUtils.orElse(od.getOrderDishesDiscountPrice(), 0D);
-            int num = CommonUtils.orElse(od.getOrderDishesNums(), 1);
+            double price = OrElse.orGet(od.getOrderDishesDiscountPrice(), 0D);
+            int num = OrElse.orGet(od.getOrderDishesNums(), 1);
             billAmount += price * num;
         }
         return billAmount;
@@ -289,8 +290,8 @@ public class OrderService {
         double returnAmt = 0;
         for (OrderDishes od : orderDishes) {
             if (EnumOrderSaleType.of(od.getOrderDishesSaletype()) == EnumOrderSaleType.RETURN) {
-                double price = CommonUtils.orElse(od.getOrderDishesDiscountPrice(), 0D);
-                int num = CommonUtils.orElse(od.getOrderDishesNums(), 1);
+                double price = OrElse.orGet(od.getOrderDishesDiscountPrice(), 0D);
+                int num = OrElse.orGet(od.getOrderDishesNums(), 1);
                 returnAmt += price * num;
             }
         }
@@ -314,9 +315,9 @@ public class OrderService {
             return 0;
         }
         double totalBillAmt = sumBillAmount(orderDishes) - sumReturnDishesPrice(orderDishes);
-        double orderErase = CommonUtils.orElse(order.getOrderErase(), 0D);
-        double orderReduction = CommonUtils.orElse(order.getOrderReduction(), 0D);
-        double paidAmt = CommonUtils.orElse(order.getOrderHadpaid(), 0D);
+        double orderErase = OrElse.orGet(order.getOrderErase(), 0D);
+        double orderReduction = OrElse.orGet(order.getOrderReduction(), 0D);
+        double paidAmt = OrElse.orGet(order.getOrderHadpaid(), 0D);
         double notPaid = Math.max(0, totalBillAmt - orderErase - orderReduction - paidAmt);
         if (notPaid < 0.01) {
             notPaid = 0D;

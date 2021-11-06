@@ -8,8 +8,8 @@ import javax.inject.Inject;
 
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.utils.OrElse;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.foundation.EntityUtils;
 import com.xjh.dao.query.PageQueryOrderReq;
@@ -50,8 +50,8 @@ public class OrderDAO {
 
     public List<Order> pageQuery(PageQueryOrderReq cond) {
         try {
-            int pageNo = CommonUtils.orElse(cond.getPageNo(), 1);
-            int pageSize = CommonUtils.orElse(cond.getPageSize(), 20);
+            int pageNo = OrElse.orGet(cond.getPageNo(), 1);
+            int pageSize = OrElse.orGet(cond.getPageSize(), 20);
             StringBuilder where = new StringBuilder();
             List<Object> params = new ArrayList<>();
             if (cond.getOrderId() != null) {

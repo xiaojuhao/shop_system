@@ -6,19 +6,25 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.xjh.common.utils.*;
+import com.xjh.common.utils.AlertBuilder;
+import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.CurrentAccount;
+import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.OrElse;
+import com.xjh.common.utils.Result;
+import com.xjh.common.utils.TableViewUtils;
 import com.xjh.common.utils.cellvalue.InputNumber;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.RichText;
+import com.xjh.common.valueobject.CartItemVO;
+import com.xjh.common.valueobject.CartVO;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesType;
-import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.DishesTypeService;
-import com.xjh.common.valueobject.CartItemVO;
-import com.xjh.common.valueobject.CartVO;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.model.CartItemBO;
 import com.xjh.startup.view.model.DeskOrderParam;
 
@@ -26,7 +32,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -37,6 +47,7 @@ public class CartView extends VBox {
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
 
     Runnable onPlaceOrder = null;
+
     public CartView(DeskOrderParam param, Runnable onPlaceOrder) {
         this.onPlaceOrder = onPlaceOrder;
         TableView<CartItemBO> tv = new TableView<>();
@@ -86,6 +97,7 @@ public class CartView extends VBox {
         PlaceOrderFromCartReq req = new PlaceOrderFromCartReq();
         req.setDeskId(param.getDeskId());
         req.setOrderId(param.getOrderId());
+        req.setAccountId(CurrentAccount.currentAccountId());
         Result<String> createOrderRs = cartService.createOrder(req);
         if (createOrderRs.isSuccess()) {
             AlertBuilder.INFO("下单成功");
@@ -135,11 +147,11 @@ public class CartView extends VBox {
         }
     }
 
-    private void doUpdateItemNum(Integer deskId, Integer dishesId, Integer num){
+    private void doUpdateItemNum(Integer deskId, Integer dishesId, Integer num) {
         CartVO cart = cartService.getCart(deskId).getData();
-        if(cart != null){
+        if (cart != null) {
             CommonUtils.forEach(cart.getContents(), item -> {
-                if(CommonUtils.eq(item.getDishesId(), dishesId)) {
+                if (CommonUtils.eq(item.getDishesId(), dishesId)) {
                     item.setNums(num);
                 }
             });
@@ -160,7 +172,7 @@ public class CartView extends VBox {
                     CartItemBO bo = new CartItemBO();
                     bo.setSeqNo(seqNo.incrementAndGet());
                     bo.setDishesId(it.getDishesId());
-                    InputNumber num = InputNumber.from(CommonUtils.orElse(it.getNums(), 1));
+                    InputNumber num = InputNumber.from(OrElse.orGet(it.getNums(), 1));
                     num.setOnChange(n -> doUpdateItemNum(param.getDeskId(), it.getDishesId(), n));
                     bo.setNums(num);
                     DishesType type = typeMap.get(dishes.getDishesTypeId());

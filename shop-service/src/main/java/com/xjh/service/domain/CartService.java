@@ -13,10 +13,11 @@ import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.store.SequenceDatabase;
-import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.CurrentAccount;
 import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.OrElse;
 import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.CartItemVO;
 import com.xjh.common.valueobject.CartVO;
@@ -151,7 +152,7 @@ public class CartService {
                 orderDishesDAO.insert(d);
             }
             double notPaid = orderService.notPaidBillAmount(order);
-            double hadPaid = CommonUtils.orElse(order.getOrderHadpaid(), 0D);
+            double hadPaid = OrElse.orGet(order.getOrderHadpaid(), 0D);
             if (hadPaid > 0 && notPaid > 0) {
                 order.setOrderStatus(EnumOrderStatus.PARTIAL_PAID.status);
             } else if (hadPaid < 0.01 && notPaid > 0.01) {
@@ -192,14 +193,14 @@ public class CartService {
             subOrder.setOrderId(orderId);
             subOrder.setOrderType(0);
             subOrder.setSubOrderStatus(0);
-            subOrder.setAccountId(0);
+            subOrder.setAccountId(OrElse.orGet(param.getAccountId(), CurrentAccount.currentAccountId()));
             subOrder.setCreatetime(DateBuilder.now().mills());
             int subInsertRs = subOrderDAO.insert(subOrder);
 
             // order dishes
             List<OrderDishes> orderDishes = new ArrayList<>();
             for (CartItemVO item : cartVO.getContents()) {
-                int ifPackage = CommonUtils.orElse(item.getIfDishesPackage(), 0);
+                int ifPackage = OrElse.orGet(item.getIfDishesPackage(), 0);
                 if (ifPackage == 1 || ifPackage == 2) {
                     orderDishes.add(buildPackageCartItemVO(item, orderId, subOrderId));
                 } else {
@@ -210,7 +211,7 @@ public class CartService {
                 orderDishesDAO.insert(d);
             }
             double notPaid = orderService.notPaidBillAmount(order);
-            double hadPaid = CommonUtils.orElse(order.getOrderHadpaid(), 0D);
+            double hadPaid = OrElse.orGet(order.getOrderHadpaid(), 0D);
             if (hadPaid > 0 && notPaid > 0) {
                 order.setOrderStatus(EnumOrderStatus.PARTIAL_PAID.status);
             } else if (hadPaid < 0.01 && notPaid > 0.01) {
@@ -296,7 +297,7 @@ public class CartService {
         d.setIfDishesPackage(1);
         d.setOrderDishesIfchange(0);
         d.setOrderDishesIfrefund(0);
-        d.setOrderDishesNums(CommonUtils.orElse(item.getNums(), 1));
+        d.setOrderDishesNums(OrElse.orGet(item.getNums(), 1));
         d.setOrderDishesSaletype(EnumOrderSaleType.NORMAL.type);
         d.setOrderDishesOptions(Base64.encode("[]"));
         d.setOrderDishesDiscountInfo(Base64.encode(""));
