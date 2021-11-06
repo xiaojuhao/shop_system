@@ -24,7 +24,6 @@ public class SimpleForm extends VBox {
 
     public HBox newLine(Node... nodes) {
         HBox line = new HBox();
-        line.setAlignment(Pos.CENTER_LEFT);
         line.setSpacing(10);
         for (Node n : nodes) {
             line.getChildren().add(n);

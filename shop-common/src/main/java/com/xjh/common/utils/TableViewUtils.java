@@ -2,7 +2,6 @@ package com.xjh.common.utils;
 
 import static com.xjh.common.utils.ImageHelper.buildImageView;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -31,10 +30,6 @@ import javafx.scene.layout.HBox;
 import javafx.util.Callback;
 
 public class TableViewUtils {
-
-    public static Supplier<Integer> snoSp() {
-        return new AtomicInteger()::getAndIncrement;
-    }
 
     public static <T> TableColumn<T, Object> newCol(String colTitle, Supplier<?> sp, double width) {
         return newCol1(colTitle, p -> new SimpleObjectProperty<>(sp.get()), width);
@@ -69,7 +64,9 @@ public class TableViewUtils {
     }
 
     private static void render(TableCell<?, Object> cell, Observable obs, Object nv) {
-        if (nv instanceof Node) {
+        if (nv instanceof String && nv.equals("rowIndex")) {
+            cell.textProperty().set((cell.getIndex() + 1) + "");
+        } else if (nv instanceof Node) {
             Group group = new Group();
             group.getChildren().add((Node) nv);
             cell.setGraphic(group);

@@ -45,7 +45,7 @@ public class PrinterOrderDishesSettings extends SimpleForm implements Initializa
         this.setPadding(new Insets(10, 0, 10, 0));
         // 打印张数
         TextField printNumInput = new TextField();
-        addLine(newLine(new Label("打印张数:"), printNumInput));
+        addLine(newCenterLine(new Label("打印张数:"), printNumInput));
         // 打印机策略
         addLine(new Label("打印机策略:"));
 

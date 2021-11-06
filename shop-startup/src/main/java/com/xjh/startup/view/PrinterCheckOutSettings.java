@@ -52,7 +52,7 @@ public class PrinterCheckOutSettings extends SimpleForm implements Initializable
         ComboBox<IntStringPair> printerCombo = loadPrinterOptions();
         IntStringPair.select(printerCombo, selectedPrinterId, null);
 
-        addLine(newLine(new Label("选择打印机:"), printerCombo));
+        addLine(newCenterLine(new Label("选择打印机:"), printerCombo));
         // 保存
         Button button = new Button("保存配置");
         button.setOnAction(evt -> {

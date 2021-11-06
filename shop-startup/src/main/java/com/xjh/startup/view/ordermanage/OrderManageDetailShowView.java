@@ -2,7 +2,6 @@ package com.xjh.startup.view.ordermanage;
 
 
 import static com.xjh.common.utils.TableViewUtils.newCol;
-import static com.xjh.common.utils.TableViewUtils.snoSp;
 
 import java.util.List;
 
@@ -20,22 +19,27 @@ import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SimpleForm;
 
 import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 public class OrderManageDetailShowView extends SimpleForm {
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
     OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
 
     public OrderManageDetailShowView(OrderManageListView.BO data) {
+
         displayOrderInfo(data);
-        addLine(new Separator(Orientation.HORIZONTAL));
+        addLine(newSeparator());
         displayOrderBillInfo(data);
-        addLine(new Separator(Orientation.HORIZONTAL));
+        addLine(newSeparator());
         displaySubOrder(data);
         addLine(new Separator(Orientation.HORIZONTAL));
         displayDishesInfo(data);
@@ -46,21 +50,31 @@ public class OrderManageDetailShowView extends SimpleForm {
         // 订单号
         Label orderNoName = new Label("订单号:");
         orderNoName.setAlignment(Pos.CENTER_RIGHT);
+        orderNoName.setFont(Font.font(16));
         Label orderNo = new Label(data.getOrderId().toString());
+        orderNo.setFont(Font.font(null, FontWeight.BOLD, 16));
+        orderNo.setPadding(new Insets(0, 60, 0, 0));
         // 订单状态
         Label orderStatusName = new Label("订单状态:");
         orderStatusName.setAlignment(Pos.CENTER_RIGHT);
+        orderStatusName.setFont(Font.font(16));
         Label orderStatus = new Label(data.getPaymentStatus());
+        orderStatus.setFont(Font.font(16));
+        orderStatus.setPadding(new Insets(0, 60, 0, 0));
         // 桌号
         Label deskName = new Label("桌号:");
         deskName.setAlignment(Pos.CENTER_RIGHT);
+        deskName.setFont(Font.font(16));
         Label desk = new Label(data.getDeskName());
+        desk.setFont(Font.font(16));
+        desk.setPadding(new Insets(0, 60, 0, 0));
         // 就餐时间
         Label orderTimeName = new Label("就餐时间:");
         orderTimeName.setAlignment(Pos.CENTER_RIGHT);
+        orderTimeName.setFont(Font.font(16));
         Label orderTime = new Label(data.getOrderTime());
-
-        addLine(newCenterLine(
+        orderTime.setFont(Font.font(16));
+        addLine(newLine(
                 orderNoName, orderNo,
                 orderStatusName, orderStatus,
                 deskName, desk,
@@ -73,32 +87,38 @@ public class OrderManageDetailShowView extends SimpleForm {
         Label needPayName = new Label("应付金额:");
         needPayName.setAlignment(Pos.CENTER_RIGHT);
         Label needPay = new Label(data.getNeedPayAmt().toString());
+        needPay.setPadding(new Insets(0, 10, 0, 0));
         // 已付金额
         Label paidAmtName = new Label("已付金额:");
         paidAmtName.setAlignment(Pos.CENTER_RIGHT);
         Label paidAmt = new Label(data.getPaidAmt().toString());
+        paidAmt.setPadding(new Insets(0, 10, 0, 0));
         // 菜品总额
         Label totalPriceName = new Label("菜品总额:");
         totalPriceName.setAlignment(Pos.CENTER_RIGHT);
         Label totalPrice = new Label(data.getTotalPrice().toString());
+        totalPrice.setPadding(new Insets(0, 60, 0, 0));
         // 折扣金额
         Label discountAmtName = new Label("折扣金额:");
         discountAmtName.setAlignment(Pos.CENTER_RIGHT);
         Label discountAmt = new Label(data.getDiscountAmt().toString());
+        discountAmt.setPadding(new Insets(0, 10, 0, 0));
         // 折扣金额
         Label returnPriceName = new Label("退菜金额:");
         returnPriceName.setAlignment(Pos.CENTER_RIGHT);
         Label returnPrice = new Label(data.getReturnDishesPrice().toString());
+        returnPrice.setPadding(new Insets(0, 10, 0, 0));
         // 折扣金额
         Label eraseName = new Label("抹零金额:");
         eraseName.setAlignment(Pos.CENTER_RIGHT);
         Label erase = new Label(data.getEraseAmt().toString());
+        erase.setPadding(new Insets(0, 10, 0, 0));
         // 折扣金额
         Label reductionName = new Label("店长减免:");
         reductionName.setAlignment(Pos.CENTER_RIGHT);
         Label reduction = new Label(data.getReductionAmt().toString());
 
-        addLine(newCenterLine(
+        addLine(newLine(
                 needPayName, needPay,
                 paidAmtName, paidAmt,
                 totalPriceName, totalPrice,
@@ -119,9 +139,10 @@ public class OrderManageDetailShowView extends SimpleForm {
         addLine(label);
         TableView<SubOrder> tableView = new TableView<>();
         tableView.getColumns().addAll(
-                newCol("序号", snoSp(), 100),
-                newCol("订单批次", "subOrderId", 100),
-                newCol("订单时间", so -> DateBuilder.base(so.getCreatetime()).timeStr(), 200)
+                newCol("序号", () -> "rowIndex", 60),
+                newCol("订单批次", "subOrderId", 200),
+                newCol("订单类型", so -> "普通订单", 200),
+                newCol("订单时间", so -> DateBuilder.base(so.getCreatetime()).timeStr(), 300)
         );
         tableView.setItems(FXCollections.observableArrayList(subOrderList));
         tableView.refresh();
@@ -136,12 +157,12 @@ public class OrderManageDetailShowView extends SimpleForm {
         addLine(label);
         TableView<OrderDishes> tableView = new TableView<>();
         tableView.getColumns().addAll(
-                newCol("序号", snoSp(), 100),
+                newCol("序号", () -> "rowIndex", 60),
                 newCol("菜品名称", orderDishes -> getDishesName(orderDishes.getDishesId()), 150),
-                newCol("单价", orderDishes -> new Money(orderDishes.getOrderDishesPrice()), 200),
-                newCol("折扣单价", OrderDishes::getOrderDishesDiscountPrice, 200),
+                newCol("单价", orderDishes -> new Money(orderDishes.getOrderDishesPrice()), 100),
+                newCol("折扣单价", OrderDishes::getOrderDishesDiscountPrice, 100),
                 newCol("数量", OrderDishes::getOrderDishesNums, 80),
-                newCol("备注", o -> null, 200)
+                newCol("备注", o -> null, 0)
         );
         tableView.setItems(FXCollections.observableArrayList(orderDishesList));
         tableView.refresh();
@@ -157,8 +178,8 @@ public class OrderManageDetailShowView extends SimpleForm {
         TableView<OrderPay> tableView = new TableView<>();
         tableView.getColumns().addAll(
                 newCol("支付时间", pay -> DateBuilder.base(pay.getCreatetime()).timeStr(), 200),
-                newCol("支付金额", OrderPay::getActualAmount, 80),
-                newCol("后台价格", "", 80),
+                newCol("支付金额", OrderPay::getAmount, 80),
+                newCol("后台价格", OrderPay::getActualAmount, 80),
                 newCol("支付方式", pay -> EnumPayMethod.of(pay.getPaymentMethod()).name, 80),
                 newCol("支付状态", pay -> "付款成功", 200),
                 newCol("交易号", OrderPay::getCardNumber, 200),
@@ -171,5 +192,11 @@ public class OrderManageDetailShowView extends SimpleForm {
 
     private String getDishesName(Integer dishesId) {
         return dishesService.getDishesName(dishesId);
+    }
+
+    private Node newSeparator() {
+        HBox separator = newLine(new Separator(Orientation.HORIZONTAL));
+        separator.setPadding(new Insets(5, 0, 5, 0));
+        return separator;
     }
 }

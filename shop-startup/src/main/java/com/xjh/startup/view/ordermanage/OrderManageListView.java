@@ -2,7 +2,6 @@ package com.xjh.startup.view.ordermanage;
 
 
 import static com.xjh.common.utils.TableViewUtils.newCol;
-import static com.xjh.common.utils.TableViewUtils.snoSp;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -61,7 +60,6 @@ public class OrderManageListView extends SimpleForm implements Initializable {
     ObjectProperty<PageQueryOrderReq> cond = new SimpleObjectProperty<>(new PageQueryOrderReq());
     ObservableList<BO> items = FXCollections.observableArrayList();
     TableView<BO> tableView = new TableView<>();
-
     @Override
     public void initialize() {
         Window window = this.getScene().getWindow();
@@ -193,7 +191,7 @@ public class OrderManageListView extends SimpleForm implements Initializable {
         // "编号", "订单号", "桌号", "下单员工", "就餐人数", "下单时间",
         // "应付款", "菜品总额", "折扣金额", "抹零金额", "退菜金额", "已付金额", "店长减免", "已退现金", "支付状态"
         tableView.getColumns().addAll(
-                newCol("编号", snoSp(), 50),
+                newCol("编号", () -> "rowIndex", 50),
                 newCol("订单号", "orderId", 100),
                 newCol("桌号", "deskName", 50),
                 newCol("下单员工", "accountNickname", 60),
