@@ -73,6 +73,7 @@ public class OrderManageBillView extends SimpleForm {
         GridPane.setMargin(print, new Insets(5, 0, 5, quarWidth));
 
         Button reload = new Button("重载数据");
+        reload.setOnAction(evt -> buildBill(cond));
         reload.setPrefWidth(100);
         reload.setPrefHeight(50);
         GridPane.setMargin(reload, new Insets(5, 0, 5, 20));
