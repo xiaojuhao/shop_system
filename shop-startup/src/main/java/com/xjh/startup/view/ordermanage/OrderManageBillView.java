@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.xjh.common.enumeration.EnumSubOrderType;
+import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.CopyUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.dao.dataobject.Order;
@@ -82,18 +83,19 @@ public class OrderManageBillView extends SimpleForm {
     }
 
     private void buildBill(PageQueryOrderReq cond) {
+        double quartWidth = window.getWidth() / 4 * 0.95;
         List<Order> orderList = orderService.pageQuery(cond);
         List<Integer> orderIdList = orderList.stream().map(Order::getOrderId).collect(Collectors.toList());
         List<SubOrder> subOrderList = subOrderDAO.selectByOrderIds(orderIdList);
         HBox line = new HBox();
         line.getChildren().addAll(
-                printCanvas(buildStat1(orderList, subOrderList), 200),
+                printCanvas(buildStat1(orderList, subOrderList), Math.max(quartWidth, 200)),
                 new Separator(Orientation.VERTICAL),
-                printCanvas(buildStat2(), 200),
+                printCanvas(buildStat2(), Math.max(quartWidth, 200)),
                 new Separator(Orientation.VERTICAL),
-                printCanvas(buildStat3(), 220),
+                printCanvas(buildStat3(), Math.max(quartWidth, 220)),
                 new Separator(Orientation.VERTICAL),
-                printCanvas(buildStat4(), 300));
+                printCanvas(buildStat4(), Math.max(quartWidth, 300)));
         addLine(line);
     }
 
