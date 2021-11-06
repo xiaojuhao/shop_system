@@ -162,6 +162,96 @@ public class OrderService {
         }
     }
 
+    public Result<Integer> escapeOrder(Integer orderId) {
+        Order order = getOrder(orderId);
+        try {
+            // 恢复订单状态
+            deskService.closeDesk(order.getDeskId());
+            // 恢复订单状态
+            Order orderUpdate = new Order();
+            orderUpdate.setOrderId(order.getOrderId());
+            // 0: 开始用餐 1: 用餐结束
+            orderUpdate.setStatus(EnumOrderServeStatus.END.status);
+            // 5：逃单
+            orderUpdate.setOrderStatus(EnumOrderStatus.ESCAPE.status);
+            this.updateByOrderId(orderUpdate);
+
+            return Result.success(1);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail("保存订单数据失败:" + ex.getMessage());
+        }
+    }
+
+    public Result<Integer> freeOrder(Integer orderId) {
+        Order order = getOrder(orderId);
+        try {
+            // 恢复订单状态
+            deskService.closeDesk(order.getDeskId());
+            // 恢复订单状态
+            Order orderUpdate = new Order();
+            orderUpdate.setOrderId(order.getOrderId());
+            // 0: 开始用餐 1: 用餐结束
+            orderUpdate.setStatus(EnumOrderServeStatus.END.status);
+            // 6：免单
+            orderUpdate.setOrderStatus(EnumOrderStatus.FREE.status);
+            this.updateByOrderId(orderUpdate);
+
+            return Result.success(1);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail("保存订单数据失败:" + ex.getMessage());
+        }
+    }
+
+    public Result<Integer> recoverOrder(Integer orderId) {
+        Order order = getOrder(orderId);
+        Desk desk = deskService.getById(order.getDeskId());
+        if (EnumDeskStatus.of(desk.getStatus()) != EnumDeskStatus.FREE) {
+            return Result.fail("餐桌[" + desk.getDeskName() + "]正在使用中，不可以恢复");
+        }
+        try {
+            // 恢复订单状态
+            Desk deskUpdate = new Desk();
+            deskUpdate.setDeskId(desk.getDeskId());
+            deskUpdate.setOrderId(order.getOrderId());
+            deskUpdate.setStatus(EnumDeskStatus.PAID.status());
+            deskService.updateDeskByDeskId(deskUpdate);
+            // 恢复订单状态
+            Order orderUpdate = new Order();
+            orderUpdate.setOrderId(order.getOrderId());
+            // 0: 开始用餐 1: 用餐结束
+            orderUpdate.setStatus(EnumOrderServeStatus.START.status);
+            this.updateByOrderId(orderUpdate);
+
+            return Result.success(1);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail("保存订单数据失败:" + ex.getMessage());
+        }
+    }
+
+    public Result<Integer> changeOrderToPaid(Integer orderId) {
+        Order order = getOrder(orderId);
+        try {
+            // 恢复订单状态
+            deskService.closeDesk(order.getDeskId());
+            // 恢复订单状态
+            Order orderUpdate = new Order();
+            orderUpdate.setOrderId(order.getOrderId());
+            // 0: 开始用餐 1: 用餐结束
+            orderUpdate.setStatus(EnumOrderServeStatus.END.status);
+            // 6：免单
+            orderUpdate.setOrderStatus(EnumOrderStatus.PAID.status);
+            this.updateByOrderId(orderUpdate);
+
+            return Result.success(1);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail("保存订单数据失败:" + ex.getMessage());
+        }
+    }
+
     public Result<OrderOverviewVO> buildOrderOverview(
             Order order,
             List<OrderDishes> orderDishesList,
@@ -179,6 +269,7 @@ public class OrderService {
             v.orderNeedPay = this.notPaidBillAmount(order, orderDishesList);
             v.orderHadpaid = order.getOrderHadpaid();
             v.totalPrice = sumTotalPrice(order, orderDishesList);
+            v.returnedCash = OrElse.orGet(order.getOrderReturnCash(), 0D);
             v.discountAmount = calcDiscountAmount(order, orderDishesList);
             v.payStatusName = EnumOrderStatus.of(order.getOrderStatus()).remark;
             v.deduction = order.getFullReduceDishesPrice();

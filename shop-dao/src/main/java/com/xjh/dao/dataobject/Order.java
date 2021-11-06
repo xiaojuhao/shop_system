@@ -46,6 +46,10 @@ public class Order {
     String discountReason;
     @Column("return_cash_reason")
     String returnCashReason;
+
+    @Column("orderReturnCash")
+    Double orderReturnCash;
+
     @Column("orderType")
     Integer orderType;
 }

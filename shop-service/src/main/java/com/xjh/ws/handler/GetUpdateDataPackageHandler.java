@@ -235,7 +235,7 @@ public class GetUpdateDataPackageHandler implements WsHandler {
                     Order order = orderService.getOrder(desk.getOrderId());
                     if (order != null) {
                         meal_number = order.getOrderCustomerNums();
-                        pay_status = order.getStatus();
+                        pay_status = order.getOrderStatus();
                     }
                 }
 

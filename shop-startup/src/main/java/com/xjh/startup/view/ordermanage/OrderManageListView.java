@@ -3,18 +3,20 @@ package com.xjh.startup.view.ordermanage;
 
 import static com.xjh.common.utils.TableViewUtils.newCol;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.utils.Result;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.valueobject.OrderOverviewVO;
 import com.xjh.dao.dataobject.Account;
 import com.xjh.dao.dataobject.Desk;
-import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.dao.query.PageQueryOrderReq;
@@ -23,7 +25,6 @@ import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
-import com.xjh.startup.view.DishesEditView;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SimpleForm;
@@ -44,7 +45,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -60,6 +63,7 @@ public class OrderManageListView extends SimpleForm implements Initializable {
     ObjectProperty<PageQueryOrderReq> cond = new SimpleObjectProperty<>(new PageQueryOrderReq());
     ObservableList<BO> items = FXCollections.observableArrayList();
     TableView<BO> tableView = new TableView<>();
+
     @Override
     public void initialize() {
         Window window = this.getScene().getWindow();
@@ -70,10 +74,8 @@ public class OrderManageListView extends SimpleForm implements Initializable {
     }
 
     private void loadData() {
-        List<Order> orderList = orderService.pageQuery(cond.get());
-        AtomicInteger sno = new AtomicInteger(0);
-
         Platform.runLater(() -> {
+            List<Order> orderList = orderService.pageQuery(cond.get());
             items.clear();
             items.addAll(CommonUtils.collect(orderList, this::orderToBO));
             tableView.refresh();
@@ -102,6 +104,7 @@ public class OrderManageListView extends SimpleForm implements Initializable {
             bo.setEraseAmt(new Money(overview.getOrderErase()));
             bo.setPaidAmt(new Money(overview.getOrderHadpaid()));
             bo.setPaymentStatus(overview.getPayStatusName());
+            bo.setReturnedCash(new Money(overview.getReturnedCash()));
         }
         return bo;
     }
@@ -173,15 +176,19 @@ public class OrderManageListView extends SimpleForm implements Initializable {
             cond.set(q);
         });
 
-        Button addNew = new Button("新增菜品");
-        addNew.setOnAction(evt -> openEditor(new Dishes()));
+        Button modifyCustNums = new Button("修改就餐人数");
+        modifyCustNums.setOnAction(evt -> doModifyOrderCustNum());
+
+        Button specialOperations = new Button("特殊操作");
+        specialOperations.setOnAction(evt -> showSpecialOperations());
         HBox line = newCenterLine(
                 nameCondBlock,
                 deskCondBlock,
                 dateRangeBlock,
                 queryBtn,
                 new Separator(Orientation.VERTICAL),
-                addNew);
+                modifyCustNums,
+                specialOperations);
         line.setSpacing(20);
         line.setPadding(new Insets(5, 0, 5, 0));
         addLine(line);
@@ -198,13 +205,13 @@ public class OrderManageListView extends SimpleForm implements Initializable {
                 newCol("就餐人数", "orderCustomerNums", 50),
                 newCol("下单时间", "orderTime", 150),
                 newCol("应付款", "needPayAmt", 50),
-                newCol("菜品总额", "totalPayAmt", 50),
+                newCol("菜品总额", BO::getTotalPrice, 50),
                 newCol("折扣金额", "discountAmt", 50),
                 newCol("抹零金额", "eraseAmt", 50),
                 newCol("退菜金额", "returnDishesPrice", 50),
                 newCol("已付金额", "paidAmt", 50),
                 newCol("店长减免", "reductionAmt", 50),
-                newCol("已退现金", "returnedAmt", 50),
+                newCol("已退现金", "returnedCash", 50),
                 newCol("支付状态", "paymentStatus", 50),
                 newCol("操作", "operations", 100)
         );
@@ -255,14 +262,143 @@ public class OrderManageListView extends SimpleForm implements Initializable {
         addLine(line);
     }
 
-    private void openEditor(Dishes dishes) {
-        Window window = this.getScene().getWindow();
-        ModelWindow mw = new ModelWindow(window, "编辑菜品");
-        DishesEditView view = new DishesEditView(dishes);
-        view.setPrefWidth(window.getWidth() * 0.75);
-        mw.setScene(new Scene(view));
+    public void doModifyOrderCustNum() {
+        BO bo = tableView.getSelectionModel().getSelectedItem();
+        if (bo == null) {
+            AlertBuilder.ERROR("请选择操作订单");
+            return;
+        }
+        ModelWindow mw = new ModelWindow(this.getScene().getWindow());
+        mw.setHeight(200);
+        mw.setWidth(300);
+        SimpleForm form = new SimpleForm();
+        form.setSpacing(15);
+        form.setPadding(new Insets(20, 0, 0, 0));
+        mw.setScene(new Scene(form));
+        form.addLine(newCenterLine(
+                new Label("订单号:"),
+                new Label(bo.getOrderId().toString())
+        ));
+        TextField customerNum = createTextField("就餐人数");
+        form.addLine(newCenterLine(
+                new Label("就餐人数:"),
+                customerNum
+        ));
+        Button button = new Button("修改");
+        form.addLine(newCenterLine(button));
+        button.setOnAction(evt -> {
+            int custNum = CommonUtils.parseInt(customerNum.getText(), 0);
+            if (custNum <= 0) {
+                AlertBuilder.ERROR("请输入就餐人数");
+                return;
+            }
+            Order order = new Order();
+            order.setOrderId(bo.getOrderId());
+            order.setOrderCustomerNums(custNum);
+            orderService.updateByOrderId(order);
+            mw.close();
+            loadData();
+            AlertBuilder.INFO("修改就餐人数", "修改成功");
+        });
         mw.showAndWait();
-        loadData();
+    }
+
+    public void showOrderStatusChangeWindow(Window parent) {
+        BO bo = tableView.getSelectionModel().getSelectedItem();
+        if (bo == null) {
+            AlertBuilder.ERROR("请选择操作订单");
+            return;
+        }
+        ModelWindow mw = new ModelWindow(parent);
+        mw.setHeight(200);
+        mw.setWidth(300);
+        SimpleForm form = new SimpleForm();
+        form.setSpacing(15);
+        form.setPadding(new Insets(20, 0, 0, 0));
+        mw.setScene(new Scene(form));
+        form.addLine(newCenterLine(new Label("订单号:"), new Label(bo.getOrderId().toString())));
+        TextField returnMoney = createTextField("退现金额");
+        TextField returnReason = createTextField("退现原因");
+        form.addLine(newCenterLine(new Label("退现金额:"), returnMoney));
+        form.addLine(newCenterLine(new Label("退现原因:"), returnReason));
+        Button button = new Button("提 交");
+        form.addLine(newCenterLine(button));
+        button.setOnAction(evt -> {
+            String reasonText = returnReason.getText();
+            Double returnAmount = CommonUtils.parseMoney(returnMoney.getText(), null);
+            if (returnAmount == null || returnAmount <= 0.0001) {
+                AlertBuilder.ERROR("请输入退现金额");
+                return;
+            }
+            if (CommonUtils.isBlank(reasonText)) {
+                AlertBuilder.ERROR("请输入退现原因");
+                return;
+            }
+            Order order = orderService.getOrder(bo.getOrderId());
+            double totalReturn = returnAmount;
+            if (order.getOrderReturnCash() != null) {
+                totalReturn += order.getOrderReturnCash();
+            }
+            // 更新数据库
+            Order update = new Order();
+            update.setOrderId(bo.getOrderId());
+            update.setOrderReturnCash(new BigDecimal(totalReturn)
+                    .setScale(2, RoundingMode.HALF_UP)
+                    .doubleValue());
+            update.setReturnCashReason(reasonText);
+            orderService.updateByOrderId(update);
+            // reload
+            loadData();
+            // 关闭对话框
+            AlertBuilder.INFO("订单退款", "设置退款成功");
+
+            mw.close();
+            parent.hide();
+        });
+        mw.showAndWait();
+    }
+
+    public void showSpecialOperations() {
+        BO bo = tableView.getSelectionModel().getSelectedItem();
+        if (bo == null) {
+            AlertBuilder.ERROR("请选择操作订单");
+            return;
+        }
+        ModelWindow mw = new ModelWindow(this.getScene().getWindow());
+        mw.setHeight(200);
+        mw.setWidth(300);
+        SimpleForm form = new SimpleForm();
+        form.setSpacing(15);
+        form.setPadding(new Insets(20, 0, 0, 0));
+        mw.setScene(new Scene(form));
+        form.addLine(newCenterLine(new Label("订单号:"), new Label(bo.getOrderId().toString())));
+        //
+        Button escape = new Button("逃单");
+        escape.setTextFill(Color.RED);
+        escape.setOnAction(evt -> orderService.escapeOrder(bo.getOrderId()));
+        Button free = new Button("免单");
+        free.setTextFill(Color.RED);
+        free.setOnAction(evt -> orderService.freeOrder(bo.getOrderId()));
+        Button changePayStatus = new Button("已付款");
+        form.addLine(newCenterLine(escape, free, changePayStatus));
+        changePayStatus.setOnAction(evt -> orderService.changeOrderToPaid(bo.getOrderId()));
+        //
+        Button returnMoney = new Button("退现金");
+        returnMoney.setOnAction(evt -> showOrderStatusChangeWindow(mw));
+        Button recoverOrderStatus = new Button("恢复已关台订单");
+        recoverOrderStatus.setOnAction(evt -> {
+            Result<Integer> rs = orderService.recoverOrder(bo.getOrderId());
+            if (!rs.isSuccess()) {
+                AlertBuilder.ERROR("错误提示", rs.getMsg());
+            } else {
+                AlertBuilder.INFO("恢复关台成功!");
+                mw.close();
+            }
+        });
+
+        form.addLine(newCenterLine(returnMoney, recoverOrderStatus));
+
+        mw.showAndWait();
     }
 
     @Data
@@ -272,16 +408,16 @@ public class OrderManageListView extends SimpleForm implements Initializable {
         Integer orderId;
         String deskName;
         String accountNickname;
-        Integer orderCustomerNums;
+        Integer orderCustomerNums = 0;
         String orderTime;
-        Money needPayAmt;
-        Money totalPrice;
-        Money discountAmt;
-        Money eraseAmt;
-        Money returnDishesPrice;
-        Money paidAmt;
-        Money reductionAmt;
-        Money returnedAmt;
+        Money needPayAmt = new Money(0D);
+        Money totalPrice = new Money(0D);
+        Money discountAmt = new Money(0D);
+        Money eraseAmt = new Money(0D);
+        Money returnDishesPrice = new Money(0D);
+        Money paidAmt = new Money(0D);
+        Money reductionAmt = new Money(0D);
+        Money returnedCash = new Money(0D);
         String paymentStatus;
 
 

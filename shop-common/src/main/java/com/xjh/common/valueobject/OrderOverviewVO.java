@@ -20,5 +20,6 @@ public class OrderOverviewVO {
     public double deduction;
     public double orderErase;
     public double returnDishesPrice;
+    public double returnedCash;
     public String payInfoRemark;
 }
