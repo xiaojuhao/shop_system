@@ -47,7 +47,7 @@ public class PrinterKitchenSettings extends SimpleForm implements Initializable 
         }).collect(Collectors.toList()));
         TableView<BO> tableView = new TableView<>();
         tableView.getColumns().addAll(
-                newCol("ID", "printerId", 200),
+                newCol("ID", "printerId", 100),
                 newCol("名称", "printerName", 200),
                 newCol("操作", "operation", 200)
         );

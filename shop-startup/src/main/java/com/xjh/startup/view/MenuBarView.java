@@ -146,8 +146,8 @@ public class MenuBarView {
         double width = sceneWindow.getWidth() * 0.96;
         double height = sceneWindow.getHeight() * 0.96;
         if (content instanceof MediumForm) {
-            width = sceneWindow.getWidth() * 0.6;
-            height = sceneWindow.getHeight() * 0.6;
+            width = sceneWindow.getWidth() * 0.66;
+            height = sceneWindow.getHeight() * 0.66;
         }
         openView(title, content, width, height);
     }

@@ -16,10 +16,7 @@ import com.xjh.common.utils.cellvalue.Operations;
 import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.service.domain.PrinterService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
-import com.xjh.startup.view.base.Initializable;
-import com.xjh.startup.view.base.ModelWindow;
-import com.xjh.startup.view.base.OkCancelDialog;
-import com.xjh.startup.view.base.SimpleForm;
+import com.xjh.startup.view.base.*;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -34,7 +31,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Window;
 import lombok.Data;
 
-public class PrinterManageListView extends SimpleForm implements Initializable {
+public class PrinterManageListView extends MediumForm implements Initializable {
     PrinterService printerService = GuiceContainer.getInstance(PrinterService.class);
 
     ObservableList<BO> items = FXCollections.observableArrayList();
