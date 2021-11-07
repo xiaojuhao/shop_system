@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.CopyUtils;
 import com.xjh.common.utils.cellvalue.OperationButton;
+import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesAttributeValueVO;
 import com.xjh.startup.view.base.ModelWindow;
@@ -73,7 +74,7 @@ public class DishesAttributeEditView extends SmallForm {
             DishesAttributeValueBO bo = new DishesAttributeValueBO();
             bo.setAttributeValue(v.getAttributeValue());
             OperationButton op = new OperationButton();
-            op.setTitle("删除");
+            op.setTitle(RichText.create("删除"));
             op.setAction(() -> removeItem(tv, v.getAttributeValue()));
             bo.setAction(op);
             attrList.add(bo);
@@ -115,7 +116,7 @@ public class DishesAttributeEditView extends SmallForm {
         DishesAttributeValueBO t = new DishesAttributeValueBO();
         t.setAttributeValue(item);
         OperationButton op = new OperationButton();
-        op.setTitle("删除");
+        op.setTitle(RichText.create("删除"));
         op.setAction(() -> removeItem(tv, item));
         t.setAction(op);
         attrList.add(t);

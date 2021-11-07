@@ -144,7 +144,7 @@ public class GetUpdateDataPackageHandler implements WsHandler {
     }
 
     private JSONArray getDishesType(long lastUpdatTime) {
-        List<DishesType> dishesTypes = dishesTypeService.loadAllTypes();
+        List<DishesType> dishesTypes = dishesTypeService.loadAllTypesValid();
         JSONArray jSONArray = new JSONArray();
         for (int i = 0; i < dishesTypes.size(); i++) {
             DishesType dishesType = dishesTypes.get(i);

@@ -31,6 +31,12 @@ import javafx.util.Callback;
 
 public class TableViewUtils {
 
+    static String ROW_INDEX = "_rowIndex_";
+
+    public static Supplier<String> rowIndex() {
+        return () -> ROW_INDEX;
+    }
+
     public static <T> TableColumn<T, Object> newCol(String colTitle, Supplier<?> sp, double width) {
         return newCol1(colTitle, p -> new SimpleObjectProperty<>(sp.get()), width);
     }
@@ -64,7 +70,7 @@ public class TableViewUtils {
     }
 
     private static void render(TableCell<?, Object> cell, Observable obs, Object nv) {
-        if (nv instanceof String && nv.equals("rowIndex")) {
+        if (nv instanceof String && nv.equals(ROW_INDEX)) {
             cell.textProperty().set((cell.getIndex() + 1) + "");
         } else if (nv instanceof Node) {
             Group group = new Group();
@@ -116,7 +122,10 @@ public class TableViewUtils {
             cell.setGraphic(group);
         } else if (nv instanceof OperationButton) {
             OperationButton ob = (OperationButton) nv;
-            Button op = new Button(ob.getTitle());
+            Button op = new Button(ob.getTitle().getText().toString());
+            if (ob.getTitle().getColor() != null) {
+                op.setTextFill(ob.getTitle().getColor());
+            }
             if (ob.getTitleProperty() != null) {
                 op.textProperty().bind(ob.getTitleProperty());
             }
@@ -127,7 +136,14 @@ public class TableViewUtils {
             HBox hbox = new HBox();
             hbox.setSpacing(3);
             for (OperationButton ob : ops.getOperations()) {
-                Button op = new Button(ob.getTitle());
+                RichText title = ob.getTitle();
+                Button op = new Button(title.getText().toString());
+                if (title.getColor() != null) {
+                    op.setTextFill(title.getColor());
+                }
+                if (title.getPos() != null) {
+                    op.setAlignment(title.getPos());
+                }
                 if (ob.getTitleProperty() != null) {
                     op.textProperty().bind(ob.getTitleProperty());
                 }

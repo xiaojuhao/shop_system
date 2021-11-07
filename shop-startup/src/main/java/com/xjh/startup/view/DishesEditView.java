@@ -120,7 +120,7 @@ public class DishesEditView extends SimpleGridForm {
 
         Label dishesTypeLabel = createLabel("菜品类型:", labelWidth);
         ComboBox<DishesType> dishesTypeInput = new SimpleComboBox<>(
-                dishesTypeService.loadAllTypes(),
+                dishesTypeService.loadAllTypesValid(),
                 DishesType::getTypeName,
                 null
         );

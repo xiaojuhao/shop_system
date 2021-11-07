@@ -2,6 +2,7 @@ package com.xjh.startup.view.ordermanage;
 
 
 import static com.xjh.common.utils.TableViewUtils.newCol;
+import static com.xjh.common.utils.TableViewUtils.rowIndex;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -204,22 +205,21 @@ public class OrderManageListView extends SimpleForm implements Initializable {
         // "编号", "订单号", "桌号", "下单员工", "就餐人数", "下单时间",
         // "应付款", "菜品总额", "折扣金额", "抹零金额", "退菜金额", "已付金额", "店长减免", "已退现金", "支付状态"
         tableView.getColumns().addAll(
-                newCol("编号", () -> "rowIndex", 50),
-                newCol("订单号", "orderId", 100),
-                newCol("桌号", "deskName", 50),
-                newCol("下单员工", "accountNickname", 60),
-                newCol("就餐人数", "orderCustomerNums", 50),
-                newCol("下单时间", "orderTime", 150),
-                newCol("应付款", "needPayAmt", 50),
+                newCol("编号", rowIndex(), 30),
+                newCol("订单号", BO::getOrderId, 100),
+                newCol("桌号", BO::getDeskName, 30),
+                newCol("下单员工", BO::getAccountNickname, 60),
+                newCol("就餐人数", BO::getOrderCustomerNums, 30),
+                newCol("下单时间", BO::getOrderTime, 150),
+                newCol("应付款", BO::getNeedPayAmt, 50),
                 newCol("菜品总额", BO::getTotalPrice, 50),
-                newCol("折扣金额", "discountAmt", 50),
-                newCol("抹零金额", "eraseAmt", 50),
-                newCol("退菜金额", "returnDishesPrice", 50),
-                newCol("已付金额", "paidAmt", 50),
-                newCol("店长减免", "reductionAmt", 50),
-                newCol("已退现金", "returnedCash", 50),
-                newCol("支付状态", "paymentStatus", 50),
-                newCol("操作", "operations", 100)
+                newCol("折扣金额", BO::getDiscountAmt, 50),
+                newCol("抹零金额", BO::getEraseAmt, 50),
+                newCol("退菜金额", BO::getReturnDishesPrice, 50),
+                newCol("已付金额", BO::getPaidAmt, 50),
+                newCol("店长减免", BO::getReductionAmt, 50),
+                newCol("已退现金", BO::getReturnedCash, 50),
+                newCol("支付状态", BO::getPaymentStatus, 50)
         );
         tableView.setRowFactory(tv -> {
             TableRow<BO> row = new TableRow<>();
@@ -230,8 +230,8 @@ public class OrderManageListView extends SimpleForm implements Initializable {
                     stage.initModality(Modality.WINDOW_MODAL);
                     stage.initStyle(StageStyle.DECORATED);
                     stage.centerOnScreen();
-                    stage.setWidth(this.getWidth() * 0.9);
-                    stage.setHeight(this.getHeight() * 0.9);
+                    stage.setWidth(this.getWidth() * 0.98);
+                    stage.setHeight(this.getHeight() * 0.98);
                     stage.setTitle("明细");
                     stage.setScene(new Scene(new OrderManageDetailShowView(row.getItem())));
                     stage.showAndWait();

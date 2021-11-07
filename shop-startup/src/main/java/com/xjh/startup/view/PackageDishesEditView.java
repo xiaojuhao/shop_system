@@ -84,7 +84,7 @@ public class PackageDishesEditView extends SimpleGridForm {
 
         Label dishesTypeLabel = createLabel("报餐类型:", labelWidth);
         SimpleComboBox<DishesType> dishesTypeInput = new SimpleComboBox<>(
-                dishesTypeService.loadAllTypes(),
+                dishesTypeService.loadAllTypesValid(),
                 DishesType::getTypeName,
                 null
         );

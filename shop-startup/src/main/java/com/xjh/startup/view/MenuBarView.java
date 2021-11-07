@@ -68,7 +68,7 @@ public class MenuBarView {
         dishesAttrManger.setOnAction(evt -> openView("菜品属性管理", new DishesAttributeManageView()));
 
         MenuItem dishesCate = new MenuItem("菜品分类管理");
-        dishesCate.setOnAction(evt -> openView("菜品分类管理", null));
+        dishesCate.setOnAction(evt -> openView("菜品分类管理", new DishesTypeManageListView()));
 
         MenuItem dishesManager = new MenuItem("菜品管理");
         dishesManager.setOnAction(evt -> openView("菜品管理", new DishesManageListView()));

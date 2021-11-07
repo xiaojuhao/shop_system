@@ -121,12 +121,12 @@ public class DishesAttributeManageView extends LargeForm implements Initializabl
         bo.setCreateTime(RichText.create(DateBuilder.base(vo.getCreateTime()).timeStr()));
         bo.setAttachment(vo);
         OperationButton edit = new OperationButton();
-        edit.setTitle("编辑");
+        edit.setTitle(RichText.create("编辑"));
         edit.setAction(() -> this.showEditView(vo, window));
         bo.getOperations().add(edit);
 
         OperationButton del = new OperationButton();
-        del.setTitle("删除");
+        del.setTitle(RichText.create("删除"));
         del.setAction(() -> this.delDishesAttr(vo, window));
         bo.getOperations().add(del);
         return bo;

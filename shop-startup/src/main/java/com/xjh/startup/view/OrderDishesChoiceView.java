@@ -52,6 +52,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -384,11 +385,8 @@ public class OrderDishesChoiceView extends VBox {
                 });
                 line.getChildren().addAll(allCbs);
                 collectActions.add(() -> {
-                    List<String> selectedVal = allCbs.stream()
-                            .map(cb -> cb.isSelected() ? cb.getUserData().toString() : null)
-                            .filter(Objects::nonNull).collect(Collectors.toList());
-                    attr.setSelectedAttributeValues(
-                            getSelectedAttr(attr.getAllAttributeValues(), selectedVal));
+                    List<String> selectedVal = collectValue(allCbs);
+                    attr.setSelectedAttributeValues(getSelectedAttr(attr.getAllAttributeValues(), selectedVal));
                 });
             }
             form.addLine(form.newLine(name, line));
@@ -484,7 +482,7 @@ public class OrderDishesChoiceView extends VBox {
 
     private ComboBox<DishesType> dishesTypeIdSelector() {
         DishesTypeService dishesTypeService = GuiceContainer.getInstance(DishesTypeService.class);
-        List<DishesType> types = dishesTypeService.loadAllTypes();
+        List<DishesType> types = dishesTypeService.loadAllTypesValid();
         DishesType def = new DishesType();
         def.setTypeName("请选择菜品类型");
         types.add(0, def);
@@ -535,6 +533,14 @@ public class OrderDishesChoiceView extends VBox {
             iv.setFitHeight(width / 3 * 2);
             return iv;
         }
+    }
+
+    private List<String> collectValue(List<CheckBox> cbs) {
+        return cbs.stream().filter(CheckBox::isSelected)
+                .map(Node::getUserData)
+                .filter(Objects::nonNull)
+                .map(Object::toString)
+                .collect(Collectors.toList());
     }
 
     @Override

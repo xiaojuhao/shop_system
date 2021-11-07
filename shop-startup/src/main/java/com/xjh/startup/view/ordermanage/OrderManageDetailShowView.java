@@ -2,6 +2,7 @@ package com.xjh.startup.view.ordermanage;
 
 
 import static com.xjh.common.utils.TableViewUtils.newCol;
+import static com.xjh.common.utils.TableViewUtils.rowIndex;
 
 import java.util.List;
 
@@ -139,7 +140,7 @@ public class OrderManageDetailShowView extends SimpleForm {
         addLine(label);
         TableView<SubOrder> tableView = new TableView<>();
         tableView.getColumns().addAll(
-                newCol("序号", () -> "rowIndex", 60),
+                newCol("序号", rowIndex(), 60),
                 newCol("订单批次", "subOrderId", 200),
                 newCol("订单类型", so -> "普通订单", 200),
                 newCol("订单时间", so -> DateBuilder.base(so.getCreatetime()).timeStr(), 300)
@@ -157,7 +158,7 @@ public class OrderManageDetailShowView extends SimpleForm {
         addLine(label);
         TableView<OrderDishes> tableView = new TableView<>();
         tableView.getColumns().addAll(
-                newCol("序号", () -> "rowIndex", 60),
+                newCol("序号", rowIndex(), 60),
                 newCol("菜品名称", orderDishes -> getDishesName(orderDishes.getDishesId()), 150),
                 newCol("单价", orderDishes -> new Money(orderDishes.getOrderDishesPrice()), 100),
                 newCol("折扣单价", OrderDishes::getOrderDishesDiscountPrice, 100),

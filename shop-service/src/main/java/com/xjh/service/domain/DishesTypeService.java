@@ -14,11 +14,32 @@ public class DishesTypeService {
     @Inject
     DishesTypeDAO dishesTypeDAO;
 
-    public List<DishesType> loadAllTypes() {
-        return dishesTypeDAO.selectAll();
+    public int insert(DishesType newType) {
+        return dishesTypeDAO.insert(newType);
+    }
+
+    public int updateByPK(DishesType update) {
+        return dishesTypeDAO.updateByPK(update);
+    }
+
+    public int deleteByPK(Integer typeId) {
+        if (typeId == null) {
+            return 0;
+        }
+        DishesType id = new DishesType();
+        id.setTypeId(typeId);
+        return dishesTypeDAO.deleteByPK(id);
+    }
+
+    public List<DishesType> selectList(DishesType cond) {
+        return dishesTypeDAO.selectList(cond);
+    }
+
+    public List<DishesType> loadAllTypesValid() {
+        return dishesTypeDAO.selectAllValid();
     }
 
     public Map<Integer, DishesType> dishesTypeMap() {
-        return CommonUtils.listToMap(loadAllTypes(), DishesType::getTypeId);
+        return CommonUtils.listToMap(loadAllTypesValid(), DishesType::getTypeId);
     }
 }
