@@ -363,12 +363,17 @@ public class OrderDishesChoiceView extends VBox {
             // 单选框
             if (attr.getIsValueRadio() != null && attr.getIsValueRadio()) {
                 ToggleGroup group = new ToggleGroup();
+                List<RadioButton> radios = new ArrayList<>();
                 attr.getAllAttributeValues().forEach(v -> {
                     RadioButton radio = new RadioButton(v.getAttributeValue());
                     radio.setToggleGroup(group);
                     radio.setUserData(v.getAttributeValue());
-                    line.getChildren().add(radio);
+                    radios.add(radio);
                 });
+                if (radios.size() > 0) {
+                    radios.get(0).setSelected(true);
+                }
+                line.getChildren().addAll(radios);
                 collectActions.add(() -> {
                     String udata = (String) group.getSelectedToggle().getUserData();
                     attr.setSelectedAttributeValues(
