@@ -174,7 +174,7 @@ public class TableViewUtils {
             Property<?> sp = (Property<?>) nv;
             render(cell, obs, sp.getValue());
             sp.addListener((x, o, n) -> render(cell, obs, n));
-        } else {
+        } else if(nv != null){
             cell.textProperty().set(CommonUtils.stringify(nv));
         }
     }
