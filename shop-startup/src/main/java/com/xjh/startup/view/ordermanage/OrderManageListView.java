@@ -133,7 +133,6 @@ public class OrderManageListView extends SimpleForm implements Initializable {
         HBox nameCondBlock = new HBox();
         Label nameLabel = new Label("业务员:");
         ComboBox<IntStringPair> accountComBox = buildAccountComBox();
-        accountComBox.setPrefWidth(80);
         nameCondBlock.getChildren().add(newCenterLine(nameLabel, accountComBox));
         // desk列表
         HBox deskCondBlock = new HBox();
@@ -289,7 +288,7 @@ public class OrderManageListView extends SimpleForm implements Initializable {
                 new ExtensionFilter("XLS", "*.xls"),
                 new ExtensionFilter("XLSX", "*.xlsx")
         );
-        File file = chooser.showOpenDialog(this.getScene().getWindow());
+        File file = chooser.showSaveDialog(this.getScene().getWindow());
         if (file.exists()) {
             OkCancelDialog dialog = new OkCancelDialog("文件选择", "文件已存在，是否覆盖当前文件？");
             Optional<ButtonType> rs = dialog.showAndWait();

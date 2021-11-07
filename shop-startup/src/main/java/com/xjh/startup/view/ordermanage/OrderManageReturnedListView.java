@@ -144,7 +144,7 @@ public class OrderManageReturnedListView extends SimpleForm implements Initializ
                 new ExtensionFilter("XLS", "*.xls"),
                 new ExtensionFilter("XLSX", "*.xlsx")
         );
-        File file = chooser.showOpenDialog(this.getScene().getWindow());
+        File file = chooser.showSaveDialog(this.getScene().getWindow());
         if (file.exists()) {
             OkCancelDialog dialog = new OkCancelDialog("文件选择", "文件已存在，是否覆盖当前文件？");
             Optional<ButtonType> rs = dialog.showAndWait();
