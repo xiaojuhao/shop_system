@@ -5,6 +5,7 @@ import com.xjh.startup.foundation.constants.MainStageHolder;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.MediumForm;
 import com.xjh.startup.view.ordermanage.OrderManageListView;
+import com.xjh.startup.view.ordermanage.OrderManageReturnedListView;
 
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -95,12 +96,16 @@ public class MenuBarView {
 
     private Menu createOrderMenu() {
         Menu menu = new Menu("订单管理");
-        MenuItem orderManagerListView = new MenuItem("订单列表");
-        orderManagerListView.setOnAction(evt -> openView("订单列表", new OrderManageListView()));
+        MenuItem orderList = new MenuItem("订单列表");
+        orderList.setOnAction(evt -> openView("订单列表", new OrderManageListView()));
+
         MenuItem updateName = new MenuItem("菜品销售统计");
         MenuItem printJobMenu = new MenuItem("菜品分类销售统计");
-        MenuItem discount = new MenuItem("退菜记录");
-        menu.getItems().addAll(orderManagerListView, updateName, printJobMenu, discount);
+
+        MenuItem returnedDishes = new MenuItem("退菜记录");
+        returnedDishes.setOnAction(evt -> openView("退菜记录", new OrderManageReturnedListView()));
+
+        menu.getItems().addAll(orderList, updateName, printJobMenu, returnedDishes);
         return menu;
     }
 
