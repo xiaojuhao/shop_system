@@ -353,6 +353,10 @@ public class OrderDishesChoiceView extends VBox {
         stage.setHeight(this.getScene().getWindow().getHeight() / 3 * 2);
         stage.setTitle("点菜[桌号:" + param.getDeskName() + "]");
         List<DishesAttributeVO> dishesAttrs = dishesService.getDishesAttribute(bo.getDishesId());
+        if(dishesAttrs.size() == 0){
+            stage.setWidth(400);
+            stage.setHeight(300);
+        }
         SimpleForm form = new SimpleForm();
         form.setSpacing(10);
         List<Runnable> collectActions = new ArrayList<>();
