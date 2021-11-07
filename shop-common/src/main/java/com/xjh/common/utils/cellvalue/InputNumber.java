@@ -1,7 +1,14 @@
 package com.xjh.common.utils.cellvalue;
 
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import lombok.Data;
+
 import java.util.function.Consumer;
 
+@Data
 public class InputNumber {
     Integer number;
     Consumer<Integer> onChange;
@@ -12,22 +19,36 @@ public class InputNumber {
         return n;
     }
 
-    public Integer getNumber() {
-        return number;
-    }
-    public void setNumber(Integer number) {
-        this.number = number;
+    public HBox toGraphicNode(){
+        HBox group = new HBox();
+        TextField textField = new TextField(this.toString());
+        textField.setPrefWidth(60);
+        textField.setDisable(true);
+        Button plus = new Button("+");
+        plus.setOnMouseClicked(evt -> {
+            this.setNumber(this.getNumber() + 1);
+            textField.setText(this.toString());
+            if (this.getOnChange() != null) {
+                this.getOnChange().accept(this.getNumber());
+            }
+        });
+        Button minus = new Button("-");
+        minus.setOnMouseClicked(evt -> {
+            if (this.getNumber() <= 1) {
+                return;
+            }
+            this.setNumber(this.getNumber() - 1);
+            textField.setText(this.toString());
+            if (this.getOnChange() != null) {
+                this.getOnChange().accept(this.getNumber());
+            }
+        });
+        group.getChildren().addAll(textField, plus, minus);
+        return group;
     }
 
     public String toString(){
         return number == null ? "" : number.toString();
     }
 
-    public Consumer<Integer> getOnChange() {
-        return onChange;
-    }
-
-    public void setOnChange(Consumer<Integer> onChange) {
-        this.onChange = onChange;
-    }
 }

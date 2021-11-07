@@ -96,30 +96,7 @@ public class TableViewUtils {
             }
         } else if (nv instanceof InputNumber) {
             InputNumber number = (InputNumber) nv;
-            HBox group = new HBox();
-            Label label = new Label(number.toString());
-            label.setPrefWidth(60);
-            Button plus = new Button("+");
-            plus.setOnMouseClicked(evt -> {
-                number.setNumber(number.getNumber() + 1);
-                label.setText(number.toString());
-                if (number.getOnChange() != null) {
-                    number.getOnChange().accept(number.getNumber());
-                }
-            });
-            Button minus = new Button("-");
-            minus.setOnMouseClicked(evt -> {
-                if (number.getNumber() <= 1) {
-                    return;
-                }
-                number.setNumber(number.getNumber() - 1);
-                label.setText(number.toString());
-                if (number.getOnChange() != null) {
-                    number.getOnChange().accept(number.getNumber());
-                }
-            });
-            group.getChildren().addAll(label, plus, minus);
-            cell.setGraphic(group);
+            cell.setGraphic(number.toGraphicNode());
         } else if (nv instanceof OperationButton) {
             OperationButton ob = (OperationButton) nv;
             Button op = new Button(ob.getTitle().getText().toString());
