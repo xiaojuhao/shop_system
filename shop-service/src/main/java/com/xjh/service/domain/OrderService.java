@@ -256,13 +256,10 @@ public class OrderService {
             Order order,
             List<OrderDishes> orderDishesList,
             List<OrderPay> orderPays) {
+        OrderOverviewVO v = new OrderOverviewVO();
         if (order != null) {
-            OrderOverviewVO v = new OrderOverviewVO();
-            Desk desk = deskService.getById(order.getDeskId());
-            if (desk != null) {
-                v.setDeskId(desk.getDeskId());
-                v.setDeskName(desk.getDeskName());
-            }
+            v.deskId = order.getDeskId();
+            v.deskName = deskService.getDeskName(order.getDeskId());
             v.orderId = order.getOrderId().toString();
             v.customerNum = order.getOrderCustomerNums();
             v.orderTime = DateBuilder.base(order.getCreateTime()).timeStr();
@@ -298,9 +295,8 @@ public class OrderService {
                 payInfo.append("\r\n");
             });
             v.payInfoRemark = payInfo.toString();
-            return Result.success(v);
         }
-        return Result.fail("订单不存在");
+        return Result.success(v);
     }
 
     private double sumTotalPrice(Order order, List<OrderDishes> orderDishesList) {

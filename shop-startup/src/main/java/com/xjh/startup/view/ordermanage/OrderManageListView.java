@@ -4,15 +4,25 @@ package com.xjh.startup.view.ordermanage;
 import static com.xjh.common.utils.TableViewUtils.newCol;
 import static com.xjh.common.utils.TableViewUtils.rowIndex;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.CopyUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Result;
 import com.xjh.common.utils.cellvalue.Money;
@@ -29,6 +39,7 @@ import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.ModelWindow;
+import com.xjh.startup.view.base.OkCancelDialog;
 import com.xjh.startup.view.base.SimpleForm;
 import com.xjh.startup.view.model.IntStringPair;
 
@@ -41,6 +52,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -50,6 +63,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -121,7 +136,8 @@ public class OrderManageListView extends SimpleForm implements Initializable {
         accountList.add(0, noAccount);
         HBox nameCondBlock = new HBox();
         ObservableList<IntStringPair> accountOptions = FXCollections.observableArrayList(
-                accountList.stream().map(it -> new IntStringPair(it.getAccountId(), it.getAccountNickName()))
+                accountList.stream()
+                        .map(it -> new IntStringPair(it.getAccountId(), it.getAccountNickName()))
                         .collect(Collectors.toList())
         );
         ComboBox<IntStringPair> accountSelect = new ComboBox<>(accountOptions);
@@ -179,6 +195,9 @@ public class OrderManageListView extends SimpleForm implements Initializable {
             cond.set(q);
         });
 
+        Button exportExcel = new Button("导出EXCEL");
+        exportExcel.setOnAction(evt -> exportExcel(cond.get()));
+
         Button showBill = new Button("查看报表");
         showBill.setOnAction(evt -> showBill(cond.get()));
 
@@ -193,6 +212,7 @@ public class OrderManageListView extends SimpleForm implements Initializable {
                 dateRangeBlock,
                 queryBtn,
                 new Separator(Orientation.VERTICAL),
+                exportExcel,
                 showBill,
                 modifyCustNums,
                 specialOperations);
@@ -276,6 +296,103 @@ public class OrderManageListView extends SimpleForm implements Initializable {
         mw.setHeight(1000);
         mw.setScene(new Scene(new OrderManageBillView(req, mw)));
         mw.showAndWait();
+    }
+
+    public void exportExcel(PageQueryOrderReq req) {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("选择Excel文件");
+        chooser.setInitialFileName("hello.xls");
+        chooser.getExtensionFilters().addAll(
+                new ExtensionFilter("XLS", "*.xls"),
+                new ExtensionFilter("XLSX", "*.xlsx")
+        );
+        File file = chooser.showOpenDialog(this.getScene().getWindow());
+        if (file.exists()) {
+            OkCancelDialog dialog = new OkCancelDialog("文件选择", "文件已存在，是否覆盖当前文件？");
+            Optional<ButtonType> rs = dialog.showAndWait();
+            if (rs.isPresent() && rs.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                exportFile(req, file);
+            }
+        } else {
+            exportFile(req, file);
+        }
+    }
+
+    private void exportFile(PageQueryOrderReq req, File file) {
+        PageQueryOrderReq cond = CopyUtils.deepClone(req);
+        cond.setPageSize(10000000);
+        List<Order> ordersAll = orderService.pageQuery(req);
+
+        HSSFWorkbook wb = new HSSFWorkbook();
+        HSSFSheet sheet = wb.createSheet("订单列表");
+        HSSFRow row = sheet.createRow((int) 0);
+        HSSFCellStyle style = wb.createCellStyle();
+
+        HSSFCell cell = row.createCell(0);
+        cell.setCellValue("订单号");
+        cell.setCellStyle(style);
+        cell = row.createCell(1);
+        cell.setCellValue("桌号");
+        cell.setCellStyle(style);
+        cell = row.createCell(2);
+        cell.setCellValue("下单员工");
+        cell.setCellStyle(style);
+        cell = row.createCell(3);
+        cell.setCellValue("就餐人数");
+        cell.setCellStyle(style);
+        cell = row.createCell(4);
+        cell.setCellValue("下单时间");
+        cell.setCellStyle(style);
+        cell = row.createCell(5);
+        cell.setCellValue("应付款");
+        cell.setCellStyle(style);
+        cell = row.createCell(6);
+        cell.setCellValue("菜品总额");
+        cell.setCellStyle(style);
+        cell = row.createCell(7);
+        cell.setCellValue("折扣金额");
+        cell.setCellStyle(style);
+        cell = row.createCell(8);
+        cell.setCellValue("抹零金额");
+        cell.setCellStyle(style);
+        cell = row.createCell(9);
+        cell.setCellValue("退菜金额");
+        cell.setCellStyle(style);
+        cell = row.createCell(10);
+        cell.setCellValue("已付金额");
+        cell.setCellStyle(style);
+        cell = row.createCell(11);
+        cell.setCellValue("店长减免");
+        cell.setCellStyle(style);
+        cell = row.createCell(12);
+        cell.setCellValue("支付状态");
+        cell.setCellStyle(style);
+
+        for (int i = 0; i < ordersAll.size(); i++) {
+            row = sheet.createRow((int) i + 1);
+            Order order = ordersAll.get(i);
+            BO bo = this.orderToBO(order);
+            int col = -1;
+            row.createCell(++col).setCellValue(order.getOrderId());
+            row.createCell(++col).setCellValue(bo.getDeskName());
+            row.createCell(++col).setCellValue(bo.getAccountNickname());
+            row.createCell(++col).setCellValue(order.getOrderCustomerNums());
+            row.createCell(++col).setCellValue(DateBuilder.base(order.getCreateTime()).timeStr());
+            row.createCell(++col).setCellValue(bo.getNeedPayAmt().toString());
+            row.createCell(++col).setCellValue(bo.getTotalPrice().toString());
+            row.createCell(++col).setCellValue(bo.getDiscountAmt().toString());
+            row.createCell(++col).setCellValue(bo.getEraseAmt().toString());
+            row.createCell(++col).setCellValue(bo.getReturnDishesPrice().toString());
+            row.createCell(++col).setCellValue(bo.getPaidAmt().toString());
+            row.createCell(++col).setCellValue(bo.getReductionAmt().toString());
+            row.createCell(++col).setCellValue(EnumOrderStatus.of(order.getOrderStatus()).remark);
+        }
+        // 第六步，将文件存到指定位置
+        try (FileOutputStream fout = new FileOutputStream(file)) {
+            wb.write(fout);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void doModifyOrderCustNum() {

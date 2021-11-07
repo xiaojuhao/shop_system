@@ -38,6 +38,11 @@ public class DeskService {
         }
     }
 
+    public String getDeskName(Integer deskId) {
+        Desk desk = getById(deskId);
+        return desk != null ? desk.getDeskName() : "未知";
+    }
+
     public Result<Desk> getByName(String name) {
         if (CommonUtils.isBlank(name)) {
             return null;
