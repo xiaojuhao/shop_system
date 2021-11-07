@@ -289,15 +289,8 @@ public class OrderManageListView extends SimpleForm implements Initializable {
                 new ExtensionFilter("XLSX", "*.xlsx")
         );
         File file = chooser.showSaveDialog(this.getScene().getWindow());
-        if (file.exists()) {
-            OkCancelDialog dialog = new OkCancelDialog("文件选择", "文件已存在，是否覆盖当前文件？");
-            Optional<ButtonType> rs = dialog.showAndWait();
-            if (rs.isPresent() && rs.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
-                exportFile(req, file);
-            }
-        } else {
-            exportFile(req, file);
-        }
+        exportFile(req, file);
+        AlertBuilder.INFO("导出文件成功");
     }
 
     private void exportFile(PageQueryOrderReq req, File file) {

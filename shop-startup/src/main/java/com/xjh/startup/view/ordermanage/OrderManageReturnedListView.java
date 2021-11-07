@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import com.xjh.common.utils.AlertBuilder;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -71,9 +72,9 @@ public class OrderManageReturnedListView extends SimpleForm implements Initializ
         HBox dateRangeBlock = new HBox();
         Label dateRangeLabel = new Label("日期:");
         DatePicker datePickerStart = new DatePicker(LocalDate.now());
-        datePickerStart.setPrefWidth(120);
+        datePickerStart.setPrefWidth(150);
         DatePicker datePickerEnd = new DatePicker(LocalDate.now());
-        datePickerEnd.setPrefWidth(120);
+        datePickerEnd.setPrefWidth(150);
         dateRangeBlock.getChildren().add(newCenterLine(dateRangeLabel,
                 datePickerStart,
                 new Label("至"),
@@ -109,9 +110,9 @@ public class OrderManageReturnedListView extends SimpleForm implements Initializ
     private void buildContent(double height) {
         tableView.getColumns().addAll(
                 newCol("桌号", ReturnReasonDO::getDeskName, 30),
-                newCol("菜品名称", ReturnReasonDO::getDishesName, 150),
-                newCol("退菜原因", ReturnReasonDO::getReturnReason, 150),
-                newCol("退菜时间", it -> DateBuilder.base(it.getAddtime()).timeStr(), 150)
+                newCol("菜品名称", ReturnReasonDO::getDishesName, 250),
+                newCol("退菜原因", ReturnReasonDO::getReturnReason, 200),
+                newCol("退菜时间", it -> DateBuilder.base(it.getAddtime()).timeStr(), 200)
         );
         tableView.setPrefHeight(height);
         addLine(tableView);
@@ -145,15 +146,9 @@ public class OrderManageReturnedListView extends SimpleForm implements Initializ
                 new ExtensionFilter("XLSX", "*.xlsx")
         );
         File file = chooser.showSaveDialog(this.getScene().getWindow());
-        if (file.exists()) {
-            OkCancelDialog dialog = new OkCancelDialog("文件选择", "文件已存在，是否覆盖当前文件？");
-            Optional<ButtonType> rs = dialog.showAndWait();
-            if (rs.isPresent() && rs.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
-                exportFile(req, file);
-            }
-        } else {
-            exportFile(req, file);
-        }
+        exportFile(req, file);
+
+        AlertBuilder.INFO("导出文件成功");
     }
 
     private void exportFile(ReturnReasonQuery req, File file) {
