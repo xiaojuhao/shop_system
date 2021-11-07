@@ -130,32 +130,15 @@ public class OrderManageListView extends SimpleForm implements Initializable {
     private void buildCond() {
         cond.addListener((ob, o, n) -> loadData());
         // name
-        Account noAccount = new Account();
-        noAccount.setAccountNickName("全部");
-        List<Account> accountList = accountService.listAll();
-        accountList.add(0, noAccount);
         HBox nameCondBlock = new HBox();
-        ObservableList<IntStringPair> accountOptions = FXCollections.observableArrayList(
-                accountList.stream()
-                        .map(it -> new IntStringPair(it.getAccountId(), it.getAccountNickName()))
-                        .collect(Collectors.toList())
-        );
-        ComboBox<IntStringPair> accountSelect = new ComboBox<>(accountOptions);
-        accountSelect.getSelectionModel().selectFirst();
         Label nameLabel = new Label("业务员:");
-        nameCondBlock.getChildren().add(newCenterLine(nameLabel, accountSelect));
+        ComboBox<IntStringPair> accountComBox = buildAccountComBox();
+        accountComBox.setPrefWidth(80);
+        nameCondBlock.getChildren().add(newCenterLine(nameLabel, accountComBox));
         // desk列表
         HBox deskCondBlock = new HBox();
-        List<Desk> deskList = deskService.getAllDesks();
-        Desk noDesk = new Desk();
-        noDesk.setDeskName("全部");
-        deskList.add(0, noDesk);
-        ObservableList<IntStringPair> desksOptions = FXCollections.observableArrayList(
-                deskList.stream().map(it -> new IntStringPair(it.getDeskId(), it.getDeskName())).collect(Collectors.toList())
-        );
-        ComboBox<IntStringPair> deskCombo = new ComboBox<>(desksOptions);
-        deskCombo.getSelectionModel().selectFirst();
         Label deskLabel = new Label("桌号:");
+        ComboBox<IntStringPair> deskCombo = buildDeskCombo();
         deskCondBlock.getChildren().add(newCenterLine(deskLabel, deskCombo));
         // 时间选择
         HBox dateRangeBlock = new HBox();
@@ -174,7 +157,7 @@ public class OrderManageListView extends SimpleForm implements Initializable {
         Button queryBtn = new Button("查询");
         queryBtn.setOnAction(evt -> {
             PageQueryOrderReq q = cond.get().newVer();
-            IntStringPair selectedAccount = accountSelect.getSelectionModel().getSelectedItem();
+            IntStringPair selectedAccount = accountComBox.getSelectionModel().getSelectedItem();
             if (selectedAccount != null) {
                 q.setAccountId(selectedAccount.getKey());
             } else {
@@ -547,6 +530,35 @@ public class OrderManageListView extends SimpleForm implements Initializable {
         form.addLine(newCenterLine(returnMoney, recoverOrderStatus));
 
         mw.showAndWait();
+    }
+
+    private ComboBox<IntStringPair> buildDeskCombo() {
+        List<Desk> deskList = deskService.getAllDesks();
+        Desk noDesk = new Desk();
+        noDesk.setDeskName("全部");
+        deskList.add(0, noDesk);
+        ObservableList<IntStringPair> desksOptions = FXCollections.observableArrayList(
+                deskList.stream().map(it -> new IntStringPair(it.getDeskId(), it.getDeskName())).collect(Collectors.toList())
+        );
+        ComboBox<IntStringPair> deskCombo = new ComboBox<>(desksOptions);
+        deskCombo.getSelectionModel().selectFirst();
+        return deskCombo;
+    }
+
+    private ComboBox<IntStringPair> buildAccountComBox() {
+        Account noAccount = new Account();
+        noAccount.setAccountNickName("全部");
+        List<Account> accountList = accountService.listAll();
+        accountList.add(0, noAccount);
+
+        ObservableList<IntStringPair> accountOptions = FXCollections.observableArrayList(
+                accountList.stream()
+                        .map(it -> new IntStringPair(it.getAccountId(), it.getAccountNickName()))
+                        .collect(Collectors.toList())
+        );
+        ComboBox<IntStringPair> accountSelect = new ComboBox<>(accountOptions);
+        accountSelect.getSelectionModel().selectFirst();
+        return accountSelect;
     }
 
     @Data
