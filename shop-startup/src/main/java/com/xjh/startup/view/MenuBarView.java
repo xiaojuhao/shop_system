@@ -2,7 +2,6 @@ package com.xjh.startup.view;
 
 import com.xjh.common.utils.CurrentAccount;
 import com.xjh.startup.foundation.constants.MainStageHolder;
-import com.xjh.startup.view.base.HtmlLoader;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.LargeForm;
 import com.xjh.startup.view.base.MediumForm;
@@ -15,8 +14,6 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -75,14 +72,14 @@ public class MenuBarView {
 
         MenuItem dishesCollMenu = new MenuItem("菜品集合管理");
 
-        MenuItem menuManager = new MenuItem("菜单管理");
-        menuManager.setOnAction(e -> openWebView("菜单管理"));
+        // MenuItem menuManager = new MenuItem("菜单管理");
+        // menuManager.setOnAction(e -> openWebView("菜单管理"));
 
         MenuItem taocan = new MenuItem("套餐管理");
         taocan.setOnAction(evt -> openView("套餐管理", new PackageDishesManageListView()));
 
         menu.getItems().addAll(dishesAttrManger, dishesCate, dishesManager,
-                dishesCollMenu, menuManager, taocan);
+                dishesCollMenu, taocan);
         return menu;
     }
 
@@ -128,17 +125,17 @@ public class MenuBarView {
         }
     }
 
-    private void openWebView(String title) {
-        try {
-            WebView w = new WebView();
-            WebEngine engine = w.getEngine();
-            engine.setJavaScriptEnabled(true);
-            engine.load(HtmlLoader.load("ws.html").toString());
-            openView(title, w);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
+    //    private void openWebView(String title) {
+    //        try {
+    //            WebView w = new WebView();
+    //            WebEngine engine = w.getEngine();
+    //            engine.setJavaScriptEnabled(true);
+    //            engine.load(HtmlLoader.load("ws.html").toString());
+    //            openView(title, w);
+    //        } catch (Exception ex) {
+    //            ex.printStackTrace();
+    //        }
+    //    }
 
     private void openView(String title, Parent content) {
         Window sceneWindow = MainStageHolder.get().getScene().getWindow();

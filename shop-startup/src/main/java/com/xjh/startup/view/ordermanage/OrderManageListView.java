@@ -263,7 +263,10 @@ public class OrderManageListView extends SimpleForm implements Initializable {
             c.setPageNo(c.getPageNo() + 1);
             cond.set(c);
         });
-        HBox line = newCenterLine(prev, next);
+        Label remark = new Label("双击查看订单明细");
+        remark.setPadding(new Insets(0, 0, 0, 150));
+        remark.setTextFill(Color.RED);
+        HBox line = newCenterLine(prev, next, remark);
         line.setPadding(new Insets(10, 0, 0, 0));
         addLine(line);
     }
