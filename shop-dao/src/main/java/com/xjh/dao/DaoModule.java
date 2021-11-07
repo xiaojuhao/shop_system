@@ -1,9 +1,6 @@
 package com.xjh.dao;
 
-import java.util.Set;
-
 import com.google.inject.AbstractModule;
-import com.xjh.common.utils.ClasspathPackageScanner;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.TimeRecord;
 
@@ -31,13 +28,14 @@ public class DaoModule extends AbstractModule {
         //        bind(DishesPackageUpdateDAO.class);
         //        bind(PrinterDAO.class);
         //        bind(PrinterTaskDAO.class);
-        Set<Class<?>> classes = ClasspathPackageScanner.getClasses("com.xjh.dao.mapper");
-        classes.forEach(c -> {
-            if (c.getName().endsWith("DAO")) {
-                bind(c);
-                Logger.info("::: 绑定DAO >> " + c.getName());
-            }
-        });
+
+        //        Set<Class<?>> classes = ClasspathPackageScanner.getClasses("com.xjh.dao.mapper");
+        //        classes.forEach(c -> {
+        //            if (c.getName().endsWith("DAO")) {
+        //                bind(c);
+        //                Logger.info("::: 绑定DAO >> " + c.getName());
+        //            }
+        //        });
         Logger.info("DaoModule 耗时: " + timeRecord.getCost());
     }
 }

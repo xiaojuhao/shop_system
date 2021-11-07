@@ -20,6 +20,38 @@ public class DishesPriceDAO {
     @Named("mysql")
     HikariDataSource ds;
 
+    public int insert(DishesPrice price) {
+        try {
+            return Db.use(ds).insert(EntityUtils.create(price));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return 0;
+        }
+    }
+
+    public int updateByPK(DishesPrice price) {
+        try {
+            return Db.use(ds).update(EntityUtils.create(price), EntityUtils.idCond(price));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return 0;
+        }
+    }
+
+    public int deleteByPK(Integer priceId) {
+        try {
+            if (priceId == null) {
+                return 0;
+            }
+            DishesPrice id = new DishesPrice();
+            id.setDishesPriceId(priceId);
+            return Db.use(ds).del(EntityUtils.idCond(id));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return 0;
+        }
+    }
+
     public List<DishesPrice> selectList(DishesPrice cond) {
         try {
             List<Entity> list = Db.use(ds).find(EntityUtils.create(cond));

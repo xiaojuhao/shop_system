@@ -1,7 +1,6 @@
 package com.xjh.startup.view;
 
 
-import static com.xjh.common.utils.CopyUtils.deepClone;
 import static com.xjh.common.utils.TableViewUtils.newCol;
 
 import java.util.List;
@@ -11,6 +10,7 @@ import java.util.stream.Collectors;
 import com.xjh.common.enumeration.EnumDishesStatus;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.ImageHelper;
 import com.xjh.common.utils.Result;
 import com.xjh.common.utils.cellvalue.ImageSrc;
@@ -18,6 +18,8 @@ import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.utils.cellvalue.Operations;
 import com.xjh.dao.dataobject.Dishes;
+import com.xjh.dao.dataobject.DishesPrice;
+import com.xjh.dao.mapper.DishesPriceDAO;
 import com.xjh.dao.query.DishesQuery;
 import com.xjh.service.domain.DishesService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
@@ -47,6 +49,7 @@ import lombok.Data;
 
 public class DishesManageListView extends SimpleForm implements Initializable {
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
+    DishesPriceDAO dishesPriceDAO = GuiceContainer.getInstance(DishesPriceDAO.class);
 
     ObjectProperty<DishesQuery> cond = new SimpleObjectProperty<>(new DishesQuery());
     ObservableList<BO> items = FXCollections.observableArrayList();
@@ -69,7 +72,17 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 BO bo = new BO();
                 bo.setDishesId(dishes.getDishesId());
                 bo.setDishesName(dishes.getDishesName());
-                bo.setDishesPrice(new Money(dishes.getDishesPrice()));
+                bo.setDishesPrice(new Money(dishes.getDishesPrice()).toString());
+                List<DishesPrice> dishesPrices = dishesPriceDAO.queryByDishesId(dishes.getDishesId());
+                if (dishesPrices.size() > 0) {
+                    StringBuilder sb = new StringBuilder();
+                    for (DishesPrice price : dishesPrices) {
+                        sb.append(price.getDishesPriceName()).append(":")
+                                .append(new Money(price.getDishesPrice()).toString())
+                                .append("\n");
+                    }
+                    bo.setDishesPrice(sb.toString());
+                }
                 if (dishes.getDishesStock() != null && dishes.getDishesStock() >= 0) {
                     bo.setDishesStock(dishes.getDishesStock().toString());
                 } else {
@@ -96,9 +109,11 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 onoff.setTitleProperty(onOffTitle);
                 OperationButton del = new OperationButton("删除", () -> {
                 });
+                OperationButton editPrice = new OperationButton("编辑多价格", () -> openPriceEditor(dishes));
                 operations.add(edit);
                 operations.add(onoff);
                 operations.add(del);
+                operations.add(editPrice);
                 bo.setOperations(operations);
                 ImageHelper.resolveImgs(dishes.getDishesImgs()).stream()
                         .findFirst().ifPresent(x -> {
@@ -159,7 +174,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 newCol("状态", "dishesStatus", 80),
                 newCol("价格", "dishesPrice", 100),
                 newCol("库存", "dishesStock", 100),
-                newCol("操作", "operations", 200)
+                newCol("操作", "operations", 250)
         );
         tableView.setItems(items);
         tableView.setPrefHeight(height);
@@ -195,6 +210,102 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         loadData();
     }
 
+    private void openPriceEditor(Dishes dishes) {
+        Window window = this.getScene().getWindow();
+        ModelWindow mw = new ModelWindow(window, "编辑多价格");
+        mw.setWidth(450);
+        mw.setHeight(350);
+        SimpleForm form = new SimpleForm();
+        form.setSpacing(15);
+        // 菜品信息
+        Label dishesNameLabel = new Label("菜品名称:");
+        Label dishesName = new Label(dishes.getDishesName());
+        form.addLine(newLine(dishesNameLabel, dishesName));
+        // 价格列表
+        TableView<DishesPrice> tv = new TableView<>();
+        tv.getColumns().addAll(
+                newCol("价格名称", DishesPrice::getDishesPriceName, 200),
+                newCol("价格", DishesPrice::getDishesPrice, 200)
+        );
+
+        Runnable reloadPriceData = () -> {
+            tv.getItems().clear();
+            tv.getItems().addAll(dishesPriceDAO.queryByDishesId(dishes.getDishesId()));
+            tv.refresh();
+        };
+        form.addLine(tv);
+        reloadPriceData.run();
+        // 操作按钮
+        Button add = new Button("添加");
+        add.setOnAction(evt -> {
+            editPrice(mw, new DishesPrice(), dishes);
+            reloadPriceData.run();
+        });
+        Button edit = new Button("编辑");
+        edit.setOnAction(evt -> {
+            DishesPrice selectedPrices = tv.getSelectionModel().getSelectedItem();
+            if (selectedPrices == null) {
+                AlertBuilder.ERROR("请选择操作记录");
+                return;
+            }
+            editPrice(mw, selectedPrices, dishes);
+            reloadPriceData.run();
+        });
+        Button del = new Button("删除");
+        del.setOnAction(evt -> {
+            DishesPrice selectedPrices = tv.getSelectionModel().getSelectedItem();
+            if (selectedPrices == null) {
+                AlertBuilder.ERROR("请选择操作记录");
+                return;
+            }
+            dishesPriceDAO.deleteByPK(selectedPrices.getDishesPriceId());
+            reloadPriceData.run();
+        });
+        form.addLine(newCenterLine(add, edit, del));
+        mw.setScene(new Scene(form));
+        mw.showAndWait();
+        loadData();
+    }
+
+    private void editPrice(Window parent, DishesPrice dishesPrice, Dishes dishes) {
+        ModelWindow mw = new ModelWindow(parent, "编辑多价格");
+        mw.setWidth(400);
+        mw.setHeight(300);
+        SimpleForm form = new SimpleForm();
+        form.setSpacing(15);
+        form.setPadding(new Insets(20, 0, 0, 15));
+        //
+        Label priceName = new Label("价格名称:");
+        priceName.setPrefWidth(150);
+        TextField priceNameInput = new TextField(dishesPrice.getDishesPriceName());
+        //
+        Label price = new Label("价格:");
+        price.setPrefWidth(150);
+        TextField priceInput = new TextField(new Money(dishes.getDishesPrice()).toString());
+        if (dishesPrice.getDishesPriceId() != null) {
+            priceInput.setText(new Money(dishesPrice.getDishesPrice()).toString());
+        }
+        form.addLine(newLine(priceName, priceNameInput));
+        form.addLine(newLine(price, priceInput));
+        //
+        Button button = new Button("确 定");
+        button.setOnAction(evt -> {
+            dishesPrice.setDishesPrice(CommonUtils.parseDouble(priceInput.getText(), null));
+            dishesPrice.setDishesPriceName(priceNameInput.getText());
+            if (dishesPrice.getDishesPriceId() == null) {
+                dishesPrice.setDishesId(dishes.getDishesId());
+                dishesPrice.setCreatTime(DateBuilder.now().mills());
+                dishesPriceDAO.insert(dishesPrice);
+            } else {
+                dishesPriceDAO.updateByPK(dishesPrice);
+            }
+            mw.close();
+        });
+        form.addLine(newCenterLine(button));
+        mw.setScene(new Scene(form));
+        mw.showAndWait();
+    }
+
     private void changeDishesStatus(Integer dishesId, EnumDishesStatus status) {
         Dishes d = new Dishes();
         d.setDishesId(dishesId);
@@ -212,7 +323,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         Integer dishesId;
         Integer dishesTypeId;
         String dishesName;
-        Money dishesPrice;
+        String dishesPrice;
         String dishesStock;
         String dishesDescription;
         ImageSrc dishesImgs;
