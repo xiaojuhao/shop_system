@@ -7,7 +7,7 @@ import com.xjh.dao.foundation.Table;
 import lombok.Data;
 
 @Data
-@Table("dishes_package_type")
+@Table("dishes_price")
 public class DishesPrice {
     @Id
     @Column("dishesPriceId")

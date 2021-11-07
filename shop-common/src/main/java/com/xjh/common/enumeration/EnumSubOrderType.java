@@ -1,9 +1,12 @@
 package com.xjh.common.enumeration;
 
+import lombok.Getter;
+
 public enum EnumSubOrderType {
     ORDINARY(0, "普通点单"),
     H5(1, "H5订单"),
     ;
+    @Getter
     int type;
     String remark;
 

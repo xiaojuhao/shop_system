@@ -9,13 +9,18 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.xjh.common.utils.*;
-import com.xjh.common.utils.cellvalue.InputNumber;
 import org.apache.commons.collections4.CollectionUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.beust.jcommander.internal.Lists;
 import com.xjh.common.enumeration.EnumChoiceAction;
+import com.xjh.common.utils.AlertBuilder;
+import com.xjh.common.utils.ClickHelper;
+import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.CopyUtils;
+import com.xjh.common.utils.ImageHelper;
+import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.CartItemVO;
 import com.xjh.common.valueobject.CartVO;
 import com.xjh.common.valueobject.DishesAttributeVO;
@@ -24,8 +29,10 @@ import com.xjh.common.valueobject.DishesImgVO;
 import com.xjh.common.valueobject.PageCond;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackage;
+import com.xjh.dao.dataobject.DishesPrice;
 import com.xjh.dao.dataobject.DishesType;
 import com.xjh.dao.mapper.DishesPackageDAO;
+import com.xjh.dao.mapper.DishesPriceDAO;
 import com.xjh.dao.query.DishesPackageQuery;
 import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.DishesService;
@@ -68,13 +75,13 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.StringConverter;
-import org.apache.poi.ss.formula.functions.T;
 
 
 public class OrderDishesChoiceView extends VBox {
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
     DishesPackageDAO dishesPackageDAO = GuiceContainer.getInstance(DishesPackageDAO.class);
     CartService cartService = GuiceContainer.getInstance(CartService.class);
+    DishesPriceDAO dishesPriceDAO = GuiceContainer.getInstance(DishesPriceDAO.class);
 
     private final DeskOrderParam param;
     private final SimpleIntegerProperty cartSize = new SimpleIntegerProperty(0);
@@ -83,7 +90,7 @@ public class OrderDishesChoiceView extends VBox {
     public OrderDishesChoiceView(DeskOrderParam param, double prefWidth) {
         this.param = param;
         this.getChildren().add(topMenus());
-        this.getChildren().add(separator());
+        this.getChildren().add(new Separator(Orientation.HORIZONTAL));
         this.getChildren().add(initDishesView(prefWidth));
 
         refreshCartSize();
@@ -165,12 +172,6 @@ public class OrderDishesChoiceView extends VBox {
             hbox.getChildren().add(placeOrder);
         }
         return hbox;
-    }
-
-    private Separator separator() {
-        Separator s = new Separator();
-        s.setOrientation(Orientation.HORIZONTAL);
-        return s;
     }
 
     private VBox initDishesView(double prefWidth) {
@@ -397,7 +398,38 @@ public class OrderDishesChoiceView extends VBox {
             }
             HBox line = form.newLine(name, optionBox);
             line.setSpacing(15);
-            line.setPadding(new Insets(0,0,0,10));
+            line.setPadding(new Insets(0, 0, 0, 10));
+            form.addLine(line);
+        }
+        // 价格
+        List<DishesPrice> priceList = dishesPriceDAO.queryByDishesId(bo.getDishesId());
+        if (CommonUtils.isNotEmpty(priceList)) {
+            Label name = new Label("价格:");
+            name.setPrefWidth(100);
+            HBox optionBox = new HBox();
+            optionBox.setSpacing(10);
+
+            ToggleGroup group = new ToggleGroup();
+            List<RadioButton> radios = new ArrayList<>();
+            priceList.forEach(price -> {
+                RadioButton radio = new RadioButton(
+                        price.getDishesPriceName() + ": " + price.getDishesPrice() + "元/份");
+                radio.setToggleGroup(group);
+                radio.setUserData(price);
+                radios.add(radio);
+            });
+            radios.get(0).setSelected(true);
+
+            optionBox.getChildren().addAll(radios);
+            collectActions.add(() -> {
+                DishesPrice selectPrice = (DishesPrice) group.getSelectedToggle().getUserData();
+                bo.setDishesPriceId(selectPrice.getDishesPriceId());
+                bo.setDishesPrice(selectPrice.getDishesPrice());
+            });
+
+            HBox line = form.newLine(name, optionBox);
+            line.setSpacing(15);
+            line.setPadding(new Insets(15, 0, 0, 10));
             form.addLine(line);
         }
         // 添加数量
@@ -452,7 +484,7 @@ public class OrderDishesChoiceView extends VBox {
             cartItem.setDishesId(bo.getDishesId());
         }
         cartItem.setIfDishesPackage(bo.getIfPackage());
-        cartItem.setDishesPriceId(0);
+        cartItem.setDishesPriceId(bo.getDishesPriceId());
         cartItem.setNums(bo.getNum() != null ? bo.getNum() : 1);
         cartItem.setDishesAttrs(dishesAttrs);
         this.addCartItem(cartItem);

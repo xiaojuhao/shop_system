@@ -12,6 +12,7 @@ public class DishesChoiceItemBO {
     Integer dishesPackageId;
     String dishesName;
     Double dishesPrice;
+    Integer dishesPriceId;
     Integer ifPackage;
     Integer num;
 }

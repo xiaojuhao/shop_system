@@ -1,6 +1,5 @@
 package com.xjh.service.domain;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +11,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.enumeration.EnumOrderStatus;
-import com.xjh.common.store.SequenceDatabase;
+import com.xjh.common.enumeration.EnumSubOrderType;
 import com.xjh.common.utils.CurrentAccount;
 import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.DateBuilder;
@@ -24,11 +23,13 @@ import com.xjh.common.valueobject.CartVO;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackage;
+import com.xjh.dao.dataobject.DishesPrice;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.dao.dataobject.SubOrder;
 import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.dao.mapper.DishesPackageDAO;
+import com.xjh.dao.mapper.DishesPriceDAO;
 import com.xjh.dao.mapper.OrderDAO;
 import com.xjh.dao.mapper.OrderDishesDAO;
 import com.xjh.dao.mapper.SubOrderDAO;
@@ -55,6 +56,10 @@ public class CartService {
     OrderService orderService;
     @Inject
     DeskService deskService;
+    @Inject
+    SubOrderService subOrderService;
+    @Inject
+    DishesPriceDAO dishesPriceDAO;
 
     public Result<CartVO> addItem(Integer deskId, CartItemVO item) {
         Runnable clear = CurrentRequest.resetRequestId();
@@ -126,13 +131,13 @@ public class CartService {
             Integer orderId = request.getOrderId();
             Order order = orderDAO.selectByOrderId(orderId);
             // 子订单
-            Integer subOrderId = createSubOrderId();
+            Integer subOrderId = subOrderService.createSubOrderId();
             SubOrder subOrder = new SubOrder();
             subOrder.setSubOrderId(subOrderId);
             subOrder.setOrderId(orderId);
-            subOrder.setOrderType(0);
+            subOrder.setOrderType(EnumSubOrderType.ORDINARY.getType());
             subOrder.setSubOrderStatus(0);
-            subOrder.setAccountId(0);
+            subOrder.setAccountId(CurrentAccount.currentAccountId());
             subOrder.setCreatetime(DateBuilder.now().mills());
             int subInsertRs = subOrderDAO.insert(subOrder);
 
@@ -178,13 +183,13 @@ public class CartService {
                 return Result.fail("购物车空");
             }
             // 子订单
-            Integer subOrderId = createSubOrderId();
+            Integer subOrderId = subOrderService.createSubOrderId();
             SubOrder subOrder = new SubOrder();
             subOrder.setSubOrderId(subOrderId);
             subOrder.setOrderId(orderId);
-            subOrder.setOrderType(0);
+            subOrder.setOrderType(EnumSubOrderType.ORDINARY.getType());
             subOrder.setSubOrderStatus(0);
-            subOrder.setAccountId(OrElse.orGet(param.getAccountId(), CurrentAccount.currentAccountId()));
+            subOrder.setAccountId(CurrentAccount.currentAccountId());
             subOrder.setCreatetime(DateBuilder.now().mills());
             int subInsertRs = subOrderDAO.insert(subOrder);
 
@@ -230,15 +235,23 @@ public class CartService {
     }
 
     private OrderDishes buildCommonCartItemVO(CartItemVO item, Integer orderId, Integer subOrderId) {
+        DishesPrice dishesPrice = dishesPriceDAO.queryByPriceId(item.getDishesPriceId());
+
         Dishes dishes = dishesDAO.getById(item.getDishesId());
         OrderDishes d = new OrderDishes();
         d.setOrderId(orderId);
         d.setSubOrderId(subOrderId);
         d.setDishesId(item.getDishesId());
-        d.setDishesPriceId(0);
+        if (dishesPrice != null) {
+            d.setDishesPriceId(dishesPrice.getDishesPriceId());
+            d.setOrderDishesPrice(dishesPrice.getDishesPrice());
+            d.setOrderDishesDiscountPrice(dishesPrice.getDishesPrice());
+        } else {
+            d.setDishesPriceId(0);
+            d.setOrderDishesPrice(dishes.getDishesPrice());
+            d.setOrderDishesDiscountPrice(dishes.getDishesPrice());
+        }
         d.setDishesTypeId(dishes.getDishesTypeId());
-        d.setOrderDishesPrice(dishes.getDishesPrice());
-        d.setOrderDishesDiscountPrice(dishes.getDishesPrice());
         d.setCreatetime(DateBuilder.now().mills());
         d.setIfDishesPackage(0);
         d.setOrderDishesIfchange(0);
@@ -303,35 +316,5 @@ public class CartService {
 
     public Result<String> clearCart(Integer deskId) {
         return CartStore.clearCart(deskId);
-    }
-
-    public Integer createSubOrderId() {
-        while (true) {
-            Integer nextId = createSubOrderId1();
-            if (subOrderDAO.findBySubOrderId(nextId) == null) {
-                return nextId;
-            }
-        }
-    }
-
-    public Integer createSubOrderId1() {
-        LocalDateTime start = DateBuilder.base("2021-01-01 00:00:01").dateTime();
-        String timeStr = DateBuilder.today().format("yyyyMMddHH");
-        int diffHours = (int) DateBuilder.diffHours(start, DateBuilder.base(timeStr).dateTime());
-        if (diffHours <= 0) {
-            throw new RuntimeException("电脑日期设置有误:" + timeStr);
-        }
-        int nextId = nextId(timeStr);
-        if (nextId >= 2 << 15) {
-            throw new RuntimeException("循环次数已用完:" + timeStr);
-        }
-        // 前17位保存时间，后15位保存序列号
-        int id = (diffHours << 15) | nextId;
-        Logger.info("创建子订单号: " + diffHours + "," + nextId + "," + id);
-        return id;
-    }
-
-    public synchronized int nextId(String group) {
-        return SequenceDatabase.nextId("subOrderId:sequence:" + group);
     }
 }

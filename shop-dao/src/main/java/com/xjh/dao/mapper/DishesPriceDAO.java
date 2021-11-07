@@ -40,6 +40,9 @@ public class DishesPriceDAO {
     }
 
     public DishesPrice queryByPriceId(Integer priceId) {
+        if (priceId == null || priceId <= 0) {
+            return null;
+        }
         DishesPrice cond = new DishesPrice();
         cond.setDishesPriceId(priceId);
         return selectList(cond).stream().findFirst().orElse(null);
