@@ -350,7 +350,7 @@ public class OrderDishesChoiceView extends VBox {
         stage.initStyle(StageStyle.DECORATED);
         stage.centerOnScreen();
         stage.setWidth(this.getScene().getWindow().getWidth() / 2);
-        stage.setHeight(this.getScene().getWindow().getHeight() / 3 * 2);
+        stage.setHeight(this.getScene().getWindow().getHeight() /  2);
         stage.setTitle("点菜[桌号:" + param.getDeskName() + "]");
         List<DishesAttributeVO> dishesAttrs = dishesService.getDishesAttribute(bo.getDishesId());
         if(dishesAttrs.size() == 0){
@@ -362,8 +362,9 @@ public class OrderDishesChoiceView extends VBox {
         List<Runnable> collectActions = new ArrayList<>();
         for (DishesAttributeVO attr : dishesAttrs) {
             Label name = new Label(attr.getDishesAttributeName() + ":");
-            name.setPrefWidth(60);
-            HBox line = new HBox();
+            name.setPrefWidth(100);
+            HBox optionBox = new HBox();
+            optionBox.setSpacing(10);
             // 单选框
             if (attr.getIsValueRadio() != null && attr.getIsValueRadio()) {
                 ToggleGroup group = new ToggleGroup();
@@ -377,7 +378,7 @@ public class OrderDishesChoiceView extends VBox {
                 if (radios.size() > 0) {
                     radios.get(0).setSelected(true);
                 }
-                line.getChildren().addAll(radios);
+                optionBox.getChildren().addAll(radios);
                 collectActions.add(() -> {
                     String udata = (String) group.getSelectedToggle().getUserData();
                     attr.setSelectedAttributeValues(
@@ -392,23 +393,29 @@ public class OrderDishesChoiceView extends VBox {
                     cb.setUserData(v.getAttributeValue());
                     allCbs.add(cb);
                 });
-                line.getChildren().addAll(allCbs);
+                optionBox.getChildren().addAll(allCbs);
                 collectActions.add(() -> {
                     List<String> selectedVal = collectValue(allCbs);
                     attr.setSelectedAttributeValues(getSelectedAttr(attr.getAllAttributeValues(), selectedVal));
                 });
             }
-            form.addLine(form.newLine(name, line));
+            HBox line = form.newLine(name, optionBox);
+            line.setSpacing(15);
+            line.setPadding(new Insets(0,0,0,10));
+            form.addLine(line);
         }
         // 添加数量
         TextField inputNumber = new TextField();
         inputNumber.setText("1");
         if (dishesAttrs.isEmpty()) {
-            HBox numLine = form.newCenterLine(new Label("下单数量:"), inputNumber);
+            Label inputNumberLabel = new Label("下单数量:");
+            HBox numLine = form.newCenterLine(inputNumberLabel, inputNumber);
             numLine.setPadding(new Insets(20, 0, 0, 0));
             form.addLine(numLine);
         } else {
-            form.addLine(form.newLine(new Label("下单数量:"), inputNumber));
+            Label inputNumberLabel = new Label("下单数量:");
+            inputNumberLabel.setPrefWidth(100);
+            form.addLine(form.newLine(inputNumberLabel, inputNumber));
         }
 
         // 按钮

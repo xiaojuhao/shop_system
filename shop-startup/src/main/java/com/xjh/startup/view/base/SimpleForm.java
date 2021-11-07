@@ -2,6 +2,7 @@ package com.xjh.startup.view.base;
 
 import com.xjh.common.utils.CommonUtils;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -25,6 +26,7 @@ public class SimpleForm extends VBox {
     public HBox newLine(Node... nodes) {
         HBox line = new HBox();
         line.setSpacing(10);
+        line.setPadding(new Insets(0,0,0,10));
         for (Node n : nodes) {
             line.getChildren().add(n);
         }
