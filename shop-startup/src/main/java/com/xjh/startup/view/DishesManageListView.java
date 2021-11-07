@@ -5,6 +5,7 @@ import static com.xjh.common.utils.CopyUtils.deepClone;
 import static com.xjh.common.utils.TableViewUtils.newCol;
 
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.xjh.common.enumeration.EnumDishesStatus;
@@ -75,13 +76,10 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                     bo.setDishesStock("不限");
                 }
                 StringProperty onOffTitle = new SimpleStringProperty();
-                if (dishes.getDishesStatus() != null && dishes.getDishesStatus() == 1) {
-                    bo.getDishesStatus().set("上架");
-                    onOffTitle.set("下架");
-                } else {
-                    bo.getDishesStatus().set("下架");
-                    onOffTitle.set("上架");
-                }
+                Predicate<Dishes> isOnline = d -> d.getDishesStatus() != null && d.getDishesStatus() == 1;
+                bo.getDishesStatus().set(isOnline.test(dishes) ? "上架" : "下架");
+                onOffTitle.set(isOnline.test(dishes) ? "下架" : "上架");
+
                 Operations operations = new Operations();
                 OperationButton edit = new OperationButton("编辑", () -> openEditor(dishes));
                 OperationButton onoff = new OperationButton("上下架", cv -> {
@@ -169,24 +167,17 @@ public class DishesManageListView extends SimpleForm implements Initializable {
     }
 
     private void buildFoot() {
-        cond.addListener((ob, o, n) -> {
-            loadData();
-        });
+        cond.addListener((ob, o, n) -> loadData());
         Button prev = new Button("上一页");
         prev.setOnMouseClicked(e -> {
             DishesQuery c = cond.get().newVersion();
-            int pageNo = c.getPageNo();
-            if (pageNo <= 1) {
-                c.setPageNo(1);
-            } else {
-                c.setPageNo(pageNo - 1);
-            }
+            c.increasePageNo();
             cond.set(c);
         });
         Button next = new Button("下一页");
         next.setOnMouseClicked(e -> {
             DishesQuery c = cond.get().newVersion();
-            c.setPageNo(c.getPageNo() + 1);
+            c.decreasePageNo();
             cond.set(c);
         });
         HBox line = newCenterLine(prev, next);
@@ -227,9 +218,6 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         ImageSrc dishesImgs;
         String dishesUnitName;
         StringProperty dishesStatus = new SimpleStringProperty();
-        Long creatTime;
-        Integer ifNeedMergePrint;
-        Integer ifNeedPrint;
         String validTime;
         Operations operations;
     }

@@ -4,12 +4,13 @@ import static com.xjh.common.utils.CopyUtils.deepClone;
 
 import com.xjh.common.utils.CommonUtils;
 
+import com.xjh.common.valueobject.PageCond;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class DishesQuery {
-    int pageNo = 1;
-    int pageSize = 20;
+@EqualsAndHashCode(callSuper = true)
+public class DishesQuery extends PageCond {
     String dishesName;
     Integer status;
     Integer version;
