@@ -306,6 +306,15 @@ public class CartService {
     }
 
     public Integer createSubOrderId() {
+        while (true) {
+            Integer nextId = createSubOrderId1();
+            if (subOrderDAO.findBySubOrderId(nextId) == null) {
+                return nextId;
+            }
+        }
+    }
+
+    public Integer createSubOrderId1() {
         LocalDateTime start = DateBuilder.base("2021-01-01 00:00:01").dateTime();
         String timeStr = DateBuilder.today().format("yyyyMMddHH");
         int diffHours = (int) DateBuilder.diffHours(start, DateBuilder.base(timeStr).dateTime());

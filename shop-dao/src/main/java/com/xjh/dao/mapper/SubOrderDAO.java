@@ -36,6 +36,20 @@ public class SubOrderDAO {
         }
     }
 
+    public SubOrder findBySubOrderId(Integer subOrderId) {
+        try {
+            if (subOrderId == null) {
+                return null;
+            }
+            SubOrder cond = new SubOrder();
+            cond.setSubOrderId(subOrderId);
+            return selectList(cond).stream().findFirst().orElse(null);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
     public Long firsSubOrderTime(Integer orderId) throws SQLException {
         if (orderId == null) {
             return null;

@@ -441,6 +441,15 @@ public class OrderService {
     }
 
     public Integer createNewOrderId() {
+        while (true) {
+            Integer newOrderId = createNewOrderId1();
+            if (getOrder(newOrderId) == null) {
+                return newOrderId;
+            }
+        }
+    }
+
+    public Integer createNewOrderId1() {
         LocalDateTime start = DateBuilder.base("2021-01-01 00:00:01").dateTime();
         String timeStr = DateBuilder.today().format("yyyyMMddHH");
         int diffHours = (int) DateBuilder.diffHours(start, DateBuilder.base(timeStr).dateTime());
