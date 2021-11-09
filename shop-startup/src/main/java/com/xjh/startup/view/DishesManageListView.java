@@ -2,11 +2,15 @@ package com.xjh.startup.view;
 
 
 import static com.xjh.common.utils.TableViewUtils.newCol;
+import static com.xjh.common.utils.TableViewUtils.rowIndex;
 
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.xjh.common.enumeration.EnumDishesStatus;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
@@ -27,6 +31,7 @@ import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SimpleForm;
 
+import cn.hutool.core.lang.Holder;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -36,6 +41,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -43,7 +49,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 import lombok.Data;
 
@@ -110,10 +118,12 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 OperationButton del = new OperationButton("删除", () -> {
                 });
                 OperationButton editPrice = new OperationButton("编辑多价格", () -> openPriceEditor(dishes));
+                OperationButton editValidTime = new OperationButton("编辑有效期", () -> openValidTimeEditor(dishes));
                 operations.add(edit);
                 operations.add(onoff);
                 operations.add(del);
                 operations.add(editPrice);
+                operations.add(editValidTime);
                 bo.setOperations(operations);
                 ImageHelper.resolveImgs(dishes.getDishesImgs()).stream()
                         .findFirst().ifPresent(x -> {
@@ -174,7 +184,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 newCol("状态", "dishesStatus", 80),
                 newCol("价格", "dishesPrice", 100),
                 newCol("库存", "dishesStock", 100),
-                newCol("操作", "operations", 250)
+                newCol("操作", "operations", 350)
         );
         tableView.setItems(items);
         tableView.setPrefHeight(height);
@@ -267,6 +277,99 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         loadData();
     }
 
+    private void openValidTimeEditor(Dishes dishes) {
+        Window window = this.getScene().getWindow();
+        ModelWindow mw = new ModelWindow(window, "编辑有效期");
+        mw.setWidth(450);
+        mw.setHeight(350);
+        Dishes dd = dishesService.getById(dishes.getDishesId());
+
+        ObservableList<TimeRange> data = FXCollections.observableArrayList();
+        CommonUtils.safeRun(() -> {
+            List<String> validTimeList = JSONArray.parseArray(dd.getValidTime(), String.class);
+            CommonUtils.forEach(validTimeList, s -> {
+                TimeRange t = TimeRange.from(s);
+                if (t != null) {
+                    data.add(t);
+                }
+            });
+        });
+
+        TableView<TimeRange> tv = new TableView<>();
+        tv.getColumns().addAll(
+                newCol("序号", rowIndex(), 100),
+                newCol("有效时间", it -> it.getStart() + "至" + it.getEnd(), 200)
+        );
+        tv.setPrefWidth(250);
+        tv.setPrefHeight(300);
+
+        Holder<Integer> currDay = Holder.of(1);
+        Runnable refreshData = () -> {
+            tv.getItems().clear();
+            tv.getItems().addAll(data.stream().filter(it -> it.getDay().equals(currDay.get())).collect(Collectors.toList()));
+            tv.refresh();
+        };
+        refreshData.run(); // 首次刷新
+
+        GridPane grid = new GridPane();
+        // 星期
+        BiFunction<Integer, String, Button> createButton = (day, name) -> {
+            Button btn = new Button(name);
+            btn.setOnAction(evt -> {
+                currDay.set(day);
+                refreshData.run();
+            });
+            return btn;
+        };
+        VBox week = new VBox();
+        week.setSpacing(10);
+        week.setPadding(new Insets(30, 0, 0, 0));
+        week.setAlignment(Pos.TOP_CENTER);
+        week.getChildren().add(createButton.apply(1, "星期一"));
+        week.getChildren().add(createButton.apply(2, "星期二"));
+        week.getChildren().add(createButton.apply(3, "星期三"));
+        week.getChildren().add(createButton.apply(4, "星期四"));
+        week.getChildren().add(createButton.apply(5, "星期五"));
+        week.getChildren().add(createButton.apply(6, "星期六"));
+        week.getChildren().add(createButton.apply(7, "星期日"));
+        week.setPrefWidth(80);
+        grid.add(week, 0, 0);
+        // 时间区间
+        VBox timeRange = new VBox();
+        timeRange.setSpacing(10);
+        timeRange.setPadding(new Insets(0, 0, 10, 0));
+
+        timeRange.getChildren().add(tv);
+        Button update = new Button("提交修改");
+        update.setOnAction(evt -> {
+            Dishes u = new Dishes();
+            u.setDishesId(dishes.getDishesId());
+            u.setValidTime(JSON.toJSONString(data.stream().map(TimeRange::asStr).collect(Collectors.toList())));
+            dishesService.save(u);
+            AlertBuilder.INFO("修改成功");
+            mw.close();
+        });
+        timeRange.getChildren().add(update);
+        grid.add(timeRange, 1, 0);
+        // 编辑
+        VBox operations = new VBox();
+        operations.setSpacing(10);
+        operations.setPadding(new Insets(30, 0, 0, 10));
+        operations.getChildren().add(new Button("添加时间"));
+        operations.getChildren().add(new Button("编辑时间"));
+        Button del = new Button("删除时间");
+        del.setOnAction(evt -> {
+            TimeRange tr = tv.getSelectionModel().getSelectedItem();
+            data.remove(tr);
+            refreshData.run();
+        });
+        operations.getChildren().add(del);
+        grid.add(operations, 2, 0);
+        mw.setScene(new Scene(grid));
+        mw.showAndWait();
+
+    }
+
     private void editPrice(Window parent, DishesPrice dishesPrice, Dishes dishes) {
         ModelWindow mw = new ModelWindow(parent, "编辑多价格");
         mw.setWidth(400);
@@ -331,5 +434,28 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         StringProperty dishesStatus = new SimpleStringProperty();
         String validTime;
         Operations operations;
+    }
+
+    @Data
+    public static class TimeRange {
+        Integer day;
+        String start;
+        String end;
+
+        public String asStr() {
+            return day + "_" + start + "_" + end;
+        }
+
+        public static TimeRange from(String str) {
+            String[] arr = str.split("_");
+            if (arr.length != 3) {
+                return null;
+            }
+            TimeRange t = new TimeRange();
+            t.day = Integer.parseInt(arr[0]);
+            t.start = arr[1];
+            t.end = arr[2];
+            return t;
+        }
     }
 }
