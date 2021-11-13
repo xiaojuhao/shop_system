@@ -187,7 +187,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 newCol("状态", "dishesStatus", 80),
                 newCol("价格", "dishesPrice", 100),
                 newCol("库存", "dishesStock", 100),
-                newCol("操作", "operations", 350)
+                newCol("操作", "operations", 400)
         );
         tableView.setItems(items);
         tableView.setPrefHeight(height);
@@ -283,8 +283,8 @@ public class DishesManageListView extends SimpleForm implements Initializable {
     private void openValidTimeEditor(Dishes dishes) {
         Window window = this.getScene().getWindow();
         ModelWindow mw = new ModelWindow(window, "编辑有效期");
-        mw.setWidth(450);
-        mw.setHeight(350);
+        mw.setWidth(550);
+        mw.setHeight(450);
         Dishes dd = dishesService.getById(dishes.getDishesId());
 
         ObservableList<DishesValidTime> data = FXCollections.observableArrayList();
@@ -303,7 +303,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 newCol("序号", rowIndex(), 100),
                 newCol("有效时间", it -> it.getStart() + "至" + it.getEnd(), 200)
         );
-        tv.setPrefWidth(250);
+        tv.setPrefWidth(350);
         tv.setPrefHeight(300);
 
         Holder<Integer> currDay = Holder.of(1);
@@ -447,7 +447,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
 
     private void editValidTime(Window pwindow, DishesValidTime time) {
         ModelWindow w = new ModelWindow(pwindow, "编辑时间");
-        w.setHeight(100);
+        w.setHeight(150);
         w.setWidth(pwindow.getWidth());
 
         SimpleForm form = new SimpleForm();
