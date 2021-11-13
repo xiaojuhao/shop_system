@@ -843,7 +843,7 @@ public class CommonUtils {
     }
 
     public static boolean isBlank(String str) {
-        return !isNotBlank(str);
+        return str == null || str.trim().isEmpty();
     }
 
     public static boolean isNotBlank(String str) {
