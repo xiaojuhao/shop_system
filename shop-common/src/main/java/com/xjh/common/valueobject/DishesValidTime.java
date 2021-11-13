@@ -43,7 +43,9 @@ public class DishesValidTime {
     }
 
     public boolean isValid() {
-        return day != null && start != null && end != null;
+        int intStart = getStartHour() * 60 + getStartMinute();
+        int intEnd = getEndHour() * 60 + getEndMinute();
+        return day != null && intStart < intEnd;
     }
 
     public static DishesValidTime from(String str) {

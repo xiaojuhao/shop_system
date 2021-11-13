@@ -476,6 +476,10 @@ public class DishesManageListView extends SimpleForm implements Initializable {
             time.setEnd(hours2.getSelectionModel().getSelectedItem().getValue()
                     + ":"
                     + minute2.getSelectionModel().getSelectedItem().getValue());
+            if (!time.isValid()) {
+                AlertBuilder.ERROR("请输入有效的时间段");
+                return;
+            }
             w.close();
         });
         form.addLine(newCenterLine(submit));
