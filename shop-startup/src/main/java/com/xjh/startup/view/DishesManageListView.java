@@ -456,14 +456,10 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         form.setSpacing(10);
         form.setPadding(new Insets(6, 0, 0, 0));
         Label label = new Label("有效时间:");
-        ComboBox<IntStringPair> hours = createHourSelector();
-        IntStringPair.select(hours, time.getStartHour(), 0);
-        ComboBox<IntStringPair> hours2 = createHourSelector();
-        IntStringPair.select(hours2, time.getEndHour(), 0);
-        ComboBox<IntStringPair> minute = createMinuteSelector();
-        IntStringPair.select(minute, time.getStartMinute(), 0);
-        ComboBox<IntStringPair> minute2 = createMinuteSelector();
-        IntStringPair.select(minute2, time.getEndMinute(), 0);
+        ComboBox<IntStringPair> hours = createHourSelector(time.getStartHour());
+        ComboBox<IntStringPair> hours2 = createHourSelector(time.getEndHour());
+        ComboBox<IntStringPair> minute = createMinuteSelector(time.getStartMinute());
+        ComboBox<IntStringPair> minute2 = createMinuteSelector(time.getEndMinute());
         form.addLine(newCenterLine(
                 label, hours, new Label(":"), minute,
                 new Label("至"),
@@ -502,17 +498,21 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         Operations operations;
     }
 
-    private ComboBox<IntStringPair> createHourSelector() {
+    private ComboBox<IntStringPair> createHourSelector(Integer init) {
         List<IntStringPair> hours = IntStream.range(0, 24)
                 .mapToObj(i -> new IntStringPair(i, i < 10 ? "0" + i : "" + i))
                 .collect(Collectors.toList());
-        return new ComboBox<>(FXCollections.observableArrayList(hours));
+        ComboBox<IntStringPair> combo = new ComboBox<>(FXCollections.observableArrayList(hours));
+        IntStringPair.select(combo, init, null);
+        return combo;
     }
 
-    private ComboBox<IntStringPair> createMinuteSelector() {
-        List<IntStringPair> hours = IntStream.range(0, 59)
+    private ComboBox<IntStringPair> createMinuteSelector(Integer init) {
+        List<IntStringPair> hours = IntStream.range(0, 60)
                 .mapToObj(i -> new IntStringPair(i, i < 10 ? "0" + i : "" + i))
                 .collect(Collectors.toList());
-        return new ComboBox<>(FXCollections.observableArrayList(hours));
+        ComboBox<IntStringPair> combo = new ComboBox<>(FXCollections.observableArrayList(hours));
+        IntStringPair.select(combo, init, null);
+        return combo;
     }
 }
