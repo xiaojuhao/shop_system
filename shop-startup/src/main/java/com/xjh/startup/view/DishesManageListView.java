@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -30,6 +31,7 @@ import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SimpleForm;
+import com.xjh.startup.view.model.IntStringPair;
 
 import cn.hutool.core.lang.Holder;
 import javafx.application.Platform;
@@ -355,8 +357,29 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         VBox operations = new VBox();
         operations.setSpacing(10);
         operations.setPadding(new Insets(30, 0, 0, 10));
-        operations.getChildren().add(new Button("添加时间"));
-        operations.getChildren().add(new Button("编辑时间"));
+        Button add = new Button("添加时间");
+        add.setOnAction(evt -> {
+            TimeRange newTime = new TimeRange();
+            newTime.setDay(currDay.get());
+            editValidTime(mw, newTime);
+            if (newTime.isValid()) {
+                data.add(newTime);
+                refreshData.run();
+            }
+        });
+        operations.getChildren().add(add);
+        Button edit = new Button("编辑时间");
+        edit.setOnAction(evt -> {
+            TimeRange s = tv.getSelectionModel().getSelectedItem();
+            if (s == null) {
+                AlertBuilder.ERROR("请选择修改记录");
+                return;
+            }
+            editValidTime(mw, s);
+            refreshData.run();
+        });
+        operations.getChildren().add(edit);
+
         Button del = new Button("删除时间");
         del.setOnAction(evt -> {
             TimeRange tr = tv.getSelectionModel().getSelectedItem();
@@ -421,6 +444,44 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         }
     }
 
+    private void editValidTime(Window pwindow, TimeRange time) {
+        ModelWindow w = new ModelWindow(pwindow, "编辑时间");
+        w.setHeight(100);
+        w.setWidth(pwindow.getWidth());
+
+        SimpleForm form = new SimpleForm();
+        w.setScene(new Scene(form));
+
+        form.setSpacing(10);
+        form.setPadding(new Insets(6, 0, 0, 0));
+        Label label = new Label("有效时间:");
+        ComboBox<IntStringPair> hours = createHourSelector();
+        IntStringPair.select(hours, time.getStartHour(), 0);
+        ComboBox<IntStringPair> hours2 = createHourSelector();
+        IntStringPair.select(hours2, time.getEndHour(), 0);
+        ComboBox<IntStringPair> minute = createMinuteSelector();
+        IntStringPair.select(minute, time.getStartMinute(), 0);
+        ComboBox<IntStringPair> minute2 = createMinuteSelector();
+        IntStringPair.select(minute2, time.getEndMinute(), 0);
+        form.addLine(newCenterLine(
+                label, hours, new Label(":"), minute,
+                new Label("至"),
+                hours2, new Label(":"), minute2));
+        Button submit = new Button("确定");
+        submit.setOnAction(evt -> {
+            time.setStart(hours.getSelectionModel().getSelectedItem().getValue()
+                    + ":"
+                    + minute.getSelectionModel().getSelectedItem().getValue());
+            time.setEnd(hours2.getSelectionModel().getSelectedItem().getValue()
+                    + ":"
+                    + minute2.getSelectionModel().getSelectedItem().getValue());
+            w.close();
+        });
+        form.addLine(newCenterLine(submit));
+
+        w.showAndWait();
+    }
+
     @Data
     public static class BO {
         Integer dishesId;
@@ -436,6 +497,20 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         Operations operations;
     }
 
+    private ComboBox<IntStringPair> createHourSelector() {
+        List<IntStringPair> hours = IntStream.range(0, 24)
+                .mapToObj(i -> new IntStringPair(i, i < 10 ? "0" + i : "" + i))
+                .collect(Collectors.toList());
+        return new ComboBox<>(FXCollections.observableArrayList(hours));
+    }
+
+    private ComboBox<IntStringPair> createMinuteSelector() {
+        List<IntStringPair> hours = IntStream.range(0, 59)
+                .mapToObj(i -> new IntStringPair(i, i < 10 ? "0" + i : "" + i))
+                .collect(Collectors.toList());
+        return new ComboBox<>(FXCollections.observableArrayList(hours));
+    }
+
     @Data
     public static class TimeRange {
         Integer day;
@@ -444,6 +519,38 @@ public class DishesManageListView extends SimpleForm implements Initializable {
 
         public String asStr() {
             return day + "_" + start + "_" + end;
+        }
+
+        public int getStartHour() {
+            if (start == null || start.indexOf(":") <= 0) {
+                return 0;
+            }
+            return Integer.parseInt(start.split(":")[0]);
+        }
+
+        public int getStartMinute() {
+            if (start == null || start.indexOf(":") <= 0) {
+                return 0;
+            }
+            return Integer.parseInt(start.split(":")[1]);
+        }
+
+        public int getEndHour() {
+            if (end == null || end.indexOf(":") <= 0) {
+                return 0;
+            }
+            return Integer.parseInt(end.split(":")[0]);
+        }
+
+        public int getEndMinute() {
+            if (end == null || end.indexOf(":") <= 0) {
+                return 0;
+            }
+            return Integer.parseInt(end.split(":")[1]);
+        }
+
+        public boolean isValid() {
+            return day != null && start != null && end != null;
         }
 
         public static TimeRange from(String str) {
