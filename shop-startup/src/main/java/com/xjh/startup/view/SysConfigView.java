@@ -20,6 +20,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -100,7 +101,7 @@ public class SysConfigView extends GridPane {
         collectData.add(() -> runtimeProp.setProperty(DB_USERNAME.name, trim(dbUser.getText())));
 
         row++;
-        TextField dbPwd = new TextField();
+        PasswordField dbPwd = new PasswordField();
         dbPwd.setText(runtimeProp.getProperty(DB_PASSWORD.name));
         dbPwd.setPrefWidth(450);
         this.add(new Label("DB密码："), 0, row);

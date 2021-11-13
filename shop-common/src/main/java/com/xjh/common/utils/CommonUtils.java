@@ -28,6 +28,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.JSON;
+import com.scalax.tools.ScalaTools;
 
 @SuppressWarnings({"unused"})
 public class CommonUtils {
@@ -843,7 +844,7 @@ public class CommonUtils {
     }
 
     public static boolean isBlank(String str) {
-        return str == null || str.trim().isEmpty();
+        return !ScalaTools.isNotBlank(str);
     }
 
     public static boolean isNotBlank(String str) {

@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 
 import com.alibaba.fastjson.JSON;
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
 import com.xjh.common.enumeration.EnumChoiceAction;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.ClickHelper;
@@ -454,9 +454,15 @@ public class OrderDishesChoiceView extends VBox {
         // 按钮
         Button add = new Button("添加购物车");
         add.setOnAction(evt -> {
-            CommonUtils.safeRun(collectActions);
-            bo.setNum(CommonUtils.parseInt(inputNumber.getText(), 1));
-            addDishesToCart(bo, dishesAttrs);
+            try {
+                CommonUtils.safeRun(collectActions);
+                bo.setNum(CommonUtils.parseInt(inputNumber.getText(), 1));
+                addDishesToCart(bo, dishesAttrs);
+            } catch (Exception ex) {
+                Logger.info(ex.getMessage());
+                AlertBuilder.ERROR("添加购物车出现错误了:" + ex.getMessage());
+                return;
+            }
             stage.close();
         });
         form.addLine(form.newCenterLine(add));
