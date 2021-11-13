@@ -2,6 +2,7 @@ package com.xjh.service.domain;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -21,6 +22,7 @@ import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesImgVO;
+import com.xjh.common.valueobject.DishesValidTime;
 import com.xjh.common.valueobject.PageCond;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesAttribute;
@@ -226,6 +228,33 @@ public class DishesService {
             w = 0;
         }
         return weekDays[w];
+    }
+
+    public static boolean isInValidTime(Dishes dishes) {
+        if (CommonUtils.isBlank(dishes.getValidTime())) {
+            return true;
+        }
+        LocalDateTime now = LocalDateTime.now();
+        // 解析有效时间段
+        List<String> validTimeList = JSONArray.parseArray(dishes.getValidTime(), String.class);
+        List<DishesValidTime> timeList = validTimeList.stream()
+                .map(DishesValidTime::from)
+                .collect(Collectors.toList());
+        // 过滤出当天的时间段
+        int weekDay = now.getDayOfWeek().getValue();
+        timeList = timeList.stream().filter(it -> it.getDay() == weekDay)
+                .collect(Collectors.toList());
+        // 若没有配置有效期，则认为全天有效
+        if (timeList.isEmpty()) {
+            return true;
+        }
+        // 逐个时间段校验
+        for (DishesValidTime vt : timeList) {
+            if (vt.testValid(now)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public List<Dishes> pageQuery(Dishes cond, PageCond page) {

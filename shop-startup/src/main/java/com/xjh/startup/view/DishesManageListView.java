@@ -22,6 +22,7 @@ import com.xjh.common.utils.cellvalue.ImageSrc;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.utils.cellvalue.Operations;
+import com.xjh.common.valueobject.DishesValidTime;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPrice;
 import com.xjh.dao.mapper.DishesPriceDAO;
@@ -286,18 +287,18 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         mw.setHeight(350);
         Dishes dd = dishesService.getById(dishes.getDishesId());
 
-        ObservableList<TimeRange> data = FXCollections.observableArrayList();
+        ObservableList<DishesValidTime> data = FXCollections.observableArrayList();
         CommonUtils.safeRun(() -> {
             List<String> validTimeList = JSONArray.parseArray(dd.getValidTime(), String.class);
             CommonUtils.forEach(validTimeList, s -> {
-                TimeRange t = TimeRange.from(s);
+                DishesValidTime t = DishesValidTime.from(s);
                 if (t != null) {
                     data.add(t);
                 }
             });
         });
 
-        TableView<TimeRange> tv = new TableView<>();
+        TableView<DishesValidTime> tv = new TableView<>();
         tv.getColumns().addAll(
                 newCol("序号", rowIndex(), 100),
                 newCol("有效时间", it -> it.getStart() + "至" + it.getEnd(), 200)
@@ -346,7 +347,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         update.setOnAction(evt -> {
             Dishes u = new Dishes();
             u.setDishesId(dishes.getDishesId());
-            u.setValidTime(JSON.toJSONString(data.stream().map(TimeRange::asStr).collect(Collectors.toList())));
+            u.setValidTime(JSON.toJSONString(data.stream().map(DishesValidTime::asStr).collect(Collectors.toList())));
             dishesService.save(u);
             AlertBuilder.INFO("修改成功");
             mw.close();
@@ -359,7 +360,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         operations.setPadding(new Insets(30, 0, 0, 10));
         Button add = new Button("添加时间");
         add.setOnAction(evt -> {
-            TimeRange newTime = new TimeRange();
+            DishesValidTime newTime = new DishesValidTime();
             newTime.setDay(currDay.get());
             editValidTime(mw, newTime);
             if (newTime.isValid()) {
@@ -370,7 +371,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         operations.getChildren().add(add);
         Button edit = new Button("编辑时间");
         edit.setOnAction(evt -> {
-            TimeRange s = tv.getSelectionModel().getSelectedItem();
+            DishesValidTime s = tv.getSelectionModel().getSelectedItem();
             if (s == null) {
                 AlertBuilder.ERROR("请选择修改记录");
                 return;
@@ -382,7 +383,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
 
         Button del = new Button("删除时间");
         del.setOnAction(evt -> {
-            TimeRange tr = tv.getSelectionModel().getSelectedItem();
+            DishesValidTime tr = tv.getSelectionModel().getSelectedItem();
             data.remove(tr);
             refreshData.run();
         });
@@ -444,7 +445,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         }
     }
 
-    private void editValidTime(Window pwindow, TimeRange time) {
+    private void editValidTime(Window pwindow, DishesValidTime time) {
         ModelWindow w = new ModelWindow(pwindow, "编辑时间");
         w.setHeight(100);
         w.setWidth(pwindow.getWidth());
@@ -509,60 +510,5 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 .mapToObj(i -> new IntStringPair(i, i < 10 ? "0" + i : "" + i))
                 .collect(Collectors.toList());
         return new ComboBox<>(FXCollections.observableArrayList(hours));
-    }
-
-    @Data
-    public static class TimeRange {
-        Integer day;
-        String start;
-        String end;
-
-        public String asStr() {
-            return day + "_" + start + "_" + end;
-        }
-
-        public int getStartHour() {
-            if (start == null || start.indexOf(":") <= 0) {
-                return 0;
-            }
-            return Integer.parseInt(start.split(":")[0]);
-        }
-
-        public int getStartMinute() {
-            if (start == null || start.indexOf(":") <= 0) {
-                return 0;
-            }
-            return Integer.parseInt(start.split(":")[1]);
-        }
-
-        public int getEndHour() {
-            if (end == null || end.indexOf(":") <= 0) {
-                return 0;
-            }
-            return Integer.parseInt(end.split(":")[0]);
-        }
-
-        public int getEndMinute() {
-            if (end == null || end.indexOf(":") <= 0) {
-                return 0;
-            }
-            return Integer.parseInt(end.split(":")[1]);
-        }
-
-        public boolean isValid() {
-            return day != null && start != null && end != null;
-        }
-
-        public static TimeRange from(String str) {
-            String[] arr = str.split("_");
-            if (arr.length != 3) {
-                return null;
-            }
-            TimeRange t = new TimeRange();
-            t.day = Integer.parseInt(arr[0]);
-            t.start = arr[1];
-            t.end = arr[2];
-            return t;
-        }
     }
 }

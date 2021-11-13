@@ -287,6 +287,11 @@ public class OrderDishesChoiceView extends VBox {
         ImageView iv = getImageView(bo.getImg(), width);
         box.setOnMouseClicked(evt -> {
             if (ClickHelper.isDblClick()) {
+                Dishes dishes = dishesService.getById(bo.getDishesId());
+                if (!DishesService.isInValidTime(dishes)) {
+                    AlertBuilder.ERROR("当前时间不可售");
+                    return;
+                }
                 // 赠送
                 if (param.getChoiceAction() == EnumChoiceAction.SEND) {
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
