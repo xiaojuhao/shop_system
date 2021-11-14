@@ -100,6 +100,7 @@ public class OrderDishesChoiceView extends VBox {
         HBox hbox = new HBox();
         hbox.setAlignment(Pos.CENTER);
         hbox.setSpacing(10);
+        hbox.setPadding(new Insets(10,0,0,0));
         // 套餐、普通菜品选择
         hbox.getChildren().add(new Label("类型:"));
         ToggleGroup toggleGroup = new ToggleGroup();
@@ -361,6 +362,7 @@ public class OrderDishesChoiceView extends VBox {
         }
         SimpleForm form = new SimpleForm();
         form.setSpacing(10);
+        form.setPadding(new Insets(10,0,0,0));
         List<Runnable> collectActions = new ArrayList<>();
         for (DishesAttributeVO attr : dishesAttrs) {
             Label name = new Label(attr.getDishesAttributeName() + ":");

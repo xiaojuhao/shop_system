@@ -38,7 +38,7 @@ public class PackageDishesChoiceView extends Group {
     public PackageDishesChoiceView(DishesChoiceItemBO bo, Consumer<CartItemVO> addCartItemCb) {
         grid.setVgap(10);
         grid.setHgap(10);
-        grid.setPadding(new Insets(0, 0, 0, 10));
+        grid.setPadding(new Insets(10, 0, 0, 10));
         this.getChildren().add(grid);
         List<Supplier<List<DishesPackageDishes>>> dishesSources = new ArrayList<>();
         List<Supplier<String>> dishesCheckers = new ArrayList<>();
@@ -48,6 +48,7 @@ public class PackageDishesChoiceView extends Group {
         {
             row++;
             Label label = new Label("套餐名:");
+            label.setMinWidth(80);
             Label name = new Label(bo.getDishesName());
             grid.add(label, 0, row);
             grid.add(name, 1, row);

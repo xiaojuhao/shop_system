@@ -231,7 +231,7 @@ public class DishesService {
     }
 
     public static boolean isInValidTime(Dishes dishes) {
-        if (CommonUtils.isBlank(dishes.getValidTime())) {
+        if (dishes == null || CommonUtils.isBlank(dishes.getValidTime())) {
             return true;
         }
         LocalDateTime now = LocalDateTime.now();
