@@ -3,6 +3,7 @@ package com.xjh.dao.mapper;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -33,6 +34,23 @@ public class OrderDishesDAO {
         OrderDishes cond = new OrderDishes();
         cond.setOrderId(orderId);
         return select(cond);
+    }
+
+    public List<OrderDishes> selectByOrderIds(List<Integer> orderIds) {
+        try {
+            if (CommonUtils.isEmpty(orderIds)) {
+                return new ArrayList<>();
+            }
+            String sql = "select * from order_pays where orderId in (" +
+                    orderIds.stream().map(Object::toString)
+                            .collect(Collectors.joining(",", "", ""))
+                    + ")";
+            List<Entity> list = Db.use(ds).query(sql);
+            return EntityUtils.convertList(list, OrderDishes.class);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
     public List<OrderDishes> select(OrderDishes example) {

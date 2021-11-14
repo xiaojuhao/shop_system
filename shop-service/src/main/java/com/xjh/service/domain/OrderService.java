@@ -265,6 +265,7 @@ public class OrderService {
             v.orderTime = DateBuilder.base(order.getCreateTime()).timeStr();
             v.orderNeedPay = this.notPaidBillAmount(order, orderDishesList);
             v.orderHadpaid = order.getOrderHadpaid();
+            v.orderRefund = OrElse.orGet(order.getOrderRefund(), 0D);
             v.totalPrice = sumTotalPrice(order, orderDishesList);
             v.returnedCash = OrElse.orGet(order.getOrderReturnCash(), 0D);
             v.discountAmount = calcDiscountAmount(order, orderDishesList);

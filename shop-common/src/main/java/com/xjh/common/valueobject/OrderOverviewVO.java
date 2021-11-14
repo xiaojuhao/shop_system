@@ -16,6 +16,7 @@ public class OrderOverviewVO {
     public double discountAmount;
     public double discountableAmount;
     public double orderHadpaid;
+    public double orderRefund;
     public double orderReduction;
     public double deduction;
     public double orderErase;
