@@ -148,6 +148,7 @@
     </build>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- 全局参数 -->
         <global.encoding>UTF-8</global.encoding>
         <global.jdk.version>1.8</global.jdk.version>
