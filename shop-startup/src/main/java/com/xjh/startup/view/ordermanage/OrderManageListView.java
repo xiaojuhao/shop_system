@@ -9,7 +9,9 @@ import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -76,10 +78,13 @@ public class OrderManageListView extends SimpleForm implements Initializable {
     ObjectProperty<PageQueryOrderReq> cond = new SimpleObjectProperty<>(new PageQueryOrderReq());
     ObservableList<BO> items = FXCollections.observableArrayList();
     TableView<BO> tableView = new TableView<>();
+    Map<Integer, Account> accountMap = new HashMap<>();
 
     @Override
     public void initialize() {
         Window window = this.getScene().getWindow();
+        accountService.listAll().forEach(account -> accountMap.put(account.getAccountId(), account));
+        //
         buildCond();
         buildContent(window.getHeight() - 130);
         buildFoot();
@@ -102,7 +107,8 @@ public class OrderManageListView extends SimpleForm implements Initializable {
         BO bo = new BO();
         bo.setOrderId(order.getOrderId());
         bo.setDeskName(order.getDeskId() + "");
-        bo.setAccountNickname("管理员");
+        Account account = accountMap.get(CommonUtils.parseInt(order.getAccountId(), null));
+        bo.setAccountNickname(account != null ? account.getAccountNickName() : "未知");
         bo.setOrderCustomerNums(order.getOrderCustomerNums());
         bo.setOrderTime(DateBuilder.base(order.getCreateTime()).timeStr());
         List<OrderDishes> dishesList = orderDishesService.selectByOrderId(order.getOrderId());

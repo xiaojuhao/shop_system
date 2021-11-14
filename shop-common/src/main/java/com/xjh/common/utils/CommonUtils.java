@@ -223,12 +223,12 @@ public class CommonUtils {
         }
     }
 
-    public static Integer parseInt(String str, Integer def) {
+    public static Integer parseInt(Object str, Integer def) {
         try {
             if (str == null) {
                 return def;
             }
-            return new Double(Double.parseDouble(str)).intValue();
+            return new Double(Double.parseDouble(str.toString())).intValue();
         } catch (Exception ex) {
             return def;
         }
