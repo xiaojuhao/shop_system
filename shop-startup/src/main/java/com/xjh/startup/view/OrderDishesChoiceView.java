@@ -74,6 +74,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.Window;
 import javafx.util.StringConverter;
 
 
@@ -335,12 +336,13 @@ public class OrderDishesChoiceView extends VBox {
 
     private void openPackageAddDialog(DishesChoiceItemBO bo) {
         Stage stage = new Stage();
-        stage.initOwner(this.getScene().getWindow());
+        Window owner = this.getScene().getWindow();
+        stage.initOwner(owner);
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initStyle(StageStyle.DECORATED);
         stage.centerOnScreen();
-        stage.setWidth(this.getScene().getWindow().getWidth() / 2);
-        stage.setHeight(this.getScene().getWindow().getHeight() / 3 * 2);
+        stage.setWidth(owner.getWidth() / 5 * 3);
+        stage.setHeight(owner.getHeight() / 3 * 2);
         stage.setTitle("点菜[桌号:" + param.getDeskName() + "]");
         stage.setScene(new Scene(new PackageDishesChoiceView(bo, this::addCartItem)));
         stage.showAndWait();
@@ -348,21 +350,18 @@ public class OrderDishesChoiceView extends VBox {
 
     private void openAddDishesDialog(DishesChoiceItemBO bo) {
         Stage stage = new Stage();
-        stage.initOwner(this.getScene().getWindow());
+        Window owner = this.getScene().getWindow();
+        stage.initOwner(owner);
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initStyle(StageStyle.DECORATED);
         stage.centerOnScreen();
-        stage.setWidth(this.getScene().getWindow().getWidth() / 2);
-        stage.setHeight(this.getScene().getWindow().getHeight() /  2);
+        stage.setWidth(owner.getWidth() / 2);
+        stage.setHeight(owner.getHeight() / 2);
         stage.setTitle("点菜[桌号:" + param.getDeskName() + "]");
         List<DishesAttributeVO> dishesAttrs = dishesService.getDishesAttribute(bo.getDishesId());
-        if(dishesAttrs.size() == 0){
-            stage.setWidth(400);
-            stage.setHeight(300);
-        }
         SimpleForm form = new SimpleForm();
         form.setSpacing(10);
-        form.setPadding(new Insets(10,0,0,0));
+        form.setPadding(new Insets(10, 0, 0, 0));
         List<Runnable> collectActions = new ArrayList<>();
         for (DishesAttributeVO attr : dishesAttrs) {
             Label name = new Label(attr.getDishesAttributeName() + ":");

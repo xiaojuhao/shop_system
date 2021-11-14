@@ -1,18 +1,24 @@
 package com.xjh.startup.view;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 import com.xjh.common.enumeration.EnumChoseType;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.JSONBuilder;
+import com.xjh.common.valueobject.CartItemVO;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackageDishes;
 import com.xjh.dao.dataobject.DishesPackageType;
 import com.xjh.dao.mapper.DishesPackageDishesDAO;
 import com.xjh.dao.mapper.DishesPackageTypeDAO;
-import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.service.domain.DishesService;
-import com.xjh.common.valueobject.CartItemVO;
+import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.model.DishesChoiceItemBO;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -24,11 +30,6 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
 public class PackageDishesChoiceView extends Group {
     DishesPackageTypeDAO typeDAO = GuiceContainer.getInstance(DishesPackageTypeDAO.class);
     DishesPackageDishesDAO packageDishesDAO = GuiceContainer.getInstance(DishesPackageDishesDAO.class);
@@ -36,7 +37,9 @@ public class PackageDishesChoiceView extends Group {
     GridPane grid = new GridPane();
 
     public PackageDishesChoiceView(DishesChoiceItemBO bo, Consumer<CartItemVO> addCartItemCb) {
-        grid.setVgap(10);
+        Integer packageId = bo.getDishesPackageId();
+
+        grid.setVgap(15);
         grid.setHgap(10);
         grid.setPadding(new Insets(10, 0, 0, 10));
         this.getChildren().add(grid);
@@ -53,20 +56,27 @@ public class PackageDishesChoiceView extends Group {
             grid.add(label, 0, row);
             grid.add(name, 1, row);
         }
+
         {
-            List<DishesPackageType> types = typeDAO.getByDishesPackageId(bo.getDishesPackageId());
+            // 查询套餐包含的菜品类型
+            List<DishesPackageType> types = typeDAO.getByDishesPackageId(packageId);
             for (DishesPackageType type : types) {
                 row++;
                 List<DishesPackageDishes> packageDishes = packageDishesDAO.getByDishesPackageTypeId(
-                        type.getDishesPackageId(), type.getDishesPackageTypeId());
+                        packageId, type.getDishesPackageTypeId());
+                // 菜品类型包含的菜品个数
+                int dishesSize = packageDishes.size();
+                // 选择个数
+                Integer typeChooseNums = type.getChooseNums();
+
                 EnumChoseType chose = EnumChoseType.of(type.getIfRequired());
                 StringBuilder name = new StringBuilder(type.getDishesPackageTypeName());
                 if (chose == EnumChoseType.ALL) {
                     name.append("(必选):");
                 } else if (chose == EnumChoseType.MAX) {
-                    name.append("(最多选").append(type.getChooseNums()).append("个):");
+                    name.append("(最多选").append(typeChooseNums).append("个):");
                 } else {
-                    name.append("(").append(packageDishes.size()).append("选").append(type.getChooseNums()).append("):");
+                    name.append("(").append(dishesSize).append("选").append(typeChooseNums).append("):");
                 }
                 grid.add(new Label(name.toString()), 0, row);
                 FlowPane choices = new FlowPane();
@@ -81,9 +91,8 @@ public class PackageDishesChoiceView extends Group {
                     CheckBox cb = new CheckBox(dishes.getDishesName());
                     if (chose == EnumChoseType.ALL) {
                         cb.setSelected(true);
-                        cb.selectedProperty().addListener((x, y, z) -> {
-                            cb.setSelected(true);
-                        });
+                        // 必选时，不可取消
+                        cb.selectedProperty().addListener((x, y, z) -> cb.setSelected(true));
                     }
                     choices.getChildren().add(cb);
                     typeSelected.add(() -> cb.isSelected() ? pd : null);
@@ -99,16 +108,16 @@ public class PackageDishesChoiceView extends Group {
                 } else if (chose == EnumChoseType.MAX) {
                     dishesCheckers.add(() -> {
                         int selectedSize = CommonUtils.collect(typeSelected, Supplier::get).size();
-                        if (selectedSize > type.getChooseNums()) {
-                            return type.getDishesPackageTypeName() + " 最多可选" + type.getChooseNums() + "个,已选择" + selectedSize + "个";
+                        if (selectedSize > typeChooseNums) {
+                            return type.getDishesPackageTypeName() + " 最多可选" + typeChooseNums + "个,已选择" + selectedSize + "个";
                         }
                         return null;
                     });
                 } else {
                     dishesCheckers.add(() -> {
                         int selectedSize = CommonUtils.collect(typeSelected, Supplier::get).size();
-                        if (selectedSize != type.getChooseNums()) {
-                            return type.getDishesPackageTypeName() + " 应选" + type.getChooseNums() + "个,已选择" + selectedSize + "个";
+                        if (selectedSize != typeChooseNums) {
+                            return type.getDishesPackageTypeName() + " 应选" + typeChooseNums + "个,已选择" + selectedSize + "个";
                         }
                         return null;
                     });
@@ -154,7 +163,7 @@ public class PackageDishesChoiceView extends Group {
                 CommonUtils.forEach(dishesSources, it -> CommonUtils.addList(selectedDishes, it.get()));
                 CartItemVO cartItem = new CartItemVO();
                 if (bo.getIfPackage() == 1) {
-                    cartItem.setDishesId(bo.getDishesPackageId());
+                    cartItem.setDishesId(packageId);
                 } else {
                     cartItem.setDishesId(bo.getDishesId());
                 }
