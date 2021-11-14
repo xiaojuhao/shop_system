@@ -226,10 +226,10 @@ public class DishesManageListView extends SimpleForm implements Initializable {
     private void openPriceEditor(Dishes dishes) {
         Window window = this.getScene().getWindow();
         ModelWindow mw = new ModelWindow(window, "编辑多价格");
-        mw.setWidth(450);
-        mw.setHeight(350);
+        mw.setWidth(550);
+        mw.setHeight(450);
         SimpleForm form = new SimpleForm();
-        form.setSpacing(15);
+        form.setSpacing(10);
         // 菜品信息
         Label dishesNameLabel = new Label("菜品名称:");
         Label dishesName = new Label(dishes.getDishesName());
@@ -237,8 +237,8 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         // 价格列表
         TableView<DishesPrice> tv = new TableView<>();
         tv.getColumns().addAll(
-                newCol("价格名称", DishesPrice::getDishesPriceName, 200),
-                newCol("价格", DishesPrice::getDishesPrice, 200)
+                newCol("价格名称", DishesPrice::getDishesPriceName, 250),
+                newCol("价格", DishesPrice::getDishesPrice, 250)
         );
 
         Runnable reloadPriceData = () -> {
