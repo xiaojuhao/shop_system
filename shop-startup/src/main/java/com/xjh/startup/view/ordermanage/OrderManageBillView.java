@@ -1,6 +1,7 @@
 package com.xjh.startup.view.ordermanage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -8,10 +9,12 @@ import java.util.stream.Collectors;
 
 import com.xjh.common.enumeration.EnumOrderPeriodType;
 import com.xjh.common.enumeration.EnumOrderStatus;
+import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.enumeration.EnumSubOrderType;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.CopyUtils;
 import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.utils.OrElse;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.valueobject.OrderOverviewVO;
 import com.xjh.dao.dataobject.Order;
@@ -110,7 +113,7 @@ public class OrderManageBillView extends SimpleForm {
                 new Separator(Orientation.VERTICAL),
                 printCanvas(buildStat2(bo), Math.max(quartWidth, 200)),
                 new Separator(Orientation.VERTICAL),
-                printCanvas(buildStat3(), Math.max(quartWidth, 220)),
+                printCanvas(buildStat3(bo), Math.max(quartWidth, 220)),
                 new Separator(Orientation.VERTICAL),
                 printCanvas(buildStat4(), Math.max(quartWidth, 300)));
         addLine(line);
@@ -177,6 +180,13 @@ public class OrderManageBillView extends SimpleForm {
                     bo.customerNumsSupper += 1;
                     bo.actualAmountSupper += billView.orderHadpaid;
             }
+
+            // 按渠道统计
+            CommonUtils.forEach(orderPayList, pay -> {
+                EnumPayMethod pm = EnumPayMethod.of(pay.getPaymentMethod());
+                double s = OrElse.orGet(bo.payMethodSummarize.get(pm), 0D);
+                bo.payMethodSummarize.put(pm, s + pay.getAmount());
+            });
         }
     }
 
@@ -207,16 +217,16 @@ public class OrderManageBillView extends SimpleForm {
         return list;
     }
 
-    public List<BillItem> buildStat3() {
+    public List<BillItem> buildStat3(BillBO bo) {
         List<BillItem> list = new ArrayList<>();
-        list.add(new BillItem("+ 现金", "0.00"));
-        list.add(new BillItem("+ 银行卡", "0.00"));
-        list.add(new BillItem("+ 微信", "0.00"));
-        list.add(new BillItem("+ 支付宝", "0.00"));
-        list.add(new BillItem("+ 储值卡", "0.00"));
-        list.add(new BillItem("+ 美团券", "0.00"));
+        list.add(new BillItem("+ 现金", new Money(bo.payMethodSummarize.get(EnumPayMethod.CASH))));
+        list.add(new BillItem("+ 银行卡", new Money(bo.payMethodSummarize.get(EnumPayMethod.BANKCARD))));
+        list.add(new BillItem("+ 微信", new Money(bo.payMethodSummarize.get(EnumPayMethod.WECHAT))));
+        list.add(new BillItem("+ 支付宝", new Money(bo.payMethodSummarize.get(EnumPayMethod.ALIPAY))));
+        list.add(new BillItem("+ 储值卡", new Money(bo.payMethodSummarize.get(EnumPayMethod.STORECARD))));
+        list.add(new BillItem("+ 美团券", new Money(bo.payMethodSummarize.get(EnumPayMethod.MEITUAN))));
         list.add(new BillItem("+ 代金券", "0.00"));
-        list.add(new BillItem("+ 口碑商家", "0.00"));
+        list.add(new BillItem("+ 口碑商家", new Money(bo.payMethodSummarize.get(EnumPayMethod.KOUBEI))));
         list.add(new BillItem("+ 店铺减免", "0.00"));
         list.add(new BillItem("+ 套餐买单", "0.00"));
         list.add(new BillItem("+ 公众号", "0.00"));
@@ -229,7 +239,7 @@ public class OrderManageBillView extends SimpleForm {
         list.add(new BillItem("+ 微生活积储值卡", "0.00"));
         list.add(new BillItem("+ 微信银联支付", "0.00"));
         list.add(new BillItem("+ 外卖", "0.00"));
-        list.add(new BillItem("+ 银联POS机", "0.00"));
+        list.add(new BillItem("+ 银联POS机", new Money(bo.payMethodSummarize.get(EnumPayMethod.POS))));
         list.add(new BillItem("+ 交行活动", "0.00"));
         list.add(new BillItem("+ 招行活动", "0.00"));
         list.add(new BillItem("+ 商场活动", "0.00"));
@@ -315,6 +325,8 @@ public class OrderManageBillView extends SimpleForm {
         int totalUnpaidNums;
 
         double totalRedunction;
+
+        Map<EnumPayMethod, Double> payMethodSummarize = new HashMap<>();
 
     }
 
