@@ -26,20 +26,8 @@
             <artifactId>sqlite-jdbc</artifactId>
         </dependency>
         <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.coobird</groupId>
-            <artifactId>thumbnailator</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.jfoenix</groupId>
-            <artifactId>jfoenix</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>
@@ -52,13 +40,11 @@
         <dependency>
             <groupId>com.xjh</groupId>
             <artifactId>shop-common</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

@@ -22,10 +22,6 @@
             <artifactId>hutool-all</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.caucho</groupId>
-            <artifactId>hessian</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
         </dependency>
@@ -40,7 +36,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
