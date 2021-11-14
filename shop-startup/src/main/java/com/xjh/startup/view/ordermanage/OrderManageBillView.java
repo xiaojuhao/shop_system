@@ -164,20 +164,20 @@ public class OrderManageBillView extends SimpleForm {
                     break;
                 default:
                     bo.totalSuccNums += 1;
-                    bo.customerNums += 1;
+                    bo.customerNums += order.getOrderCustomerNums();
             }
 
             EnumOrderPeriodType periodType = EnumOrderPeriodType.check(order.getCreateTime());
             switch (periodType) {
                 case NOON:
-                    bo.customerNumsNoon += 1;
+                    bo.customerNumsNoon += order.getOrderCustomerNums();
                     bo.actualAmountNoon += billView.orderHadpaid;
                     break;
                 case NIGHT:
-                    bo.customerNumsNight += 1;
+                    bo.customerNumsNight += order.getOrderCustomerNums();
                     bo.actualAmountNight += billView.orderHadpaid;
                 default:
-                    bo.customerNumsSupper += 1;
+                    bo.customerNumsSupper += order.getOrderCustomerNums();
                     bo.actualAmountSupper += billView.orderHadpaid;
             }
 
