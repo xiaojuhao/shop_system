@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.xjh</groupId>
     <artifactId>xjh-parent</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>xjh</name>
@@ -15,6 +15,34 @@
         <module>shop-common</module>
         <module>shop-service</module>
     </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- 全局参数 -->
+        <global.encoding>UTF-8</global.encoding>
+        <global.jdk.version>1.8</global.jdk.version>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+
+        <QLExpress.version>3.2.2</QLExpress.version>
+        <apollo.client.version>1.2.1</apollo.client.version>
+        <kotlin.version>1.4.30-M1</kotlin.version>
+
+        <!-- 插件版本 -->
+        <plugin.compiler.version>3.5.1</plugin.compiler.version>
+        <plugin.source.version>3.0.0</plugin.source.version>
+        <plugin.javadoc.version>2.9.1</plugin.javadoc.version>
+        <plugin.deploy.version>2.8.2</plugin.deploy.version>
+        <plugin.staging.version>1.6.7</plugin.staging.version>
+        <plugin.surefire.version>2.9</plugin.surefire.version>
+        <plugin.findbugs.version>3.0.3</plugin.findbugs.version>
+        <plugin.springboot.version>2.4.1</plugin.springboot.version>
+
+        <xjh-version>1.0.0-SNAPSHOT</xjh-version>
+        <!-- 启动类 -->
+        <start-class>com.xjh.startup.LoginApp</start-class>
+        <final-jar-name>shop-system-xjh</final-jar-name>
+    </properties>
 
     <build>
         <pluginManagement>    <!-- 插件模板 -->
@@ -44,7 +72,7 @@
                         </descriptorRefs>
                         <archive>
                             <manifest>
-                                <mainClass>com.xjh.startup.LoginApp</mainClass>
+                                <mainClass>${start-class}}</mainClass>
                             </manifest>
                         </archive>
                     </configuration>
@@ -143,34 +171,25 @@
                         <mainClass>${start-class}</mainClass>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>2.8.1</version>
+                    <configuration>
+                        <generateBackupPoms>false</generateBackupPoms>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
     </build>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- 全局参数 -->
-        <global.encoding>UTF-8</global.encoding>
-        <global.jdk.version>1.8</global.jdk.version>
 
-        <!-- Third part -->
-        <QLExpress.version>3.2.2</QLExpress.version>
-
-        <apollo.client.version>1.2.1</apollo.client.version>
-        <!-- 插件版本 -->
-        <plugin.compiler.version>3.5.1</plugin.compiler.version>
-        <plugin.source.version>3.0.0</plugin.source.version>
-        <plugin.javadoc.version>2.9.1</plugin.javadoc.version>
-        <plugin.deploy.version>2.8.2</plugin.deploy.version>
-        <plugin.staging.version>1.6.7</plugin.staging.version>
-        <plugin.surefire.version>2.9</plugin.surefire.version>
-        <plugin.findbugs.version>3.0.3</plugin.findbugs.version>
-        <plugin.springboot.version>2.4.1</plugin.springboot.version>
-        <kotlin.version>1.4.30-M1</kotlin.version>
-
-        <start-class>com.xjh.startup.LoginApp</start-class>
-
-    </properties>
 
     <dependencyManagement>
         <dependencies>
@@ -182,22 +201,22 @@
             <dependency>
                 <groupId>com.xjh</groupId>
                 <artifactId>shop-startup</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>${xjh-version}</version>
             </dependency>
             <dependency>
                 <groupId>com.xjh</groupId>
                 <artifactId>shop-dao</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>${xjh-version}</version>
             </dependency>
             <dependency>
                 <groupId>com.xjh</groupId>
                 <artifactId>shop-service</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>${xjh-version}</version>
             </dependency>
             <dependency>
                 <groupId>com.xjh</groupId>
                 <artifactId>shop-common</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>${xjh-version}</version>
             </dependency>
             <!--Java工具集合的依赖-->
             <dependency>
@@ -239,22 +258,12 @@
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
-                <version>1.2.62</version>
-            </dependency>
-            <dependency>
-                <groupId>com.jfoenix</groupId>
-                <artifactId>jfoenix</artifactId>
-                <version>8.0.10</version>
+                <version>1.2.76</version>
             </dependency>
             <dependency>
                 <groupId>org.xerial</groupId>
                 <artifactId>sqlite-jdbc</artifactId>
                 <version>3.34.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.caucho</groupId>
-                <artifactId>hessian</artifactId>
-                <version>4.0.38</version>
             </dependency>
             <dependency>
                 <groupId>com.sleepycat</groupId>
