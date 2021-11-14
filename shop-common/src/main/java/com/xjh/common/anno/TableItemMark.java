@@ -8,6 +8,9 @@ import java.lang.annotation.Target;
 
 import com.google.inject.BindingAnnotation;
 
+/**
+ * table注解
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
 @BindingAnnotation
