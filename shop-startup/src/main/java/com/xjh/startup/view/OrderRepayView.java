@@ -11,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 public class OrderRepayView extends SmallForm {
@@ -42,5 +43,9 @@ public class OrderRepayView extends SmallForm {
         HBox buttonLine = newCenterLine(cancel, ok);
         buttonLine.setSpacing(30);
         addLine(buttonLine);
+
+        Label remark = new Label("注: 微信，支付宝，微信余额，微信优惠券，\n代金券，储值卡，微生活代金券，微生活\n积分抵扣，微生活储值卡，微信银联支付\n不可以重新结账");
+        remark.setTextFill(Color.RED);
+        addLine(remark);
     }
 }
