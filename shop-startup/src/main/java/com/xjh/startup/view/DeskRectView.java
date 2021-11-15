@@ -96,18 +96,20 @@ public class DeskRectView extends VBox {
                 EnumDeskStatus runStatus = EnumDeskStatus.of(desk.get().getStatus());
                 if (runStatus == EnumDeskStatus.IN_USE || runStatus == EnumDeskStatus.PAID) {
                     Window sceneWindow = this.getScene().getWindow();
-                    double width = sceneWindow.getWidth() / 10 * 9;
-                    double height = sceneWindow.getHeight() / 10 * 9;
-                    Stage orderInfo = new Stage();
-                    orderInfo.initOwner(sceneWindow);
-                    orderInfo.initModality(Modality.WINDOW_MODAL);
-                    orderInfo.initStyle(StageStyle.DECORATED);
-                    orderInfo.centerOnScreen();
-                    orderInfo.setWidth(width);
-                    orderInfo.setHeight(height);
-                    orderInfo.setTitle("订单详情");
-                    orderInfo.setScene(new Scene(new OrderDetailView(desk.get(), width, height)));
-                    orderInfo.showAndWait();
+                    double width = sceneWindow.getWidth() * 0.96;
+                    double height = sceneWindow.getHeight() * 0.96;
+                    OrderDetailView orderDetailView = new OrderDetailView(desk.get());
+                    Stage stage = new Stage();
+                    stage.initOwner(sceneWindow);
+                    stage.initModality(Modality.WINDOW_MODAL);
+                    stage.initStyle(StageStyle.DECORATED);
+                    stage.centerOnScreen();
+                    stage.setWidth(width);
+                    stage.setHeight(height);
+                    stage.setTitle("订单详情");
+                    stage.setScene(new Scene(orderDetailView));
+                    orderDetailView.initialize();
+                    stage.showAndWait();
                     refreshTable(desk);
                     System.gc();
                 } else {

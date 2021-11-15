@@ -51,6 +51,7 @@ import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.foundation.printers.OrderPrinterHelper;
 import com.xjh.startup.foundation.printers.PrintResult;
 import com.xjh.startup.foundation.printers.PrinterImpl;
+import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.MediumForm;
 import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
@@ -87,7 +88,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-public class OrderDetailView extends VBox {
+public class OrderDetailView extends VBox implements Initializable {
     // 依赖服务
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
     OrderPayService orderPayService = GuiceContainer.getInstance(OrderPayService.class);
@@ -100,8 +101,15 @@ public class OrderDetailView extends VBox {
     PrinterTaskDAO printerTaskDAO = GuiceContainer.getInstance(PrinterTaskDAO.class);
 
     ObjectProperty<OrderOverviewVO> orderView = new SimpleObjectProperty<>();
+    Desk desk;
 
-    public OrderDetailView(Desk desk, double width, double height) {
+    public OrderDetailView(Desk desk) {
+        this.desk = desk;
+    }
+
+    public void initialize() {
+        double width = this.getScene().getWidth();
+        double height = this.getScene().getHeight();
         TimeRecord cost = TimeRecord.start();
         Integer orderId = desk.getOrderId();
         TableView<OrderDishesTableItemBO> tableView = new TableView<>();
@@ -258,15 +266,18 @@ public class OrderDetailView extends VBox {
             Button transferBtn = createButton("转台", width, e -> openDeskChangeView(deskOrderParam));
             Button splitBtn = createButton("拆台", width, null);
             Button payBillBtn = createButton("结账", width, evt -> openPayWayChoiceView(deskOrderParam));
+
+            FlowPane.setMargin(payBillBtn, new Insets(0, 80, 0, 0));
+
             Button orderErase = createButton("抹零", width, evt -> openOrderEraseView(deskOrderParam));
-            FlowPane.setMargin(orderErase, new Insets(0, 0, 0, 100));
+            Button repay = createButton("重新结账", width, evt -> orderRepay(deskOrderParam));
             Button reduction = createButton("店长减免", width, evt -> openOrderReductionDialog(deskOrderParam));
             Button discount = createButton("选择折扣", width, evt -> openDiscountSelectionDialog(deskOrderParam));
             Button printOrder = createButton("打印账单", width, evt -> submitPrintOrderInfo(deskOrderParam));
             // add all buttons
             operationButtonPane.getChildren().addAll(
                     orderBtn, sendBtn, returnBtn, transferBtn, splitBtn, payBillBtn,
-                    orderErase, reduction, discount, printOrder);
+                    repay, orderErase, reduction, discount, printOrder);
             addLine(operationButtonPane);
         }
         Logger.info("OrderDetail构建页面耗时: " + cost.getCostAndReset());
@@ -291,7 +302,7 @@ public class OrderDetailView extends VBox {
     }
 
     private Button createButton(String name, double width, EventHandler<? super MouseEvent> onClick) {
-        width = Math.max(66, (width - 11 * 20) / 11);
+        width = Math.max(66, (width - 12 * 15) / 12);
         if (width > 100) {
             width = 100;
         }
@@ -483,6 +494,13 @@ public class OrderDetailView extends VBox {
         param.setChoiceAction(EnumChoiceAction.NULL);
         String title = "店长减免[桌号:" + param.getDeskName() + "]";
         VBox view = new OrderReductionView(param);
+        openView(title, param, view);
+    }
+
+    private void orderRepay(DeskOrderParam param) {
+        param.setChoiceAction(EnumChoiceAction.NULL);
+        String title = "重新结账[桌号:" + param.getDeskName() + "]";
+        VBox view = new OrderRepayView(param);
         openView(title, param, view);
     }
 

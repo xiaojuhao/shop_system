@@ -104,6 +104,10 @@ public class OrderService {
         }
     }
 
+    public Result<String> repayOrder(Integer orderId, String pwd) {
+        return Result.fail("暂不支持重新结账");
+    }
+
     public Result<String> erase(Integer orderId, double eraseAmt) {
         if (eraseAmt < 0) {
             return Result.fail("抹零金额错误");
