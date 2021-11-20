@@ -3,16 +3,23 @@ package com.xjh.startup.view.model;
 import com.xjh.common.utils.CommonUtils;
 
 import javafx.scene.control.ComboBox;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class IntStringPair {
     Integer key;
     String value;
+    Object attachment;
+
+    public IntStringPair(Integer key, String value) {
+        this(key, value, null);
+    }
+
+    public IntStringPair(Integer key, String value, Object attachment) {
+        this.key = key;
+        this.value = value;
+        this.attachment = attachment;
+    }
 
     public String toString() {
         return value;

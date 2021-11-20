@@ -132,11 +132,9 @@ public class PrinterOrderDishesSettings extends SimpleForm implements Initializa
         List<PrinterDO> printers = printerService.query(new PrinterDO()).getData();
         ObservableList<IntStringPair> options = FXCollections.observableArrayList(printers.stream()
                 .map(it -> {
-                    IntStringPair pair = new IntStringPair();
-                    pair.setKey(it.getPrinterId());
-                    pair.setValue(String.format("%s(%s:%s)",
-                            it.getPrinterName(), it.getPrinterIp(), it.getPrinterPort()));
-                    return pair;
+                    String show = String.format("%s(%s:%s)",
+                            it.getPrinterName(), it.getPrinterIp(), it.getPrinterPort());
+                    return new IntStringPair(it.getPrinterId(), show);
                 }).collect(Collectors.toSet()));
 
         ComboBox<IntStringPair> combo = new ComboBox<>(options);

@@ -1,4 +1,4 @@
-package com.xjh.startup.view;
+package com.xjh.startup.view.paymethods;
 
 import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.utils.CommonUtils;
