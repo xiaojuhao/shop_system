@@ -224,11 +224,11 @@ public class OrderManageBillView extends SimpleForm {
         list.add(new BillItem("+ 微信", new Money(bo.payMethodSummarize.get(EnumPayMethod.WECHAT))));
         list.add(new BillItem("+ 支付宝", new Money(bo.payMethodSummarize.get(EnumPayMethod.ALIPAY))));
         list.add(new BillItem("+ 储值卡", new Money(bo.payMethodSummarize.get(EnumPayMethod.STORECARD))));
-        list.add(new BillItem("+ 美团券", new Money(bo.payMethodSummarize.get(EnumPayMethod.MEITUAN))));
-        list.add(new BillItem("+ 代金券", "0.00"));
-        list.add(new BillItem("+ 口碑商家", new Money(bo.payMethodSummarize.get(EnumPayMethod.KOUBEI))));
+        list.add(new BillItem("+ 美团券", new Money(bo.payMethodSummarize.get(EnumPayMethod.MEITUAN_COUPON))));
+        list.add(new BillItem("+ 代金券", new Money(bo.payMethodSummarize.get(EnumPayMethod.KOUBEI))));
+        list.add(new BillItem("+ 口碑商家", new Money(bo.payMethodSummarize.get(EnumPayMethod.COUPON))));
         list.add(new BillItem("+ 店铺减免", "0.00"));
-        list.add(new BillItem("+ 套餐买单", "0.00"));
+        list.add(new BillItem("+ 套餐买单", new Money(bo.payMethodSummarize.get(EnumPayMethod.WANDA_PACKAGE))));
         list.add(new BillItem("+ 公众号", "0.00"));
         list.add(new BillItem("+ 公众号减免", "0.00"));
         list.add(new BillItem("+ 其他优惠", "0.00"));

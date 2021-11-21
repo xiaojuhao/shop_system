@@ -9,6 +9,7 @@ import com.google.inject.Singleton;
 import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.enumeration.EnumPayStatus;
+import com.xjh.common.utils.CurrentAccount;
 import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Logger;
@@ -51,9 +52,10 @@ public class OrderPayService {
             }
             OrderPay orderPay = new OrderPay();
             orderPay.setOrderId(paymentResult.getOrderId());
-            orderPay.setAccountId(0);
+            orderPay.setAccountId(CurrentAccount.currentAccountId());
             orderPay.setAmount(paymentResult.getPayAmount());
-            orderPay.setActualAmount(paymentResult.getPayAmount());
+            orderPay.setActualAmount(paymentResult.getActualAmount());
+            orderPay.setVoucherNums(paymentResult.getVoucherNum());
             orderPay.setCardNumber(paymentResult.getCardNumber());
             orderPay.setRemark(paymentResult.getPayRemark());
             orderPay.setPaymentMethod(paymentResult.getPayMethod().code);

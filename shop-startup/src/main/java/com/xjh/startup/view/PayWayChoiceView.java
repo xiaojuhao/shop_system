@@ -1,5 +1,12 @@
 package com.xjh.startup.view;
 
+import static com.xjh.common.enumeration.EnumPayMethod.BANKCARD;
+import static com.xjh.common.enumeration.EnumPayMethod.KOUBEI;
+import static com.xjh.common.enumeration.EnumPayMethod.MEITUAN_COUPON;
+import static com.xjh.common.enumeration.EnumPayMethod.MEITUAN_PACKAGE;
+import static com.xjh.common.enumeration.EnumPayMethod.POS;
+import static com.xjh.common.enumeration.EnumPayMethod.WANDA_PACKAGE;
+
 import java.util.Optional;
 
 import com.alibaba.fastjson.JSON;
@@ -40,12 +47,12 @@ public class PayWayChoiceView extends SmallForm {
         pane.setPrefHeight(500);
 
         pane.getChildren().add(cashButtonAction("现金结账", param));
-        pane.getChildren().add(commonPaymentAction("银联POS机", param, EnumPayMethod.POS));
-        pane.getChildren().add(commonPaymentAction("美团收单结账", param, EnumPayMethod.MEITUAN));
-        pane.getChildren().add(commonPaymentAction("口碑收单", param, EnumPayMethod.KOUBEI));
-        pane.getChildren().add(couponPaymentAction("美团代金券", param, 1));
-        pane.getChildren().add(couponPaymentAction("美团套餐买单", param, 2));
-        pane.getChildren().add(couponPaymentAction("假日套餐补差价结账", param, 4));
+        pane.getChildren().add(commonPaymentAction("银联POS机", param, POS));
+        pane.getChildren().add(commonPaymentAction("美团收单结账", param, BANKCARD));
+        pane.getChildren().add(commonPaymentAction("口碑收单", param, KOUBEI));
+        pane.getChildren().add(couponPaymentAction("美团代金券", param, 1, MEITUAN_COUPON));
+        pane.getChildren().add(couponPaymentAction("美团套餐买单", param, 2, MEITUAN_PACKAGE));
+        pane.getChildren().add(couponPaymentAction("假日套餐补差价结账", param, 4, WANDA_PACKAGE));
         pane.getChildren().add(createButton("代金券结账", this::notSupportConfirm));
         pane.getChildren().add(createButton("充值卡结账", this::notSupportConfirm));
         pane.getChildren().add(createButton("逃单", () -> handleEscapeOrder(param)));
@@ -65,18 +72,19 @@ public class PayWayChoiceView extends SmallForm {
         return button;
     }
 
-    private Node couponPaymentAction(String name, DeskOrderParam param, int type) {
+    private Node couponPaymentAction(String name, DeskOrderParam param, int type, EnumPayMethod payMethod) {
         Button button = new Button(name);
         button.setMinWidth(100);
         button.setMaxWidth(100);
         button.setOnMouseClicked(event -> {
-            PaymentDialogOfCoupon scene = new PaymentDialogOfCoupon(param, type, name);
+            PaymentDialogOfCoupon scene = new PaymentDialogOfCoupon(param, type, name, payMethod);
             ModelWindow window = new ModelWindow(this.getScene().getWindow());
             window.setHeight(300);
             window.setScene(new Scene(scene));
             scene.initialize();
             window.showAndWait();
             System.out.println("返回值:" + JSON.toJSONString(window.getUserData()));
+            addPay((PaymentResult) window.getUserData());
         });
         return button;
     }

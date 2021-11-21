@@ -1,8 +1,10 @@
 package com.xjh.startup.view.paymethods;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.dao.dataobject.CouponList;
 import com.xjh.dao.mapper.CouponListDAO;
@@ -23,9 +25,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Window;
 
 public class PaymentDialogOfCoupon extends SimpleForm implements Initializable {
@@ -34,11 +38,13 @@ public class PaymentDialogOfCoupon extends SimpleForm implements Initializable {
     DeskOrderParam param;
     int type;
     String name;
+    EnumPayMethod payMethod;
 
-    public PaymentDialogOfCoupon(DeskOrderParam param, int type, String name) {
+    public PaymentDialogOfCoupon(DeskOrderParam param, int type, String name, EnumPayMethod payMethod) {
         this.param = param;
         this.type = type;
         this.name = name;
+        this.payMethod = payMethod;
     }
 
     @Override
@@ -51,53 +57,72 @@ public class PaymentDialogOfCoupon extends SimpleForm implements Initializable {
         grid.setPadding(new Insets(20, 20, 10, 10));
 
         int row = 0;
-        grid.add(new Label("桌号:"), 0, row);
+        grid.add(createTitleLabel("桌号"), 0, row);
         grid.add(new Label(param.getDeskName()), 1, row);
 
         row++;
         double needPayAmt = orderService.notPaidBillAmount(param.getOrderId());
         StringProperty couponValue = new SimpleStringProperty("0.0");
         StringProperty actualPay = new SimpleStringProperty("0.0");
-        grid.add(new Label("待支付:"), 0, row);
+        grid.add(createTitleLabel("待支付"), 0, row);
         grid.add(new Label(CommonUtils.formatMoney(needPayAmt) + " 元"), 1, row);
 
         row++;
         Label couponAmtLabel = new Label("00");
         couponAmtLabel.textProperty().bind(couponValue);
-        grid.add(new Label("支付金额:"), 0, row);
+        grid.add(createTitleLabel("支付金额"), 0, row);
         grid.add(couponAmtLabel, 1, row);
 
         row++;
         Label actualAmtLabel = new Label("00");
         actualAmtLabel.textProperty().bind(actualPay);
-        grid.add(new Label("后台金额:"), 0, row);
+        grid.add(createTitleLabel("后台金额"), 0, row);
         grid.add(actualAmtLabel, 1, row);
 
         row++;
+        TextField couponNum = new TextField();
         ComboBox<IntStringPair> combo = buildCombo(type);
         combo.setPrefWidth(100);
         combo.valueProperty().addListener((obs, old, _new) -> {
             if (_new == null) {
                 return;
             }
+            int num = CommonUtils.parseInt(couponNum.getText(), 0);
             CouponList coupon = (CouponList) _new.getAttachment();
-            couponValue.set(CommonUtils.formatMoney(Math.min(needPayAmt, coupon.getCouponAmount())));
-            actualPay.set(CommonUtils.formatMoney(coupon.getActualAmount()));
+            couponValue.set(CommonUtils.formatMoney(num * Math.min(needPayAmt, coupon.getCouponAmount())));
+            actualPay.set(CommonUtils.formatMoney(num * coupon.getActualAmount()));
         });
         VBox groupBox = new VBox();
-        TextField couponNum = new TextField();
+        groupBox.setSpacing(5);
+        List<TextField> serialNoList = new ArrayList<>();
+
         couponNum.setPromptText("张数");
-        couponNum.setText("1");
+        couponNum.setText("0");
         couponNum.setPrefWidth(40);
         couponNum.textProperty().addListener((obs, old, _new) -> {
-            int num = CommonUtils.parseInt(_new, 0);
+            serialNoList.clear();
             groupBox.getChildren().clear();
+            int num = CommonUtils.parseInt(_new, 0);
             for (int i = 0; i < num; i++) {
-                groupBox.getChildren().add(new Label("序列" + i));
+                TextField serialNoInput = new TextField();
+                Label serialNoLabel = new Label("序列号" + i + ":");
+                serialNoLabel.setPrefWidth(60);
+                serialNoList.add(serialNoInput);
+                groupBox.getChildren().add(newLine(serialNoLabel, serialNoInput));
+
+                CouponList coupon = (CouponList) combo.getSelectionModel().getSelectedItem().getAttachment();
+                if (coupon != null) {
+                    couponValue.set(CommonUtils.formatMoney(num * Math.min(needPayAmt, coupon.getCouponAmount())));
+                    actualPay.set(CommonUtils.formatMoney(num * coupon.getActualAmount()));
+                } else {
+                    couponValue.set("0.00");
+                    actualPay.set("0.00");
+                }
+
             }
             pwindow.setHeight(oriHeight + num * (couponNum.getHeight() + 5));
         });
-        grid.add(new Label("选择券:"), 0, row);
+        grid.add(createTitleLabel("选择券"), 0, row);
         Label middleLabel = new Label("元 X");
         middleLabel.setAlignment(Pos.BOTTOM_RIGHT);
         HBox box = new HBox();
@@ -105,12 +130,12 @@ public class PaymentDialogOfCoupon extends SimpleForm implements Initializable {
         grid.add(box, 1, row);
         // 序列号
         row++;
-        grid.add(groupBox, 1, row);
+        grid.add(groupBox, 0, row, 2, 1);
 
         row++;
         TextField remarkField = new TextField();
         remarkField.setPromptText("支付消息");
-        grid.add(new Label("备注:"), 0, row);
+        grid.add(createTitleLabel("备注"), 0, row);
         grid.add(remarkField, 1, row);
 
         this.addLine(newCenterLine(grid));
@@ -118,13 +143,24 @@ public class PaymentDialogOfCoupon extends SimpleForm implements Initializable {
         //操作按钮
         row++;
         Button cancel = new Button("取 消");
-        cancel.setOnAction(evt -> this.getScene().getWindow().hide());
+        cancel.setOnAction(evt -> {
+            PaymentResult result = new PaymentResult();
+            result.setPayAction(0);
+            this.getScene().getWindow().setUserData(result);
+            this.getScene().getWindow().hide();
+        });
         Button submit = new Button("确 定");
         submit.setOnAction(evt -> {
+            List<String> cardNoList = serialNoList.stream().map(TextInputControl::getText).collect(Collectors.toList());
             PaymentResult result = new PaymentResult();
-            result.setPayAmount(CommonUtils.parseDouble(actualPay, 0D));
-            result.setPayCertNo("aaaaaaaa");
-            result.setPayRemark("代金券支付");
+            result.setPayAction(1);
+            result.setOrderId(param.getOrderId());
+            result.setActualAmount(CommonUtils.parseDouble(actualPay.getValue(), 0D));
+            result.setPayAmount(CommonUtils.parseDouble(couponValue.getValue(), 0D));
+            result.setVoucherNum(cardNoList.size());
+            result.setCardNumber(String.join(",", cardNoList));
+            result.setPayMethod(payMethod);
+            result.setPayRemark(remarkField.getText());
             this.getScene().getWindow().setUserData(result);
             this.getScene().getWindow().hide();
         });
@@ -140,6 +176,12 @@ public class PaymentDialogOfCoupon extends SimpleForm implements Initializable {
                 list.stream().map(it -> new IntStringPair(it.getType(), it.getCouponName(), it))
                         .collect(Collectors.toList())
         ));
+    }
+
+    private Label createTitleLabel(String labelName) {
+        Label label = new Label(labelName + ":");
+        label.setTextAlignment(TextAlignment.RIGHT);
+        return label;
     }
 
 

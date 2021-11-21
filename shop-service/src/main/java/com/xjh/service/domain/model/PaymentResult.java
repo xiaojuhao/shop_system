@@ -8,6 +8,8 @@ import lombok.Data;
 public class PaymentResult {
     Integer orderId;
     double payAmount;
+    double actualAmount;
+    Integer voucherNum = 0;
     String payCertNo;
     String payRemark;
     String cardNumber;
