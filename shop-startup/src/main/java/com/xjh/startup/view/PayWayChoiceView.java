@@ -4,7 +4,7 @@ import static com.xjh.common.enumeration.EnumPayMethod.BANKCARD;
 import static com.xjh.common.enumeration.EnumPayMethod.KOUBEI;
 import static com.xjh.common.enumeration.EnumPayMethod.MEITUAN_COUPON;
 import static com.xjh.common.enumeration.EnumPayMethod.MEITUAN_PACKAGE;
-import static com.xjh.common.enumeration.EnumPayMethod.POS;
+import static com.xjh.common.enumeration.EnumPayMethod.UNIONPAY_POS;
 import static com.xjh.common.enumeration.EnumPayMethod.WANDA_PACKAGE;
 
 import java.util.Optional;
@@ -47,7 +47,7 @@ public class PayWayChoiceView extends SmallForm {
         pane.setPrefHeight(500);
 
         pane.getChildren().add(cashButtonAction("现金结账", param));
-        pane.getChildren().add(commonPaymentAction("银联POS机", param, POS));
+        pane.getChildren().add(commonPaymentAction("银联POS机", param, UNIONPAY_POS));
         pane.getChildren().add(commonPaymentAction("美团收单结账", param, BANKCARD));
         pane.getChildren().add(commonPaymentAction("口碑收单", param, KOUBEI));
         pane.getChildren().add(couponPaymentAction("美团代金券", param, 1, MEITUAN_COUPON));

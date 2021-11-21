@@ -115,7 +115,7 @@ public class OrderManageBillView extends SimpleForm {
                 new Separator(Orientation.VERTICAL),
                 printCanvas(buildStat3(bo), Math.max(quartWidth, 220)),
                 new Separator(Orientation.VERTICAL),
-                printCanvas(buildStat4(), Math.max(quartWidth, 300)));
+                printCanvas(buildStat4(bo), Math.max(quartWidth, 300)));
         addLine(line);
     }
 
@@ -186,6 +186,9 @@ public class OrderManageBillView extends SimpleForm {
                 EnumPayMethod pm = EnumPayMethod.of(pay.getPaymentMethod());
                 double s = OrElse.orGet(bo.payMethodSummarize.get(pm), 0D);
                 bo.payMethodSummarize.put(pm, s + pay.getAmount());
+
+                double a = OrElse.orGet(bo.payMethodActualSummarize.get(pm), 0D);
+                bo.payMethodActualSummarize.put(pm, a + pay.getActualAmount());
             });
         }
     }
@@ -219,51 +222,19 @@ public class OrderManageBillView extends SimpleForm {
 
     public List<BillItem> buildStat3(BillBO bo) {
         List<BillItem> list = new ArrayList<>();
-        list.add(new BillItem("+ 现金", new Money(bo.payMethodSummarize.get(EnumPayMethod.CASH))));
-        list.add(new BillItem("+ 银行卡", new Money(bo.payMethodSummarize.get(EnumPayMethod.BANKCARD))));
-        list.add(new BillItem("+ 微信", new Money(bo.payMethodSummarize.get(EnumPayMethod.WECHAT))));
-        list.add(new BillItem("+ 支付宝", new Money(bo.payMethodSummarize.get(EnumPayMethod.ALIPAY))));
-        list.add(new BillItem("+ 储值卡", new Money(bo.payMethodSummarize.get(EnumPayMethod.STORECARD))));
-        list.add(new BillItem("+ 美团券", new Money(bo.payMethodSummarize.get(EnumPayMethod.MEITUAN_COUPON))));
-        list.add(new BillItem("+ 代金券", new Money(bo.payMethodSummarize.get(EnumPayMethod.KOUBEI))));
-        list.add(new BillItem("+ 口碑商家", new Money(bo.payMethodSummarize.get(EnumPayMethod.COUPON))));
-        list.add(new BillItem("+ 店铺减免", "0.00"));
-        list.add(new BillItem("+ 套餐买单", new Money(bo.payMethodSummarize.get(EnumPayMethod.WANDA_PACKAGE))));
-        list.add(new BillItem("+ 公众号", "0.00"));
-        list.add(new BillItem("+ 公众号减免", "0.00"));
-        list.add(new BillItem("+ 其他优惠", "0.00"));
-        list.add(new BillItem("+ 店铺优惠券", "0.00"));
-        list.add(new BillItem("+ 假日套餐补差价", "0.00"));
-        list.add(new BillItem("+ 微生活代金券", "0.00"));
-        list.add(new BillItem("+ 微生活积分抵扣", "0.00"));
-        list.add(new BillItem("+ 微生活积储值卡", "0.00"));
-        list.add(new BillItem("+ 微信银联支付", "0.00"));
-        list.add(new BillItem("+ 外卖", "0.00"));
-        list.add(new BillItem("+ 银联POS机", new Money(bo.payMethodSummarize.get(EnumPayMethod.POS))));
-        list.add(new BillItem("+ 交行活动", "0.00"));
-        list.add(new BillItem("+ 招行活动", "0.00"));
-        list.add(new BillItem("+ 商场活动", "0.00"));
-        list.add(new BillItem("+ 美团闪惠", "0.00"));
+        for (EnumPayMethod payMethod : EnumPayMethod.values()) {
+            list.add(new BillItem("+ " + payMethod.name, new Money(bo.payMethodSummarize.get(payMethod))));
+        }
         return list;
     }
 
-    public List<BillItem> buildStat4() {
+    public List<BillItem> buildStat4(BillBO bo) {
         List<BillItem> list = new ArrayList<>();
-        list.add(new BillItem("+ 套餐后台价格", "0.00"));
-        list.add(new BillItem("+ 美团后台价格", "0.00"));
-        list.add(new BillItem("+ 口碑后台价格", "0.00"));
-        list.add(new BillItem("+ 店铺优惠后台价值", "0.00"));
-        list.add(new BillItem("+ 其他后台价值", "0.00"));
-        list.add(new BillItem("+ 补差价后台价值", "0.00"));
-        list.add(new BillItem("+ 公众号实际价值", "0.00"));
-        list.add(new BillItem("+ 微生活代金券实际价值", "0.00"));
-        list.add(new BillItem("+ 微生活积分抵扣实际价值", "0.00"));
-        list.add(new BillItem("+ 微生活储值卡实际价值", "0.00"));
-        list.add(new BillItem("+ 外卖实际价值", "0.00"));
-        list.add(new BillItem("+ 交行活动实际价值", "0.00"));
-        list.add(new BillItem("+ 招行活动实际价值", "0.00"));
-        list.add(new BillItem("+ 商场活动实际价值", "0.00"));
-        list.add(new BillItem("+ 美团闪惠实际价值", "0.00"));
+        for (EnumPayMethod payMethod : EnumPayMethod.values()) {
+            if (payMethod.showActual) {
+                list.add(new BillItem("+ " + payMethod.name + "后台价值", new Money(bo.payMethodActualSummarize.get(payMethod))));
+            }
+        }
         return list;
     }
 
@@ -327,6 +298,7 @@ public class OrderManageBillView extends SimpleForm {
         double totalRedunction;
 
         Map<EnumPayMethod, Double> payMethodSummarize = new HashMap<>();
+        Map<EnumPayMethod, Double> payMethodActualSummarize = new HashMap<>();
 
     }
 
