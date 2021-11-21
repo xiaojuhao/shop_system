@@ -8,6 +8,7 @@ import java.util.Objects;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.common.enumeration.EnumDeskStatus;
@@ -33,6 +34,7 @@ import com.xjh.dao.dataobject.OrderPay;
 import com.xjh.dao.dataobject.SubOrder;
 import com.xjh.dao.mapper.OrderDAO;
 import com.xjh.dao.mapper.SubOrderDAO;
+import com.xjh.dao.query.OrderPayQuery;
 import com.xjh.dao.query.PageQueryOrderReq;
 import com.xjh.service.domain.model.CreateOrderParam;
 
@@ -60,7 +62,7 @@ public class OrderService {
             if (orderId == null) {
                 return null;
             }
-            return orderDAO.selectByOrderId(orderId);
+            return orderDAO.selectByOrderId(orderId).getData();
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
@@ -105,7 +107,36 @@ public class OrderService {
     }
 
     public Result<String> repayOrder(Integer orderId, String pwd) {
-        return Result.fail("暂不支持重新结账");
+        Order order = orderDAO.selectByOrderId(orderId).getData();
+
+        OrderPayQuery cond = new OrderPayQuery();
+        cond.setOrderId(orderId);
+        cond.setPaymentStatus(1);
+        cond.setExcludePayMethods(Lists.newArrayList(
+                EnumPayMethod.WECHAT.code, EnumPayMethod.ALIPAY.code));
+        orderPayService.deleteBy(cond);
+        // 更新支付金额
+        List<OrderPay> pays = orderPayService.selectByOrderId(orderId);
+        double orderHaidPaid = pays.stream().map(OrderPay::getAmount).reduce(Double::sum).orElse(0D);
+        List<OrderDishes> orderDishes = orderDishesService.selectByOrderId(orderId);
+        order.setOrderHadpaid(orderHaidPaid);
+        order.setFullReduceDishesPrice(0D);
+        order.setOrderDiscountInfo(JSON.toJSONString(new OrderDiscountVO()));
+        OrderOverviewVO billView = this.buildOrderOverview(order, orderDishes, pays).getData();
+        if (billView.getOrderNeedPay() <= 0.01) {
+            order.setOrderStatus(EnumOrderStatus.PAID.status);
+        } else if (orderHaidPaid > 0.01) {
+            order.setOrderStatus(EnumOrderStatus.PARTIAL_PAID.status);
+        } else {
+            order.setOrderStatus(EnumOrderStatus.UNPAID.status);
+        }
+        orderDAO.updateByOrderId(order);
+        // 更新餐桌状态
+        Desk desk = new Desk();
+        desk.setDeskId(order.getDeskId());
+        desk.setOrderId(order.getOrderId());
+        deskService.useDesk(desk);
+        return Result.success("重结算成功");
     }
 
     public Result<String> erase(Integer orderId, double eraseAmt) {
@@ -154,8 +185,8 @@ public class OrderService {
             return Result.fail("更新订单失败");
         }
         try {
-            int u = orderDAO.updateByOrderId(order);
-            if (u > 0) {
+            Result<Integer> rs = orderDAO.updateByOrderId(order);
+            if (rs.isSuccess()) {
                 return Result.success(1);
             } else {
                 return Result.fail("保存订单失败, 更新记录0");

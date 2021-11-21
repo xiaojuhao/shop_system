@@ -19,6 +19,7 @@ import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderPay;
 import com.xjh.dao.mapper.OrderDAO;
 import com.xjh.dao.mapper.OrderPayDAO;
+import com.xjh.dao.query.OrderPayQuery;
 import com.xjh.service.domain.model.PaymentResult;
 
 @Singleton
@@ -39,10 +40,11 @@ public class OrderPayService {
             if (paymentResult.getPayAction() == 0) {
                 return Result.success("取消支付");
             }
-            Order order = orderDAO.selectByOrderId(paymentResult.getOrderId());
-            if (order == null) {
+            Result<Order> orderRs = orderDAO.selectByOrderId(paymentResult.getOrderId());
+            if (!orderRs.isSuccess()) {
                 return Result.fail("订单信息不存在:" + paymentResult.getOrderId());
             }
+            Order order = orderRs.getData();
             double notPaidBillAmount = orderService.notPaidBillAmount(order);
             if (Math.abs(notPaidBillAmount - paymentResult.getPayAmount()) < 0.009) {
                 paymentResult.setPayAmount(notPaidBillAmount);
@@ -96,6 +98,15 @@ public class OrderPayService {
 
     public int insert(OrderPay orderPay) throws SQLException {
         return orderPayDAO.insert(orderPay);
+    }
+
+    public Result<Integer> deleteBy(OrderPayQuery query) {
+        try {
+            return Result.success(orderPayDAO.deleteBy(query));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail(ex.getMessage());
+        }
     }
 
     public List<OrderPay> selectByOrderId(Integer orderId) {

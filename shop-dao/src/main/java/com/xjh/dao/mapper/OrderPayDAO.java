@@ -8,10 +8,13 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.alibaba.fastjson.JSON;
 import com.google.inject.name.Named;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.dao.dataobject.OrderPay;
 import com.xjh.dao.foundation.EntityUtils;
+import com.xjh.dao.query.OrderPayQuery;
 import com.zaxxer.hikari.HikariDataSource;
 
 import cn.hutool.db.Db;
@@ -61,5 +64,22 @@ public class OrderPayDAO {
             ex.printStackTrace();
             return new ArrayList<>();
         }
+    }
+
+    public int deleteBy(OrderPayQuery cond) throws SQLException {
+        StringBuilder sql = new StringBuilder("delete from order_pays where orderId = ? ");
+        List<Object> params = new ArrayList<>();
+        params.add(cond.getOrderId());
+        if (cond.getPaymentStatus() != null) {
+            sql.append(" and paymentStatus = ? ");
+            params.add(cond.getPaymentStatus());
+        }
+        if (CommonUtils.isNotEmpty(cond.getExcludePayMethods())) {
+            sql.append(" and paymentMethod in (")
+                    .append(cond.getExcludePayMethods().stream().map(i -> i + "").collect(Collectors.joining(",")))
+                    .append(")");
+        }
+        Logger.info("删除支付记录: " + JSON.toJSON(cond));
+        return Db.use(ds).execute(sql.toString(), params.toArray(new Object[0]));
     }
 }

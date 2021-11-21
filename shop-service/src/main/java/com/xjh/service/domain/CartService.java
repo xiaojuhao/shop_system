@@ -129,7 +129,7 @@ public class CartService {
         Runnable clear = CurrentRequest.resetRequestId();
         try {
             Integer orderId = request.getOrderId();
-            Order order = orderDAO.selectByOrderId(orderId);
+            Order order = orderDAO.selectByOrderId(orderId).getData();
             // 子订单
             Integer subOrderId = subOrderService.createSubOrderId();
             SubOrder subOrder = new SubOrder();
@@ -173,7 +173,7 @@ public class CartService {
             Integer deskId = param.getDeskId();
             Integer orderId = param.getOrderId();
             CartVO cartVO = CartStore.getCart(deskId);
-            Order order = orderDAO.selectByOrderId(orderId);
+            Order order = orderDAO.selectByOrderId(orderId).getData();
             if (order == null) {
                 return Result.fail("订单号不存在:" + orderId);
             }

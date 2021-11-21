@@ -10,6 +10,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.OrElse;
+import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.foundation.EntityUtils;
 import com.xjh.dao.query.PageQueryOrderReq;
@@ -28,24 +29,35 @@ public class OrderDAO {
         return Db.use(ds).insert(EntityUtils.create(order));
     }
 
-    public int updateByOrderId(Order order) throws SQLException {
-        return Db.use(ds).update(
-                EntityUtils.create(order),
-                EntityUtils.idCond(order)
-        );
+    public Result<Integer> updateByOrderId(Order order) {
+        try {
+            int i = Db.use(ds).update(
+                    EntityUtils.create(order),
+                    EntityUtils.idCond(order)
+            );
+            return Result.success(i);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail(ex.getMessage());
+        }
     }
 
-    public Order selectByOrderId(Integer orderId) throws SQLException {
-        if (orderId == null) {
-            return null;
+    public Result<Order> selectByOrderId(Integer orderId) {
+        try {
+            if (orderId == null) {
+                return Result.fail("入参错误");
+            }
+            Order cond = new Order();
+            cond.setOrderId(orderId);
+            List<Entity> list = Db.use(ds).find(EntityUtils.create(cond));
+            if (list.size() > 0) {
+                return Result.success(convert(list.get(0)));
+            }
+            return Result.fail("订单不存在");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail(ex.getMessage());
         }
-        Order cond = new Order();
-        cond.setOrderId(orderId);
-        List<Entity> list = Db.use(ds).find(EntityUtils.create(cond));
-        if (list.size() > 0) {
-            return convert(list.get(0));
-        }
-        return null;
     }
 
     public List<Order> pageQuery(PageQueryOrderReq cond) {
