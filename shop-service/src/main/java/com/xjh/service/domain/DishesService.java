@@ -264,4 +264,8 @@ public class DishesService {
     public List<Dishes> pageQuery(DishesQuery query) {
         return dishesDAO.pageQuery(query);
     }
+
+    public int pageCount(DishesQuery query) {
+        return dishesDAO.pageCount(query);
+    }
 }

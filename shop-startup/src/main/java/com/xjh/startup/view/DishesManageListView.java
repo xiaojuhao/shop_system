@@ -22,6 +22,7 @@ import com.xjh.common.utils.cellvalue.ImageSrc;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.utils.cellvalue.Operations;
+import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.common.valueobject.DishesValidTime;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPrice;
@@ -55,6 +56,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Window;
 import lombok.Data;
 
@@ -65,6 +67,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
     ObjectProperty<DishesQuery> cond = new SimpleObjectProperty<>(new DishesQuery());
     ObservableList<BO> items = FXCollections.observableArrayList();
     TableView<BO> tableView = new TableView<>();
+    Holder<Integer> totalPage = new Holder<>();
 
     @Override
     public void initialize() {
@@ -77,6 +80,8 @@ public class DishesManageListView extends SimpleForm implements Initializable {
 
     private void loadData() {
         List<Dishes> list = dishesService.pageQuery(cond.get());
+        int pageCount = dishesService.pageCount(cond.get());
+        totalPage.set(pageCount / cond.get().getPageSize() + 1);
         Platform.runLater(() -> {
             items.clear();
             items.addAll(list.stream().map(dishes -> {
@@ -101,7 +106,9 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 }
                 StringProperty onOffTitle = new SimpleStringProperty();
                 Predicate<Dishes> isOnline = d -> d.getDishesStatus() != null && d.getDishesStatus() == 1;
-                bo.getDishesStatus().set(isOnline.test(dishes) ? "上架" : "下架");
+                bo.getDishesStatus().set(isOnline.test(dishes) ?
+                        RichText.create("上架").with(Color.BLUE) :
+                        RichText.create("下架").with(Color.RED));
                 onOffTitle.set(isOnline.test(dishes) ? "下架" : "上架");
 
                 Operations operations = new Operations();
@@ -110,11 +117,11 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                     if (onOffTitle.get().equals("上架")) {
                         changeDishesStatus(dishes.getDishesId(), EnumDishesStatus.ON);
                         onOffTitle.set("下架");
-                        bo.getDishesStatus().set("上架");
+                        bo.getDishesStatus().set(RichText.create("上架").with(Color.BLUE));
                     } else {
                         onOffTitle.set("上架");
                         changeDishesStatus(dishes.getDishesId(), EnumDishesStatus.OFF);
-                        bo.getDishesStatus().set("下架");
+                        bo.getDishesStatus().set(RichText.create("下架").with(Color.RED));
                     }
                 });
                 onoff.setTitleProperty(onOffTitle);
@@ -160,6 +167,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         Button queryBtn = new Button("查询");
         queryBtn.setOnAction(evt -> {
             DishesQuery q = cond.get().newVersion();
+            q.setPageNo(1);
             q.setDishesName(CommonUtils.trim(nameInput.getText()));
             String selectedStatus = modelSelect.getSelectionModel().getSelectedItem();
             if (CommonUtils.eq(selectedStatus, "上架")) q.setStatus(1);
@@ -199,13 +207,17 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         Button prev = new Button("上一页");
         prev.setOnMouseClicked(e -> {
             DishesQuery c = cond.get().newVersion();
-            c.increasePageNo();
+            c.decreasePageNo();
             cond.set(c);
         });
         Button next = new Button("下一页");
         next.setOnMouseClicked(e -> {
             DishesQuery c = cond.get().newVersion();
-            c.decreasePageNo();
+            if (totalPage.get() != null && c.getPageNo() >= totalPage.get()) {
+                AlertBuilder.ERROR("已经是最后一页了");
+                return;
+            }
+            c.increasePageNo();
             cond.set(c);
         });
         HBox line = newCenterLine(prev, next);
@@ -493,7 +505,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         String dishesDescription;
         ImageSrc dishesImgs;
         String dishesUnitName;
-        StringProperty dishesStatus = new SimpleStringProperty();
+        ObjectProperty<RichText> dishesStatus = new SimpleObjectProperty<>();
         String validTime;
         Operations operations;
     }

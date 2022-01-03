@@ -107,6 +107,29 @@ public class DishesDAO {
         }
     }
 
+    public int pageCount(DishesQuery query) {
+        try {
+            StringBuilder where = new StringBuilder();
+            List<Object> params = new ArrayList<>();
+            if (CommonUtils.isNotBlank(query.getDishesName())) {
+                where.append(" and dishesName like ?");
+                params.add("%" + query.getDishesName() + "%");
+            }
+            if (query.getStatus() != null) {
+                where.append(" and dishesStatus = ?");
+                params.add(query.getStatus());
+            }
+            String sql = "select count(*) as cnt from dishes_list where 1=1 " + where;
+
+            // System.out.println(sql + ", " + JSON.toJSONString(params));
+            List<Entity> list = Db.use(ds).query(sql, params.toArray(new Object[0]));
+            return list.get(0).getInt("cnt");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return 0;
+        }
+    }
+
     public List<Dishes> pageQuery(Dishes cond, PageCond page) {
         try {
             int pageNo = OrElse.orGet(page.getPageNo(), 1);
