@@ -101,7 +101,7 @@ public class OrderDishesChoiceView extends VBox {
         HBox hbox = new HBox();
         hbox.setAlignment(Pos.CENTER);
         hbox.setSpacing(10);
-        hbox.setPadding(new Insets(10,0,0,0));
+        hbox.setPadding(new Insets(10, 0, 0, 0));
         // 套餐、普通菜品选择
         hbox.getChildren().add(new Label("类型:"));
         ToggleGroup toggleGroup = new ToggleGroup();
@@ -141,6 +141,7 @@ public class OrderDishesChoiceView extends VBox {
         queryBtn.setText("查 询");
         queryBtn.setOnAction(evt -> {
             DishesQueryCond newCond = CopyUtils.cloneObj(qryDishesCond.get()).newVersion();
+            newCond.setPageNo(1);
             qryDishesCond.setValue(newCond);
         });
         hbox.getChildren().add(queryBtn);
@@ -287,44 +288,50 @@ public class OrderDishesChoiceView extends VBox {
         box.setPrefWidth(width);
 
         ImageView iv = getImageView(bo.getImg(), width);
-        box.setOnMouseClicked(evt -> {
-            if (ClickHelper.isDblClick()) {
-                Dishes dishes = dishesService.getById(bo.getDishesId());
-                if (!DishesService.isInValidTime(dishes)) {
-                    AlertBuilder.ERROR("当前时间不可售");
-                    return;
-                }
-                // 赠送
-                if (param.getChoiceAction() == EnumChoiceAction.SEND) {
-                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                    alert.setTitle("送菜");
-                    alert.setHeaderText("确定给用户送菜吗?");
-                    alert.setContentText(bo.getDishesName());
-                    Optional<ButtonType> result = alert.showAndWait();
-                    if (result.isPresent() && result.get() != ButtonType.OK) {
-                        return;
-                    }
-                    Result<String> sendRs = sendDishes(bo);
-                    if (!sendRs.isSuccess()) {
-                        AlertBuilder.ERROR(sendRs.getMsg());
-                    }
-                    this.getScene().getWindow().hide();
-                }
-                // 打开套餐
-                else if (bo.getIfPackage() == 1) {
-                    openPackageAddDialog(bo);
-                }
-                // 加入到购物车
-                else {
-                    openAddDishesDialog(bo);
-                }
-            }
-        });
+        box.setOnMouseClicked(evt -> onDishesClicked(bo)); // 双击菜品
+        // 菜品图片
         box.getChildren().add(iv);
+        // 菜品名称
         box.getChildren().add(new Label(bo.getDishesName()));
-        box.getChildren().add(new Label("单价:" + CommonUtils.formatMoney(bo.getDishesPrice()) + "元"));
+        // 菜品价格
+        String price = CommonUtils.formatMoney(bo.getDishesPrice());
+        box.getChildren().add(new Label("单价:" + price + "元"));
 
         return box;
+    }
+
+    private void onDishesClicked(DishesChoiceItemBO bo) {
+        if (ClickHelper.isDblClick()) {
+            Dishes dishes = dishesService.getById(bo.getDishesId());
+            if (!DishesService.isInValidTime(dishes)) {
+                AlertBuilder.ERROR("当前时间不可售");
+                return;
+            }
+            // 赠送
+            if (param.getChoiceAction() == EnumChoiceAction.SEND) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("送菜");
+                alert.setHeaderText("确定给用户送菜吗?");
+                alert.setContentText(bo.getDishesName());
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && result.get() != ButtonType.OK) {
+                    return;
+                }
+                Result<String> sendRs = sendDishes(bo);
+                if (!sendRs.isSuccess()) {
+                    AlertBuilder.ERROR(sendRs.getMsg());
+                }
+                this.getScene().getWindow().hide();
+            }
+            // 打开套餐
+            else if (bo.getIfPackage() == 1) {
+                openPackageAddDialog(bo);
+            }
+            // 加入到购物车
+            else {
+                openAddDishesDialog(bo);
+            }
+        }
     }
 
     private Result<String> sendDishes(DishesChoiceItemBO bo) {
