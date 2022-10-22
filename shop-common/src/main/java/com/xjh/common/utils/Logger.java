@@ -1,15 +1,16 @@
 package com.xjh.common.utils;
 
+import com.xjh.common.store.SysConfigUtils;
+
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import com.xjh.common.store.SysConfigUtils;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class Logger {
+    private static AtomicLong counter = new AtomicLong();
     private static AtomicBoolean exiting = new AtomicBoolean(false);
 
     public static void info(String msg) {
@@ -50,6 +51,7 @@ public class Logger {
             }
             log.append(msg).append("\r\n");
             logWriter.append(log);
+            counter.incrementAndGet();
             if(exiting.get()){
                 doFlush(logWriter);
             }
@@ -90,7 +92,10 @@ public class Logger {
 
     private static void doFlush(FileWriter fileWriter) {
         try {
-            fileWriter.flush();
+            if (counter.get() > 0) {
+                counter.set(0);
+                fileWriter.flush();
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
