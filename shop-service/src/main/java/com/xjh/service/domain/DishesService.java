@@ -1,25 +1,11 @@
 package com.xjh.service.domain;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.CopyUtils;
-import com.xjh.common.utils.DateBuilder;
-import com.xjh.common.utils.ImageHelper;
-import com.xjh.common.utils.Logger;
-import com.xjh.common.utils.Result;
+import com.xjh.common.utils.*;
 import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesImgVO;
 import com.xjh.common.valueobject.DishesValidTime;
@@ -33,7 +19,11 @@ import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.dao.mapper.DishesPriceDAO;
 import com.xjh.dao.query.DishesQuery;
 
-import cn.hutool.core.codec.Base64;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Singleton
 public class DishesService {
@@ -80,8 +70,10 @@ public class DishesService {
             DishesAttribute pubAttr = dishesAttributeDAO.selectById(CommonUtils.parseInt(id, null));
             if (pubAttr != null) {
                 if (CommonUtils.isNotBlank(pubAttr.getDishesAttributeObj())) {
-                    DishesAttributeVO vo = JSON.parseObject(Base64.decodeStr(pubAttr.getDishesAttributeObj()),
-                            DishesAttributeVO.class);
+                    if (!pubAttr.getDishesAttributeObj().contains("{")) {
+                        pubAttr.setDishesAttributeObj(Base64.decodeStr(pubAttr.getDishesAttributeObj()));
+                    }
+                    DishesAttributeVO vo = JSON.parseObject(pubAttr.getDishesAttributeObj(), DishesAttributeVO.class);
                     if (vo != null) {
                         rs.add(vo);
                     }
@@ -91,8 +83,10 @@ public class DishesService {
         // 私有属性
         String priAttrs = dishes.getDishesPrivateAttribute();
         if (CommonUtils.isNotBlank(priAttrs)) {
-            String attr = Base64.decodeStr(priAttrs);
-            List<DishesAttributeVO> priAttrVOs = JSONArray.parseArray(attr, DishesAttributeVO.class);
+            if (priAttrs.contains("{")) {
+                priAttrs = Base64.decodeStr(priAttrs);
+            }
+            List<DishesAttributeVO> priAttrVOs = JSONArray.parseArray(priAttrs, DishesAttributeVO.class);
             if (CommonUtils.isNotEmpty(priAttrVOs)) {
                 rs.addAll(priAttrVOs);
             }

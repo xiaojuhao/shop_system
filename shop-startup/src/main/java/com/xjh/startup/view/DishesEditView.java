@@ -1,30 +1,10 @@
 package com.xjh.startup.view;
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
+import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
-import com.xjh.common.utils.AlertBuilder;
-import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.DateBuilder;
-import com.xjh.common.utils.ImageHelper;
-import com.xjh.common.utils.Logger;
-import com.xjh.common.utils.Result;
-import com.xjh.common.utils.cellvalue.ImageSrc;
-import com.xjh.common.utils.cellvalue.Money;
-import com.xjh.common.utils.cellvalue.OperationButton;
-import com.xjh.common.utils.cellvalue.Operations;
-import com.xjh.common.utils.cellvalue.RichText;
+import com.xjh.common.utils.*;
+import com.xjh.common.utils.cellvalue.*;
 import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesAttributeValueVO;
 import com.xjh.common.valueobject.DishesImgVO;
@@ -38,8 +18,6 @@ import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SimpleComboBox;
 import com.xjh.startup.view.base.SimpleGridForm;
 import com.xjh.startup.view.model.DishesAttributeBO;
-
-import cn.hutool.core.codec.Base64;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -48,12 +26,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -61,6 +34,18 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Window;
 import lombok.Data;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static com.xjh.common.utils.TableViewUtils.newCol;
 
 public class DishesEditView extends SimpleGridForm {
 
@@ -161,7 +146,7 @@ public class DishesEditView extends SimpleGridForm {
                 v.setImageSrc(it.getImg().getImgUrl());
                 return v;
             }).collect(Collectors.toList());
-            dishes.setDishesImgs(Base64.encode(JSON.toJSONString(imgs)));
+            dishes.setDishesImgs(JSON.toJSONString(imgs));
         });
         resolveDishesImg(imgTV, dishes, imgItems);
         imgTV.refresh();
@@ -229,7 +214,10 @@ public class DishesEditView extends SimpleGridForm {
 
         ObservableList<DishesAttributeVO> priAttrItems = FXCollections.observableArrayList();
         if (CommonUtils.isNotBlank(dishes.getDishesPrivateAttribute())) {
-            String s = Base64.decodeStr(dishes.getDishesPrivateAttribute());
+            String s = dishes.getDishesPrivateAttribute();
+            if (!s.contains("{")) {
+                s = Base64.decodeStr(s);
+            }
             priAttrItems.addAll(JSON.parseArray(s, DishesAttributeVO.class));
         }
         ObjectProperty<DishesAttributeVO> selectedPriAttr = new SimpleObjectProperty<>();
@@ -275,7 +263,7 @@ public class DishesEditView extends SimpleGridForm {
                 it.setIsValueRadio(CommonUtils.orElse(it.getIsValueRadio(), false));
                 it.setCreateTime(DateBuilder.now().mills());
             });
-            dishes.setDishesPrivateAttribute(Base64.encode(JSON.toJSONString(priAttrItems)));
+            dishes.setDishesPrivateAttribute(JSON.toJSONString(priAttrItems));
         });
 
         /* ************************************************************** *\
@@ -401,7 +389,7 @@ public class DishesEditView extends SimpleGridForm {
     }
 
     private void resolveDishesImg(TableView<ImgBO> imgTV, Dishes dishes,
-            ObservableList<ImgBO> imgItems) {
+                                  ObservableList<ImgBO> imgItems) {
         CommonUtils.forEach(ImageHelper.resolveImgs(dishes.getDishesImgs()), it -> {
             ImgBO bo = new ImgBO();
             bo.setSno(imgItems.size() + 1);

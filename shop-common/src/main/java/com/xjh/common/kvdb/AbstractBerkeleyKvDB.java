@@ -1,18 +1,12 @@
 package com.xjh.common.kvdb;
 
-import java.nio.charset.StandardCharsets;
-
 import com.alibaba.fastjson.JSON;
-import com.sleepycat.je.Database;
-import com.sleepycat.je.DatabaseConfig;
-import com.sleepycat.je.DatabaseEntry;
-import com.sleepycat.je.LockMode;
-import com.sleepycat.je.OperationStatus;
-import com.sleepycat.je.Transaction;
-import com.sleepycat.je.TransactionConfig;
+import com.sleepycat.je.*;
 import com.xjh.common.store.BerkeleyDBUtils;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Holder;
+
+import java.nio.charset.StandardCharsets;
 
 public abstract class AbstractBerkeleyKvDB<T> implements KvDB<T> {
     ThreadLocal<Transaction> transaction = new ThreadLocal<>();
@@ -47,6 +41,18 @@ public abstract class AbstractBerkeleyKvDB<T> implements KvDB<T> {
         DatabaseEntry newData = new DatabaseEntry(JSON.toJSONString(val).getBytes(StandardCharsets.UTF_8));
         OperationStatus status = getDB().put(transaction.get(), theKey, newData);
         // Logger.info("保存KV数据, key=" + key +", status="+ status +", val=" + CommonUtils.reflectString(val));
+
+        // 使用StoredClassCatalog存储数据
+//        DatabaseConfig catalogDBConfig = new DatabaseConfig();
+//        catalogDBConfig.setTransactional(true);
+//        catalogDBConfig.setAllowCreate(true);
+//        Database catalogDB = BerkeleyDBUtils.getEnv().openDatabase(null, "catalog_db", catalogDBConfig);
+//        StoredClassCatalog catalog = new StoredClassCatalog(catalogDB);
+//        EntryBinding binding = new SerialBinding(catalog, Object.class);
+//
+//        DatabaseEntry dbentry = new DatabaseEntry();
+//        binding.objectToEntry(val, dbentry); // 将对象存入dbentry
+//        getDB().put(null, theKey, dbentry); // 存入数据库
     }
 
     @Override

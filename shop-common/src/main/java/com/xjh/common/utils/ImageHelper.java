@@ -1,16 +1,15 @@
 package com.xjh.common.utils;
 
-import static com.xjh.common.store.SysConfigUtils.getWorkDir;
+import cn.hutool.core.codec.Base64;
+import com.alibaba.fastjson.JSONArray;
+import com.xjh.common.valueobject.DishesImgVO;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.alibaba.fastjson.JSONArray;
-import com.xjh.common.valueobject.DishesImgVO;
-
-import cn.hutool.core.codec.Base64;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import static com.xjh.common.store.SysConfigUtils.getWorkDir;
 
 public class ImageHelper {
     public static List<DishesImgVO> resolveImgs(String base64Imgs) {
@@ -19,7 +18,10 @@ public class ImageHelper {
         }
         List<DishesImgVO> imgs = new ArrayList<>();
         if (CommonUtils.isNotBlank(base64Imgs)) {
-            String json = Base64.decodeStr(base64Imgs);
+            String json = base64Imgs;
+            if (!json.contains("[")) {
+                json = Base64.decodeStr(base64Imgs);
+            }
             List<DishesImgVO> arr = JSONArray.parseArray(json, DishesImgVO.class);
             if (arr != null) {
                 imgs.addAll(arr);

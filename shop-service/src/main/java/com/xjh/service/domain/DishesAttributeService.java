@@ -1,16 +1,5 @@
 package com.xjh.service.domain;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.apache.commons.codec.binary.Base64;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.CommonUtils;
@@ -20,6 +9,14 @@ import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesAttributeValueVO;
 import com.xjh.dao.dataobject.DishesAttribute;
 import com.xjh.dao.mapper.DishesAttributeDAO;
+import org.apache.commons.codec.binary.Base64;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Singleton
 public class DishesAttributeService {
@@ -100,7 +97,7 @@ public class DishesAttributeService {
             selectedAttributeValues.add(v);
         });
         valueObj.put("selectedAttributeValues", selectedAttributeValues);
-        dd.setDishesAttributeObj(Base64.encodeBase64String(valueObj.toJSONString().getBytes(StandardCharsets.UTF_8)));
+        dd.setDishesAttributeObj(valueObj.toJSONString());
         return dd;
     }
 
@@ -148,6 +145,9 @@ public class DishesAttributeService {
     private String decodeBase64(String str) {
         if (str == null || str.length() == 0) {
             return null;
+        }
+        if (str.contains("{")) {
+            return str;
         }
         return new String(Base64.decodeBase64(str));
     }
