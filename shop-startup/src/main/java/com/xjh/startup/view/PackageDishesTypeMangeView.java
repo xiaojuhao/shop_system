@@ -1,15 +1,5 @@
 package com.xjh.startup.view;
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Result;
@@ -24,7 +14,6 @@ import com.xjh.service.domain.DishesTypeService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SimpleGridForm;
-
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -32,14 +21,16 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Window;
 import lombok.Data;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.xjh.common.utils.TableViewUtils.newCol;
 
 public class PackageDishesTypeMangeView extends SimpleGridForm {
     DishesPackageService dishesPackageService = GuiceContainer.getInstance(DishesPackageService.class);
@@ -67,6 +58,8 @@ public class PackageDishesTypeMangeView extends SimpleGridForm {
         }
         dishesPackage = param;
         loadData();
+
+        addLine((Node) null, new Label(param.getDishesPackageName()));
 
         tableView.getColumns().addAll(
                 newCol("序号", "dishesPackageTypeId", 60),

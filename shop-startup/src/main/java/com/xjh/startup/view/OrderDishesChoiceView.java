@@ -1,32 +1,10 @@
 package com.xjh.startup.view;
 
-import static com.xjh.common.utils.CommonUtils.collect;
-import static com.xjh.common.utils.ImageHelper.buildImageView;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.apache.commons.collections4.CollectionUtils;
-
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.xjh.common.enumeration.EnumChoiceAction;
-import com.xjh.common.utils.AlertBuilder;
-import com.xjh.common.utils.ClickHelper;
-import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.CopyUtils;
-import com.xjh.common.utils.ImageHelper;
-import com.xjh.common.utils.Logger;
-import com.xjh.common.utils.Result;
-import com.xjh.common.valueobject.CartItemVO;
-import com.xjh.common.valueobject.CartVO;
-import com.xjh.common.valueobject.DishesAttributeVO;
-import com.xjh.common.valueobject.DishesAttributeValueVO;
-import com.xjh.common.valueobject.DishesImgVO;
-import com.xjh.common.valueobject.PageCond;
+import com.xjh.common.utils.*;
+import com.xjh.common.valueobject.*;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.dao.dataobject.DishesPrice;
@@ -44,7 +22,6 @@ import com.xjh.startup.view.base.SimpleForm;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.DishesChoiceItemBO;
 import com.xjh.startup.view.model.DishesQueryCond;
-
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -56,17 +33,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Separator;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -76,6 +43,16 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import javafx.util.StringConverter;
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static com.xjh.common.utils.CommonUtils.collect;
+import static com.xjh.common.utils.ImageHelper.buildImageView;
 
 
 public class OrderDishesChoiceView extends VBox {
@@ -376,7 +353,7 @@ public class OrderDishesChoiceView extends VBox {
             HBox optionBox = new HBox();
             optionBox.setSpacing(10);
             // 单选框
-            if (attr.getIsValueRadio() != null && attr.getIsValueRadio()) {
+            if (attr.getIsValueRadio()) {
                 ToggleGroup group = new ToggleGroup();
                 List<RadioButton> radios = new ArrayList<>();
                 attr.getAllAttributeValues().forEach(v -> {
@@ -396,7 +373,7 @@ public class OrderDishesChoiceView extends VBox {
                 });
             }
             // 复选框
-            if (attr.getIsValueRadio() != null && !attr.getIsValueRadio()) {
+            if (!attr.getIsValueRadio()) {
                 List<CheckBox> allCbs = new ArrayList<>();
                 attr.getAllAttributeValues().forEach(v -> {
                     CheckBox cb = new CheckBox(v.getAttributeValue());

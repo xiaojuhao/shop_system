@@ -1,24 +1,12 @@
 package com.xjh.startup.view;
 
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.apache.commons.collections4.CollectionUtils;
-
 import com.xjh.common.enumeration.EnumDishesStatus;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.ImageHelper;
 import com.xjh.common.utils.Result;
-import com.xjh.common.utils.cellvalue.ImageSrc;
-import com.xjh.common.utils.cellvalue.Money;
-import com.xjh.common.utils.cellvalue.OperationButton;
-import com.xjh.common.utils.cellvalue.Operations;
-import com.xjh.common.utils.cellvalue.RichText;
+import com.xjh.common.utils.cellvalue.*;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.dao.dataobject.DishesPackageDishes;
@@ -30,7 +18,6 @@ import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SimpleForm;
-
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -39,16 +26,18 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Window;
 import lombok.Data;
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static com.xjh.common.utils.TableViewUtils.newCol;
 
 public class PackageDishesManageListView extends SimpleForm implements Initializable {
     static RichText IN_USE = RichText.create("已启用").with(Color.BLUE);
@@ -182,7 +171,7 @@ public class PackageDishesManageListView extends SimpleForm implements Initializ
 
     private void openDishesSelectPage(DishesPackage dishesPkg) {
         Window window = this.getScene().getWindow();
-        ModelWindow mw = new ModelWindow(window, "编辑套餐基础信息");
+        ModelWindow mw = new ModelWindow(window, "套餐菜品信息维护");
         PackageDishesTypeMangeView view = new PackageDishesTypeMangeView(dishesPkg);
         view.setPrefWidth(window.getWidth() * 0.75);
         mw.setScene(new Scene(view));

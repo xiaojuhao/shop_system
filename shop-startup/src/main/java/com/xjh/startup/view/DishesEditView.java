@@ -215,7 +215,7 @@ public class DishesEditView extends SimpleGridForm {
         ObservableList<DishesAttributeVO> priAttrItems = FXCollections.observableArrayList();
         if (CommonUtils.isNotBlank(dishes.getDishesPrivateAttribute())) {
             String s = dishes.getDishesPrivateAttribute();
-            if (!s.contains("{")) {
+            if (!s.contains("{") && !s.contains("[")) {
                 s = Base64.decodeStr(s);
             }
             priAttrItems.addAll(JSON.parseArray(s, DishesAttributeVO.class));
