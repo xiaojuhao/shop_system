@@ -255,7 +255,6 @@ public class OrderService {
     public Result<Integer> changeOrderToPaid(Integer orderId) {
         Order order = getOrder(orderId);
         try {
-            // 恢复订单状态
             deskService.closeDesk(order.getDeskId());
             // 恢复订单状态
             Order orderUpdate = new Order();
