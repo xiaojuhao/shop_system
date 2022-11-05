@@ -1,12 +1,6 @@
 package com.xjh.service.domain;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.inject.Inject;
-
+import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSONArray;
 import com.google.inject.Singleton;
 import com.xjh.common.utils.CommonUtils;
@@ -20,7 +14,11 @@ import com.xjh.dao.mapper.DishesGroupDAO;
 import com.xjh.dao.mapper.StoreDAO;
 import com.xjh.service.domain.model.StoreVO;
 
-import cn.hutool.core.codec.Base64;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Singleton
 public class StoreService {
@@ -71,7 +69,10 @@ public class StoreService {
                     groupVO.setCreateTime(group.getCreateTime());
                     groupVO.setGroupIds(new ArrayList<>());
                     if (CommonUtils.isNotBlank(group.getDishesGroupContent())) {
-                        String json = Base64.decodeStr(group.getDishesGroupContent());
+                        String json = group.getDishesGroupContent();
+                        if (!json.contains("[") && !json.contains("{")) {
+                            json = Base64.decodeStr(group.getDishesGroupContent());
+                        }
                         groupVO.getGroupIds().addAll(JSONArray.parseArray(json, Integer.class));
                     }
                     vo.getStoreDishesGroups().add(groupVO);
@@ -92,7 +93,10 @@ public class StoreService {
                     groupVO.setCreateTime(group.getCreateTime());
                     groupVO.setGroupIds(new ArrayList<>());
                     if (CommonUtils.isNotBlank(group.getDishesGroupContent())) {
-                        String json = Base64.decodeStr(group.getDishesGroupContent());
+                        String json = group.getDishesGroupContent();
+                        if (!json.contains("[") && !json.contains("{")) {
+                            json = Base64.decodeStr(group.getDishesGroupContent());
+                        }
                         groupVO.getGroupIds().addAll(JSONArray.parseArray(json, Integer.class));
                     }
                     vo.getManagerDishesGroups().add(groupVO);

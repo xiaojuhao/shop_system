@@ -1,5 +1,8 @@
 package com.xjh.common.utils;
 
+import cn.hutool.core.codec.Base64;
+import com.alibaba.fastjson.JSON;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -9,25 +12,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import com.alibaba.fastjson.JSON;
 
 @SuppressWarnings({"unused"})
 public class CommonUtils {
@@ -861,5 +850,13 @@ public class CommonUtils {
     }
 
     public static void emptyAction() {
+    }
+
+    public static String tryDecodeBase64(String json) {
+        if (isNotBlank(json) && !json.contains("[") && !json.contains("{")) {
+            return Base64.decodeStr(json);
+        } else {
+            return json;
+        }
     }
 }

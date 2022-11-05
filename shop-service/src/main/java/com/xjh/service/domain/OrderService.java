@@ -1,44 +1,30 @@
 package com.xjh.service.domain;
 
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
+import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.xjh.common.enumeration.EnumDeskStatus;
-import com.xjh.common.enumeration.EnumOrderSaleType;
-import com.xjh.common.enumeration.EnumOrderServeStatus;
-import com.xjh.common.enumeration.EnumOrderStatus;
-import com.xjh.common.enumeration.EnumOrderType;
-import com.xjh.common.enumeration.EnumPayMethod;
+import com.xjh.common.enumeration.*;
 import com.xjh.common.store.SequenceDatabase;
-import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.CurrentAccount;
-import com.xjh.common.utils.CurrentRequest;
-import com.xjh.common.utils.DateBuilder;
-import com.xjh.common.utils.Logger;
-import com.xjh.common.utils.OrElse;
-import com.xjh.common.utils.Result;
+import com.xjh.common.utils.*;
 import com.xjh.common.valueobject.OrderDiscountVO;
 import com.xjh.common.valueobject.OrderOverviewVO;
-import com.xjh.dao.dataobject.Desk;
-import com.xjh.dao.dataobject.Order;
-import com.xjh.dao.dataobject.OrderDishes;
-import com.xjh.dao.dataobject.OrderPay;
-import com.xjh.dao.dataobject.SubOrder;
+import com.xjh.dao.dataobject.*;
 import com.xjh.dao.mapper.OrderDAO;
 import com.xjh.dao.mapper.SubOrderDAO;
 import com.xjh.dao.query.OrderPayQuery;
 import com.xjh.dao.query.PageQueryOrderReq;
 import com.xjh.service.domain.model.CreateOrderParam;
 
-import cn.hutool.core.codec.Base64;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import static com.xjh.common.utils.CommonUtils.tryDecodeBase64;
 
 @Singleton
 public class OrderService {
@@ -311,7 +297,7 @@ public class OrderService {
             v.orderReduction = OrElse.orGet(order.getOrderReduction(), 0D);
             v.discountName = order.getDiscountReason();
             if (CommonUtils.isNotBlank(order.getOrderDiscountInfo())) {
-                OrderDiscountVO d = JSON.parseObject(Base64.decodeStr(order.getOrderDiscountInfo()), OrderDiscountVO.class);
+                OrderDiscountVO d = JSON.parseObject(tryDecodeBase64(order.getOrderDiscountInfo()), OrderDiscountVO.class);
                 if (d != null) {
                     v.discountName = d.getDiscountName();
                 }

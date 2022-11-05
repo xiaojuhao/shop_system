@@ -1,17 +1,8 @@
 package com.xjh.startup.view;
 
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
 import com.alibaba.fastjson.JSON;
 import com.xjh.common.enumeration.EnumDiscountType;
-import com.xjh.common.utils.AlertBuilder;
-import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.Holder;
-import com.xjh.common.utils.Logger;
-import com.xjh.common.utils.Result;
+import com.xjh.common.utils.*;
 import com.xjh.common.valueobject.OrderDiscountVO;
 import com.xjh.dao.dataobject.DiscountDO;
 import com.xjh.dao.dataobject.Order;
@@ -25,19 +16,16 @@ import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.DiscountApplyReq;
 import com.xjh.startup.view.model.DiscountTypeBO;
-
-import cn.hutool.core.codec.Base64;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
+
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class OrderDiscountSelectionView extends SmallForm {
     OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
@@ -221,7 +209,7 @@ public class OrderDiscountSelectionView extends SmallForm {
 
         Order orderUpdate = new Order();
         orderUpdate.setOrderId(param.getOrderId());
-        orderUpdate.setOrderDiscountInfo(Base64.encode(JSON.toJSONString(orderDiscount)));
+        orderUpdate.setOrderDiscountInfo(JSON.toJSONString(orderDiscount));
         orderUpdate.setDiscountReason(req.getDiscountName());
         orderService.updateByOrderId(orderUpdate);
         AlertBuilder.INFO("优惠使用成功");
