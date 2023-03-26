@@ -1,11 +1,13 @@
 package com.xjh.service.domain;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.OrElse;
 import com.xjh.dao.dataobject.DishesType;
 import com.xjh.dao.mapper.DishesTypeDAO;
 
@@ -18,21 +20,23 @@ public class DishesTypeService {
         return dishesTypeDAO.insert(newType);
     }
 
-    public int updateByPK(DishesType update) {
-        return dishesTypeDAO.updateByPK(update);
+    public void updateByPK(DishesType update) {
+         dishesTypeDAO.updateByPK(update);
     }
 
-    public int deleteByPK(Integer typeId) {
+    public void deleteByPK(Integer typeId) {
         if (typeId == null) {
-            return 0;
+            return;
         }
         DishesType id = new DishesType();
         id.setTypeId(typeId);
-        return dishesTypeDAO.deleteByPK(id);
+        dishesTypeDAO.deleteByPK(id);
     }
 
     public List<DishesType> selectList(DishesType cond) {
-        return dishesTypeDAO.selectList(cond);
+        List<DishesType> list = dishesTypeDAO.selectList(cond);
+        list.sort(Comparator.comparing(a -> OrElse.orGet(a.getSortby(), 0)));
+        return list;
     }
 
     public List<DishesType> loadAllTypesValid() {
@@ -41,5 +45,13 @@ public class DishesTypeService {
 
     public Map<Integer, DishesType> dishesTypeMap() {
         return CommonUtils.listToMap(loadAllTypesValid(), DishesType::getTypeId);
+    }
+
+    public static String toDishesTypeName(Map<Integer, DishesType> typeMap, Integer typeId){
+        DishesType type = typeMap.get(typeId);
+        if(type == null){
+            return "未知";
+        }
+        return type.getTypeName();
     }
 }

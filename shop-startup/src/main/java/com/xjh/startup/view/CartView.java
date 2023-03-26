@@ -1,6 +1,7 @@
 package com.xjh.startup.view;
 
 import static com.xjh.common.utils.TableViewUtils.newCol;
+import static com.xjh.service.domain.DishesTypeService.toDishesTypeName;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +49,7 @@ public class CartView extends VBox {
     DishesTypeService dishesTypeService = GuiceContainer.getInstance(DishesTypeService.class);
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
 
-    Runnable onPlaceOrder = null;
+    Runnable onPlaceOrder;
 
     public CartView(DeskOrderParam param, Runnable onPlaceOrder) {
         this.onPlaceOrder = onPlaceOrder;
@@ -179,10 +180,8 @@ public class CartView extends VBox {
                     InputNumber num = InputNumber.from(OrElse.orGet(it.getNums(), 1));
                     num.setOnChange(n -> doUpdateItemNum(param.getDeskId(), it.getCartDishesId(), n));
                     bo.setNums(num);
-                    DishesType type = typeMap.get(dishes.getDishesTypeId());
-                    if (type != null) {
-                        bo.setDishesTypeName(new RichText(type.getTypeName()).with(Color.RED));
-                    }
+                    String dishesTypeName = toDishesTypeName(typeMap, dishes.getDishesTypeId());
+                    bo.setDishesTypeName(new RichText(dishesTypeName).with(Color.RED));
                     bo.setDishesName(new RichText(dishes.getDishesName()));
                     bo.setDishesPrice(new Money(dishes.getDishesPrice()));
                     bo.setTotalPrice(new Money(bo.getNums().getNumber() * dishes.getDishesPrice()));

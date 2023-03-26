@@ -3,8 +3,10 @@ package com.xjh.startup.view;
 
 import static com.xjh.common.utils.TableViewUtils.newCol;
 import static com.xjh.common.utils.TableViewUtils.rowIndex;
+import static com.xjh.service.domain.DishesTypeService.toDishesTypeName;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -26,9 +28,11 @@ import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.common.valueobject.DishesValidTime;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesPrice;
+import com.xjh.dao.dataobject.DishesType;
 import com.xjh.dao.mapper.DishesPriceDAO;
 import com.xjh.dao.query.DishesQuery;
 import com.xjh.service.domain.DishesService;
+import com.xjh.service.domain.DishesTypeService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.ModelWindow;
@@ -63,7 +67,7 @@ import lombok.Data;
 public class DishesManageListView extends SimpleForm implements Initializable {
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
     DishesPriceDAO dishesPriceDAO = GuiceContainer.getInstance(DishesPriceDAO.class);
-
+    DishesTypeService dishesTypeService = GuiceContainer.getInstance(DishesTypeService.class);
     ObjectProperty<DishesQuery> cond = new SimpleObjectProperty<>(new DishesQuery());
     ObservableList<BO> items = FXCollections.observableArrayList();
     TableView<BO> tableView = new TableView<>();
@@ -79,6 +83,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
     }
 
     private void loadData() {
+        Map<Integer, DishesType> typeMap = dishesTypeService.dishesTypeMap();
         List<Dishes> list = dishesService.pageQuery(cond.get());
         int pageCount = dishesService.pageCount(cond.get());
         totalPage.set(pageCount / cond.get().getPageSize() + 1);
@@ -89,12 +94,14 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 bo.setDishesId(dishes.getDishesId());
                 bo.setDishesName(dishes.getDishesName());
                 bo.setDishesPrice(new Money(dishes.getDishesPrice()).toString());
+                bo.setDishesTypeId(dishes.getDishesTypeId());
+                bo.setDishesTypeName(toDishesTypeName(typeMap, dishes.getDishesTypeId()));
                 List<DishesPrice> dishesPrices = dishesPriceDAO.queryByDishesId(dishes.getDishesId());
                 if (dishesPrices.size() > 0) {
                     StringBuilder sb = new StringBuilder();
                     for (DishesPrice price : dishesPrices) {
                         sb.append(price.getDishesPriceName()).append(":")
-                                .append(new Money(price.getDishesPrice()).toString())
+                                .append(new Money(price.getDishesPrice()))
                                 .append("\n");
                     }
                     bo.setDishesPrice(sb.toString());
@@ -191,6 +198,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         tableView.getColumns().addAll(
                 newCol("ID", "dishesId", 100),
                 newCol("名称", "dishesName", 200),
+                newCol("菜品分类", "dishesTypeName", 100),
                 newCol("图像", "dishesImgs", 200),
                 newCol("状态", "dishesStatus", 80),
                 newCol("价格", "dishesPrice", 100),
@@ -499,6 +507,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
     public static class BO {
         Integer dishesId;
         Integer dishesTypeId;
+        String dishesTypeName;
         String dishesName;
         String dishesPrice;
         String dishesStock;

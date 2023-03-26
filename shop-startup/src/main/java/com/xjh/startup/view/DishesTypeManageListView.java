@@ -1,11 +1,6 @@
 package com.xjh.startup.view;
 
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
-
-import java.util.Comparator;
-import java.util.List;
-
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
@@ -22,17 +17,16 @@ import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SimpleForm;
 import com.xjh.startup.view.model.IntStringPair;
-
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Window;
+
+import java.util.List;
+
+import static com.xjh.common.utils.TableViewUtils.newCol;
 
 public class DishesTypeManageListView extends SimpleForm implements Initializable {
     DishesTypeService dishesTypeService = GuiceContainer.getInstance(DishesTypeService.class);
@@ -50,7 +44,6 @@ public class DishesTypeManageListView extends SimpleForm implements Initializabl
 
     private void loadData() {
         List<DishesType> types = dishesTypeService.selectList(new DishesType());
-        types.sort(Comparator.comparingInt(DishesType::getTypeId));
         tableView.getItems().clear();
         tableView.getItems().addAll(types);
         tableView.refresh();
