@@ -83,7 +83,7 @@ public class DishesService {
         // 私有属性
         String priAttrs = dishes.getDishesPrivateAttribute();
         if (CommonUtils.isNotBlank(priAttrs)) {
-            if (priAttrs.contains("{")) {
+            if (!priAttrs.contains("{")) {
                 priAttrs = Base64.decodeStr(priAttrs);
             }
             List<DishesAttributeVO> priAttrVOs = JSONArray.parseArray(priAttrs, DishesAttributeVO.class);

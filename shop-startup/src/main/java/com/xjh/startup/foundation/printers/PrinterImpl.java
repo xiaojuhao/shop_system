@@ -5,19 +5,6 @@
  */
 package com.xjh.startup.foundation.printers;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.zxing.WriterException;
@@ -27,8 +14,16 @@ import com.xjh.common.utils.Logger;
 import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.startup.foundation.constants.EnumAlign;
 import com.xjh.startup.foundation.constants.EnumComType;
-
 import lombok.Data;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
+import java.util.List;
+import java.util.concurrent.*;
 
 
 /**
@@ -86,7 +81,7 @@ public class PrinterImpl implements Printer {
                 return print(contentItems, isVoicce);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                PrintResultImpl fail = new PrintResultImpl(this, contentItems);
+                PrintResult fail = new PrintResult(this, contentItems);
                 fail.toFailure(StatusUtil.UNKNOWN);
                 return fail;
             }
@@ -94,7 +89,7 @@ public class PrinterImpl implements Printer {
     }
 
     public synchronized PrintResult print(JSONArray contentItems, boolean isVoicce) throws Exception {
-        PrintResultImpl printResultImpl = new PrintResultImpl(this, contentItems);
+        PrintResult printResult = new PrintResult(this, contentItems);
         SocketAddress socketAddress = new InetSocketAddress(printerDO.getPrinterIp(), printerDO.getPrinterPort());
         byte[] dataRead = new byte[0];
         try (Socket s = new Socket()) {
@@ -142,7 +137,7 @@ public class PrinterImpl implements Printer {
                         len = inputStream.read(inputData);
                     } catch (java.net.SocketTimeoutException e) {
                         openPreventLost(outputStream);
-                        printResultImpl.toFailure(StatusUtil.DATA_READ_TIMEOUT);
+                        printResult.toFailure(StatusUtil.DATA_READ_TIMEOUT);
                         break;
                     }
                     dataRead = PrinterCmdUtil.byteMerger(dataRead, inputData);
@@ -153,11 +148,11 @@ public class PrinterImpl implements Printer {
                         }
                         if (StatusUtil.checkDetailedStatus(inputData) == StatusUtil.NORMAL && printingFlag) {
                             successFlag = true;
-                            printResultImpl.toSuccess(StatusUtil.NORMAL);
+                            printResult.toSuccess(StatusUtil.NORMAL);
                         }
                     } else {
                         int resultCode = StatusUtil.checkDetailedStatus(inputData);
-                        printResultImpl.toFailure(resultCode);
+                        printResult.toFailure(resultCode);
                         //查看输入流是否还有字节，有的话，一起全部都读出来
                         while (len != -1) {
                             len = inputStream.read(inputData);
@@ -172,17 +167,17 @@ public class PrinterImpl implements Printer {
         } catch (IOException e) {
             Logger.info("打印出错了 .......");
             e.printStackTrace();
-            printResultImpl.setSuccess(false);
-            if (printResultImpl.getResultCode() == StatusUtil.INIT) {
-                printResultImpl.setResultCode(StatusUtil.SOCKET_TIMEOUT);
+            printResult.setSuccess(false);
+            if (printResult.getResultCode() == StatusUtil.INIT) {
+                printResult.setResultCode(StatusUtil.SOCKET_TIMEOUT);
             }
-            return printResultImpl;
+            return printResult;
         } catch (Exception e) {
             e.printStackTrace();
-            printResultImpl.toFailure(StatusUtil.UNKNOWN);
+            printResult.toFailure(StatusUtil.UNKNOWN);
         }
         ////////////////////事件处理////////////////////
-        return printResultImpl;
+        return printResult;
     }
 
     /**
