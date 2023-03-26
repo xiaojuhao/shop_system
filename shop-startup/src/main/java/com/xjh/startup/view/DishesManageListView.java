@@ -95,7 +95,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 bo.setDishesName(dishes.getDishesName());
                 bo.setDishesPrice(new Money(dishes.getDishesPrice()).toString());
                 bo.setDishesTypeId(dishes.getDishesTypeId());
-                bo.setDishesTypeName(toDishesTypeName(typeMap, dishes.getDishesTypeId()));
+                bo.setDishesTypeName(RichText.create(toDishesTypeName(typeMap, dishes.getDishesTypeId())).with(Color.RED));
                 List<DishesPrice> dishesPrices = dishesPriceDAO.queryByDishesId(dishes.getDishesId());
                 if (dishesPrices.size() > 0) {
                     StringBuilder sb = new StringBuilder();
@@ -507,7 +507,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
     public static class BO {
         Integer dishesId;
         Integer dishesTypeId;
-        String dishesTypeName;
+        RichText dishesTypeName;
         String dishesName;
         String dishesPrice;
         String dishesStock;
