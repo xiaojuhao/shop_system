@@ -36,22 +36,22 @@ public class DeskRectView extends VBox {
     DeskService deskService = GuiceContainer.getInstance(DeskService.class);
     static AtomicBoolean openingDesk = new AtomicBoolean(false);
 
-    public DeskRectView(SimpleObjectProperty<Desk> desk, double deskWidth) {
-        double height = deskWidth / 2;
-        this.setPrefSize(deskWidth, height);
+    public DeskRectView(SimpleObjectProperty<Desk> desk, double rectWidth) {
+        double rectHeight = rectWidth / 2;
+        this.setPrefSize(rectWidth, rectHeight);
         this.getStyleClass().add("desk");
         EnumDeskStatus status = EnumDeskStatus.of(desk.get().getStatus());
 
         Canvas canvas = new Canvas();
-        canvas.setWidth(deskWidth);
-        canvas.setHeight(height);
+        canvas.setWidth(rectWidth);
+        canvas.setHeight(rectHeight);
         setBackground(this, status);
         canvas.setOnMouseClicked(evt -> this.onClickTable(desk));
         GraphicsContext gc = canvas.getGraphicsContext2D();
         // 状态
-        paintStatus(gc, deskWidth, status.remark());
+        paintStatus(gc, rectWidth, rectHeight, status.remark());
         // 桌号
-        paintTableNo(gc, desk.get(), deskWidth, height);
+        paintTableNo(gc, desk.get(), rectWidth, rectHeight);
 
         this.getChildren().addAll(canvas);
 
@@ -69,13 +69,13 @@ public class DeskRectView extends VBox {
                 time = "未点菜";
             }
             //
-            paintStatus(gc, deskWidth, desKStatus.remark());
+            paintStatus(gc, rectWidth, rectHeight, desKStatus.remark());
             // 用餐时间
-            paintTime(gc, deskWidth, height, time);
+            paintTime(gc, rectWidth, rectHeight, time);
             // 人数
             Order order = orderService.getOrder(orderId);
             if (order != null) {
-                paintCustNum(gc, deskWidth, height, order.getOrderCustomerNums());
+                paintCustNum(gc, rectWidth, rectHeight, order.getOrderCustomerNums());
             }
         });
     }
@@ -146,20 +146,21 @@ public class DeskRectView extends VBox {
         }
     }
 
-    private void paintStatus(GraphicsContext gc, double width, String statusName) {
+    private void paintStatus(GraphicsContext gc, double width, double rectHeight, String statusName) {
+        // 在桌面rect区域打印当前桌子的状态，在右上角打印
         gc.save();
-        gc.setFont(Font.font(12));
+        gc.setFont(Font.font(22));
         gc.setFill(Color.PURPLE);
-        gc.fillRect(width / 2, 0, width / 2, 25);
+        gc.fillRect(width / 2, 0, width / 2, rectHeight/3);
         gc.setFill(Color.WHITE);
-        double statusOffset = width - CommonUtils.length(statusName) * 10 - 30;
-        gc.fillText(statusName, statusOffset, 16);
+        double statusOffset = width - CommonUtils.length(statusName) * 20 - 30;
+        gc.fillText(statusName, statusOffset, 22);
         gc.restore();
     }
 
     private void paintTableNo(GraphicsContext gc, Desk desk, double width, double height) {
         gc.setFill(Color.WHITE);
-        gc.setFont(Font.font(16));
+        gc.setFont(Font.font(22));
         gc.fillText(desk.getDeskName(),
                 width / 2 - CommonUtils.length(desk.getDeskName()) * 5,
                 height / 2);

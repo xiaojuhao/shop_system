@@ -46,10 +46,10 @@ public class DeskListView extends ScrollPane{
         ThreadUtils.runInNewThread(() -> {
             List<Desk> allDeskList = allDesks();
             int size_per_line = calcLineSize(allDeskList.size());
-            double tableWidth = Math.max(width * 0.92 / size_per_line, 200);
+            double rectWidth = Math.max(width * 0.92 / size_per_line, 200);
             // 加载所有的tables
             allDeskList.forEach(desk -> desks.add(new SimpleObjectProperty<>(desk)));
-            List<DeskRectView> views = collect(desks, it -> new DeskRectView(it, tableWidth));
+            List<DeskRectView> views = collect(desks, it -> new DeskRectView(it, rectWidth));
             // 渲染tables;
             Platform.runLater(() -> pane.getChildren().addAll(views));
             // 监测变化
