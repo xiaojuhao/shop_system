@@ -1,14 +1,13 @@
 package com.xjh.service.domain;
 
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.dao.mapper.PrinterDAO;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.List;
 
 @Singleton
 public class PrinterService {
@@ -35,13 +34,6 @@ public class PrinterService {
                 .stream().findFirst().orElse(null);
     }
 
-    public int updateById(PrinterDO printer) {
-        if (printer.getPrinterId() == null) {
-            return 0;
-        }
-        return printerDAO.updateById(printer);
-    }
-
     public Result<Integer> deleteById(Integer printerId) {
         return printerDAO.deleteById(printerId);
     }
@@ -52,9 +44,9 @@ public class PrinterService {
                 if (printer.getAddTime() == null) {
                     printer.setAddTime(DateBuilder.now().mills());
                 }
-                return Result.success(printerDAO.insert(printer));
+                return printerDAO.insert(printer);
             }
-            return Result.success(printerDAO.updateById(printer));
+            return printerDAO.updateById(printer);
         } catch (Exception ex) {
             ex.printStackTrace();
             return Result.fail(ex.getMessage());

@@ -1,20 +1,19 @@
 package com.xjh.dao.mapper;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
+import cn.hutool.db.Db;
+import cn.hutool.db.Entity;
 import com.google.inject.name.Named;
+import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.dao.foundation.EntityUtils;
 import com.zaxxer.hikari.HikariDataSource;
 
-import cn.hutool.db.Db;
-import cn.hutool.db.Entity;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Singleton
 public class PrinterDAO {
@@ -40,18 +39,31 @@ public class PrinterDAO {
         }
     }
 
-    public int updateById(PrinterDO printer) {
+    public Result<Integer> updateById(PrinterDO printer) {
         try {
-            return Db.use(ds).update(EntityUtils.create(printer),
+            int i = Db.use(ds).update(EntityUtils.create(printer),
                     EntityUtils.idCond(printer));
+            if (i == 0) {
+                return Result.fail("未更新到打印机信息");
+            }
+            return Result.success(i);
         } catch (Exception ex) {
             ex.printStackTrace();
-            return 0;
+            return Result.fail("更新打印信息异常: " + ex.getMessage());
         }
     }
 
-    public int insert(PrinterDO printer) throws SQLException {
-        return Db.use(ds).insert(EntityUtils.create(printer));
+    public Result<Integer> insert(PrinterDO printer) throws SQLException {
+        try {
+            int i = Db.use(ds).insert(EntityUtils.create(printer));
+            if (i == 0) {
+                return Result.fail("插入打印机信息失败");
+            }
+            return Result.success(i);
+        } catch (Exception ex) {
+            Logger.error("插入打印机失败" + ex.getMessage());
+            return Result.fail("新增打印机失败:" + ex.getMessage());
+        }
     }
 
     public PrinterDO selectByPrinterId(Integer printerId) {
