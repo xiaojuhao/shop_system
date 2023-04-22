@@ -1,30 +1,44 @@
 package com.xjh.startup.another;
 
-import java.io.File;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.xjh.common.utils.FileUtils;
 import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.startup.foundation.printers.PrintResult;
 import com.xjh.startup.foundation.printers.PrinterImpl;
-
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 public class PrinterTest extends Application {
+
+    static void directPrint() throws Exception {
+        PrinterDO dd = new PrinterDO();
+        dd.setPrinterId(1);
+        dd.setPrinterName("打印机");
+        dd.setPrinterIp("192.168.1.9");
+        dd.setPrinterPort(9100);
+        dd.setPrinterType(1);
+        dd.setPrinterStatus(1);
+
+        PrinterImpl printer = new PrinterImpl(dd);
+        Future<PrintResult> ps = printer.submitTask(loadJson("/data/ticket2.json"), true);
+        System.out.println("打印结果:" + JSON.toJSONString(ps.get(3, TimeUnit.SECONDS)));
+        System.exit(0);
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         PrinterDO dd = new PrinterDO();
         dd.setPrinterId(1);
         dd.setPrinterName("打印机");
-        dd.setPrinterIp("192.168.1.4");
+        dd.setPrinterIp("192.168.1.9");
         dd.setPrinterPort(9100);
         dd.setPrinterType(1);
         dd.setPrinterStatus(1);
@@ -95,6 +109,7 @@ public class PrinterTest extends Application {
 
     public static void main(String[] args) throws Exception {
         // loadJson();
-        launch(args);
+        // launch(args);
+        directPrint();
     }
 }

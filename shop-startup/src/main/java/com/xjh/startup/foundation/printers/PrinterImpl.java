@@ -384,6 +384,7 @@ public class PrinterImpl implements Printer {
         printTableRow(outputStream, columnNames, columnWidths, columnAligns, size);
         for (int i = 0; i < rows.size(); i++) {
             printTableRow(outputStream, rows.getJSONArray(i), columnWidths, columnAligns, size);
+            outputStream.write(PrinterCmdUtil.nextLine(1));
         }
         print1_5Distance(outputStream);
         // 重置字符大小
