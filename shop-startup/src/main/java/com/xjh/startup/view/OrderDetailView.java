@@ -1,52 +1,19 @@
 package com.xjh.startup.view;
 
-import static com.xjh.common.utils.CommonUtils.formatMoney;
-import static com.xjh.common.utils.TableViewUtils.newCol;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import org.apache.commons.collections4.CollectionUtils;
-
+import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.enumeration.EnumChoiceAction;
 import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
-import com.xjh.common.utils.AlertBuilder;
-import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.CopyUtils;
-import com.xjh.common.utils.CurrentRequest;
-import com.xjh.common.utils.Logger;
-import com.xjh.common.utils.OrElse;
-import com.xjh.common.utils.Result;
-import com.xjh.common.utils.TimeRecord;
+import com.xjh.common.utils.*;
 import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.common.valueobject.OrderOverviewVO;
-import com.xjh.dao.dataobject.Desk;
-import com.xjh.dao.dataobject.Dishes;
-import com.xjh.dao.dataobject.DishesPackage;
-import com.xjh.dao.dataobject.Order;
-import com.xjh.dao.dataobject.OrderDishes;
-import com.xjh.dao.dataobject.OrderPay;
-import com.xjh.dao.dataobject.PrinterDO;
-import com.xjh.dao.dataobject.PrinterTaskDO;
+import com.xjh.dao.dataobject.*;
 import com.xjh.dao.mapper.PrinterDAO;
 import com.xjh.dao.mapper.PrinterTaskDAO;
-import com.xjh.service.domain.DeskService;
-import com.xjh.service.domain.DishesPackageService;
-import com.xjh.service.domain.DishesService;
-import com.xjh.service.domain.OrderDishesService;
-import com.xjh.service.domain.OrderPayService;
-import com.xjh.service.domain.OrderService;
+import com.xjh.service.domain.*;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.foundation.printers.OrderPrinterHelper;
 import com.xjh.startup.foundation.printers.PrintResult;
@@ -56,8 +23,6 @@ import com.xjh.startup.view.base.MediumForm;
 import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.OrderDishesTableItemBO;
-
-import cn.hutool.core.codec.Base64;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -69,15 +34,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.Separator;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
@@ -87,6 +44,15 @@ import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static com.xjh.common.utils.CommonUtils.formatMoney;
+import static com.xjh.common.utils.TableViewUtils.newCol;
 
 public class OrderDetailView extends VBox implements Initializable {
     // 依赖服务
@@ -540,7 +506,7 @@ public class OrderDetailView extends VBox implements Initializable {
             }
             PrinterImpl printer = new PrinterImpl(dd);
 
-            JSONArray printData = orderPrinterHelper.buildOrderPrintData(param);
+            List<Object> printData = orderPrinterHelper.buildOrderPrintData(param);
             PrintResult rs = printer.print(printData, true);
             Logger.info(JSON.toJSONString(rs));
         } catch (Exception ex) {

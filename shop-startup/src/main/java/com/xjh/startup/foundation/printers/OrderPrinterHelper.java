@@ -1,38 +1,28 @@
 package com.xjh.startup.foundation.printers;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.DoubleAdder;
-import java.util.function.Predicate;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.apache.commons.collections4.CollectionUtils;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.valueobject.OrderOverviewVO;
-import com.xjh.dao.dataobject.Desk;
-import com.xjh.dao.dataobject.Dishes;
-import com.xjh.dao.dataobject.Order;
-import com.xjh.dao.dataobject.OrderDishes;
-import com.xjh.dao.dataobject.OrderPay;
-import com.xjh.service.domain.DeskService;
-import com.xjh.service.domain.DishesService;
-import com.xjh.service.domain.OrderDishesService;
-import com.xjh.service.domain.OrderPayService;
-import com.xjh.service.domain.OrderService;
-import com.xjh.service.domain.StoreService;
+import com.xjh.dao.dataobject.*;
+import com.xjh.service.domain.*;
 import com.xjh.service.domain.model.StoreVO;
 import com.xjh.startup.foundation.constants.EnumAlign;
 import com.xjh.startup.foundation.constants.EnumComType;
+import com.xjh.startup.foundation.printers.models.TextModel;
 import com.xjh.startup.view.model.DeskOrderParam;
+import org.apache.commons.collections4.CollectionUtils;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.DoubleAdder;
+import java.util.function.Predicate;
 
 @Singleton
 public class OrderPrinterHelper {
@@ -49,10 +39,10 @@ public class OrderPrinterHelper {
     @Inject
     OrderPayService orderPayService;
 
-    public JSONArray buildOrderPrintData(DeskOrderParam param) {
+    public List<Object> buildOrderPrintData(DeskOrderParam param) {
         // 可折扣的菜品信息
         Predicate<OrderDishes> discountableChecker = orderDishesService.discountableChecker();
-        List<JSONObject> array = new ArrayList<>();
+        List<Object> array = new ArrayList<>();
         Order order = orderService.getOrder(param.getOrderId());
         StoreVO store = storeService.getStore().getData();
         Desk desk = deskService.getById(order.getDeskId());
@@ -133,17 +123,14 @@ public class OrderPrinterHelper {
         return titles;
     }
 
-    private JSONObject simpleLineText(String text) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("Name", "simple-text-name");
-        jsonObject.put("ComType", EnumComType.TEXT.type);
-        jsonObject.put("SampleContent", text);
-        jsonObject.put("Size", 1);
-        jsonObject.put("FrontLen", 0);
-        jsonObject.put("BehindLen", 0);
-        jsonObject.put("FrontEnterNum", 0);
-        jsonObject.put("BehindEnterNum", 1);
-        return jsonObject;
+    private TextModel simpleLineText(String text) {
+        return TextModel.builder()
+                .name("一行简单文本")
+                .comType(EnumComType.TEXT.type)
+                .sampleContent(text)
+                .size(1)
+                .behindEnterNum(1)
+                .build();
     }
 
     private JSONObject crlf() {
@@ -157,6 +144,13 @@ public class OrderPrinterHelper {
         jsonObject.put("FrontEnterNum", 0);
         jsonObject.put("BehindEnterNum", 1);
         return jsonObject;
+//        return TextModel.builder()
+//                .name("换行")
+//                .comType(EnumComType.TEXT.type)
+//                .size(1)
+//                .sampleContent("")
+//                .behindEnterNum(1)
+//                .build();
     }
 
     private JSONObject dotLine() {
@@ -169,8 +163,8 @@ public class OrderPrinterHelper {
         return jsonObject;
     }
 
-    private List<JSONObject> dishesItems(String title, List<OrderDishes> orderDishesList, DoubleAdder sumAdder) {
-        List<JSONObject> list = new ArrayList<>();
+    private List<Object> dishesItems(String title, List<OrderDishes> orderDishesList, DoubleAdder sumAdder) {
+        List<Object> list = new ArrayList<>();
         if (CollectionUtils.isEmpty(orderDishesList)) {
             return list;
         }

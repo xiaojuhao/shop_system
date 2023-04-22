@@ -5,8 +5,9 @@
  */
 package com.xjh.startup.foundation.printers;
 
-import com.alibaba.fastjson.JSONArray;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @author liangh
@@ -14,17 +15,13 @@ import lombok.Data;
 @Data
 public class PrintResult {
     private Printer printer;
-    private JSONArray jSONArray;
+    private List<Object> printDataList;
     private boolean isSuccess;
     private int resultCode = StatusUtil.INIT;
 
-    public PrintResult(Printer printer, JSONArray jSONArray) {
+    public PrintResult(Printer printer, List<Object> printDataList) {
         this.printer = printer;
-        this.jSONArray = jSONArray;
-    }
-
-    public JSONArray getPrintContent() {
-        return jSONArray;
+        this.printDataList = printDataList;
     }
 
     public void toFailure(int code) {

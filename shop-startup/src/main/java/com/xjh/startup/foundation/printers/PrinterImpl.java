@@ -14,6 +14,7 @@ import com.xjh.common.utils.Logger;
 import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.startup.foundation.constants.EnumAlign;
 import com.xjh.startup.foundation.constants.EnumComType;
+import com.xjh.startup.foundation.printers.models.TextModel;
 import lombok.Data;
 
 import java.io.IOException;
@@ -75,7 +76,7 @@ public class PrinterImpl implements Printer {
         return printerStatus;
     }
 
-    public Future<PrintResult> submitTask(JSONArray contentItems, boolean isVoicce) {
+    public Future<PrintResult> submitTask(List<Object> contentItems, boolean isVoicce) {
         return executorService.submit(() -> {
             try {
                 return print(contentItems, isVoicce);
@@ -88,7 +89,7 @@ public class PrinterImpl implements Printer {
         });
     }
 
-    public synchronized PrintResult print(JSONArray contentItems, boolean isVoicce) throws Exception {
+    public synchronized PrintResult print(List<Object> contentItems, boolean isVoicce) throws Exception {
         PrintResult printResult = new PrintResult(this, contentItems);
         SocketAddress socketAddress = new InetSocketAddress(printerDO.getPrinterIp(), printerDO.getPrinterPort());
         byte[] dataRead = new byte[0];
@@ -105,23 +106,35 @@ public class PrinterImpl implements Printer {
                 // 如果true，要加，否则后一个模块会接在文本后面；
                 // 如果不是，不加，否则会多一个空行。
                 for (int i = 0; i < contentItems.size(); i++) {
-                    JSONObject contentItem = contentItems.getJSONObject(i);
-                    EnumComType comType = EnumComType.of(contentItem.getInteger("ComType"));
-                    if (comType == EnumComType.TEXT) {
-                        printText(outputStream, contentItem);
-                    } else if (comType == EnumComType.TABLE) {
-                        printTable(outputStream, contentItem);
-                    } else if (comType == EnumComType.QRCODE) {
-                        printQRCode(outputStream, contentItem);
-                    } else if (comType == EnumComType.QRCODE2) {
-                        printQRCode2(outputStream, contentItem);
-                    } else if (comType == EnumComType.LINE) {
-                        printDotLine(outputStream, contentItem);
+                    Object contentItem = contentItems.get(i);
+                    EnumComType comType = null;
+                    if (contentItem instanceof JSONObject) {
+                        JSONObject jsonItem = (JSONObject) contentItem;
+                        comType = EnumComType.of(jsonItem.getInteger("ComType"));
+                        if (comType == EnumComType.TEXT) {
+                            printText(outputStream, jsonItem);
+                        } else if (comType == EnumComType.TABLE) {
+                            printTable(outputStream, jsonItem);
+                        } else if (comType == EnumComType.QRCODE) {
+                            printQRCode(outputStream, jsonItem);
+                        } else if (comType == EnumComType.QRCODE2) {
+                            printQRCode2(outputStream, jsonItem);
+                        } else if (comType == EnumComType.LINE) {
+                            printDotLine(outputStream, jsonItem);
+                        } else {
+                            Logger.info("不支持的打印类型。。。。。。");
+                            String detailedInfo = "json第 " + i + " 个元素的type属性错误,错误类型为：type = " + comType;
+                            throw new Exception(detailedInfo + ", " + comType);
+                        }
+                    } else if (contentItem instanceof TextModel) {
+                        printText(outputStream, (TextModel) contentItem);
                     } else {
                         Logger.info("不支持的打印类型。。。。。。");
                         String detailedInfo = "json第 " + i + " 个元素的type属性错误,错误类型为：type = " + comType;
                         throw new Exception(detailedInfo + ", " + comType);
                     }
+
+
                 }
                 feedPaperCut(outputStream);
                 if (isVoicce) {
@@ -227,6 +240,20 @@ public class PrinterImpl implements Printer {
         outputStream.flush();
     }
 
+    private void printText(OutputStream outputStream, TextModel model) throws IOException {
+        byte[][] byteList = new byte[][]{
+                PrinterCmdUtil.nextLine(model.getFrontEnterNum()),
+                PrinterCmdUtil.printSpace(model.getFrontLen()),
+                PrinterCmdUtil.fontSizeSetBig(model.getSize()), // 设置字体大小
+                PrinterCmdUtil.printText(model.getSampleContent()), // 打印内容
+                PrinterCmdUtil.fontSizeSetBig(1), // 恢复字体大小
+                PrinterCmdUtil.printSpace(model.getBehindLen()),
+                PrinterCmdUtil.nextLine(model.getBehindEnterNum())
+        };
+        outputStream.write(PrinterCmdUtil.byteMerger(byteList));
+        outputStream.flush();
+    }
+
     private void printText(OutputStream outputStream, JSONObject jsonObject) throws IOException {
         String sampleContent = jsonObject.getString("SampleContent");
         Integer size = jsonObject.getInteger("Size");
@@ -235,17 +262,20 @@ public class PrinterImpl implements Printer {
         Integer frontLen = jsonObject.getInteger("FrontLen");
         Integer behindLen = jsonObject.getInteger("BehindLen");
 
-        byte[][] byteList = new byte[][]{
-                PrinterCmdUtil.nextLine(frontEnterNum),
-                PrinterCmdUtil.printSpace(frontLen),
-                PrinterCmdUtil.fontSizeSetBig(size), // 设置字体大小
-                PrinterCmdUtil.printText(sampleContent), // 打印内容
-                PrinterCmdUtil.fontSizeSetBig(1), // 恢复字体大小
-                PrinterCmdUtil.printSpace(behindLen),
-                PrinterCmdUtil.nextLine(behindEnterNum)
-        };
-        outputStream.write(PrinterCmdUtil.byteMerger(byteList));
-        outputStream.flush();
+//        byte[][] byteList = new byte[][]{
+//                PrinterCmdUtil.nextLine(frontEnterNum),
+//                PrinterCmdUtil.printSpace(frontLen),
+//                PrinterCmdUtil.fontSizeSetBig(size), // 设置字体大小
+//                PrinterCmdUtil.printText(sampleContent), // 打印内容
+//                PrinterCmdUtil.fontSizeSetBig(1), // 恢复字体大小
+//                PrinterCmdUtil.printSpace(behindLen),
+//                PrinterCmdUtil.nextLine(behindEnterNum)
+//        };
+//        outputStream.write(PrinterCmdUtil.byteMerger(byteList));
+//        outputStream.flush();
+        printText(outputStream,
+                TextModel.builder().sampleContent(sampleContent).size(size).frontEnterNum(frontEnterNum)
+                        .behindEnterNum(behindEnterNum).frontLen(frontLen).behindLen(behindLen).build());
     }
 
     private void printQRCode(OutputStream outputStream, JSONObject jsonObject) throws IOException, WriterException {

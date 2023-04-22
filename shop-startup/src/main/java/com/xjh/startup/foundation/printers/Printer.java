@@ -5,15 +5,14 @@
  */
 package com.xjh.startup.foundation.printers;
 
+import java.util.List;
 import java.util.concurrent.Future;
-
-import com.alibaba.fastjson.JSONArray;
 
 /**
  * @author 36181
  */
 public interface Printer {
 
-    Future<PrintResult> submitTask(JSONArray contentItems, boolean isVoicce);
+    Future<PrintResult> submitTask(List<Object> contentItems, boolean isVoicce);
 
 }

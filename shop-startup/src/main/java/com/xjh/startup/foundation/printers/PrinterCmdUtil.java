@@ -1,14 +1,5 @@
 package com.xjh.startup.foundation.printers;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-
-import javax.imageio.ImageIO;
-
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
@@ -16,6 +7,15 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageConfig;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import com.xjh.common.utils.CommonUtils;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 
 @SuppressWarnings("unused")
 public class PrinterCmdUtil {
@@ -256,6 +256,9 @@ public class PrinterCmdUtil {
      * @throws UnsupportedEncodingException ex
      */
     public static byte[] printText(String text) throws UnsupportedEncodingException {
+        if (CommonUtils.isBlank(text)) {
+            text = " ";
+        }
         return text.getBytes("gb18030");
     }
 
