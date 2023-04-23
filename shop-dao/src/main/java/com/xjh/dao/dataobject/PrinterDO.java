@@ -3,7 +3,6 @@ package com.xjh.dao.dataobject;
 import com.xjh.dao.foundation.Column;
 import com.xjh.dao.foundation.Id;
 import com.xjh.dao.foundation.Table;
-
 import lombok.Data;
 
 @Data
@@ -24,8 +23,8 @@ public class PrinterDO {
 
     @Column("printerInfo")
     String printerInfo;
-    // 1:80mm;  0:58mm
 
+    // 1:80mm;  0:58mm
     @Column("printerType")
     Integer printerType;
 

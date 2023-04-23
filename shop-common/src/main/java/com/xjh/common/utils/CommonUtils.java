@@ -13,6 +13,7 @@ import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -85,6 +86,20 @@ public class CommonUtils {
         } else {
             return coll.stream().findFirst().orElse(null);
         }
+    }
+
+    public static <T> Iterator<T> createIter(T[] arr) {
+        int arrLen = arr.length;
+        AtomicInteger index = new AtomicInteger(0);
+        return new Iterator<T>() {
+            public boolean hasNext() {
+                return index.get() < arrLen;
+            }
+
+            public T next() {
+                return arr[index.getAndIncrement()];
+            }
+        };
     }
 
     public static void safeRun(Runnable run) {
@@ -858,5 +873,15 @@ public class CommonUtils {
         } else {
             return json;
         }
+    }
+
+    public static <T extends Comparable<T>> T max(T a, T b) {
+        if (a == null) {
+            return b;
+        }
+        if (b == null) {
+            return a;
+        }
+        return a.compareTo(b) > 0 ? a : b;
     }
 }

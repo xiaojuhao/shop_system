@@ -2,11 +2,11 @@ package com.xjh.startup.another;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.xjh.common.enumeration.EnumPrinterType;
 import com.xjh.common.utils.FileUtils;
 import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.startup.foundation.printers.PrintResult;
 import com.xjh.startup.foundation.printers.PrinterImpl;
-import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
@@ -16,15 +16,15 @@ import java.io.File;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-public class PrinterTest extends Application {
+public class PrinterTest {
 
     static void directPrint() throws Exception {
         PrinterDO dd = new PrinterDO();
         dd.setPrinterId(1);
         dd.setPrinterName("打印机");
-        dd.setPrinterIp("192.168.1.9");
+        dd.setPrinterIp("192.168.1.7");
         dd.setPrinterPort(9100);
-        dd.setPrinterType(1);
+        dd.setPrinterType(EnumPrinterType.T80.code);
         dd.setPrinterStatus(1);
 
         PrinterImpl printer = new PrinterImpl(dd);
@@ -33,7 +33,6 @@ public class PrinterTest extends Application {
         System.exit(0);
     }
 
-    @Override
     public void start(Stage primaryStage) throws Exception {
         PrinterDO dd = new PrinterDO();
         dd.setPrinterId(1);

@@ -11,9 +11,12 @@ import com.google.zxing.WriterException;
 import com.xjh.common.enumeration.EnumPrinterType;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.OrElse;
 import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.startup.foundation.constants.EnumAlign;
 import com.xjh.startup.foundation.constants.EnumComType;
+import com.xjh.startup.foundation.printers.models.TableCellModel;
+import com.xjh.startup.foundation.printers.models.TableRowModel;
 import com.xjh.startup.foundation.printers.models.TextModel;
 import lombok.Data;
 
@@ -39,8 +42,8 @@ import java.util.concurrent.*;
 @SuppressWarnings("unused")
 public class PrinterImpl implements Printer {
     PrinterDO printerDO;
+    private EnumPrinterType printerType = EnumPrinterType.T58;
     // 默认58毫米打印32个字符
-    private int charCount = 32;
     private int timeout = 3 * 1000; //输入流读取超时时间
     private int connectTimeout = 3 * 1000; //socket连接超时时间
     ExecutorService executorService = new ThreadPoolExecutor(
@@ -51,10 +54,7 @@ public class PrinterImpl implements Printer {
 
     public PrinterImpl(PrinterDO dd) {
         this.printerDO = dd;
-        // 80毫米，每行打印48个字符
-        if (EnumPrinterType.of(dd.getPrinterType()) == EnumPrinterType.T80) {
-            charCount = 48;
-        }
+        printerType = EnumPrinterType.of(dd.getPrinterType());
     }
 
     public int checkPrinter() {
@@ -257,10 +257,10 @@ public class PrinterImpl implements Printer {
     private void printText(OutputStream outputStream, JSONObject jsonObject) throws IOException {
         String sampleContent = jsonObject.getString("SampleContent");
         Integer size = jsonObject.getInteger("Size");
-        Integer frontEnterNum = jsonObject.getInteger("FrontEnterNum");
-        Integer behindEnterNum = jsonObject.getInteger("BehindEnterNum");
-        Integer frontLen = jsonObject.getInteger("FrontLen");
-        Integer behindLen = jsonObject.getInteger("BehindLen");
+        Integer frontEnterNum = OrElse.orGet(jsonObject.getInteger("FrontEnterNum"), 0);
+        Integer behindEnterNum = OrElse.orGet(jsonObject.getInteger("BehindEnterNum"), 0);
+        Integer frontLen = OrElse.orGet(jsonObject.getInteger("FrontLen"), 0);
+        Integer behindLen = OrElse.orGet(jsonObject.getInteger("BehindLen"), 0);
 
 //        byte[][] byteList = new byte[][]{
 //                PrinterCmdUtil.nextLine(frontEnterNum),
@@ -284,7 +284,7 @@ public class PrinterImpl implements Printer {
         double width = jsonObject.getDouble("Size");
         int frontEnterNum = jsonObject.getInteger("FrontEnterNum");
         int behindEnterNum = jsonObject.getInteger("BehindEnterNum");
-        int size = Math.min((int) (charCount * width / 100), maxSize);
+        int size = Math.min((int) (printerType.numOfChars * width / 100), maxSize);
 
         // 二维码内容
         byte[] byteQRCode = PrinterCmdUtil.printQRCode(content, size * 12, size * 12);
@@ -348,7 +348,7 @@ public class PrinterImpl implements Printer {
         int behindEnterNum = jsonObject.getInteger("BehindEnterNum");
 
         byte[] byteSize = PrinterCmdUtil.fontSizeSetBig(size);
-        int realCount = charCount / size;
+        int realCount = printerType.numOfChars / size;
         byte[] hyphenLine = PrinterCmdUtil.printText(CommonUtils.repeatStr("- ", realCount / 2));
         byte[] byteSizeDefault = PrinterCmdUtil.fontSizeSetBig(1);
 
@@ -383,8 +383,16 @@ public class PrinterImpl implements Printer {
         outputStream.write(PrinterCmdUtil.lineDistance(4 * size + 2));
         printTableRow(outputStream, columnNames, columnWidths, columnAligns, size);
         for (int i = 0; i < rows.size(); i++) {
-            printTableRow(outputStream, rows.getJSONArray(i), columnWidths, columnAligns, size);
-            outputStream.write(PrinterCmdUtil.nextLine(1));
+            // printTableRow(outputStream, rows.getJSONArray(i), columnWidths, columnAligns, size);
+            TableRowModel row = new TableRowModel();
+            for (int j = 0; j < columnWidths.size(); j++) {
+                row.addCell(rows.getJSONArray(i).getString(j), columnWidths.getInteger(j), columnAligns.getInteger(j));
+            }
+            for (TableRowModel subRow : row.split(printerType)) {
+                Logger.info(subRow.formatStr());
+                printTableRow(outputStream, subRow, size);
+                outputStream.write(PrinterCmdUtil.nextLine(1));
+            }
         }
         print1_5Distance(outputStream);
         // 重置字符大小
@@ -409,16 +417,17 @@ public class PrinterImpl implements Printer {
         double widthPlus = 0;
         JSONArray jsonCells = new JSONArray();
         for (int i = 0; i < columnWidths.size(); i++) {
-            int colWidth = columnWidths.getInteger(i);
-            int colAlign = columnAligns.getInteger(i);
-            int paddingLeft = (int) (widthPlus * charCount / 100 / size);
+            int colWidth = columnWidths.getInteger(i); // 宽度百分比
+            int colAlign = columnAligns.getInteger(i); // 对齐方式
+            int paddingLeft = (int) (widthPlus * printerType.numOfChars / 100 / size);
 
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("paddingLeft", paddingLeft);
             jsonObject.put("align", colAlign);
-            int widthChar = (charCount * colWidth / 100 / size);
+            // 打印的字符数（按打印纸的行总字符数，按百分比折算）
+            int widthChar = (printerType.numOfChars * colWidth / 100 / size);
             if (i == columnWidths.size() - 1) {
-                widthChar = (charCount - (int) (widthPlus * charCount / 100)) / size;
+                widthChar = (printerType.numOfChars - (int) (widthPlus * printerType.numOfChars / 100)) / size;
             }
             widthPlus += colWidth;
             jsonObject.put("widthChar", widthChar);
@@ -454,6 +463,28 @@ public class PrinterImpl implements Printer {
                     outputStream.write(byteMerger);
                 }
             }
+        }
+    }
+
+    private void printTableRow(
+            OutputStream outputStream,
+            TableRowModel row,
+            int size) throws Exception {
+        // 整个数据都是空，不打印
+        if (row == null || row.isEmpty()) {
+            return;
+        }
+
+        for (TableCellModel cell : row.getCells()) {
+            int widthChar = cell.getCharWidth();   //12223333
+            EnumAlign align = EnumAlign.of(cell.getAlign());
+
+            byte[] byteContent = PrinterCmdUtil.printText(StringUtil.alignString(cell.getText(), widthChar, align));
+            byte[][] byteList = new byte[][]{
+                    byteContent,
+            };
+            byte[] byteMerger = PrinterCmdUtil.byteMerger(byteList);
+            outputStream.write(byteMerger);
         }
     }
 }
