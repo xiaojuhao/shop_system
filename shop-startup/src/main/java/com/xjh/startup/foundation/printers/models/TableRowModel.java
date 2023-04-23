@@ -92,7 +92,7 @@ public class TableRowModel {
         for (TableCellModel c : cells) {
             String text = OrElse.orGet(c.text, "--");
             String padded = alignString(text, c.charWidth, EnumAlign.of(c.align));
-            sb.append(padded).append("(").append(lengthOfStr(padded)).append(")|");
+            sb.append(padded).append("(").append(lengthOfStr(padded)).append(",").append(c.charWidth).append(")|");
         }
         return sb.toString();
     }
