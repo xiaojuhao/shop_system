@@ -68,18 +68,23 @@ public class DeskService {
             if (EnumDeskStatus.of(desk.getStatus()) != EnumDeskStatus.FREE) {
                 return Result.fail("餐桌状态错误, 无法开台");
             }
-            // 开桌
-            Integer orderId = orderService.createNewOrderId();
-            desk.setOrderId(orderId);
-            deskDAO.useDesk(desk);
+
             // 下单
             CreateOrderParam createOrderParam = new CreateOrderParam();
-            createOrderParam.setOrderId(orderId);
+            // createOrderParam.setOrderId(orderId);
             createOrderParam.setDeskId(deskId);
             createOrderParam.setRecommender(param.getRecommender());
             createOrderParam.setCustomerNum(param.getCustomerNum());
-            Order order = orderService.createOrder(createOrderParam);
+            Result<Order> order = orderService.createOrder(createOrderParam);
             Logger.info("下单成功: " + JSON.toJSONString(order));
+            if(!order.isSuccess()){
+                return Result.fail(order.getCode(), order.getMsg());
+            }
+            // 开桌
+            // Integer orderId = orderService.createNewOrderId();
+            desk.setOrderId(order.getData().getOrderId());
+            deskDAO.useDesk(desk);
+
             return Result.success("下单成功");
         } catch (Exception ex) {
             Logger.info("开桌失败" + ex.getMessage());

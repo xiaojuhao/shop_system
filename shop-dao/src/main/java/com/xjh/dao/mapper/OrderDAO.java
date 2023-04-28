@@ -8,6 +8,7 @@ import javax.inject.Inject;
 
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.OrElse;
 import com.xjh.common.utils.Result;
@@ -19,14 +20,22 @@ import com.zaxxer.hikari.HikariDataSource;
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
 
+import static com.xjh.common.utils.CommonUtils.firstOf;
+
 @Singleton
 public class OrderDAO {
     @Inject
     @Named("mysql")
     HikariDataSource ds;
 
-    public int insert(Order order) throws SQLException {
-        return Db.use(ds).insert(EntityUtils.create(order));
+    public Result<Integer> insert(Order order) throws SQLException {
+        // return Db.use(ds).insert(EntityUtils.create(order));
+        List<Object> keys = Db.use(ds).insertForGeneratedKeys(EntityUtils.create(order));
+        Integer key = CommonUtils.parseInt(firstOf(keys), null);
+        if(key == null){
+            return Result.fail("插入Order表失败");
+        }
+        return Result.success(key);
     }
 
     public Result<Integer> updateByOrderId(Order order) {

@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class CreateOrderParam {
-    Integer orderId;
+    // Integer orderId;
     Integer deskId;
     Integer customerNum;
     String recommender;

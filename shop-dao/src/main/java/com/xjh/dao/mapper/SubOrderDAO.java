@@ -10,12 +10,15 @@ import javax.inject.Singleton;
 
 import com.google.inject.name.Named;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.SubOrder;
 import com.xjh.dao.foundation.EntityUtils;
 import com.zaxxer.hikari.HikariDataSource;
 
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
+
+import static com.xjh.common.utils.CommonUtils.parseInt;
 
 @Singleton
 public class SubOrderDAO {
@@ -63,8 +66,13 @@ public class SubOrderDAO {
         return rs.getLong("createtime");
     }
 
-    public int insert(SubOrder subOrder) throws SQLException {
-        return Db.use(ds).insert(EntityUtils.create(subOrder));
+    public Result<Integer> insert(SubOrder subOrder) throws SQLException {
+        // return Db.use(ds).insert(EntityUtils.create(subOrder));
+        Long id = Db.use(ds).insertForGeneratedKey(EntityUtils.create(subOrder));
+        if(id == null){
+            return Result.fail("插入SubOrder失败");
+        }
+        return Result.success(parseInt(id, null));
     }
 
     public int updateById(SubOrder subOrder) throws SQLException {

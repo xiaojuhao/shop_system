@@ -131,19 +131,21 @@ public class CartService {
             Integer orderId = request.getOrderId();
             Order order = orderDAO.selectByOrderId(orderId).getData();
             // 子订单
-            Integer subOrderId = subOrderService.createSubOrderId();
+            // Integer subOrderId = subOrderService.createSubOrderId();
             SubOrder subOrder = new SubOrder();
-            subOrder.setSubOrderId(subOrderId);
+            // subOrder.setSubOrderId(subOrderId);
             subOrder.setOrderId(orderId);
             subOrder.setOrderType(EnumSubOrderType.ORDINARY.getType());
             subOrder.setSubOrderStatus(0);
             subOrder.setAccountId(CurrentAccount.currentAccountId());
             subOrder.setCreatetime(DateBuilder.now().mills());
-            int subInsertRs = subOrderDAO.insert(subOrder);
-
+            Result<Integer> subInsertRs = subOrderDAO.insert(subOrder);
+            if(!subInsertRs.isSuccess()){
+                return Result.fail(subInsertRs.getMsg());
+            }
             // order dishes
             List<OrderDishes> orderDishes = new ArrayList<>();
-            orderDishes.add(buildSendOrderDishes(request, orderId, subOrderId));
+            orderDishes.add(buildSendOrderDishes(request, orderId, subInsertRs.getData()));
             for (OrderDishes d : orderDishes) {
                 orderDishesDAO.insert(d);
             }
@@ -183,24 +185,26 @@ public class CartService {
                 return Result.fail("购物车空");
             }
             // 子订单
-            Integer subOrderId = subOrderService.createSubOrderId();
+            // Integer subOrderId = subOrderService.createSubOrderId();
             SubOrder subOrder = new SubOrder();
-            subOrder.setSubOrderId(subOrderId);
+            // subOrder.setSubOrderId(subOrderId);
             subOrder.setOrderId(orderId);
             subOrder.setOrderType(EnumSubOrderType.ORDINARY.getType());
             subOrder.setSubOrderStatus(0);
             subOrder.setAccountId(CurrentAccount.currentAccountId());
             subOrder.setCreatetime(DateBuilder.now().mills());
-            int subInsertRs = subOrderDAO.insert(subOrder);
-
+            Result<Integer> subInsertRs = subOrderDAO.insert(subOrder);
+            if(!subInsertRs.isSuccess()){
+                return Result.fail(subInsertRs.getMsg());
+            }
             // order dishes
             List<OrderDishes> orderDishes = new ArrayList<>();
             for (CartItemVO item : cartVO.getContents()) {
                 int ifPackage = OrElse.orGet(item.getIfDishesPackage(), 0);
                 if (ifPackage == 1 || ifPackage == 2) {
-                    orderDishes.add(buildPackageCartItemVO(item, orderId, subOrderId));
+                    orderDishes.add(buildPackageCartItemVO(item, orderId, subInsertRs.getData()));
                 } else {
-                    orderDishes.add(buildCommonCartItemVO(item, orderId, subOrderId));
+                    orderDishes.add(buildCommonCartItemVO(item, orderId, subInsertRs.getData()));
                 }
             }
             for (OrderDishes d : orderDishes) {

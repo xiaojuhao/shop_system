@@ -14,7 +14,7 @@ import com.xjh.dao.mapper.SubOrderDAO;
 public class SubOrderService {
     @Inject
     SubOrderDAO subOrderDAO;
-
+    @Deprecated
     public Integer createSubOrderId() {
         while (true) {
             Integer nextId = createSubOrderId1();
@@ -23,7 +23,7 @@ public class SubOrderService {
             }
         }
     }
-
+    @Deprecated
     public Integer createSubOrderId1() {
         LocalDateTime start = DateBuilder.base("2021-01-01 00:00:01").dateTime();
         String timeStr = DateBuilder.today().format("yyyyMMddHH");
@@ -40,7 +40,7 @@ public class SubOrderService {
         Logger.info("创建子订单号: " + diffHours + "," + nextId + "," + id);
         return id;
     }
-
+    @Deprecated
     public synchronized int nextId(String group) {
         return SequenceDatabase.nextId("subOrderId:sequence:" + group);
     }

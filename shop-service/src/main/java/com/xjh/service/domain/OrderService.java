@@ -434,11 +434,11 @@ public class OrderService {
         return CommonUtils.parseMoney(notPaid + "", 0D);
     }
 
-    public Order createOrder(CreateOrderParam param) throws SQLException {
+    public Result<Order> createOrder(CreateOrderParam param) throws SQLException {
         Runnable clear = CurrentRequest.resetRequestId();
         try {
             Order order = new Order();
-            order.setOrderId(param.getOrderId());
+            // order.setOrderId(param.getOrderId());
             order.setDeskId(param.getDeskId());
             order.setOrderStatus(EnumOrderStatus.UNPAID.status);
             order.setStatus(EnumOrderServeStatus.START.status);
@@ -454,13 +454,19 @@ public class OrderService {
             order.setOrderHadpaid(0D);
             order.setCreateTime(DateBuilder.now().mills());
 
-            orderDAO.insert(order);
-            return order;
+            Result<Integer> rs = orderDAO.insert(order);
+            if(rs.isSuccess()){
+                order.setOrderId(rs.getData());
+            } else {
+                return Result.fail(rs.getCode(), rs.getMsg());
+            }
+            return Result.success(order);
         } finally {
             clear.run();
         }
     }
 
+    @Deprecated
     public Integer createNewOrderId() {
         while (true) {
             Integer newOrderId = createNewOrderId1();
@@ -469,7 +475,7 @@ public class OrderService {
             }
         }
     }
-
+    @Deprecated
     public Integer createNewOrderId1() {
         LocalDateTime start = DateBuilder.base("2021-01-01 00:00:01").dateTime();
         String timeStr = DateBuilder.today().format("yyyyMMddHH");
@@ -486,7 +492,7 @@ public class OrderService {
         Logger.info("创建订单号: " + diffHours + "," + nextId + "," + id);
         return id;
     }
-
+    @Deprecated
     public synchronized int nextId(String group) {
         return SequenceDatabase.nextId("orderId:sequence:" + group);
     }
