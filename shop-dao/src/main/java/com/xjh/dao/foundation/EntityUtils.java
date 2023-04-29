@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.xjh.common.anno.NotColumn;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Logger;
@@ -32,7 +33,10 @@ public class EntityUtils {
             try {
                 Object value = pd.readValue(dd);
                 if (notNone(value)) {
-                    entity.set(getColumnName(pd.getField()), value);
+                    String colname = getColumnName(pd.getField());
+                    if (CommonUtils.isNotBlank(colname)) {
+                        entity.set(colname, value);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -50,8 +54,11 @@ public class EntityUtils {
         ReflectionUtils.resolvePD(dd.getClass()).values().forEach(pd -> {
             try {
                 if (pd.getField().getAnnotation(Id.class) != null) {
-                    hasId.set(true);
-                    entity.set(getColumnName(pd.getField()), pd.readValue(dd));
+                    String colname = getColumnName(pd.getField());
+                    if (CommonUtils.isNotBlank(colname)) {
+                        hasId.set(true);
+                        entity.set(colname, pd.readValue(dd));
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -93,8 +100,10 @@ public class EntityUtils {
     public static void convert(Entity entity, Object target) {
         ReflectionUtils.resolvePD(target.getClass()).values().forEach(pd -> {
             try {
-                pd.writeValue(target, getValue(entity,
-                        getColumnName(pd.getField()), pd.getField().getType()));
+                String colname = getColumnName(pd.getField());
+                if (CommonUtils.isNotBlank(colname)) {
+                    pd.writeValue(target, getValue(entity, colname, pd.getField().getType()));
+                }
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -103,6 +112,10 @@ public class EntityUtils {
 
     private static String getColumnName(Field field) {
         String columnName = field.getName();
+        NotColumn notCol = field.getAnnotation(NotColumn.class);
+        if (notCol != null) {
+            return null;
+        }
         Column column = field.getAnnotation(Column.class);
         if (column != null && !CommonUtils.isBlank(column.value())) {
             columnName = column.value();

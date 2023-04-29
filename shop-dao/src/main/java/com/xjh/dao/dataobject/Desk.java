@@ -1,7 +1,9 @@
 package com.xjh.dao.dataobject;
 
+import java.beans.Transient;
 import java.io.Serializable;
 
+import com.xjh.common.anno.NotColumn;
 import com.xjh.dao.foundation.Column;
 import com.xjh.dao.foundation.Id;
 import com.xjh.dao.foundation.Table;
@@ -29,4 +31,11 @@ public class Desk implements Serializable {
     Long orderCreateTime;
     @Column("physicalStatus")
     Integer physicalStatus;
+
+    @NotColumn
+    private long version;
+    public Desk newVer(){
+        this.version = System.currentTimeMillis();
+        return this;
+    }
 }
