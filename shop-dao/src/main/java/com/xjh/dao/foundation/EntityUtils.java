@@ -1,5 +1,11 @@
 package com.xjh.dao.foundation;
 
+import cn.hutool.db.Entity;
+import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.utils.Logger;
+import com.xjh.common.utils.ReflectionUtils;
+
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -8,14 +14,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import com.xjh.common.anno.NotColumn;
-import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.DateBuilder;
-import com.xjh.common.utils.Logger;
-import com.xjh.common.utils.ReflectionUtils;
-
-import cn.hutool.db.Entity;
 
 public class EntityUtils {
     public static Entity pureCreate(Class<?> clz) {
@@ -112,8 +110,8 @@ public class EntityUtils {
 
     private static String getColumnName(Field field) {
         String columnName = field.getName();
-        NotColumn notCol = field.getAnnotation(NotColumn.class);
-        if (notCol != null) {
+        Transient isTransient = field.getAnnotation(Transient.class);
+        if (isTransient != null) {
             return null;
         }
         Column column = field.getAnnotation(Column.class);

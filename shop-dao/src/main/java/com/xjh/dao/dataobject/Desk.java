@@ -1,14 +1,12 @@
 package com.xjh.dao.dataobject;
 
-import java.beans.Transient;
-import java.io.Serializable;
-
-import com.xjh.common.anno.NotColumn;
 import com.xjh.dao.foundation.Column;
 import com.xjh.dao.foundation.Id;
 import com.xjh.dao.foundation.Table;
-
+import com.xjh.dao.foundation.Transient;
 import lombok.Data;
+
+import java.io.Serializable;
 
 @Data
 @Table("desks")
@@ -32,7 +30,7 @@ public class Desk implements Serializable {
     @Column("physicalStatus")
     Integer physicalStatus;
 
-    @NotColumn
+    @Transient
     private long version;
     public Desk newVer(){
         this.version = System.currentTimeMillis();

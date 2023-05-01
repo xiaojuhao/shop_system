@@ -1,12 +1,5 @@
 package com.xjh.startup.view.ordermanage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 import com.xjh.common.enumeration.EnumOrderPeriodType;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.enumeration.EnumPayMethod;
@@ -14,13 +7,12 @@ import com.xjh.common.enumeration.EnumSubOrderType;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.CopyUtils;
 import com.xjh.common.utils.DateBuilder;
-import com.xjh.common.utils.OrElse;
+import com.xjh.common.utils.ReflectionUtils;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.valueobject.OrderOverviewVO;
-import com.xjh.dao.dataobject.Order;
-import com.xjh.dao.dataobject.OrderDishes;
-import com.xjh.dao.dataobject.OrderPay;
-import com.xjh.dao.dataobject.SubOrder;
+import com.xjh.dao.dataobject.*;
+import com.xjh.dao.foundation.SumActualPrice;
+import com.xjh.dao.foundation.SumTotalPrice;
 import com.xjh.dao.mapper.OrderDishesDAO;
 import com.xjh.dao.mapper.OrderPayDAO;
 import com.xjh.dao.mapper.SubOrderDAO;
@@ -30,7 +22,6 @@ import com.xjh.service.domain.StoreService;
 import com.xjh.service.domain.model.StoreVO;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SimpleForm;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.canvas.Canvas;
@@ -42,6 +33,12 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Window;
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class OrderManageBillView extends SimpleForm {
     static String YYYYMMDD = "yyyy-MM-dd";
@@ -105,11 +102,14 @@ public class OrderManageBillView extends SimpleForm {
         List<SubOrder> subOrderList = subOrderDAO.selectByOrderIds(orderIdList);
         List<OrderDishes> orderDishesList = orderDishesDAO.selectByOrderIds(orderIdList);
         List<OrderPay> orderPayList = orderPayDAO.selectByOrderIds(orderIdList);
-        BillBO bo = new BillBO();
-        sumOrderBill(bo, orderList, subOrderList, orderDishesList, orderPayList);
+        BillListDO bo = new BillListDO();
+        BillListNoonDO noon = new BillListNoonDO();
+        BillListNightDO night = new BillListNightDO();
+        BillListSupperDO supper = new BillListSupperDO();
+        sumOrderBill(bo, noon, night, supper, orderList, subOrderList, orderDishesList, orderPayList);
         HBox line = new HBox();
         line.getChildren().addAll(
-                printCanvas(buildStat1(bo), Math.max(quartWidth, 200)),
+                printCanvas(buildStat1(bo, noon, night, supper), Math.max(quartWidth, 200)),
                 new Separator(Orientation.VERTICAL),
                 printCanvas(buildStat2(bo), Math.max(quartWidth, 200)),
                 new Separator(Orientation.VERTICAL),
@@ -119,11 +119,14 @@ public class OrderManageBillView extends SimpleForm {
         addLine(line);
     }
 
-    private void sumOrderBill(BillBO bo,
-            List<Order> orders,
-            List<SubOrder> subOrders,
-            List<OrderDishes> orderDishesList,
-            List<OrderPay> orderPayList) {
+    private void sumOrderBill(BillListDO bo,
+                              BillListNoonDO noon,
+                              BillListNightDO night,
+                              BillListSupperDO supper,
+                              List<Order> orders,
+                              List<SubOrder> subOrders,
+                              List<OrderDishes> orderDishesList,
+                              List<OrderPay> orderPayList) {
         Predicate<SubOrder> isH5 = it -> EnumSubOrderType.of(it.getOrderType()) == EnumSubOrderType.H5;
 
         Map<Integer, List<SubOrder>> subOrderMap = CommonUtils.groupBy(subOrders, SubOrder::getOrderId);
@@ -138,15 +141,13 @@ public class OrderManageBillView extends SimpleForm {
                     bo.h5OrderNums += 1;
                 }
             });
-            bo.totalDue += billView.orderNeedPay;
-            bo.actualAmount += billView.orderHadpaid;
 
             bo.totalDiscountPrice += billView.discountAmount;
             bo.totalErasePrice += billView.orderErase;
             bo.totalReturnPrice += billView.returnDishesPrice;
             bo.totalHadPaidPrice += billView.orderHadpaid;
             bo.totalRefundPrice += billView.orderRefund;
-            bo.totalRedunction += billView.orderReduction;
+            bo.totalReductionPrice += billView.orderReduction;
 
             EnumOrderStatus orderStatus = EnumOrderStatus.of(order.getOrderStatus());
             switch (orderStatus) {
@@ -163,76 +164,117 @@ public class OrderManageBillView extends SimpleForm {
                     bo.totalUnpaidNums += 1;
                     break;
                 default:
-                    bo.totalSuccNums += 1;
                     bo.customerNums += order.getOrderCustomerNums();
             }
 
             EnumOrderPeriodType periodType = EnumOrderPeriodType.check(order.getCreateTime());
             switch (periodType) {
                 case NOON:
-                    bo.customerNumsNoon += order.getOrderCustomerNums();
-                    bo.actualAmountNoon += billView.orderHadpaid;
+                    noon.customerNums += order.getOrderCustomerNums();
+                    noon.totalHadPaidPrice += billView.orderHadpaid;
                     break;
                 case NIGHT:
-                    bo.customerNumsNight += order.getOrderCustomerNums();
-                    bo.actualAmountNight += billView.orderHadpaid;
+                    night.customerNums += order.getOrderCustomerNums();
+                    night.totalHadPaidPrice += billView.orderHadpaid;
+                case SUPER:
+                    supper.customerNums += order.getOrderCustomerNums();
+                    supper.totalHadPaidPrice += billView.orderHadpaid;
                 default:
-                    bo.customerNumsSupper += order.getOrderCustomerNums();
-                    bo.actualAmountSupper += billView.orderHadpaid;
+                    bo.customerNums += order.getOrderCustomerNums();
+                    bo.totalHadPaidPrice += billView.orderHadpaid;
             }
 
             // 按渠道统计
             CommonUtils.forEach(orderPayList, pay -> {
                 EnumPayMethod pm = EnumPayMethod.of(pay.getPaymentMethod());
-                double s = OrElse.orGet(bo.payMethodSummarize.get(pm), 0D);
-                bo.payMethodSummarize.put(pm, s + pay.getAmount());
-
-                double a = OrElse.orGet(bo.payMethodActualSummarize.get(pm), 0D);
-                bo.payMethodActualSummarize.put(pm, a + pay.getActualAmount());
+                // 支付渠道累计金额
+                ReflectionUtils.PropertyDescriptor totalPricePD = getSumTotalPricePD(BillListDO.class, pm);
+                if (totalPricePD != null) {
+                    double s = CommonUtils.parseDouble(totalPricePD.readValue(bo), 0D);
+                    totalPricePD.writeValue(bo, s + pay.getAmount());
+                }
+                // 支付渠道实际金额
+                ReflectionUtils.PropertyDescriptor actualPricePD = getSumActualPricePD(BillListDO.class, pm);
+                if (actualPricePD != null) {
+                    double s = CommonUtils.parseDouble(actualPricePD.readValue(bo), 0D);
+                    actualPricePD.writeValue(bo, s + pay.getActualAmount());
+                }
             });
         }
     }
 
-    public List<BillItem> buildStat1(BillBO bo) {
+    static ReflectionUtils.PropertyDescriptor getSumTotalPricePD(Class<?> clz, EnumPayMethod pm) {
+        for (ReflectionUtils.PropertyDescriptor pd : ReflectionUtils.resolvePD(clz).values()) {
+            if (pd.getField().isAnnotationPresent(SumTotalPrice.class)) {
+                if (pd.getField().getAnnotation(SumTotalPrice.class).value() == pm) {
+                    return pd;
+                }
+            }
+        }
+        return null;
+    }
+
+    static ReflectionUtils.PropertyDescriptor getSumActualPricePD(Class<?> clz, EnumPayMethod pm) {
+        for (ReflectionUtils.PropertyDescriptor pd : ReflectionUtils.resolvePD(clz).values()) {
+            if (pd.getField().isAnnotationPresent(SumActualPrice.class)) {
+                if (pd.getField().getAnnotation(SumActualPrice.class).value() == pm) {
+                    return pd;
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<BillItem> buildStat1(BillListDO bo, BillListNoonDO noon, BillListNightDO night, BillListSupperDO supper) {
         List<BillItem> list = new ArrayList<>();
-        list.add(new BillItem("H5点单数", bo.h5OrderNums));
-        list.add(new BillItem("成功交易桌数", bo.totalSuccNums));
-        list.add(new BillItem("平均每桌单价", new Money(bo.totalSuccNums == 0 ? 0D : bo.actualAmount / bo.totalSuccNums)));
-        list.add(new BillItem("来客数量", bo.customerNums));
-        list.add(new BillItem("平均每客单价", new Money(bo.customerNums == 0 ? 0D : bo.actualAmount / bo.customerNums)));
-        list.add(new BillItem("午市每客单价", new Money(bo.customerNumsNoon == 0 ? 0D : bo.actualAmountNoon / bo.customerNumsNoon)));
-        list.add(new BillItem("晚市每客单价", new Money(bo.customerNumsNight == 0 ? 0D : bo.actualAmountNight / bo.customerNumsNight)));
-        list.add(new BillItem("夜宵每客单价", new Money(bo.customerNumsSupper == 0 ? 0D : bo.actualAmountSupper / bo.customerNumsSupper)));
+        list.add(new BillItem("H5点单数", bo.getH5OrderNums()));
+        list.add(new BillItem("成功交易桌数", bo.getOrderNums()));
+        list.add(new BillItem("平均每桌单价", bo.avgPrice()));
+        list.add(new BillItem("来客数量", bo.getCustomerNums()));
+        list.add(new BillItem("平均每客单价", bo.custAvgPrice()));
+        list.add(new BillItem("午市每客单价", noon.custAvgPrice()));
+        list.add(new BillItem("晚市每客单价", night.custAvgPrice()));
+        list.add(new BillItem("夜宵每客单价", supper.custAvgPrice()));
         return list;
     }
 
-    public List<BillItem> buildStat2(BillBO bo) {
+    public List<BillItem> buildStat2(BillListDO bo) {
         List<BillItem> list = new ArrayList<>();
-        list.add(new BillItem("- 抹零", new Money(bo.totalErasePrice)));
-        list.add(new BillItem("- 店长减免", new Money(bo.totalRedunction)));
-        list.add(new BillItem("- 打折", new Money(bo.totalDiscountPrice)));
-        list.add(new BillItem("- 退菜", new Money(bo.totalReturnPrice)));
-        list.add(new BillItem("- 反结账", new Money(bo.totalRefundPrice)));
-        list.add(new BillItem("- 免单金额", new Money(bo.totalFreePrice)));
-        list.add(new BillItem("- 逃单金额", new Money(bo.totalEscapePrice)));
-        list.add(new BillItem("- 未结账", new Money(bo.totalUnpaidPrice)));
+        list.add(new BillItem("- 抹零", new Money(bo.getTotalErasePrice())));
+        list.add(new BillItem("- 店长减免", new Money(bo.getTotalReductionPrice())));
+        list.add(new BillItem("- 打折", new Money(bo.getTotalDiscountPrice())));
+        list.add(new BillItem("- 退菜", new Money(bo.getTotalReturnPrice())));
+        list.add(new BillItem("- 反结账", new Money(bo.getTotalRefundPrice())));
+        list.add(new BillItem("- 免单金额", new Money(bo.getTotalFreePrice())));
+        list.add(new BillItem("- 逃单金额", new Money(bo.getTotalEscapePrice())));
+        list.add(new BillItem("- 未结账", new Money(bo.getTotalUnpaidPrice())));
         list.add(new BillItem("- 自助差价补齐", "0.00"));
         return list;
     }
 
-    public List<BillItem> buildStat3(BillBO bo) {
+    public List<BillItem> buildStat3(BillListDO bo) {
         List<BillItem> list = new ArrayList<>();
         for (EnumPayMethod payMethod : EnumPayMethod.values()) {
-            list.add(new BillItem("+ " + payMethod.name, new Money(bo.payMethodSummarize.get(payMethod))));
+            Double totalPrice = -1D;
+            ReflectionUtils.PropertyDescriptor totalPricePD = getSumTotalPricePD(BillListDO.class, payMethod);
+            if (totalPricePD != null) {
+                totalPrice = CommonUtils.parseDouble(totalPricePD.readValue(bo), 0D);
+            }
+            list.add(new BillItem("+ " + payMethod.name, new Money(totalPrice)));
         }
         return list;
     }
 
-    public List<BillItem> buildStat4(BillBO bo) {
+    public List<BillItem> buildStat4(BillListDO bo) {
         List<BillItem> list = new ArrayList<>();
         for (EnumPayMethod payMethod : EnumPayMethod.values()) {
             if (payMethod.showActual) {
-                list.add(new BillItem("+ " + payMethod.name + "后台价值", new Money(bo.payMethodActualSummarize.get(payMethod))));
+                Double actualPrice = -1D;
+                ReflectionUtils.PropertyDescriptor actualPricePD = getSumActualPricePD(BillListDO.class, payMethod);
+                if (actualPricePD != null) {
+                    actualPrice = CommonUtils.parseDouble(actualPricePD.readValue(bo), 0D);
+                }
+                list.add(new BillItem("+ " + payMethod.name + "后台价值", new Money(actualPrice)));
             }
         }
         return list;
@@ -262,45 +304,4 @@ public class OrderManageBillView extends SimpleForm {
         String title;
         String value;
     }
-
-    public static class BillBO {
-        int h5OrderNums;
-        // 成功桌数
-        int totalSuccNums;
-        int customerNums;
-        int customerNumsNoon = 0;//午市
-        int customerNumsSupper = 0;//夜宵
-        int customerNumsNight = 0;//晚市
-
-        double totalDue;
-
-        double actualAmount = 0;//实际收入
-        double actualAmountFull = 0;//实际收入
-        double actualAmountNoon = 0;//午市实际收入
-        double actualAmountSupper = 0;//夜宵实际收入
-        double actualAmountNight = 0;//晚市实际收入
-
-        double totalDiscountPrice = 0;//折扣总额
-        double totalErasePrice = 0;//抹零总额
-        double totalReturnPrice = 0;//已退菜总额
-        double totalHadPaidPrice = 0;//已付款总额
-        double totalRefundPrice = 0;//反结账总额
-
-        double totalEscapePrice;
-        int totalEscapeNums;
-
-        double totalFreePrice;
-        int totalFreeNums;
-
-        double totalUnpaidPrice;
-        int totalUnpaidNums;
-
-        double totalRedunction;
-
-        Map<EnumPayMethod, Double> payMethodSummarize = new HashMap<>();
-        Map<EnumPayMethod, Double> payMethodActualSummarize = new HashMap<>();
-
-    }
-
-
 }

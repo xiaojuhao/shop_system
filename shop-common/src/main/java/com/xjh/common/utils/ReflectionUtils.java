@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ReflectionUtils {
     public static List<PropertyDescriptor> getAnnotatedPDs(Class<?> clazz,
-            Class<? extends Annotation> annotationClass) {
+                                                           Class<? extends Annotation> annotationClass) {
         List<PropertyDescriptor> pds = new ArrayList<>();
         Map<String, PropertyDescriptor> map = resolvePD(clazz);
         map.forEach((fieldName, pd) -> {
@@ -108,19 +108,25 @@ public class ReflectionUtils {
         Method read;
         Method write;
 
-        public Object readValue(Object bean) throws Exception {
+        public Object readValue(Object bean) throws RuntimeException {
             if (bean != null && read != null) {
-                return read.invoke(bean);
+                try {
+                    return read.invoke(bean);
+                } catch (Exception ex) {
+                    return new RuntimeException(ex);
+                }
             } else {
                 return null;
             }
         }
 
-        public Object writeValue(Object bean, Object val) throws Exception {
+        public void writeValue(Object bean, Object val) throws RuntimeException {
             if (bean != null && write != null) {
-                return write.invoke(bean, val);
-            } else {
-                return null;
+                try {
+                    write.invoke(bean, val);
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         }
 
