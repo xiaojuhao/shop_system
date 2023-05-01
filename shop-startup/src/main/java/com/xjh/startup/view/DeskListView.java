@@ -58,7 +58,7 @@ public class DeskListView extends ScrollPane{
                 desks.forEach(it -> Platform.runLater(() -> {
                     Desk dd = deskService.getById(it.get().getDeskId());
                     if (dd != null) {
-                        it.set(dd);
+                        it.set(dd.newVer());
                     }
                 }));
                 sleep(1000 - cost.getCost());

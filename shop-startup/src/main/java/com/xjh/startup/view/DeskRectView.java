@@ -60,7 +60,7 @@ public class DeskRectView extends VBox {
             setBackground(this, desKStatus);
             Integer orderId = _new.getOrderId();
 
-            String time = "";
+            String time = "未知";
             LocalDateTime firstSubOrderTime = orderService.firstSubOrderTime(orderId).getData();
             if (firstSubOrderTime != null && desKStatus != EnumDeskStatus.FREE) {
                 long usedSeconds = DateBuilder.intervalSeconds(firstSubOrderTime, LocalDateTime.now());
@@ -170,7 +170,7 @@ public class DeskRectView extends VBox {
     private void paintTime(GraphicsContext gc, double width, double height, String time) {
         gc.save();
         gc.clearRect(0, height - 20, width, 20);
-        gc.setFont(Font.font(12));
+        gc.setFont(Font.font(16));
         gc.setFill(Color.WHITE);
         gc.fillText(time, 10, height - 5);
         gc.restore();
@@ -179,10 +179,10 @@ public class DeskRectView extends VBox {
     private void paintCustNum(GraphicsContext gc, double width, double height, Integer num) {
         gc.save();
         gc.setFill(Color.GRAY);
-        gc.fillOval(width - 20, height - 20, 20, 20);
+        gc.fillOval(width - 25, height - 25, 25, 25);
         gc.setFill(Color.WHITE);
-        gc.setFont(Font.font(11));
-        gc.fillText(num + "", width - 14, height - 6);
+        gc.setFont(Font.font(22));
+        gc.fillText(num + "", width - 18, height - 6);
         gc.restore();
     }
 
