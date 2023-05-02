@@ -16,17 +16,18 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class EntityUtils {
-    public static Entity pureCreate(Class<?> clz) {
+
+    public static String tableName(Class<?> clz) {
         Table table = clz.getAnnotation(Table.class);
-        String tableName = table.value();
-        return Entity.create(tableName);
+        return table.value();
+    }
+
+    public static Entity pureCreate(Class<?> clz) {
+        return Entity.create(tableName(clz));
     }
 
     public static Entity create(Object dd) {
-        Class<?> clz = dd.getClass();
-        Table table = clz.getAnnotation(Table.class);
-        String tableName = table.value();
-        Entity entity = Entity.create(tableName);
+        Entity entity = Entity.create(tableName(dd.getClass()));
         ReflectionUtils.resolvePD(dd.getClass()).values().forEach(pd -> {
             try {
                 Object value = pd.readValue(dd);
@@ -44,10 +45,7 @@ public class EntityUtils {
     }
 
     public static Entity idCond(Object dd) throws SQLException {
-        Class<?> clz = dd.getClass();
-        Table table = clz.getAnnotation(Table.class);
-        String tableName = table.value();
-        Entity entity = Entity.create(tableName);
+        Entity entity = Entity.create(tableName(dd.getClass()));
         AtomicBoolean hasId = new AtomicBoolean(false);
         ReflectionUtils.resolvePD(dd.getClass()).values().forEach(pd -> {
             try {

@@ -29,6 +29,17 @@ public class BillListNightDAO {
         }
     }
 
+    public BillListNightDO save(BillListNightDO dd) throws SQLException {
+        String tableName = EntityUtils.tableName(dd.getClass());
+        if (dd.getDateTime() <= 0) {
+            throw new RuntimeException(tableName + " dateTime值错误");
+        }
+        String sql = "delete from " + tableName + " where dateTime = " + dd.getDateTime();
+        Db.use(ds).execute(sql);
+
+        return insert(dd);
+    }
+
     public BillListNightDO insert(BillListNightDO dd) throws SQLException {
         Long id = Db.use(ds).insertForGeneratedKey(EntityUtils.create(dd));
         dd.setId(id.intValue());
