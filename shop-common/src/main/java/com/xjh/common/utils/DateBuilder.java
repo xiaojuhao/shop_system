@@ -25,6 +25,10 @@ public class DateBuilder {
         return today().plusDays(1);
     }
 
+    public static DateBuilder yestoday() {
+        return today().plusDays(-1);
+    }
+
     public static DateBuilder base(Long mills) {
         DateBuilder builder = new DateBuilder();
         if (mills != null && mills > 0) {
@@ -181,7 +185,7 @@ public class DateBuilder {
 
     public DateBuilder zeroAM() {
         if (this.localDateTime != null) {
-            this.localDateTime = this.localDateTime.withHour(0).withMinute(0).withSecond(0);
+            this.localDateTime = this.localDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0);
         }
         return this;
     }

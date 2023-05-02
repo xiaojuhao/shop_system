@@ -1,11 +1,7 @@
 package com.xjh.dao.mapper;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
+import cn.hutool.db.Db;
+import cn.hutool.db.Entity;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.xjh.common.utils.CommonUtils;
@@ -17,8 +13,11 @@ import com.xjh.dao.foundation.EntityUtils;
 import com.xjh.dao.query.PageQueryOrderReq;
 import com.zaxxer.hikari.HikariDataSource;
 
-import cn.hutool.db.Db;
-import cn.hutool.db.Entity;
+import javax.inject.Inject;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import static com.xjh.common.utils.CommonUtils.firstOf;
 
@@ -32,7 +31,7 @@ public class OrderDAO {
         // return Db.use(ds).insert(EntityUtils.create(order));
         List<Object> keys = Db.use(ds).insertForGeneratedKeys(EntityUtils.create(order));
         Integer key = CommonUtils.parseInt(firstOf(keys), null);
-        if(key == null){
+        if (key == null) {
             return Result.fail("插入Order表失败");
         }
         return Result.success(key);
@@ -105,6 +104,23 @@ public class OrderDAO {
         } catch (Exception ex) {
             ex.printStackTrace();
             return new ArrayList<>();
+        }
+    }
+
+    public Order firstOrderOf(Date fromDate) {
+        try {
+            List<Object> params = new ArrayList<>();
+            if (fromDate == null) {
+                fromDate = DateBuilder.base("2015-01-01").date();
+            }
+            String sql = "select * from order_list where createtime >= ? order by createtime desc limit 1 ";
+            params.add(fromDate.getTime());
+            // System.out.println(sql + ", " + JSON.toJSONString(params));
+            List<Entity> list = Db.use(ds).query(sql, params.toArray(new Object[0]));
+            return CommonUtils.firstOf(EntityUtils.convertList(list, Order.class));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
         }
     }
 
