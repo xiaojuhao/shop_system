@@ -6,3 +6,4 @@ target
 .configs
 logs
 database
+*.log
