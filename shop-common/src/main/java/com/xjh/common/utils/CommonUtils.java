@@ -49,6 +49,13 @@ public class CommonUtils {
         return retList;
     }
 
+    public static <T> HashSet<T> newHashset(T... ts) {
+        if (ts == null) {
+            return new HashSet<>();
+        }
+        return new HashSet<>(Arrays.asList(ts));
+    }
+
     public static <V> List<V> filter(List<V> list, Predicate<V> test) {
         if (list == null || list.size() == 0) {
             return new ArrayList<>();
@@ -756,7 +763,7 @@ public class CommonUtils {
 
     public static void sleep(long millis) {
         try {
-            if(millis <= 0){
+            if (millis <= 0) {
                 millis = 1000;
             }
             Thread.sleep(millis);

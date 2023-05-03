@@ -1,7 +1,12 @@
 package com.xjh.common.utils;
 
-import java.util.Date;
+import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+@Data
 public class DateRange {
     Date from;
     Date end;
@@ -17,6 +22,15 @@ public class DateRange {
         dr.end = end;
         dr.index = from;
         return dr;
+    }
+
+    public List<Date> listDates() {
+        List<Date> dates = new ArrayList<>();
+        DateRange copy = DateRange.of(this.from, this.end);
+        while (copy.hasNext()) {
+            dates.add(copy.nextDay());
+        }
+        return dates;
     }
 
     public boolean hasNext() {

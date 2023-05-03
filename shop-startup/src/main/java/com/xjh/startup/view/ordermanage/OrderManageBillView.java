@@ -6,15 +6,15 @@ import com.xjh.common.utils.CopyUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.ReflectionUtils;
 import com.xjh.common.utils.cellvalue.Money;
-import com.xjh.dao.dataobject.*;
-import com.xjh.dao.mapper.OrderDishesDAO;
-import com.xjh.dao.mapper.OrderPayDAO;
-import com.xjh.dao.mapper.SubOrderDAO;
+import com.xjh.dao.dataobject.BillListDO;
+import com.xjh.dao.dataobject.BillListNightDO;
+import com.xjh.dao.dataobject.BillListNoonDO;
+import com.xjh.dao.dataobject.BillListSupperDO;
 import com.xjh.dao.query.PageQueryOrderReq;
+import com.xjh.service.domain.BillListService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.StoreService;
 import com.xjh.service.domain.model.StoreVO;
-import com.xjh.service.jobs.BillListJob;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SimpleForm;
 import javafx.geometry.Insets;
@@ -30,19 +30,17 @@ import javafx.stage.Window;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-import static com.xjh.service.jobs.BillListJob.getSumActualPricePD;
-import static com.xjh.service.jobs.BillListJob.getSumTotalPricePD;
+import static com.xjh.service.domain.BillListService.getSumActualPricePD;
+import static com.xjh.service.domain.BillListService.getSumTotalPricePD;
 
 public class OrderManageBillView extends SimpleForm {
     static String YYYYMMDD = "yyyy-MM-dd";
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
-    SubOrderDAO subOrderDAO = GuiceContainer.getInstance(SubOrderDAO.class);
-    OrderDishesDAO orderDishesDAO = GuiceContainer.getInstance(OrderDishesDAO.class);
-    OrderPayDAO orderPayDAO = GuiceContainer.getInstance(OrderPayDAO.class);
     StoreService storeService = GuiceContainer.getInstance(StoreService.class);
-    BillListJob billListJob = GuiceContainer.getInstance(BillListJob.class);
+    BillListService billListService = GuiceContainer.getInstance(BillListService.class);
     Window window;
 
     public OrderManageBillView(PageQueryOrderReq cond, Window window) {
@@ -93,22 +91,40 @@ public class OrderManageBillView extends SimpleForm {
 
     private void buildBill(PageQueryOrderReq cond) {
         double quartWidth = window.getWidth() / 4 * 0.95;
-        List<Order> orderList = orderService.pageQuery(cond);
+        List<Date> missedDates = new ArrayList<>();
+        // 已经统计过的值
+        BillListDO statsBO = billListService.queryBillList(cond, missedDates);
+        BillListNoonDO statsNoon = billListService.queryBillListNoon(cond);
+        BillListNightDO statsNight = billListService.queryBillListNight(cond);
+        BillListSupperDO statsSupper = billListService.queryBillListSupper(cond);
 
-        BillListDO bo = new BillListDO();
-        BillListNoonDO noon = new BillListNoonDO();
-        BillListNightDO night = new BillListNightDO();
-        BillListSupperDO supper = new BillListSupperDO();
-        billListJob.sumOrderBill(bo, noon, night, supper, orderList);
+        Date recent30 = DateBuilder.today().plusDays(-30).date();
+        for (Date missed : missedDates) {
+            // 只补偿最近30天的记录
+            if (missed.getTime() < recent30.getTime()) {
+                continue;
+            }
+            try {
+                billListService.doStatistics(missed, (bo, noon, night, supper) -> {
+                    BillListService.mergeWith(statsBO, bo);
+                    BillListService.mergeWith(statsNoon, noon);
+                    BillListService.mergeWith(statsNight, night);
+                    BillListService.mergeWith(statsSupper, supper);
+                });
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+
         HBox line = new HBox();
         line.getChildren().addAll(
-                printCanvas(buildStat1(bo, noon, night, supper), Math.max(quartWidth, 200)),
+                printCanvas(buildStat1(statsBO, statsNoon, statsNight, statsSupper), Math.max(quartWidth, 200)),
                 new Separator(Orientation.VERTICAL),
-                printCanvas(buildStat2(bo), Math.max(quartWidth, 200)),
+                printCanvas(buildStat2(statsBO), Math.max(quartWidth, 200)),
                 new Separator(Orientation.VERTICAL),
-                printCanvas(buildStat3(bo), Math.max(quartWidth, 220)),
+                printCanvas(buildStat3(statsBO), Math.max(quartWidth, 220)),
                 new Separator(Orientation.VERTICAL),
-                printCanvas(buildStat4(bo), Math.max(quartWidth, 300)));
+                printCanvas(buildStat4(statsBO), Math.max(quartWidth, 300)));
         addLine(line);
     }
 

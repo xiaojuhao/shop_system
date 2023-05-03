@@ -11,6 +11,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Singleton
@@ -18,6 +19,20 @@ public class BillListNightDAO {
     @Inject
     @Named("mysql")
     HikariDataSource ds;
+
+    public List<BillListNightDO> selectList(Date start, Date end) {
+        try {
+            String table = EntityUtils.tableName(BillListNightDO.class);
+            String sql = "select * from " + table
+                    + " where dateTime >= " + start.getTime()
+                    + "   and dateTime <= " + end.getTime();
+            List<Entity> list = Db.use(ds).query(sql);
+            return EntityUtils.convertList(list, BillListNightDO.class);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
 
     public List<BillListNightDO> selectList(BillListNightDO cond) {
         try {

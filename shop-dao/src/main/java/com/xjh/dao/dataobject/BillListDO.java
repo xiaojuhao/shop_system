@@ -270,4 +270,6 @@ public class BillListDO {
     public double actualAmountFull() {
         return methodCashTotal + methodBankcardTotal + methodWechatTotal + methodAlipayTotal + actualMeituanTotal + actualKouBeiTotal + actualPackageTotal + actualPublicSignalTotal + actualOtherTotal + methodCouponTotal + actualTinyLifeCouponTotal + actualTinyLifeIntegralDeductionTotal + actualTinyLifeStorecardTotal + methodWechatTotal + actualWandaTotal + actualWandaPackageTotal;
     }
+
+
 }

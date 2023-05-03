@@ -45,6 +45,14 @@ public class DateBuilder {
         return builder;
     }
 
+    public static Date toDate(LocalDate localDate) {
+        return base(localDate).date();
+    }
+
+    public static LocalDate toLocalDate(Date date) {
+        return base(date).dateTime().toLocalDate();
+    }
+
     public static DateBuilder base(LocalDateTime dateTime) {
         DateBuilder builder = new DateBuilder();
         if (dateTime != null) {

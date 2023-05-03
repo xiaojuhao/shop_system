@@ -12,6 +12,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Singleton
@@ -30,6 +31,20 @@ public class BillListDAO {
         BillListDO cond = new BillListDO();
         cond.setDateTime(maxDateTime);
         return CommonUtils.firstOf(selectList(cond));
+    }
+
+    public List<BillListDO> selectList(Date start, Date end) {
+        try {
+            String table = EntityUtils.tableName(BillListDO.class);
+            String sql = "select * from " + table
+                    + " where dateTime >= " + start.getTime()
+                    + "   and dateTime <= " + end.getTime();
+            List<Entity> list = Db.use(ds).query(sql);
+            return EntityUtils.convertList(list, BillListDO.class);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
     public List<BillListDO> selectList(BillListDO cond) {

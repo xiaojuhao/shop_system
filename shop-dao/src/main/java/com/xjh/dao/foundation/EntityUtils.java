@@ -123,13 +123,13 @@ public class EntityUtils {
         if (targetClass == String.class) {
             return entity.getStr(columnName);
         }
-        if (targetClass == Integer.class) {
+        if (targetClass == Integer.class || targetClass == int.class) {
             return entity.getInt(columnName);
         }
-        if (targetClass == Long.class) {
+        if (targetClass == Long.class || targetClass == long.class) {
             return entity.getLong(columnName);
         }
-        if (targetClass == Double.class) {
+        if (targetClass == Double.class || targetClass == double.class) {
             return entity.getDouble(columnName);
         }
         if (targetClass == BigDecimal.class) {
