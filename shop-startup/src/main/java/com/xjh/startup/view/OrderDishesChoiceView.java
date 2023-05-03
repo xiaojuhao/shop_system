@@ -561,7 +561,7 @@ public class OrderDishesChoiceView extends VBox {
 
     private ImageView getImageView(String path, double width) {
         try {
-            Logger.info("展示图片: " + path + ", " + width);
+            // Logger.info("展示图片: " + path + ", " + width);
             ImageView iv = buildImageView(path);
             assert iv != null;
             iv.setFitWidth(width);
