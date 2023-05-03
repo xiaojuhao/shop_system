@@ -95,7 +95,7 @@ public class Logger {
     private static FileWriter getHomerWriter() {
         try {
             String workDir = userHomeDir().getAbsolutePath();
-            String fileName = "common-" + DateBuilder.today().format("yyyy-MM-dd") + ".log";
+            String fileName = "common." + DateBuilder.today().format("yyyyMMdd") + ".log";
             File logDir = new File(workDir + "/logs/");
             if (!logDir.exists()) {
                 if (!logDir.mkdirs()) {
