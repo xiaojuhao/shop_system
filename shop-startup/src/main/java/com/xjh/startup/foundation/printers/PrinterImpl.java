@@ -71,7 +71,7 @@ public class PrinterImpl implements Printer {
                 printerStatus = StatusUtil.checkDetailedStatus(inputData);
             }
         } catch (IOException ex) {
-            printerStatus = StatusUtil.SOCKET_TIMEOUT;
+            printerStatus = PrinterStatus.SOCKET_TIMEOUT.status;
         }
         return printerStatus;
     }
@@ -83,7 +83,7 @@ public class PrinterImpl implements Printer {
             } catch (Exception ex) {
                 ex.printStackTrace();
                 PrintResult fail = new PrintResult(this, contentItems);
-                fail.toFailure(StatusUtil.UNKNOWN);
+                fail.toFailure(PrinterStatus.UNKNOWN.status);
                 return fail;
             }
         });
@@ -150,18 +150,18 @@ public class PrinterImpl implements Printer {
                         len = inputStream.read(inputData);
                     } catch (java.net.SocketTimeoutException e) {
                         openPreventLost(outputStream);
-                        printResult.toFailure(StatusUtil.DATA_READ_TIMEOUT);
+                        printResult.toFailure(PrinterStatus.DATA_READ_TIMEOUT.status);
                         break;
                     }
                     dataRead = PrinterCmdUtil.byteMerger(dataRead, inputData);
 
                     if (StatusUtil.checkStatus(inputData)) {
-                        if (StatusUtil.checkDetailedStatus(inputData) == StatusUtil.PRINTING) {
+                        if (StatusUtil.checkDetailedStatus(inputData) == PrinterStatus.PRINTING.status) {
                             printingFlag = true;
                         }
-                        if (StatusUtil.checkDetailedStatus(inputData) == StatusUtil.NORMAL && printingFlag) {
+                        if (StatusUtil.checkDetailedStatus(inputData) == PrinterStatus.NORMAL.status && printingFlag) {
                             successFlag = true;
-                            printResult.toSuccess(StatusUtil.NORMAL);
+                            printResult.toSuccess(PrinterStatus.NORMAL.status);
                         }
                     } else {
                         int resultCode = StatusUtil.checkDetailedStatus(inputData);
@@ -181,13 +181,13 @@ public class PrinterImpl implements Printer {
             Logger.info("打印出错了 .......");
             e.printStackTrace();
             printResult.setSuccess(false);
-            if (printResult.getResultCode() == StatusUtil.INIT) {
-                printResult.setResultCode(StatusUtil.SOCKET_TIMEOUT);
+            if (printResult.getResultCode() == PrinterStatus.INIT.status) {
+                printResult.setResultCode(PrinterStatus.SOCKET_TIMEOUT.status);
             }
             return printResult;
         } catch (Exception e) {
             e.printStackTrace();
-            printResult.toFailure(StatusUtil.UNKNOWN);
+            printResult.toFailure(PrinterStatus.UNKNOWN.status);
         }
         ////////////////////事件处理////////////////////
         return printResult;
@@ -247,9 +247,7 @@ public class PrinterImpl implements Printer {
                 PrinterCmdUtil.fontSizeSetBig(model.getSize()), // 设置字体大小
                 PrinterCmdUtil.printText(model.getSampleContent()), // 打印内容
                 PrinterCmdUtil.fontSizeSetBig(1), // 恢复字体大小
-                PrinterCmdUtil.printSpace(model.getBehindLen()),
-                PrinterCmdUtil.nextLine(model.getBehindEnterNum())
-        };
+                PrinterCmdUtil.printSpace(model.getBehindLen()), PrinterCmdUtil.nextLine(model.getBehindEnterNum())};
         outputStream.write(PrinterCmdUtil.byteMerger(byteList));
         outputStream.flush();
     }

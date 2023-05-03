@@ -34,14 +34,6 @@ public class StatusUtil {
     private static final byte b36 = 64;
     //打印机会返回四个字节，这些字节中可能出错的位
 
-    public static final int PRINTING = 0; // 打印中
-    public static final int NORMAL = 1; // 正常
-    public static final int NO_PAPER = 2; // 缺纸
-    public static final int TRAPPED_PAPER = 3; // 卡纸
-    public static final int UNKNOWN = 4;// 未知
-    public static final int SOCKET_TIMEOUT = 5; // 打印机离线超时
-    public static final int DATA_READ_TIMEOUT = 6; // 读取打印机返回字节超时
-    public static final int INIT = 7; // 打印机结果刚new出来的初始状态
 
     /**
      * 判断打印机返回的状态是否正常
@@ -64,15 +56,15 @@ public class StatusUtil {
         byte d2 = data[2];
         byte d3 = data[3];
         if (Arrays.equals(PRINTER_STATUS_NORMAL, data)) {
-            return NORMAL;
+            return PrinterStatus.NORMAL.status;
         } else if (Arrays.equals(PRINTER_STATUS_PRINTING, data)) {
-            return PRINTING;
+            return PrinterStatus.PRINTING.status;
         } else if (byteAndEqual(d2, b223)) {
-            return NO_PAPER;
+            return PrinterStatus.NO_PAPER.status;
         } else if (byteAndEqual(d1, b15)) {
-            return TRAPPED_PAPER;
+            return PrinterStatus.TRAPPED_PAPER.status;
         } else {
-            return UNKNOWN;
+            return PrinterStatus.UNKNOWN.status;
         }
     }
 
@@ -85,11 +77,7 @@ public class StatusUtil {
      */
     public static boolean byteAndEqual(byte a, byte b) {
         byte result = (byte) (a & b);
-        if (result == b) {
-            return true;
-        } else {
-            return false;
-        }
+        return result == b;
     }
 
 }

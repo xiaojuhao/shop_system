@@ -17,7 +17,7 @@ public class PrintResult {
     private Printer printer;
     private List<Object> printDataList;
     private boolean isSuccess;
-    private int resultCode = StatusUtil.INIT;
+    private int resultCode = PrinterStatus.INIT.status;
 
     public PrintResult(Printer printer, List<Object> printDataList) {
         this.printer = printer;
