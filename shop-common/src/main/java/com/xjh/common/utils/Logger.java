@@ -1,13 +1,14 @@
 package com.xjh.common.utils;
 
-import com.xjh.common.store.SysConfigUtils;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static com.xjh.common.store.DirUtils.userHomeDir;
+import static com.xjh.common.store.DirUtils.workDir;
 
 public class Logger {
     private static AtomicLong counter = new AtomicLong();
@@ -33,14 +34,28 @@ public class Logger {
         append("ERROR", msg);
     }
 
-    public static void exiting(){
+    public static void logToHome(String msg) {
+        if (homeLogger == null) {
+            System.out.println("HomeWriter缺失，打印到标准输出");
+            System.out.println(msg);
+        }
+        try {
+            System.out.println(msg);
+            homeLogger.append(msg);
+            homeLogger.flush();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static void exiting() {
         exiting.set(true);
-        doFlush(logWriter);
+        doFlush(workDirWriter);
     }
 
     private static void append(String level, String msg) {
         try {
-            if (logWriter == null) {
+            if (workDirWriter == null) {
                 return;
             }
             String time = DateBuilder.now().format("yyyy-MM-dd HH:mm:ss");
@@ -50,24 +65,46 @@ public class Logger {
                 log.append(CurrentRequest.requestId()).append(" >> ");
             }
             log.append(msg).append("\r\n");
-            logWriter.append(log);
+            workDirWriter.append(log);
             counter.incrementAndGet();
-            if(exiting.get()){
-                doFlush(logWriter);
+            if (exiting.get()) {
+                doFlush(workDirWriter);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    static FileWriter logWriter = getWriter();
+    static FileWriter homeLogger = getHomerWriter();
 
-    private static FileWriter getWriter() {
+    static FileWriter workDirWriter = getWorkDirWriter();
+
+
+    private static FileWriter getWorkDirWriter() {
         try {
-            String workDir = SysConfigUtils.getWorkDir();
+            String workDir = workDir();
             if (CommonUtils.isBlank(workDir)) {
-                workDir = SysConfigUtils.userHomeDir().getAbsolutePath();
+                workDir = userHomeDir().getAbsolutePath();
             }
+            String fileName = "common-" + DateBuilder.today().format("yyyy-MM-dd") + ".log";
+            File logDir = new File(workDir + "/logs/");
+            if (!logDir.exists()) {
+                if (!logDir.mkdirs()) {
+                    System.out.println("创建日志目录失败");
+                }
+            }
+            FileWriter writer = new FileWriter(new File(logDir, fileName), true);
+            flushInSchedule(writer);
+            return writer;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    private static FileWriter getHomerWriter() {
+        try {
+            String workDir = userHomeDir().getAbsolutePath();
             String fileName = "common-" + DateBuilder.today().format("yyyy-MM-dd") + ".log";
             File logDir = new File(workDir + "/logs/");
             if (!logDir.exists()) {

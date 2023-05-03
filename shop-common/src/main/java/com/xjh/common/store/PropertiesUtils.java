@@ -1,18 +1,20 @@
 package com.xjh.common.store;
 
+import com.xjh.common.utils.AlertBuilder;
+import com.xjh.common.utils.CommonUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.util.Properties;
 
-import com.xjh.common.utils.AlertBuilder;
-import com.xjh.common.utils.CommonUtils;
+import static com.xjh.common.store.DirUtils.workDir;
 
 public class PropertiesUtils {
 
     public static Properties loadFromWorkDir(String fileName) {
-        String workDir = SysConfigUtils.getWorkDir();
+        String workDir = workDir();
         if (CommonUtils.isBlank(workDir)) {
             AlertBuilder.ERROR("异常", "工作目录未设置");
             throw new RuntimeException("工作目录未设置");

@@ -1,21 +1,8 @@
 package com.xjh.startup.view;
 
-import static com.xjh.common.enumeration.EnumPropName.DB_DRIVER;
-import static com.xjh.common.enumeration.EnumPropName.DB_PASSWORD;
-import static com.xjh.common.enumeration.EnumPropName.DB_URL;
-import static com.xjh.common.enumeration.EnumPropName.DB_USERNAME;
-import static com.xjh.common.enumeration.EnumPropName.WORK_DIR;
-import static com.xjh.common.utils.CommonUtils.isBlank;
-import static com.xjh.common.utils.CommonUtils.trim;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
 import com.xjh.common.store.SysConfigUtils;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -24,6 +11,15 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+import static com.xjh.common.enumeration.EnumPropName.*;
+import static com.xjh.common.store.DirUtils.workDir;
+import static com.xjh.common.utils.CommonUtils.isBlank;
+import static com.xjh.common.utils.CommonUtils.trim;
 
 public class SysConfigView extends GridPane {
     public SysConfigView() {
@@ -64,7 +60,7 @@ public class SysConfigView extends GridPane {
         int row = 0;
         row++;
         TextField workDir = new TextField();
-        workDir.setText(SysConfigUtils.getWorkDir());
+        workDir.setText(workDir());
         workDir.setPrefWidth(450);
         this.add(new Label("工作目录："), 0, row);
         this.add(workDir, 1, row);
