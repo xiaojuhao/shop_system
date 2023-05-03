@@ -561,12 +561,14 @@ public class OrderDishesChoiceView extends VBox {
 
     private ImageView getImageView(String path, double width) {
         try {
+            Logger.info("展示图片: " + path + ", " + width);
             ImageView iv = buildImageView(path);
             assert iv != null;
             iv.setFitWidth(width);
             iv.setFitHeight(width / 3 * 2);
             return iv;
         } catch (Exception ex) {
+            Logger.info("展示图片异常: " + ex.getMessage() + "," + path);
             ImageView iv = buildImageView("/img/logo.png");
             assert iv != null;
             iv.setFitWidth(width);

@@ -37,30 +37,39 @@ public class ImageHelper {
         return getImageDir(workDir());
     }
 
-    public static String getImageDir(String dir) {
+    private static String getImageDir(String dir) {
         return dir + "/images/";
     }
 
-    public static String getImageUrl(String url) {
+    private static File getImageUrl(String url) {
         if (CommonUtils.isBlank(url)) {
-            url = "/img/book1.jpg";
+            return null;
         }
-        String path = "file:" + getImageDir() + url.replaceAll("\\\\", "/");
+        String path = getImageDir() + url.replaceAll("\\\\", "/");
         File file = new File(path);
         Logger.info("图片路劲:" + file.exists() + ", " + path);
         if (!file.exists()) {
             Properties runtimeProp = SysConfigUtils.loadRuntimeProperties();
-            path = "file:" + getImageDir(runtimeProp.getProperty("work_dir")) + url.replaceAll("\\\\", "/");
+            path = getImageDir(runtimeProp.getProperty("work_dir")) + url.replaceAll("\\\\", "/");
             file = new File(path);
-            Logger.info("图片路劲(备份):" + file.exists() + ", " + path);
+            Logger.info("图片路劲(备份):" + file.exists() + "," + path);
         }
-        return path;
+        return file;
     }
 
     public static ImageView buildImageView(String imgUrl) {
         if (CommonUtils.isBlank(imgUrl)) {
             return null;
         }
-        return new ImageView(new Image(getImageUrl(imgUrl)));
+        File imageFile = getImageUrl(imgUrl);
+        if (imageFile == null || !imageFile.exists()) {
+            return null;
+        }
+        try {
+            return new ImageView(new Image("file:" + imageFile.getAbsolutePath()));
+        } catch (Exception ex) {
+            Logger.info("解析图片错误: " + ex.getMessage() + ", " + imageFile.getAbsolutePath());
+            return null;
+        }
     }
 }

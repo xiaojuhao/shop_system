@@ -4,3 +4,5 @@ target
 *.iml
 .config
 .configs
+logs
+database
