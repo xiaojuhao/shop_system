@@ -64,6 +64,7 @@ public class XjhWebSocketServer extends WebSocketServer {
 
     @Override
     public void onOpen(WebSocket ws, ClientHandshake clientHandshake) {
+        tryInitHandlers();
         JSONObject resp = handlers.get("socketOpen").handle(ws, null);
         String uuid = CommonUtils.randomStr(10);
         ws.setAttachment(uuid);
