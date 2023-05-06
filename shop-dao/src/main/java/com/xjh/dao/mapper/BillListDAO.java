@@ -28,6 +28,9 @@ public class BillListDAO {
             return null;
         }
         Long maxDateTime = list.get(0).getLong("maxDateTime");
+        if(maxDateTime == null){
+            return null;
+        }
         BillListDO cond = new BillListDO();
         cond.setDateTime(maxDateTime);
         return CommonUtils.firstOf(selectList(cond));
@@ -72,12 +75,5 @@ public class BillListDAO {
         Long id = Db.use(ds).insertForGeneratedKey(EntityUtils.create(dd));
         dd.setId(id.intValue());
         return dd;
-    }
-
-    public int insertList(List<BillListDO> list) throws SQLException {
-        for (BillListDO dd : list) {
-            insert(dd);
-        }
-        return 1;
     }
 }

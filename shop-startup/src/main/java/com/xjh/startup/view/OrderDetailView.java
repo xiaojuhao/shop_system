@@ -18,6 +18,7 @@ import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.foundation.printers.OrderPrinterHelper;
 import com.xjh.startup.foundation.printers.PrintResult;
 import com.xjh.startup.foundation.printers.PrinterImpl;
+import com.xjh.startup.foundation.printers.PrinterStatus;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.MediumForm;
 import com.xjh.startup.view.base.SmallForm;
@@ -509,6 +510,15 @@ public class OrderDetailView extends VBox implements Initializable {
             List<Object> printData = orderPrinterHelper.buildOrderPrintData(param);
             PrintResult rs = printer.print(printData, true);
             Logger.info(JSON.toJSONString(rs));
+            if (!rs.isSuccess()) {
+                PrinterStatus sts = PrinterStatus.of(rs.getResultCode());
+                if (sts == PrinterStatus.UNKNOWN) {
+                    AlertBuilder.ERROR("打印机配置错误,请检查4");
+                } else {
+                    AlertBuilder.ERROR(sts.remark);
+                }
+
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {

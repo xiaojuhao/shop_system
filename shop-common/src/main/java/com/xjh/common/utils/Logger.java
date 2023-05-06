@@ -11,22 +11,12 @@ import static com.xjh.common.store.DirUtils.userHomeDir;
 import static com.xjh.common.store.DirUtils.workDir;
 
 public class Logger {
-    private static AtomicLong counter = new AtomicLong();
-    private static AtomicBoolean exiting = new AtomicBoolean(false);
+    private static final AtomicLong counter = new AtomicLong();
+    private static final AtomicBoolean exiting = new AtomicBoolean(false);
 
     public static void info(String msg) {
         System.out.println("INFO:" + msg);
         append("INFO", msg);
-    }
-
-    public static void trace(String msg) {
-        System.out.println("TRACE:" + msg);
-        append("TRACE", msg);
-    }
-
-    public static void warn(String msg) {
-        System.err.println("WARN:" + msg);
-        append("WARN", msg);
     }
 
     public static void error(String msg) {
@@ -86,7 +76,7 @@ public class Logger {
             if (CommonUtils.isBlank(workDir)) {
                 workDir = userHomeDir().getAbsolutePath();
             }
-            String fileName = "common-" + DateBuilder.today().format("yyyy-MM-dd") + ".log";
+            String fileName = "shopsystem." + DateBuilder.today().format("yyyyMMdd") + ".log";
             File logDir = new File(workDir + "/logs/");
             if (!logDir.exists()) {
                 if (!logDir.mkdirs()) {
@@ -105,7 +95,7 @@ public class Logger {
     private static FileWriter getHomerWriter() {
         try {
             String workDir = userHomeDir().getAbsolutePath();
-            String fileName = "common-" + DateBuilder.today().format("yyyy-MM-dd") + ".log";
+            String fileName = "common." + DateBuilder.today().format("yyyyMMdd") + ".log";
             File logDir = new File(workDir + "/logs/");
             if (!logDir.exists()) {
                 if (!logDir.mkdirs()) {

@@ -17,12 +17,6 @@ public class BillListJob {
     @Inject
     BillListDAO billListDAO;
     @Inject
-    BillListNoonDAO billListNoonDAO;
-    @Inject
-    BillListNightDAO billListNightDAO;
-    @Inject
-    BillListSupperDAO billListSupperDAO;
-    @Inject
     OrderDAO orderDAO;
     @Inject
     BillListService billListService;
@@ -32,6 +26,7 @@ public class BillListJob {
         try {
             doJob();
         } catch (Exception ex) {
+            ex.printStackTrace();
             Logger.error("BillListJob >> " + ex.getMessage());
         }
     }
@@ -42,7 +37,8 @@ public class BillListJob {
         if (newest != null) {
             start = new Date(newest.getDateTime());
         } else {
-            Order order = orderDAO.firstOrderOf(null);
+            Date recent30 = DateBuilder.today().plusDays(-30).date();
+            Order order = orderDAO.firstOrderOf(recent30);
             if (order != null) {
                 start = new Date(order.getCreateTime());
             }

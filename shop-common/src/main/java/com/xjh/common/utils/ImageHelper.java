@@ -47,12 +47,12 @@ public class ImageHelper {
         }
         String path = getImageDir() + url.replaceAll("\\\\", "/");
         File file = new File(path);
-        Logger.info("图片路劲:" + file.exists() + ", " + path);
+        //Logger.info("图片路劲:" + file.exists() + ", " + path);
         if (!file.exists()) {
             Properties runtimeProp = SysConfigUtils.loadRuntimeProperties();
             path = getImageDir(runtimeProp.getProperty("work_dir")) + url.replaceAll("\\\\", "/");
             file = new File(path);
-            Logger.info("图片路劲(备份):" + file.exists() + "," + path);
+            //Logger.info("图片路劲(备份):" + file.exists() + "," + path);
         }
         return file;
     }

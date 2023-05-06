@@ -111,9 +111,9 @@ public class OrderDAO {
         try {
             List<Object> params = new ArrayList<>();
             if (fromDate == null) {
-                fromDate = DateBuilder.base("2015-01-01").date();
+                fromDate = DateBuilder.today().plusDays(-30).date();
             }
-            String sql = "select * from order_list where createtime >= ? order by createtime desc limit 1 ";
+            String sql = "select * from order_list where createtime >= ? order by createtime asc limit 1 ";
             params.add(fromDate.getTime());
             // System.out.println(sql + ", " + JSON.toJSONString(params));
             List<Entity> list = Db.use(ds).query(sql, params.toArray(new Object[0]));
