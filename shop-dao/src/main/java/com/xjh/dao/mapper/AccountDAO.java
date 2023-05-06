@@ -1,11 +1,7 @@
 package com.xjh.dao.mapper;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
+import cn.hutool.db.Db;
+import cn.hutool.db.Entity;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.xjh.common.utils.CommonUtils;
@@ -13,8 +9,10 @@ import com.xjh.dao.dataobject.Account;
 import com.xjh.dao.foundation.EntityUtils;
 import com.zaxxer.hikari.HikariDataSource;
 
-import cn.hutool.db.Db;
-import cn.hutool.db.Entity;
+import javax.inject.Inject;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Singleton
 public class AccountDAO {
@@ -28,6 +26,16 @@ public class AccountDAO {
         }
         Account cond = new Account();
         cond.setAccountUser(userName);
+        List<Account> desks = selectList(cond);
+        return desks.stream().findFirst().orElse(null);
+    }
+
+    public Account getByAccountId(Integer accountId) {
+        if (accountId == null) {
+            return null;
+        }
+        Account cond = new Account();
+        cond.setAccountId(accountId);
         List<Account> desks = selectList(cond);
         return desks.stream().findFirst().orElse(null);
     }
