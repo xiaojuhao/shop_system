@@ -9,10 +9,12 @@ import com.xjh.ws.WsHandler;
 import org.java_websocket.WebSocket;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.security.auth.login.AccountNotFoundException;
 import java.sql.SQLException;
 
 @WsApiType("API_TYPE_LOGIN")
+@Singleton
 public class LoginHandler implements WsHandler {
     public static final String TRANSFER_STATION_IN_USER_NAME = "localServerIn";//这个账号用于h5用户登陆，不能删除
     public static final String LOCAL_SERVER_OUT_OTHER_PLACE = "LOCAL_SERVER_OUT_OTHER_PLACE";//另外一个本地服务器启动了

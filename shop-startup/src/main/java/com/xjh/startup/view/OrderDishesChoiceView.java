@@ -106,8 +106,7 @@ public class OrderDishesChoiceView extends VBox {
         // 按名称搜索
         hbox.getChildren().add(new Label("菜品名称:"));
         TextField dishesNameField = new TextField();
-        dishesNameField.focusedProperty().addListener((_obs, _old, _new) ->
-                qryDishesCond.get().setDishesName(dishesNameField.getText()));
+        dishesNameField.focusedProperty().addListener((_obs, _old, _new) -> qryDishesCond.get().setDishesName(dishesNameField.getText()));
         hbox.getChildren().add(dishesNameField);
 
         // 菜品类型
@@ -314,8 +313,12 @@ public class OrderDishesChoiceView extends VBox {
     private Result<String> sendDishes(DishesChoiceItemBO bo) {
         SendOrderRequest req = new SendOrderRequest();
         CopyUtils.copy(bo, req);
-        cartService.createSendOrder(req);
-        return Result.success("赠送成功");
+        Result<String> rs = cartService.createSendOrder(req);
+        if (rs.isSuccess()) {
+            return Result.success("赠送成功");
+        } else {
+            return rs;
+        }
     }
 
     private void openPackageAddDialog(DishesChoiceItemBO bo) {
@@ -368,8 +371,7 @@ public class OrderDishesChoiceView extends VBox {
                 optionBox.getChildren().addAll(radios);
                 collectActions.add(() -> {
                     String udata = (String) group.getSelectedToggle().getUserData();
-                    attr.setSelectedAttributeValues(
-                            getSelectedAttr(attr.getAllAttributeValues(), Lists.newArrayList(udata)));
+                    attr.setSelectedAttributeValues(getSelectedAttr(attr.getAllAttributeValues(), Lists.newArrayList(udata)));
                 });
             }
             // 复选框
@@ -402,8 +404,7 @@ public class OrderDishesChoiceView extends VBox {
             ToggleGroup group = new ToggleGroup();
             List<RadioButton> radios = new ArrayList<>();
             priceList.forEach(price -> {
-                RadioButton radio = new RadioButton(
-                        price.getDishesPriceName() + ": " + price.getDishesPrice() + "元/份");
+                RadioButton radio = new RadioButton(price.getDishesPriceName() + ": " + price.getDishesPrice() + "元/份");
                 radio.setToggleGroup(group);
                 radio.setUserData(price);
                 radios.add(radio);
@@ -466,12 +467,7 @@ public class OrderDishesChoiceView extends VBox {
     }
 
     private void addDishesToCart(DishesChoiceItemBO bo, List<DishesAttributeVO> dishesAttrs) {
-        Logger.info("添加到购物车," +
-                "DishesId=" + bo.getDishesId() + "," +
-                "PackageId=" + bo.getDishesPackageId() + "," +
-                bo.getDishesName() + ", " +
-                (bo.getIfPackage() == 0 ? "普通菜品" : "套餐")
-                + CommonUtils.reflectString(param));
+        Logger.info("添加到购物车," + "DishesId=" + bo.getDishesId() + "," + "PackageId=" + bo.getDishesPackageId() + "," + bo.getDishesName() + ", " + (bo.getIfPackage() == 0 ? "普通菜品" : "套餐") + CommonUtils.reflectString(param));
         CartItemVO cartItem = new CartItemVO();
         cartItem.setCartDishesId(CommonUtils.randomNumber(0, Integer.MAX_VALUE));
         if (bo.getIfPackage() == 1) {
@@ -578,11 +574,7 @@ public class OrderDishesChoiceView extends VBox {
     }
 
     private List<String> collectValue(List<CheckBox> cbs) {
-        return cbs.stream().filter(CheckBox::isSelected)
-                .map(Node::getUserData)
-                .filter(Objects::nonNull)
-                .map(Object::toString)
-                .collect(Collectors.toList());
+        return cbs.stream().filter(CheckBox::isSelected).map(Node::getUserData).filter(Objects::nonNull).map(Object::toString).collect(Collectors.toList());
     }
 
     @Override

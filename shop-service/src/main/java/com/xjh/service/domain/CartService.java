@@ -2,6 +2,7 @@ package com.xjh.service.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -57,8 +58,6 @@ public class CartService {
     @Inject
     DeskService deskService;
     @Inject
-    SubOrderService subOrderService;
-    @Inject
     DishesPriceDAO dishesPriceDAO;
 
     public Result<CartVO> addItem(Integer deskId, CartItemVO item) {
@@ -74,7 +73,19 @@ public class CartService {
             CartVO cart = new CartVO();
             cart.setDeskId(deskId);
             List<CartItemVO> contentItems = getCartItems(deskId);
-            contentItems.add(item);
+            boolean merged = false;
+            // 如果购物车里面已经存在了菜品，则合并
+            for(CartItemVO it : contentItems){
+                if(Objects.equals(it.getDishesId(), item.getDishesId())){
+                    it.setNums(it.getNums() + item.getNums());
+                    merged = true;
+                    break;
+                }
+            }
+            // 新菜品，添加新的记录
+            if(!merged) {
+                contentItems.add(item);
+            }
             cart.setContents(contentItems);
             Result<String> rs = CartStore.saveCart(cart);
             if (!rs.isSuccess()) {
