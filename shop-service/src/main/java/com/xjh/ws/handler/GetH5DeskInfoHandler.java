@@ -17,6 +17,8 @@ import com.xjh.ws.WsHandler;
 @Singleton
 @WsApiType("h5DeskInfo")
 public class GetH5DeskInfoHandler implements WsHandler {
+    static int SUCCESS = 0;
+    static int FAIL = 1;
     @Inject
     DeskService deskService;
 
@@ -29,32 +31,31 @@ public class GetH5DeskInfoHandler implements WsHandler {
         //提供桌名，temKey。服务器进行判断。
         String deskName = msg.getString("deskName");
 
-
         try {
             Result<Desk> oneDeskRs = deskService.getByName(deskName);
             if (!oneDeskRs.isSuccess()) {
-                jSONObjectReturn.put("status", 1);
+                jSONObjectReturn.put("status", FAIL);
                 jSONObjectReturn.put("msg", oneDeskRs.getMsg());
                 return jSONObjectReturn;
             }
             Desk oneDesk = oneDeskRs.getData();
             EnumDeskStatus status = EnumDeskStatus.of(oneDesk.getStatus());
             if (EnumDeskPhysicalStatus.of(oneDesk.getPhysicalStatus()) == EnumDeskPhysicalStatus.DISABLE) {
-                jSONObjectReturn.put("status", 1);
+                jSONObjectReturn.put("status", FAIL);
                 jSONObjectReturn.put("msg", "桌子被禁用!");
             } else if (status == EnumDeskStatus.FREE) {
-                jSONObjectReturn.put("status", 1);
+                jSONObjectReturn.put("status", FAIL);
                 jSONObjectReturn.put("msg", "还未开台，请联系服务员！");
             } else if (status == EnumDeskStatus.PRESERVED) {
-                jSONObjectReturn.put("status", 1);
+                jSONObjectReturn.put("status", FAIL);
                 jSONObjectReturn.put("msg", "桌子预约中...");
             } else {
-                jSONObjectReturn.put("status", 0);
+                jSONObjectReturn.put("status", SUCCESS);
                 jSONObjectReturn.put("useStatus", status.status());
                 jSONObjectReturn.put("deskIdDb", oneDesk.getDeskId());
             }
         } catch (Exception ex) {
-            jSONObjectReturn.put("status", 1);
+            jSONObjectReturn.put("status", FAIL);
             jSONObjectReturn.put("msg", "未知错误!");
         }
         return jSONObjectReturn;
