@@ -50,7 +50,7 @@ public class GetH5DeskInfoHandler implements WsHandler {
                 jSONObjectReturn.put("msg", "桌子预约中...");
             } else {
                 jSONObjectReturn.put("status", 0);
-                jSONObjectReturn.put("useStatus", status.remark());
+                jSONObjectReturn.put("useStatus", status.status());
                 jSONObjectReturn.put("deskIdDb", oneDesk.getDeskId());
             }
         } catch (Exception ex) {
