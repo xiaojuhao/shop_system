@@ -572,7 +572,7 @@ public class OrderDetailView extends VBox implements Initializable {
 
     private String buildDishesName(Dishes dishes, OrderDishes orderDishes) {
         if (orderDishes.getIfDishesPackage() == 1) {
-            DishesPackage pkg = dishesPackageService.getById(orderDishes.getDishesId());
+            DishesPackage pkg = dishesPackageService.getByDishesPackageId(orderDishes.getDishesId());
             if (pkg != null) {
                 return "(套餐)" + pkg.getDishesPackageName();
             }

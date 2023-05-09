@@ -14,11 +14,11 @@ public class DishesPackageService {
     @Inject
     DishesPackageDAO dishesPackageDAO;
 
-    public DishesPackage getById(Integer id) {
+    public DishesPackage getByDishesPackageId(Integer id) {
         if (id == null) {
             return null;
         }
-        return dishesPackageDAO.getById(id);
+        return dishesPackageDAO.getByDishesPackageId(id);
     }
 
     public List<DishesPackage> selectList(DishesPackage cond) {

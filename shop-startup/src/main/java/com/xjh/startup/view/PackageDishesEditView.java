@@ -63,7 +63,7 @@ public class PackageDishesEditView extends SimpleGridForm {
     RichText NOT_MAIN = RichText.create("否").with(Color.BLACK);
 
     public PackageDishesEditView(DishesPackage param) {
-        dishesPackage = dishesPackageService.getById(param.getDishesPackageId());
+        dishesPackage = dishesPackageService.getByDishesPackageId(param.getDishesPackageId());
         if (dishesPackage == null) {
             dishesPackage = new DishesPackage();
         }

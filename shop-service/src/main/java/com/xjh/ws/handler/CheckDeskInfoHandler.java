@@ -131,12 +131,12 @@ public class CheckDeskInfoHandler implements WsHandler {
                         if (orderDishes.getIfDishesPackage() == 1) {
                             jSONObjectOrderDishes.put("type", "dishesPackage");
                             jSONObjectOrderDishes.put("dishesPackageId", dishesId);
-                            DishesPackage dishesPackage = dishesPackageService.getById(orderDishes.getDishesId());
+                            DishesPackage dishesPackage = dishesPackageService.getByDishesPackageId(orderDishes.getDishesId());
                             jSONObjectOrderDishes.put("dishesPackageName", dishesPackage.getDishesPackageName());
                         } else if (orderDishes.getIfDishesPackage() == 2) {
                             jSONObjectOrderDishes.put("type", "dishesPackage");
                             jSONObjectOrderDishes.put("dishesPackageId", dishesId);
-                            DishesPackage dishesPackage = dishesPackageService.getById(orderDishes.getDishesId());
+                            DishesPackage dishesPackage = dishesPackageService.getByDishesPackageId(orderDishes.getDishesId());
                             jSONObjectOrderDishes.put("dishesPackageName", dishesPackage.getDishesPackageName());
                         } else {
                             jSONObjectOrderDishes.put("type", "dishes");

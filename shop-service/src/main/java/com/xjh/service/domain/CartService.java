@@ -1,5 +1,7 @@
 package com.xjh.service.domain;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -9,16 +11,8 @@ import javax.inject.Singleton;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.xjh.common.enumeration.EnumDeskStatus;
-import com.xjh.common.enumeration.EnumOrderSaleType;
-import com.xjh.common.enumeration.EnumOrderStatus;
-import com.xjh.common.enumeration.EnumSubOrderType;
-import com.xjh.common.utils.CurrentAccount;
-import com.xjh.common.utils.CurrentRequest;
-import com.xjh.common.utils.DateBuilder;
-import com.xjh.common.utils.Logger;
-import com.xjh.common.utils.OrElse;
-import com.xjh.common.utils.Result;
+import com.xjh.common.enumeration.*;
+import com.xjh.common.utils.*;
 import com.xjh.common.valueobject.CartItemVO;
 import com.xjh.common.valueobject.CartVO;
 import com.xjh.dao.dataobject.Desk;
@@ -103,7 +97,7 @@ public class CartService {
         }
     }
 
-    public void notifyFront(Integer deskId){
+    public void notifyFront(Integer deskId) {
         CartVO cart = new CartVO();
         cart.setDeskId(deskId);
         List<CartItemVO> contentItems = getCartItems(deskId);
@@ -112,7 +106,7 @@ public class CartService {
         JSONObject notify = new JSONObject();
         notify.put("API_TYPE", "cartAddOneRecord");
         notify.put("dishesAttribute", new JSONObject());
-        notify.put("totalPrice", cart.sumDishesNum() * 1.2);
+        notify.put("totalPrice", sumCartPrice(cart));
         notify.put("cartDishesId", cart.getId());
         notify.put("num", cart.sumDishesNum());
         notify.put("dishesPriceId", 0);
@@ -263,6 +257,9 @@ public class CartService {
                 updateDesk.setDeskId(order.getDeskId());
                 deskService.updateDeskByDeskId(updateDesk);
             }
+
+            notifyFront(deskId);
+
             return Result.success("下单成功");
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -330,7 +327,7 @@ public class CartService {
 
 
     private OrderDishes buildPackageCartItemVO(CartItemVO item, Integer orderId, Integer subOrderId) {
-        DishesPackage dishes = dishesPackageDAO.getById(item.getDishesId());
+        DishesPackage dishes = dishesPackageDAO.getByDishesPackageId(item.getDishesId());
         OrderDishes d = new OrderDishes();
         d.setOrderId(orderId);
         d.setSubOrderId(subOrderId);
@@ -354,5 +351,37 @@ public class CartService {
 
     public Result<String> clearCart(Integer deskId) {
         return CartStore.clearCart(deskId);
+    }
+
+
+    public BigDecimal sumCartPrice(CartVO cart) {
+        double allPrice = 0;
+        if (cart == null || CommonUtils.isEmpty(cart.getContents())) {
+            return BigDecimal.ZERO;
+        }
+        for (CartItemVO cartItem : cart.getContents()) {
+            int dishesId = cartItem.getDishesId();
+            if (cartItem.getIfDishesPackage() == EnumIsPackage.YES.code) {
+                DishesPackage dishesPackage = dishesPackageDAO.getByDishesPackageId(dishesId);
+                int nums = cartItem.getNums();
+                allPrice = allPrice + dishesPackage.getDishesPackagePrice() * nums;
+            } else if (cartItem.getIfDishesPackage() == EnumIsPackage.YES_NEW.code) {
+                DishesPackage dishesPackage = dishesPackageDAO.getByDishesPackageId(dishesId);
+                int nums = cartItem.getNums();
+                allPrice = allPrice + dishesPackage.getDishesPackagePrice() * nums;
+            } else {
+                Dishes dishes = dishesDAO.getById(dishesId);
+                int nums = cartItem.getNums();
+                int dishesPriceId = cartItem.getDishesPriceId();
+                DishesPrice dishesPrice = dishesPriceDAO.queryByPriceId(dishesPriceId);
+                if (dishesPrice != null) {
+                    allPrice = (float) (allPrice + dishesPrice.getDishesPrice() * nums);
+                } else {
+                    allPrice = allPrice + dishes.getDishesPrice() * nums;
+                }
+            }
+
+        }
+        return BigDecimal.valueOf(allPrice).setScale(2, RoundingMode.HALF_UP);
     }
 }

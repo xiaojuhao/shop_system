@@ -24,7 +24,7 @@ public class DishesPackageDAO {
     @Named("mysql")
     HikariDataSource ds;
 
-    public DishesPackage getById(Integer id) {
+    public DishesPackage getByDishesPackageId(Integer id) {
         if (id == null) {
             return null;
         }

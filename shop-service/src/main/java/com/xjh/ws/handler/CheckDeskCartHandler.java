@@ -65,7 +65,7 @@ public class CheckDeskCartHandler implements WsHandler {
 
             jSONObjectReturn.put("cartDisheses", cartDisheses);
             jSONObjectReturn.put("cartDishesesNums", cartVO.sumDishesNum());
-            jSONObjectReturn.put("totalPrice", 10);
+            jSONObjectReturn.put("totalPrice", cartService.sumCartPrice(cartVO));
             jSONObjectReturn.put("status", 0);
             if (msg.containsKey("h5SessionId")) {
                 jSONObjectReturn.put("h5SessionId", msg.getInteger("h5SessionId"));
