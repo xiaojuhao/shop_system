@@ -39,6 +39,7 @@ import com.xjh.service.domain.model.SendOrderRequest;
 import com.xjh.service.store.CartStore;
 
 import cn.hutool.core.codec.Base64;
+import com.xjh.ws.SocketUtils;
 
 @Singleton
 public class CartService {
@@ -75,15 +76,15 @@ public class CartService {
             List<CartItemVO> contentItems = getCartItems(deskId);
             boolean merged = false;
             // 如果购物车里面已经存在了菜品，则合并
-            for(CartItemVO it : contentItems){
-                if(Objects.equals(it.getDishesId(), item.getDishesId())){
+            for (CartItemVO it : contentItems) {
+                if (Objects.equals(it.getDishesId(), item.getDishesId())) {
                     it.setNums(it.getNums() + item.getNums());
                     merged = true;
                     break;
                 }
             }
             // 新菜品，添加新的记录
-            if(!merged) {
+            if (!merged) {
                 contentItems.add(item);
             }
             cart.setContents(contentItems);
@@ -91,6 +92,8 @@ public class CartService {
             if (!rs.isSuccess()) {
                 return Result.fail("添加购物车失败,保存数据库失败");
             }
+            // 通知到前段
+            notifyFront(deskId);
             return Result.success(cart);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -98,6 +101,27 @@ public class CartService {
         } finally {
             clear.run();
         }
+    }
+
+    public void notifyFront(Integer deskId){
+        CartVO cart = new CartVO();
+        cart.setDeskId(deskId);
+        List<CartItemVO> contentItems = getCartItems(deskId);
+        cart.setContents(contentItems);
+        // 通知前端
+        JSONObject notify = new JSONObject();
+        notify.put("API_TYPE", "cartAddOneRecord");
+        notify.put("dishesAttribute", new JSONObject());
+        notify.put("totalPrice", cart.sumDishesNum() * 1.2);
+        notify.put("cartDishesId", cart.getId());
+        notify.put("num", cart.sumDishesNum());
+        notify.put("dishesPriceId", 0);
+        notify.put("dishesId", 0);
+        notify.put("type", "dishes");
+        notify.put("deskId", cart.getDeskId());
+        notify.put("operateAccount", "root");
+        notify.put("cartDishesesNums", cart.sumDishesNum());
+        SocketUtils.sendMsg(deskId, notify);
     }
 
     public Result<CartVO> updateCart(Integer deskId, CartVO cart) {
@@ -151,7 +175,7 @@ public class CartService {
             subOrder.setAccountId(CurrentAccount.currentAccountId());
             subOrder.setCreatetime(DateBuilder.now().mills());
             Result<Integer> subInsertRs = subOrderDAO.insert(subOrder);
-            if(!subInsertRs.isSuccess()){
+            if (!subInsertRs.isSuccess()) {
                 return Result.fail(subInsertRs.getMsg());
             }
             // order dishes
@@ -169,8 +193,7 @@ public class CartService {
             }
             // 更新订单状态
             orderService.updateByOrderId(order);
-            Logger.info("赠送菜品: 订单号:" + orderId +
-                    ", 菜品:" + request.getDishesName() + "(" + request.getDishesId() + ")");
+            Logger.info("赠送菜品: 订单号:" + orderId + ", 菜品:" + request.getDishesName() + "(" + request.getDishesId() + ")");
             return Result.success("下单成功");
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -205,7 +228,7 @@ public class CartService {
             subOrder.setAccountId(CurrentAccount.currentAccountId());
             subOrder.setCreatetime(DateBuilder.now().mills());
             Result<Integer> subInsertRs = subOrderDAO.insert(subOrder);
-            if(!subInsertRs.isSuccess()){
+            if (!subInsertRs.isSuccess()) {
                 return Result.fail(subInsertRs.getMsg());
             }
             // order dishes

@@ -2,9 +2,14 @@ package com.xjh.startup.foundation.ws;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import cn.hutool.core.lang.Snowflake;
+import com.xjh.common.utils.CurrentRequest;
+import com.xjh.ws.SocketUtils;
+import com.xjh.ws.WsAttachment;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
@@ -62,35 +67,58 @@ public class XjhWebSocketServer extends WebSocketServer {
         }
     }
 
+    public static void main(String[] args) {
+        for (int i = 0; i < 100; i++) {
+            System.out.println(Long.toHexString(snowflake.nextId()));
+        }
+    }
+
+    static Snowflake snowflake = new Snowflake(1, 1);
+
     @Override
     public void onOpen(WebSocket ws, ClientHandshake clientHandshake) {
         tryInitHandlers();
         JSONObject resp = handlers.get("socketOpen").handle(ws, null);
-        String uuid = CommonUtils.randomStr(10);
-        ws.setAttachment(uuid);
-        Logger.info(uuid + " >> WS链接打开: " + resp);
+        WsAttachment att = new WsAttachment();
+        att.setRequestId("ws" + Long.toHexString(snowflake.nextId()));
+        ws.setAttachment(att);
+        Logger.info(att.getRequestId() + " >> WS链接打开: " + resp);
         ws.send(resp.toJSONString());
+        // 维护起来
+        SocketUtils.put(att.getRequestId(), ws);
     }
 
     @Override
     public void onClose(WebSocket webSocket, int i, String s, boolean b) {
-        String uuid = webSocket.getAttachment();
-        Logger.info(uuid + " >> WS链接关闭");
+        WsAttachment att = webSocket.getAttachment();
+        Logger.info(att.getRequestId() + " >> WS链接关闭");
+        SocketUtils.remove(att.getRequestId());
     }
 
     @Override
     public void onMessage(WebSocket ws, String message) {
-        String uuid = ws.getAttachment();
-        Logger.info(uuid + " >> 收到了消息: " + message);
-        JSONObject msg = JSONObject.parseObject(message);
+        // 本地请求id
+        CurrentRequest.resetRequestId();
+        try {
+            Logger.info(traceUuid(ws) + " >> 收到了消息: " + message);
+            JSONObject msg = JSONObject.parseObject(message);
 
-        WsHandler handler = getHandler(msg);
-        if (handler != null) {
-            JSONObject resp = handler.handle(ws, msg);
-            Logger.info(uuid + " >> 响应结果: " + resp);
-            ws.send(resp.toJSONString());
-        } else {
-            Logger.info(uuid + " >> 无法响应内容");
+            WsHandler handler = getHandler(msg);
+            if (handler != null) {
+                JSONObject resp = handler.handle(ws, msg);
+                String respStr = resp.toJSONString();
+                if (CommonUtils.length(respStr) > 200) {
+                    respStr = respStr.substring(0, 200);
+                }
+                Logger.info(traceUuid(ws) + " >> 响应结果: " + respStr);
+                ws.send(resp.toJSONString());
+            } else {
+                Logger.info(traceUuid(ws) + " >> 无法响应内容");
+            }
+        } catch (Exception ex) {
+            Logger.error("onMessage >> " + ex.getMessage());
+        } finally {
+            CurrentRequest.clear();
         }
     }
 
@@ -98,10 +126,15 @@ public class XjhWebSocketServer extends WebSocketServer {
     public void onError(WebSocket webSocket, Exception e) {
         e.printStackTrace();
         if (webSocket != null) {
-            String uuid = webSocket.getAttachment();
-            Logger.info(uuid + " >> socket出现了异常, 关闭链接" + e);
+            WsAttachment uuid = webSocket.getAttachment();
+            Logger.info(uuid.getRequestId() + " >> socket出现了异常, 关闭链接" + e);
             webSocket.close();
         }
+    }
+
+    public static String traceUuid(WebSocket ws) {
+        WsAttachment attachment = ws.getAttachment();
+        return attachment.getRequestId() + "-" + CurrentRequest.requestId();
     }
 
     @Override

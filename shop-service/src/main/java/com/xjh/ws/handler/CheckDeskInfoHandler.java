@@ -6,6 +6,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.xjh.ws.WsAttachment;
 import org.java_websocket.WebSocket;
 
 import com.alibaba.fastjson.JSONArray;
@@ -53,6 +54,9 @@ public class CheckDeskInfoHandler implements WsHandler {
         jSONObjectReturn.put("API_TYPE", "checkDeskInfo_ACK");
         try {
             int deskId = msg.getInteger("tables_id");
+            WsAttachment attachment = ws.getAttachment();
+            attachment.setDeskId(deskId);
+
             Desk desk = deskService.getById(deskId);
             if (desk == null) {
                 throw new Exception("桌子不存在");
@@ -72,8 +76,7 @@ public class CheckDeskInfoHandler implements WsHandler {
             Order order = orderService.getOrder(desk.getOrderId());
             List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(desk.getOrderId());
             if (physicalStatus != EnumDeskPhysicalStatus.DISABLE) {
-                if (deskUseStatus != EnumDeskStatus.FREE && deskUseStatus != EnumDeskStatus.PRESERVED
-                        && order != null) {
+                if (deskUseStatus != EnumDeskStatus.FREE && deskUseStatus != EnumDeskStatus.PRESERVED && order != null) {
                     JSONObject jSONObjectOrder = new JSONObject();
                     int orderId = order.getOrderId();
                     jSONObjectOrder.put("orderId", orderId);
@@ -89,10 +92,7 @@ public class CheckDeskInfoHandler implements WsHandler {
                     jSONObjectOrder.put("reduction", order.getOrderReduction());
                     jSONObjectOrder.put("refund", order.getOrderRefund());
 
-                    OrderOverviewVO billVO = orderService.buildOrderOverview(
-                            order,
-                            orderDishesList,
-                            null).getData();
+                    OrderOverviewVO billVO = orderService.buildOrderOverview(order, orderDishesList, null).getData();
                     EnumOrderStatus orderStatus = EnumOrderStatus.of(order.getOrderStatus());
                     String status = orderStatus.remark;
                     jSONObjectOrder.put("status", status);

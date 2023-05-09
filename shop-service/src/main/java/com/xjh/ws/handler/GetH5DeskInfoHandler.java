@@ -3,6 +3,7 @@ package com.xjh.ws.handler;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.xjh.ws.WsAttachment;
 import org.java_websocket.WebSocket;
 
 import com.alibaba.fastjson.JSONObject;
@@ -39,6 +40,10 @@ public class GetH5DeskInfoHandler implements WsHandler {
                 return jSONObjectReturn;
             }
             Desk oneDesk = oneDeskRs.getData();
+            // 桌号附加到webSocket对象中
+            WsAttachment attachment = ws.getAttachment();
+            attachment.setDeskId(oneDesk.getDeskId());
+
             EnumDeskStatus status = EnumDeskStatus.of(oneDesk.getStatus());
             if (EnumDeskPhysicalStatus.of(oneDesk.getPhysicalStatus()) == EnumDeskPhysicalStatus.DISABLE) {
                 jSONObjectReturn.put("status", FAIL);

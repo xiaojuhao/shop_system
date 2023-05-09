@@ -18,6 +18,6 @@ public class CurrentRequest {
     }
 
     public static void clear() {
-        requestId.set(null);
+        requestId.remove();
     }
 }
