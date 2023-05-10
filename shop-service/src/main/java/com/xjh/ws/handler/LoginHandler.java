@@ -5,6 +5,7 @@ import com.xjh.dao.dataobject.Account;
 import com.xjh.dao.mapper.AccountDAO;
 import com.xjh.dao.mapper.StoreDAO;
 import com.xjh.ws.WsApiType;
+import com.xjh.ws.WsAttachment;
 import com.xjh.ws.WsHandler;
 import org.java_websocket.WebSocket;
 
@@ -49,6 +50,7 @@ public class LoginHandler implements WsHandler {
 
     @Override
     public JSONObject handle(WebSocket ws, JSONObject msg) {
+        WsAttachment attachment = ws.getAttachment();
         String userName = msg.getString(API_ACCOUNT_USERNAME);
         String password = msg.getString(API_ACCOUNT_PASSWORD);
         String api_type = msg.getString(API_TYPE);
@@ -60,9 +62,17 @@ public class LoginHandler implements WsHandler {
             if (TRANSFER_STATION_IN_USER_NAME.equals(userName) && TRANSFER_STATION_IN_USER_NAME.equals(password)) {
                 //中转账号的话直接通过
                 account = login(userName, password, false, true);
+                if(account != null){
+                    attachment.setAccountId(account.getAccountId());
+                    attachment.setAccountUser(account.getAccountUser());
+                }
             } else {
                 try {
                     account = login(userName, password, false, true);
+                    if(account != null){
+                        attachment.setAccountId(account.getAccountId());
+                        attachment.setAccountUser(account.getAccountUser());
+                    }
                 } catch (Exception e) {
 //                result.put(APIKeyword.API_LOGIN_RESULT, APIKeyword.LOGIN_RESULT_LOGIN_FAIL);
 //                /*后期再优化*/

@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import cn.hutool.core.lang.Snowflake;
 import com.xjh.common.utils.CurrentRequest;
+import com.xjh.common.utils.Safe;
 import com.xjh.ws.SocketUtils;
 import com.xjh.ws.WsAttachment;
 import org.java_websocket.WebSocket;
@@ -100,6 +101,7 @@ public class XjhWebSocketServer extends WebSocketServer {
         // 本地请求id
         CurrentRequest.resetRequestId();
         try {
+            WsAttachment attachment = ws.getAttachment();
             Logger.info(traceUuid(ws) + " >> 收到了消息: " + message);
             JSONObject msg = JSONObject.parseObject(message);
 
@@ -112,6 +114,8 @@ public class XjhWebSocketServer extends WebSocketServer {
                 }
                 Logger.info(traceUuid(ws) + " >> 响应结果: " + respStr);
                 ws.send(resp.toJSONString());
+
+                attachment.drains();
             } else {
                 Logger.info(traceUuid(ws) + " >> 无法响应内容");
             }
