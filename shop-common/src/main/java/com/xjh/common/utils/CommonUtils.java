@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.text.DecimalFormat;
@@ -126,6 +127,10 @@ public class CommonUtils {
 
     public static <T> T orElse(T v, T def) {
         return OrElse.orGet(v, def);
+    }
+
+    public static BigDecimal decimalMoney(Number value){
+        return new BigDecimal(formatMoney(value));
     }
 
     public static String formatMoney(Number value) {

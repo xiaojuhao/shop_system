@@ -372,8 +372,7 @@ public class CartService {
             } else {
                 Dishes dishes = dishesDAO.getById(dishesId);
                 int nums = cartItem.getNums();
-                int dishesPriceId = cartItem.getDishesPriceId();
-                DishesPrice dishesPrice = dishesPriceDAO.queryByPriceId(dishesPriceId);
+                DishesPrice dishesPrice = dishesPriceDAO.queryByPriceId(cartItem.getDishesPriceId());
                 if (dishesPrice != null) {
                     allPrice = (float) (allPrice + dishesPrice.getDishesPrice() * nums);
                 } else {
