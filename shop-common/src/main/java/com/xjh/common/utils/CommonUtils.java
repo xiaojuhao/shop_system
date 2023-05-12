@@ -129,7 +129,7 @@ public class CommonUtils {
         return OrElse.orGet(v, def);
     }
 
-    public static BigDecimal decimalMoney(Number value){
+    public static BigDecimal decimalMoney(Number value) {
         return new BigDecimal(formatMoney(value));
     }
 
@@ -169,6 +169,13 @@ public class CommonUtils {
         } else {
             return "" + time;
         }
+    }
+
+    public static String abbr(String str, int maxLen) {
+        if (length(str) > maxLen) {
+            return str.substring(0, maxLen);
+        }
+        return str;
     }
 
     public static boolean ne(Object a, Object b) {

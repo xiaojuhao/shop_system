@@ -22,6 +22,8 @@ import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.ws.WsApiType;
 import com.xjh.ws.WsHandler;
 
+import static com.xjh.common.utils.CommonUtils.abbr;
+
 public class XjhWebSocketServer extends WebSocketServer {
     private final Map<String, WsHandler> handlers = new ConcurrentHashMap<>();
     private final AtomicBoolean initialized = new AtomicBoolean();
@@ -108,11 +110,7 @@ public class XjhWebSocketServer extends WebSocketServer {
             WsHandler handler = getHandler(msg);
             if (handler != null) {
                 JSONObject resp = handler.handle(ws, msg);
-                String respStr = resp.toJSONString();
-                if (CommonUtils.length(respStr) > 200) {
-                    respStr = respStr.substring(0, 200);
-                }
-                Logger.info(traceUuid(ws) + " >> 响应结果: " + respStr);
+                Logger.info(traceUuid(ws) + " >> 响应结果: " + abbr(resp.toJSONString(), 200));
                 ws.send(resp.toJSONString());
 
                 attachment.drains();
