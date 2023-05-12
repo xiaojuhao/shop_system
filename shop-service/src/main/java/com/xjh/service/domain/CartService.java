@@ -87,7 +87,7 @@ public class CartService {
                 return Result.fail("添加购物车失败,保存数据库失败");
             }
             // 通知到前段
-            notifyFront(deskId);
+            notifyFront(deskId, item);
             return Result.success(cart);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -97,7 +97,7 @@ public class CartService {
         }
     }
 
-    public void notifyFront(Integer deskId) {
+    public void notifyFront(Integer deskId, CartItemVO item) {
         CartVO cart = new CartVO();
         cart.setDeskId(deskId);
         List<CartItemVO> contentItems = getCartItems(deskId);
@@ -108,9 +108,9 @@ public class CartService {
         notify.put("dishesAttribute", new JSONObject());
         notify.put("totalPrice", sumCartPrice(cart));
         notify.put("cartDishesId", cart.getId());
-        notify.put("num", cart.sumDishesNum());
+        notify.put("num", item.getNums());
         notify.put("dishesPriceId", 0);
-        notify.put("dishesId", 0);
+        notify.put("dishesId", item.getDishesId());
         notify.put("type", "dishes");
         notify.put("deskId", cart.getDeskId());
         notify.put("operateAccount", "root");
@@ -258,7 +258,7 @@ public class CartService {
                 deskService.updateDeskByDeskId(updateDesk);
             }
 
-            notifyFront(deskId);
+            //notifyFront(deskId);
 
             return Result.success("下单成功");
         } catch (Exception ex) {

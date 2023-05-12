@@ -2,6 +2,8 @@ package com.xjh.ws.handler;
 
 import javax.inject.Inject;
 
+import com.xjh.ws.SocketUtils;
+import com.xjh.ws.WsAttachment;
 import org.java_websocket.WebSocket;
 
 import com.alibaba.fastjson.JSONObject;
@@ -38,6 +40,7 @@ public class OrderCartHandler implements WsHandler {
             resp.put("msg", "下单失败:餐桌未开台");
             return resp;
         }
+        WsAttachment attachment = ws.getAttachment();
         PlaceOrderFromCartReq param = new PlaceOrderFromCartReq();
         param.setOrderId(desk.getOrderId());
         param.setDeskId(deskId);
@@ -49,6 +52,13 @@ public class OrderCartHandler implements WsHandler {
             resp.put("status", 1);
             resp.put("msg", createOrderRs.getMsg());
         }
+        attachment.addNext(() -> {
+            JSONObject next = new JSONObject();
+            next.put("API_TYPE", "orderCart");
+            next.put("deskId", deskId);
+            next.put("operateAccount", attachment.getAccountUser());
+            SocketUtils.sendMsg(deskId, next);
+        });
         return resp;
     }
 }
