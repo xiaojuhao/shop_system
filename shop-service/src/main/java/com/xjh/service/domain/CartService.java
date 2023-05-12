@@ -258,7 +258,14 @@ public class CartService {
                 deskService.updateDeskByDeskId(updateDesk);
             }
 
-            //notifyFront(deskId);
+            // 通知前端更新购物车
+            SocketUtils.delay(() -> {
+                JSONObject next = new JSONObject();
+                next.put("API_TYPE", "orderCart");
+                next.put("deskId", deskId);
+                // next.put("operateAccount", order.getAccountId());
+                SocketUtils.sendMsg(deskId, next);
+            }, 3);
 
             return Result.success("下单成功");
         } catch (Exception ex) {
