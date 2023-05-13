@@ -50,6 +50,13 @@ public class CommonUtils {
         return retList;
     }
 
+    public static int sizeOf(Collection<?> coll) {
+        if (coll == null) {
+            return 0;
+        }
+        return coll.size();
+    }
+
     public static <T> HashSet<T> newHashset(T... ts) {
         if (ts == null) {
             return new HashSet<>();
@@ -149,18 +156,12 @@ public class CommonUtils {
             return padding(seconds) + "秒";
         }
         if (seconds <= 3600) {
-            return padding((seconds / 60))
-                    + "分" + padding((seconds % 60)) + "秒";
+            return padding((seconds / 60)) + "分" + padding((seconds % 60)) + "秒";
         }
         if (seconds <= 3600 * 24) {
-            return padding((seconds / 3600)) + "时"
-                    + padding(((seconds % 3600) / 60)) + "分"
-                    + padding((seconds % 60)) + "秒";
+            return padding((seconds / 3600)) + "时" + padding(((seconds % 3600) / 60)) + "分" + padding((seconds % 60)) + "秒";
         }
-        return padding((seconds / (3600 * 24))) + "天" +
-                padding((seconds % (3600 * 24) / 3600)) + "时"
-                + padding(((seconds % 3600) / 60)) + "分"
-                + padding((seconds % 60)) + "秒";
+        return padding((seconds / (3600 * 24))) + "天" + padding((seconds % (3600 * 24) / 3600)) + "时" + padding(((seconds % 3600) / 60)) + "分" + padding((seconds % 60)) + "秒";
     }
 
     private static String padding(long time) {
@@ -748,8 +749,7 @@ public class CommonUtils {
         return String.join(" ", readLines(stream));
     }
 
-    public static void setField(Object bean, Class<?> beanClass, String fieldName, Object fieldVal)
-            throws IllegalAccessException {
+    public static void setField(Object bean, Class<?> beanClass, String fieldName, Object fieldVal) throws IllegalAccessException {
         if (bean == null || fieldVal == null) {
             return;
         }

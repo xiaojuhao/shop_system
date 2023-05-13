@@ -16,6 +16,9 @@ import com.xjh.service.domain.model.PlaceOrderFromCartReq;
 import com.xjh.ws.WsApiType;
 import com.xjh.ws.WsHandler;
 
+import static com.xjh.ws.NotifyCenter.FRONT_STS_FAILURE;
+import static com.xjh.ws.NotifyCenter.FRONT_STS_SUCCESS;
+
 @Singleton
 @WsApiType("orderCart")
 public class OrderCartHandler implements WsHandler {
@@ -31,12 +34,12 @@ public class OrderCartHandler implements WsHandler {
         int deskId = msg.getIntValue("tables_id");
         Desk desk = deskService.getById(deskId);
         if (desk == null) {
-            resp.put("status", 1);
+            resp.put("status", FRONT_STS_FAILURE);
             resp.put("msg", "下单失败:桌号有误");
             return resp;
         }
         if (desk.getOrderId() == null) {
-            resp.put("status", 1);
+            resp.put("status", FRONT_STS_FAILURE);
             resp.put("msg", "下单失败:餐桌未开台");
             return resp;
         }
@@ -47,9 +50,9 @@ public class OrderCartHandler implements WsHandler {
         param.setAccountId(0);
         Result<String> createOrderRs = cartService.createOrder(param);
         if (createOrderRs.isSuccess()) {
-            resp.put("status", 0);
+            resp.put("status", FRONT_STS_SUCCESS);
         } else {
-            resp.put("status", 1);
+            resp.put("status", FRONT_STS_FAILURE);
             resp.put("msg", createOrderRs.getMsg());
         }
 

@@ -2,9 +2,8 @@ package com.xjh.service.domain;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -33,7 +32,10 @@ import com.xjh.service.domain.model.SendOrderRequest;
 import com.xjh.service.store.CartStore;
 
 import cn.hutool.core.codec.Base64;
+import com.xjh.ws.NotifyCenter;
 import com.xjh.ws.SocketUtils;
+
+import static com.xjh.common.utils.CommonUtils.firstOf;
 
 @Singleton
 public class CartService {
@@ -54,6 +56,8 @@ public class CartService {
     DeskService deskService;
     @Inject
     DishesPriceDAO dishesPriceDAO;
+    @Inject
+    NotifyCenter notifyCenter;
 
     public Result<CartVO> addItem(Integer deskId, CartItemVO item) {
         Runnable clear = CurrentRequest.resetRequestId();
@@ -87,7 +91,7 @@ public class CartService {
                 return Result.fail("添加购物车失败,保存数据库失败");
             }
             // 通知到前段
-            notifyFront(deskId, item);
+            notifyCenter.cartAddOneRecord(deskId, item);
             return Result.success(cart);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -97,34 +101,18 @@ public class CartService {
         }
     }
 
-    public void notifyFront(Integer deskId, CartItemVO item) {
-        CartVO cart = new CartVO();
-        cart.setDeskId(deskId);
-        List<CartItemVO> contentItems = getCartItems(deskId);
-        cart.setContents(contentItems);
-        // 通知前端
-        JSONObject notify = new JSONObject();
-        notify.put("API_TYPE", "cartAddOneRecord");
-        notify.put("dishesAttribute", new JSONObject());
-        notify.put("totalPrice", sumCartPrice(cart));
-        notify.put("cartDishesId", cart.getId());
-        notify.put("num", item.getNums());
-        notify.put("dishesPriceId", 0);
-        notify.put("dishesId", item.getDishesId());
-        notify.put("type", "dishes");
-        notify.put("deskId", cart.getDeskId());
-        notify.put("operateAccount", "root");
-        notify.put("cartDishesesNums", cart.sumDishesNum());
-        SocketUtils.sendMsg(deskId, notify);
-    }
-
     public Result<CartVO> updateCart(Integer deskId, CartVO cart) {
         Runnable clear = CurrentRequest.resetRequestId();
         try {
+//            CartVO oldCart = getCart(deskId).getData();
+//            Set<Integer> chg = cmpCartNum(cart, oldCart);
             Result<String> rs = CartStore.saveCart(cart);
             if (!rs.isSuccess()) {
                 return Result.fail("添加购物车失败,保存数据库失败");
             }
+//            if (!chg.isEmpty()) {
+//                notifyCenter.notifyFrontAddCart(deskId, cart.getContents().get(firstOf(chg)));
+//            }
             return Result.success(cart);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -152,6 +140,30 @@ public class CartService {
             Logger.error("getCartOfDesk:" + ex.getMessage());
             return Result.fail(ex.getMessage());
         }
+    }
+
+    public Set<Integer> cmpCartNum(CartVO cart, CartVO oldCart) {
+        Set<Integer> chg = new HashSet<>();
+        Map<Integer, Integer> dishesNum = cartDishesNum(cart);
+        Map<Integer, Integer> oldDishesNum = cartDishesNum(oldCart);
+        for (Integer cartDishesId : dishesNum.keySet()) {
+            Integer num = dishesNum.get(cartDishesId);
+            Integer oldNum = oldDishesNum.get(cartDishesId);
+            if (num != null && oldNum != null) {
+                chg.add(cartDishesId);
+            }
+        }
+        return chg;
+    }
+
+    public Map<Integer, Integer> cartDishesNum(CartVO cart) {
+        Map<Integer, Integer> map = new HashMap<>();
+        if (cart != null && cart.getContents() != null) {
+            for (int i = 0; i < cart.getContents().size(); i++) {
+                map.put(i, cart.getContents().get(i).getNums());
+            }
+        }
+        return map;
     }
 
     public Result<String> createSendOrder(SendOrderRequest request) {
@@ -259,13 +271,7 @@ public class CartService {
             }
 
             // 通知前端更新购物车
-            SocketUtils.delay(() -> {
-                JSONObject next = new JSONObject();
-                next.put("API_TYPE", "orderCart");
-                next.put("deskId", deskId);
-                // next.put("operateAccount", order.getAccountId());
-                SocketUtils.sendMsg(deskId, next);
-            }, 3);
+            SocketUtils.delay(() -> NotifyCenter.notifyCartCleared(deskId), 3);
 
             return Result.success("下单成功");
         } catch (Exception ex) {

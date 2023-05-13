@@ -1,12 +1,10 @@
 package com.xjh.startup.view;
 
+import static com.xjh.common.utils.CommonUtils.sizeOf;
 import static com.xjh.common.utils.TableViewUtils.newCol;
 import static com.xjh.service.domain.DishesTypeService.toDishesTypeName;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.xjh.common.utils.AlertBuilder;
@@ -31,6 +29,7 @@ import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.model.CartItemBO;
 import com.xjh.startup.view.model.DeskOrderParam;
 
+import com.xjh.ws.NotifyCenter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
@@ -48,7 +47,7 @@ public class CartView extends VBox {
     CartService cartService = GuiceContainer.getInstance(CartService.class);
     DishesTypeService dishesTypeService = GuiceContainer.getInstance(DishesTypeService.class);
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
-
+    NotifyCenter notifyCenter = GuiceContainer.getInstance(NotifyCenter.class);
     Runnable onPlaceOrder;
 
     public CartView(DeskOrderParam param, Runnable onPlaceOrder) {
@@ -76,15 +75,7 @@ public class CartView extends VBox {
 
     private TableView<CartItemBO> tableList(DeskOrderParam param, TableView<CartItemBO> tv) {
         try {
-            tv.getColumns().addAll(
-                    newCol("序号", "seqNo", 100),
-                    newCol("菜品类型", "dishesTypeName", 100),
-                    newCol("菜品名称", "dishesName", 200),
-                    newCol("价格", "dishesPrice", 100),
-                    newCol("数量", "nums", 150),
-                    newCol("小计", "totalPrice", 100),
-                    newCol("备注", "attrRemark", 100)
-            );
+            tv.getColumns().addAll(newCol("序号", "seqNo", 100), newCol("菜品类型", "dishesTypeName", 100), newCol("菜品名称", "dishesName", 200), newCol("价格", "dishesPrice", 100), newCol("数量", "nums", 150), newCol("小计", "totalPrice", 100), newCol("备注", "attrRemark", 100));
             reloadData(param, tv);
         } catch (Exception ex) {
             Logger.error("查询购物车异常:" + param.getDeskName() + ", " + ex.getMessage());
@@ -140,15 +131,26 @@ public class CartView extends VBox {
         if (cartVO == null || CommonUtils.isEmpty(cartVO.getContents())) {
             return;
         }
+        List<Integer> removedIdx = new ArrayList<>();
         List<CartItemVO> items = cartVO.getContents();
-        items = CommonUtils.filter(items, it -> !removedIds.contains(it.getCartDishesId()));
-        cartVO.setContents(items);
+        List<CartItemVO> newItems = new ArrayList<>();
+        int itemLen = sizeOf(items);
+        for (int i = 0; i < itemLen; i++) {
+            if (!removedIds.contains(items.get(i).getCartDishesId())) {
+                newItems.add(items.get(i));
+            }else {
+                removedIdx.add(i);
+            }
+        }
+        cartVO.setContents(newItems);
         Result<CartVO> updateRs = cartService.updateCart(deskId, cartVO);
         if (updateRs.isSuccess()) {
             reloadData(param, tv);
         } else {
             AlertBuilder.ERROR("删除失败," + updateRs.getMsg());
         }
+
+        notifyCenter.removeDishesFromCart(deskId, removedIdx);
     }
 
     private void doUpdateItemNum(Integer deskId, Integer cartDishesId, Integer num) {
