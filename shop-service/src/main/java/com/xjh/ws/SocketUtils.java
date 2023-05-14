@@ -67,6 +67,12 @@ public class SocketUtils {
         }
     }
 
+    static ExecutorService executorService2 = Executors.newSingleThreadExecutor();
+
+    public static void asyncSendMsg(Integer deskId, JSONObject msg) {
+        executorService2.submit(() -> sendMsg(deskId, msg));
+    }
+
     public static class DelayedRunnable implements Delayed {
         Runnable runnable;
         long startMills;

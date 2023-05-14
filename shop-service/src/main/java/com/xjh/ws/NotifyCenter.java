@@ -25,7 +25,7 @@ public class NotifyCenter {
         next.put("API_TYPE", "orderCart");
         next.put("deskId", deskId);
         // next.put("operateAccount", order.getAccountId());
-        SocketUtils.sendMsg(deskId, next);
+        SocketUtils.asyncSendMsg(deskId, next);
     }
 
     // 通知前端，添加菜品到购物车
@@ -47,7 +47,7 @@ public class NotifyCenter {
         notify.put("deskId", cart.getDeskId());
         notify.put("operateAccount", "root");
         notify.put("cartDishesesNums", cart.sumDishesNum());
-        SocketUtils.sendMsg(deskId, notify);
+        SocketUtils.asyncSendMsg(deskId, notify);
     }
 
     public void removeDishesFromCart(Integer deskId, List<Integer> removedCartDishesIds) {
@@ -63,6 +63,6 @@ public class NotifyCenter {
         notify.put("cartDishesesNums", cart.sumDishesNum());
         notify.put("totalPrice", cartService.sumCartPrice(cart));
         notify.put("cartDishesId", firstOf(removedCartDishesIds));
-        SocketUtils.sendMsg(deskId, notify);
+        SocketUtils.asyncSendMsg(deskId, notify);
     }
 }
