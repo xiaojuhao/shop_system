@@ -2,8 +2,6 @@ package com.xjh.ws.handler;
 
 import javax.inject.Inject;
 
-import com.xjh.ws.SocketUtils;
-import com.xjh.ws.WsAttachment;
 import org.java_websocket.WebSocket;
 
 import com.alibaba.fastjson.JSONObject;
@@ -16,8 +14,8 @@ import com.xjh.service.domain.model.PlaceOrderFromCartReq;
 import com.xjh.ws.WsApiType;
 import com.xjh.ws.WsHandler;
 
-import static com.xjh.ws.NotifyCenter.FRONT_STS_FAILURE;
-import static com.xjh.ws.NotifyCenter.FRONT_STS_SUCCESS;
+import static com.xjh.ws.NotifyService.FRONT_STS_FAILURE;
+import static com.xjh.ws.NotifyService.FRONT_STS_SUCCESS;
 
 @Singleton
 @WsApiType("orderCart")

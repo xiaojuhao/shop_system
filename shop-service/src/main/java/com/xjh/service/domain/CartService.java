@@ -3,7 +3,6 @@ package com.xjh.service.domain;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -32,10 +31,8 @@ import com.xjh.service.domain.model.SendOrderRequest;
 import com.xjh.service.store.CartStore;
 
 import cn.hutool.core.codec.Base64;
-import com.xjh.ws.NotifyCenter;
+import com.xjh.ws.NotifyService;
 import com.xjh.ws.SocketUtils;
-
-import static com.xjh.common.utils.CommonUtils.firstOf;
 
 @Singleton
 public class CartService {
@@ -57,7 +54,7 @@ public class CartService {
     @Inject
     DishesPriceDAO dishesPriceDAO;
     @Inject
-    NotifyCenter notifyCenter;
+    NotifyService notifyService;
 
     public Result<CartVO> addItem(Integer deskId, CartItemVO item) {
         Runnable clear = CurrentRequest.resetRequestId();
@@ -91,7 +88,7 @@ public class CartService {
                 return Result.fail("添加购物车失败,保存数据库失败");
             }
             // 通知到前段
-            notifyCenter.cartAddOneRecord(deskId, item);
+            notifyService.cartAddOneRecord(deskId, item);
             return Result.success(cart);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -271,7 +268,7 @@ public class CartService {
             }
 
             // 通知前端更新购物车
-            SocketUtils.delay(() -> NotifyCenter.notifyCartCleared(deskId), 3);
+            SocketUtils.delay(() -> NotifyService.notifyCartCleared(deskId), 3);
 
             return Result.success("下单成功");
         } catch (Exception ex) {

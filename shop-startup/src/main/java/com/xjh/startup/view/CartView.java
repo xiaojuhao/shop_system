@@ -29,7 +29,8 @@ import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.model.CartItemBO;
 import com.xjh.startup.view.model.DeskOrderParam;
 
-import com.xjh.ws.NotifyCenter;
+import com.xjh.ws.NotifyService;
+import com.xjh.ws.SocketUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
@@ -47,7 +48,7 @@ public class CartView extends VBox {
     CartService cartService = GuiceContainer.getInstance(CartService.class);
     DishesTypeService dishesTypeService = GuiceContainer.getInstance(DishesTypeService.class);
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
-    NotifyCenter notifyCenter = GuiceContainer.getInstance(NotifyCenter.class);
+    NotifyService notifyService = GuiceContainer.getInstance(NotifyService.class);
     Runnable onPlaceOrder;
 
     public CartView(DeskOrderParam param, Runnable onPlaceOrder) {
@@ -138,7 +139,7 @@ public class CartView extends VBox {
         for (int i = 0; i < itemLen; i++) {
             if (!removedIds.contains(items.get(i).getCartDishesId())) {
                 newItems.add(items.get(i));
-            }else {
+            } else {
                 removedIdx.add(i);
             }
         }
@@ -150,7 +151,7 @@ public class CartView extends VBox {
             AlertBuilder.ERROR("删除失败," + updateRs.getMsg());
         }
 
-        notifyCenter.removeDishesFromCart(deskId, removedIdx);
+        SocketUtils.delay(() -> notifyService.removeDishesFromCart(deskId, removedIdx), 1);
     }
 
     private void doUpdateItemNum(Integer deskId, Integer cartDishesId, Integer num) {

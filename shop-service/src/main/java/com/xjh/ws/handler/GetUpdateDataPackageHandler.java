@@ -92,7 +92,7 @@ public class GetUpdateDataPackageHandler implements WsHandler {
         Map<Integer, DishesType> dishesTypeMap = dishesTypeService.dishesTypeMap();
         JSONArray jSONArray = new JSONArray();
         for (Dishes dishes : disheses) {
-            long lastUpdateTimeNow = dishesUpdateDAO.getDishesUpdateLastUpdateTime(dishes.getDishesId());
+            long lastUpdateTimeNow = System.currentTimeMillis();//dishesUpdateDAO.getDishesUpdateLastUpdateTime(dishes.getDishesId());
             if (lastUpdateTimeNow > lastUpdatTime) {
                 if (lastUpdateTimeNow > lastUpdatTimeNew) {
                     lastUpdatTimeNew = lastUpdateTimeNow;
@@ -148,7 +148,7 @@ public class GetUpdateDataPackageHandler implements WsHandler {
         JSONArray jSONArray = new JSONArray();
         for (int i = 0; i < dishesTypes.size(); i++) {
             DishesType dishesType = dishesTypes.get(i);
-            long lastUpdateTimeNow = dishesTypeUpdateDAO.getDishesTypeLastUpdateTime(dishesType.getTypeId());
+            long lastUpdateTimeNow = System.currentTimeMillis();//dishesTypeUpdateDAO.getDishesTypeLastUpdateTime(dishesType.getTypeId());
             if (lastUpdateTimeNow > lastUpdatTime) {
                 if (lastUpdateTimeNow > lastUpdatTimeNew) {
                     lastUpdatTimeNew = lastUpdateTimeNow;
@@ -175,7 +175,7 @@ public class GetUpdateDataPackageHandler implements WsHandler {
         JSONArray jSONArray = new JSONArray();
         for (int i = 0; i < dishesPackages.size(); i++) {
             DishesPackage dishesPackage = dishesPackages.get(i);
-            long lastUpdateTimeNow = dishesPackageUpdateDAO.getLastUpdateTime(dishesPackage.getDishesPackageId());
+            long lastUpdateTimeNow = System.currentTimeMillis();//dishesPackageUpdateDAO.getLastUpdateTime(dishesPackage.getDishesPackageId());
             if (lastUpdateTimeNow > lastUpdatTime) {
                 if (lastUpdateTimeNow > lastUpdatTimeNew) {
                     lastUpdatTimeNew = lastUpdateTimeNow;
@@ -222,7 +222,7 @@ public class GetUpdateDataPackageHandler implements WsHandler {
         JSONArray jSONArrayDesk = new JSONArray();
         for (int i = 0; i < desks.size(); i++) {
             Desk desk = desks.get(i);
-            long lastUpdateTimeNow = deskDAO.getDeskLastUpdateTime(desk.getDeskId());
+            long lastUpdateTimeNow = System.currentTimeMillis();//deskDAO.getDeskLastUpdateTime(desk.getDeskId());
             if (lastUpdateTimeNow > lastUpdatTime) {
                 if (lastUpdateTimeNow > lastUpdatTimeNew) {
                     lastUpdatTimeNew = lastUpdateTimeNow;

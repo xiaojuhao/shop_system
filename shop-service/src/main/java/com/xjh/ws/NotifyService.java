@@ -12,7 +12,7 @@ import java.util.List;
 import static com.xjh.common.utils.CommonUtils.firstOf;
 
 @Singleton
-public class NotifyCenter {
+public class NotifyService {
     public static int FRONT_STS_SUCCESS = 0;
     public static int FRONT_STS_FAILURE = 1;
 
