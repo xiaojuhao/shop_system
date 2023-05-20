@@ -1,38 +1,25 @@
 package com.xjh.service.domain;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.*;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
+import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.enumeration.*;
 import com.xjh.common.utils.*;
 import com.xjh.common.valueobject.CartItemVO;
 import com.xjh.common.valueobject.CartVO;
-import com.xjh.dao.dataobject.Desk;
-import com.xjh.dao.dataobject.Dishes;
-import com.xjh.dao.dataobject.DishesPackage;
-import com.xjh.dao.dataobject.DishesPrice;
-import com.xjh.dao.dataobject.Order;
-import com.xjh.dao.dataobject.OrderDishes;
-import com.xjh.dao.dataobject.SubOrder;
-import com.xjh.dao.mapper.DishesDAO;
-import com.xjh.dao.mapper.DishesPackageDAO;
-import com.xjh.dao.mapper.DishesPriceDAO;
-import com.xjh.dao.mapper.OrderDAO;
-import com.xjh.dao.mapper.OrderDishesDAO;
-import com.xjh.dao.mapper.SubOrderDAO;
+import com.xjh.dao.dataobject.*;
+import com.xjh.dao.mapper.*;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
 import com.xjh.service.domain.model.SendOrderRequest;
 import com.xjh.service.store.CartStore;
-
-import cn.hutool.core.codec.Base64;
 import com.xjh.ws.NotifyService;
 import com.xjh.ws.SocketUtils;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.*;
 
 @Singleton
 public class CartService {
@@ -268,7 +255,7 @@ public class CartService {
             }
 
             // 通知前端更新购物车
-            SocketUtils.delay(() -> NotifyService.notifyCartCleared(deskId), 3);
+            SocketUtils.delay(() -> NotifyService.notifyCartCleared(deskId), 0);
 
             return Result.success("下单成功");
         } catch (Exception ex) {
