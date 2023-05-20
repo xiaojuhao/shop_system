@@ -46,6 +46,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.xjh.common.utils.TableViewUtils.newCol;
+import static com.xjh.startup.foundation.constants.Const.KEEP_BASE64;
 
 public class DishesEditView extends SimpleGridForm {
 
@@ -146,7 +147,11 @@ public class DishesEditView extends SimpleGridForm {
                 v.setImageSrc(it.getImg().getImgUrl());
                 return v;
             }).collect(Collectors.toList());
-            dishes.setDishesImgs(JSON.toJSONString(imgs));
+            if(KEEP_BASE64){
+                dishes.setDishesImgs(Base64.encode(JSON.toJSONString(imgs)));
+            }else {
+                dishes.setDishesImgs(JSON.toJSONString(imgs));
+            }
         });
         resolveDishesImg(imgTV, dishes, imgItems);
         imgTV.refresh();
@@ -263,7 +268,11 @@ public class DishesEditView extends SimpleGridForm {
                 it.setIsValueRadio(CommonUtils.orElse(it.getIsValueRadio(), false));
                 it.setCreateTime(DateBuilder.now().mills());
             });
-            dishes.setDishesPrivateAttribute(JSON.toJSONString(priAttrItems));
+            if(KEEP_BASE64){
+                dishes.setDishesPrivateAttribute(Base64.encode(JSON.toJSONString(priAttrItems)));
+            }else {
+                dishes.setDishesPrivateAttribute(JSON.toJSONString(priAttrItems));
+            }
         });
 
         /* ************************************************************** *\
