@@ -1,6 +1,7 @@
 package com.xjh.service.domain;
 
 import cn.hutool.core.codec.Base64;
+import cn.hutool.db.PageResult;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.google.inject.Inject;
@@ -251,7 +252,7 @@ public class DishesService {
         return false;
     }
 
-    public List<Dishes> pageQuery(Dishes cond, PageCond page) {
+    public PageResult<Dishes> pageQuery(Dishes cond, PageCond page) {
         return dishesDAO.pageQuery(cond, page);
     }
 

@@ -1,5 +1,6 @@
 package com.xjh.startup.view;
 
+import cn.hutool.db.PageResult;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.xjh.common.enumeration.EnumChoiceAction;
@@ -167,11 +168,13 @@ public class OrderDishesChoiceView extends VBox {
         qryDishesCond.addListener((_this, _old, _new) -> {
             List<DishesChoiceItemBO> bolist = new ArrayList<>();
             if (_new.getIfPackage() == null || _new.getIfPackage() == 0) {
-                List<Dishes> dishesList = queryList(_new);
+                PageResult<Dishes> dishesList = queryList(_new);
                 bolist.addAll(collect(dishesList, this::buildBO));
+                _new.setMaxPageNo(dishesList.getTotalPage());
             } else if (_new.getIfPackage() == 1) {
-                List<DishesPackage> packageList = queryPackageList(_new);
+                PageResult<DishesPackage> packageList = queryPackageList(_new);
                 bolist.addAll(collect(packageList, this::buildBO));
+                _new.setMaxPageNo(packageList.getTotalPage());
             }
             List<VBox> list = collect(bolist, it -> this.buildDishesView(it, prefWidth / 6 - 10));
             Platform.runLater(() -> {
@@ -187,7 +190,12 @@ public class OrderDishesChoiceView extends VBox {
         nextPage.setOnMouseClicked(evt -> {
             DishesQueryCond _old = qryDishesCond.get();
             DishesQueryCond _new = CopyUtils.cloneObj(_old);
-            _new.setPageNo(_old.getPageNo() + 1);
+            if(_old.arrivedMaxPageNo()){
+                AlertBuilder.ERROR("已经是最后一页了");
+                _new.setPageNo(_old.getPageNo());
+            }else {
+                _new.setPageNo(_old.getPageNo() + 1);
+            }
             qryDishesCond.set(_new);
         });
 
@@ -196,6 +204,9 @@ public class OrderDishesChoiceView extends VBox {
         prevPage.setOnMouseClicked(evt -> {
             DishesQueryCond _old = qryDishesCond.get();
             DishesQueryCond _new = CopyUtils.cloneObj(_old);
+            if(_old.getPageNo() == 1){
+                AlertBuilder.ERROR("已经是第一页了");
+            }
             _new.setPageNo(Math.max(1, _old.getPageNo() - 1));
             qryDishesCond.set(_new);
         });
@@ -207,7 +218,7 @@ public class OrderDishesChoiceView extends VBox {
         return box;
     }
 
-    private List<Dishes> queryList(DishesQueryCond queryCond) {
+    private PageResult<Dishes> queryList(DishesQueryCond queryCond) {
         PageCond page = new PageCond();
         page.setPageNo(queryCond.getPageNo());
         page.setPageSize(queryCond.getPageSize());
@@ -219,7 +230,7 @@ public class OrderDishesChoiceView extends VBox {
         return dishesService.pageQuery(cond, page);
     }
 
-    private List<DishesPackage> queryPackageList(DishesQueryCond queryCond) {
+    private PageResult<DishesPackage> queryPackageList(DishesQueryCond queryCond) {
         DishesPackageQuery cond = new DishesPackageQuery();
         cond.setName(queryCond.getDishesName());
         cond.setPageNo(1);
@@ -264,6 +275,7 @@ public class OrderDishesChoiceView extends VBox {
         box.setPrefWidth(width);
 
         ImageView iv = getImageView(bo.getImg(), width);
+
         box.setOnMouseClicked(evt -> onDishesClicked(bo)); // 双击菜品
         // 菜品图片
         box.getChildren().add(iv);
@@ -565,8 +577,10 @@ public class OrderDishesChoiceView extends VBox {
             return iv;
         } catch (Exception ex) {
             Logger.info("展示图片异常: " + ex.getMessage() + "," + path);
-            ImageView iv = buildImageView("/img/logo.png");
-            assert iv != null;
+            ImageView iv = buildImageView("db/img/logo.png");
+            if(iv == null){
+                iv = new ImageView();
+            }
             iv.setFitWidth(width);
             iv.setFitHeight(width / 3 * 2);
             return iv;

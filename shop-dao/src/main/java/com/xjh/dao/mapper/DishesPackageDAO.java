@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import cn.hutool.db.PageResult;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.xjh.common.utils.CommonUtils;
@@ -17,6 +18,8 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
+
+import static cn.hutool.core.util.PageUtil.totalPage;
 
 @Singleton
 public class DishesPackageDAO {
@@ -49,10 +52,11 @@ public class DishesPackageDAO {
         }
     }
 
-    public List<DishesPackage> pageQuery(DishesPackageQuery cond) {
+    public PageResult<DishesPackage> pageQuery(DishesPackageQuery cond) {
+        int pageNo = OrElse.orGet(cond.getPageNo(), 1);
+        int pageSize = OrElse.orGet(cond.getPageSize(), 20);
+        PageResult<DishesPackage> result = new PageResult<>(pageNo, pageSize, 0);
         try {
-            int pageNo = OrElse.orGet(cond.getPageNo(), 1);
-            int pageSize = OrElse.orGet(cond.getPageSize(), 20);
             StringBuilder where = new StringBuilder();
             if (CommonUtils.isNotBlank(cond.getName())) {
                 where.append(" and dishesPackageName like '%" + cond.getName() + "%'");
@@ -63,14 +67,18 @@ public class DishesPackageDAO {
             if (cond.getStatus() != null) {
                 where.append(" and dishesPackageStatus = " + cond.getStatus());
             }
-            String sql = "select * from dishes_package_list_new where 1=1 " + where
-                    + " limit " + (pageNo - 1) + "," + pageSize;
+            int total = Db.use(ds).queryNumber("select * from dishes_package_list_new where 1=1 " + where).intValue();
+            String sql = "select * from dishes_package_list_new where 1=1 " + where + " limit " + (pageNo - 1) + "," + pageSize;
             List<Entity> list = Db.use(ds).query(sql);
-            return EntityUtils.convertList(list, DishesPackage.class);
+            List<DishesPackage> dataList = EntityUtils.convertList(list, DishesPackage.class);
+            result.addAll(dataList);
+            result.setTotal(total);
+            result.setTotalPage(totalPage(total, pageSize));
         } catch (Exception ex) {
             ex.printStackTrace();
-            return new ArrayList<>();
+            result.setTotal(0);
         }
+        return result;
     }
 
     public Result<Integer> updateById(DishesPackage dishesPackage) {
@@ -78,9 +86,7 @@ public class DishesPackageDAO {
             return Result.fail("入参错误");
         }
         try {
-            int i = Db.use(ds).update(
-                    EntityUtils.create(dishesPackage),
-                    EntityUtils.idCond(dishesPackage));
+            int i = Db.use(ds).update(EntityUtils.create(dishesPackage), EntityUtils.idCond(dishesPackage));
             return Result.success(i);
         } catch (Exception ex) {
             ex.printStackTrace();

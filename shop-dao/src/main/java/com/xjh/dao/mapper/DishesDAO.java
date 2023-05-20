@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import cn.hutool.db.PageResult;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.xjh.common.utils.CommonUtils;
@@ -18,6 +19,8 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import cn.hutool.db.Db;
 import cn.hutool.db.Entity;
+
+import static cn.hutool.core.util.PageUtil.totalPage;
 
 @Singleton
 public class DishesDAO {
@@ -130,10 +133,10 @@ public class DishesDAO {
         }
     }
 
-    public List<Dishes> pageQuery(Dishes cond, PageCond page) {
+    public PageResult<Dishes> pageQuery(Dishes cond, PageCond page) {
+        int pageNo = OrElse.orGet(page.getPageNo(), 1);
+        int pageSize = OrElse.orGet(page.getPageSize(), 20);
         try {
-            int pageNo = OrElse.orGet(page.getPageNo(), 1);
-            int pageSize = OrElse.orGet(page.getPageSize(), 20);
             StringBuilder where = new StringBuilder();
             List<Object> params = new ArrayList<>();
             if (cond.getDishesId() != null) {
@@ -154,13 +157,18 @@ public class DishesDAO {
             }
             String sql = "select * from dishes_list where 1=1 " + where
                     + " limit " + (pageNo - 1) * pageSize + "," + pageSize;
-
             // System.out.println(sql + ", " + JSON.toJSONString(params));
+            int total = Db.use(ds).queryNumber("select count(*) from dishes_list where 1=1 " + where, params.toArray(new Object[0])).intValue();
             List<Entity> list = Db.use(ds).query(sql, params.toArray(new Object[0]));
-            return EntityUtils.convertList(list, Dishes.class);
+            List<Dishes> dataList = EntityUtils.convertList(list, Dishes.class);
+
+            PageResult<Dishes> result = new PageResult<>(pageNo, pageSize, total);
+            result.addAll(dataList);
+            System.out.println("总页数:" + result.getTotalPage() + ", 当前页: " + pageNo + ", 每页:" + pageSize);
+            return result;
         } catch (Exception ex) {
             ex.printStackTrace();
-            return new ArrayList<>();
+            return new PageResult<>(pageNo, pageSize, 0);
         }
     }
 }
