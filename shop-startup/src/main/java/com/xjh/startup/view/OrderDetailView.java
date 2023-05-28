@@ -565,7 +565,7 @@ public class OrderDetailView extends VBox implements Initializable {
     private double sumDishesPrice(List<OrderDishes> orderDishes) {
         return orderDishes.stream()
                 .filter(this::notReturn)
-                .map(OrderDishes::getOrderDishesPrice)
+                .map(OrderDishes::sumOrderDishesPrice)
                 .filter(Objects::nonNull)
                 .reduce(0D, Double::sum);
     }

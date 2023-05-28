@@ -1,35 +1,23 @@
 package com.xjh.ws.handler;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.xjh.common.enumeration.*;
+import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.OrElse;
+import com.xjh.common.valueobject.OrderOverviewVO;
+import com.xjh.dao.dataobject.*;
+import com.xjh.dao.mapper.DishesPriceDAO;
+import com.xjh.service.domain.*;
+import com.xjh.ws.WsApiType;
+import com.xjh.ws.WsAttachment;
+import com.xjh.ws.WsHandler;
+import org.java_websocket.WebSocket;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
-import com.xjh.common.enumeration.*;
-import com.xjh.ws.WsAttachment;
-import org.java_websocket.WebSocket;
-
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.valueobject.OrderOverviewVO;
-import com.xjh.dao.dataobject.Desk;
-import com.xjh.dao.dataobject.Dishes;
-import com.xjh.dao.dataobject.DishesPackage;
-import com.xjh.dao.dataobject.DishesPrice;
-import com.xjh.dao.dataobject.Order;
-import com.xjh.dao.dataobject.OrderDishes;
-import com.xjh.dao.mapper.DishesPriceDAO;
-import com.xjh.service.domain.DeskService;
-import com.xjh.service.domain.DishesPackageService;
-import com.xjh.service.domain.DishesService;
-import com.xjh.service.domain.OrderDishesService;
-import com.xjh.service.domain.OrderService;
-import com.xjh.ws.WsApiType;
-import com.xjh.ws.WsHandler;
+import java.util.ArrayList;
+import java.util.List;
 
 @Singleton
 @WsApiType("checkDeskInfo")
@@ -89,7 +77,7 @@ public class CheckDeskInfoHandler implements WsHandler {
                     orderInfo.put("createtime", order.getCreateTime());
                     orderInfo.put("customerNums", order.getOrderCustomerNums());
                     orderInfo.put("customerTelphone", order.getOrderCustomerTelphone());
-                    orderInfo.put("discountName", order.getDiscountReason());
+                    orderInfo.put("discountName", OrElse.orGet(order.getDiscountReason(), "无"));
                     orderInfo.put("discountValue", order.getFullReduceDishesPrice());
                     orderInfo.put("erase", CommonUtils.parseInt(order.getOrderErase(), 0));
                     orderInfo.put("hadpaid", order.getOrderHadpaid());

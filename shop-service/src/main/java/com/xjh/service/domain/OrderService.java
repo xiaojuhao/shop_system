@@ -321,16 +321,16 @@ public class OrderService {
     }
 
     private double sumTotalPrice(Order order, List<OrderDishes> orderDishesList) {
-        return CommonUtils.collect(orderDishesList, OrderDishes::getOrderDishesPrice)
+        return CommonUtils.collect(orderDishesList, OrderDishes::sumOrderDishesPrice)
                 .stream().filter(Objects::nonNull)
                 .reduce(0D, Double::sum);
     }
 
     private double calcDiscountAmount(Order order, List<OrderDishes> orderDishesList) {
-        double total = CommonUtils.collect(orderDishesList, OrderDishes::getOrderDishesPrice)
+        double total = CommonUtils.collect(orderDishesList, OrderDishes::sumOrderDishesPrice)
                 .stream().filter(Objects::nonNull)
                 .reduce(0D, Double::sum);
-        double discountedPrice = CommonUtils.collect(orderDishesList, OrderDishes::getOrderDishesDiscountPrice)
+        double discountedPrice = CommonUtils.collect(orderDishesList, OrderDishes::sumOrderDishesDiscountPrice)
                 .stream().filter(Objects::nonNull)
                 .reduce(0D, Double::sum);
         return Math.max(0, total - discountedPrice);
