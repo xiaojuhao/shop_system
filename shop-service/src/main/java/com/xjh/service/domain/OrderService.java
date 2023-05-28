@@ -384,9 +384,7 @@ public class OrderService {
         }
         double billAmount = 0;
         for (OrderDishes od : orderDishes) {
-            double price = OrElse.orGet(od.getOrderDishesDiscountPrice(), 0D);
-            int num = OrElse.orGet(od.getOrderDishesNums(), 1);
-            billAmount += price * num;
+            billAmount += od.sumOrderDishesDiscountPrice();
         }
         return billAmount;
     }
@@ -399,9 +397,7 @@ public class OrderService {
         double returnAmt = 0;
         for (OrderDishes od : orderDishes) {
             if (EnumOrderSaleType.of(od.getOrderDishesSaletype()) == EnumOrderSaleType.RETURN) {
-                double price = OrElse.orGet(od.getOrderDishesDiscountPrice(), 0D);
-                int num = OrElse.orGet(od.getOrderDishesNums(), 1);
-                returnAmt += price * num;
+                returnAmt += od.sumOrderDishesDiscountPrice();
             }
         }
         return returnAmt;

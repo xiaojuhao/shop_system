@@ -195,12 +195,12 @@ public class OrderPrinterHelper {
         JSONArray rows = new JSONArray();
         for (OrderDishes orderDishes : orderDishesList) {
             Dishes dishes = dishesMap.get(orderDishes.getDishesId());
-            sumPrices += orderDishes.getOrderDishesPrice();
+            sumPrices += orderDishes.sumOrderDishesPrice();
             rows.add(asArray(
                     dishes.getDishesName(),
-                    formatMoney(orderDishes.getOrderDishesPrice()),
+                    formatMoney(orderDishes.sumOrderDishesPrice()),
                     orderDishes.getOrderDishesNums(),
-                    orderDishes.getOrderDishesPrice()));
+                    orderDishes.sumOrderDishesPrice()));
         }
         details.put("rows", rows);
 
