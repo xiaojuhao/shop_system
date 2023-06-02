@@ -1,8 +1,7 @@
 package com.xjh.startup.view.base;
 
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.startup.foundation.constants.Const;
-
+import com.xjh.common.utils.Const;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;

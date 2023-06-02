@@ -45,8 +45,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.xjh.common.utils.Const.KEEP_BASE64;
 import static com.xjh.common.utils.TableViewUtils.newCol;
-import static com.xjh.startup.foundation.constants.Const.KEEP_BASE64;
 
 public class DishesEditView extends SimpleGridForm {
 

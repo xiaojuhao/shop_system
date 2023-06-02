@@ -1,6 +1,5 @@
 package com.xjh.service.domain;
 
-import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
@@ -25,6 +24,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.xjh.common.utils.CommonUtils.tryDecodeBase64;
+import static com.xjh.common.utils.CommonUtils.tryEncodeBase64;
 
 @Singleton
 public class OrderService {
@@ -107,7 +107,7 @@ public class OrderService {
         List<OrderDishes> orderDishes = orderDishesService.selectByOrderId(orderId);
         order.setOrderHadpaid(orderHaidPaid);
         order.setFullReduceDishesPrice(0D);
-        order.setOrderDiscountInfo(JSON.toJSONString(new OrderDiscountVO()));
+        order.setOrderDiscountInfo(tryEncodeBase64(JSON.toJSONString(new OrderDiscountVO())));
         OrderOverviewVO billView = this.buildOrderOverview(order, orderDishes, pays).getData();
         if (billView.getOrderNeedPay() <= 0.01) {
             order.setOrderStatus(EnumOrderStatus.PAID.status);
@@ -300,6 +300,9 @@ public class OrderService {
                 if (d != null) {
                     v.discountName = d.getDiscountName();
                 }
+                if (CommonUtils.isBlank(v.getDiscountName())) {
+                    v.discountName = "无";
+                }
             }
 
             // 支付信息
@@ -439,7 +442,7 @@ public class OrderService {
             order.setOrderStatus(EnumOrderStatus.UNPAID.status);
             order.setStatus(EnumOrderServeStatus.START.status);
             order.setOrderType(EnumOrderType.NORMAL.type);
-            order.setOrderDiscountInfo(Base64.encode(JSONObject.toJSONString(new OrderDiscountVO())));
+            order.setOrderDiscountInfo(tryEncodeBase64(JSONObject.toJSONString(new OrderDiscountVO())));
             order.setOrderRecommender(param.getRecommender());
             order.setMemberId(0L);
             order.setOrderCustomerNums(param.getCustomerNum());

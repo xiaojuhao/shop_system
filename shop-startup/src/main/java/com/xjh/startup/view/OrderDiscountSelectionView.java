@@ -27,6 +27,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static com.xjh.common.utils.CommonUtils.tryEncodeBase64;
+
 public class OrderDiscountSelectionView extends SmallForm {
     OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
     StoreService storeService = GuiceContainer.getInstance(StoreService.class);
@@ -209,7 +211,7 @@ public class OrderDiscountSelectionView extends SmallForm {
 
         Order orderUpdate = new Order();
         orderUpdate.setOrderId(param.getOrderId());
-        orderUpdate.setOrderDiscountInfo(JSON.toJSONString(orderDiscount));
+        orderUpdate.setOrderDiscountInfo(tryEncodeBase64(JSON.toJSONString(orderDiscount)));
         orderUpdate.setDiscountReason(req.getDiscountName());
         orderService.updateByOrderId(orderUpdate);
         AlertBuilder.INFO("优惠使用成功");

@@ -897,6 +897,14 @@ public class CommonUtils {
         }
     }
 
+    public static String tryEncodeBase64(String json) {
+        if (isNotBlank(json) && Const.KEEP_BASE64) {
+            return Base64.encode(json);
+        } else {
+            return json;
+        }
+    }
+
     public static <T extends Comparable<T>> T max(T a, T b) {
         if (a == null) {
             return b;

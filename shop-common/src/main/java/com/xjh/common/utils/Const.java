@@ -1,4 +1,4 @@
-package com.xjh.startup.foundation.constants;
+package com.xjh.common.utils;
 
 public class Const {
     public final static int REGULAR_SPACING = 10;
