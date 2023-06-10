@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
+import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Logger;
@@ -44,6 +45,10 @@ public class OrderReturnDishesView extends SmallForm {
         Button returnBtn = new Button("退菜");
         returnBtn.setOnMouseClicked(evt -> {
             String r = reasonList.getSelectionModel().getSelectedItem();
+            if(CommonUtils.isBlank(r)){
+                AlertBuilder.ERROR("请选择退菜原因");
+                return;
+            }
             doReturnDishes(param, r);
             this.getScene().getWindow().hide();
         });

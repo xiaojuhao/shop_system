@@ -12,6 +12,7 @@ import java.util.Optional;
 import com.alibaba.fastjson.JSON;
 import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.utils.AlertBuilder;
+import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Result;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderPayService;
@@ -143,6 +144,14 @@ public class PayWayChoiceView extends SmallForm {
     private void addPay(PaymentResult paymentResult) {
         // 取消按钮
         if (paymentResult.getPayAction() == 0) {
+            return;
+        }
+        if(CommonUtils.isNotBlank(paymentResult.getErrorMsg())){
+            AlertBuilder.ERROR(paymentResult.getErrorMsg());
+            return;
+        }
+        if(paymentResult.getPayAmount() < 0.001){
+            AlertBuilder.ERROR("支付金额不能为0");
             return;
         }
         // 确认支付处理

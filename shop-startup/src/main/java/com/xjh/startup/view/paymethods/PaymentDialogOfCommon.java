@@ -65,6 +65,9 @@ public class PaymentDialogOfCommon extends Dialog<PaymentResult> {
                 result.setPayAmount(CommonUtils.parseMoney(payAmountField.getText(), 0D));
                 result.setPayRemark(remarkField.getText());
                 result.setCardNumber(cardNumFiled.getText());
+                if(CommonUtils.isBlank(result.getCardNumber())){
+                    result.setErrorMsg("交易编号信息必输");
+                }
             } else {
                 result.setPayAction(0);
                 result.setPayAmount(0D);

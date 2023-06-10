@@ -16,4 +16,6 @@ public class PaymentResult {
     EnumPayMethod payMethod;
     // 0--取消  1--确认
     int payAction;
+
+    String errorMsg;
 }
