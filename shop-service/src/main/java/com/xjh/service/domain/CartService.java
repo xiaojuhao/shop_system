@@ -226,9 +226,9 @@ public class CartService {
             for (CartItemVO item : cartVO.getContents()) {
                 int ifPackage = OrElse.orGet(item.getIfDishesPackage(), 0);
                 if (ifPackage == 1 || ifPackage == 2) {
-                    orderDishes.add(buildPackageCartItemVO(item, orderId, subInsertRs.getData()));
+                    orderDishes.addAll(buildPackageCartItemVO(item, orderId, subInsertRs.getData()));
                 } else {
-                    orderDishes.add(buildCommonCartItemVO(item, orderId, subInsertRs.getData()));
+                    orderDishes.addAll(buildCommonCartItemVO(item, orderId, subInsertRs.getData()));
                 }
             }
             for (OrderDishes d : orderDishes) {
@@ -266,38 +266,38 @@ public class CartService {
         }
     }
 
-    private OrderDishes buildCommonCartItemVO(CartItemVO item, Integer orderId, Integer subOrderId) {
+    private List<OrderDishes> buildCommonCartItemVO(CartItemVO item, Integer orderId, Integer subOrderId) {
         DishesPrice dishesPrice = dishesPriceDAO.queryByPriceId(item.getDishesPriceId());
-
+        List<OrderDishes> list = new ArrayList<>();
         Dishes dishes = dishesDAO.getById(item.getDishesId());
-        OrderDishes d = new OrderDishes();
-        d.setOrderId(orderId);
-        d.setSubOrderId(subOrderId);
-        d.setDishesId(item.getDishesId());
-        if (dishesPrice != null) {
-            d.setDishesPriceId(dishesPrice.getDishesPriceId());
-            d.setOrderDishesPrice(dishesPrice.getDishesPrice());
-            d.setOrderDishesDiscountPrice(dishesPrice.getDishesPrice());
-        } else {
-            d.setDishesPriceId(0);
-            d.setOrderDishesPrice(dishes.getDishesPrice());
-            d.setOrderDishesDiscountPrice(dishes.getDishesPrice());
-        }
-        d.setDishesTypeId(dishes.getDishesTypeId());
-        d.setCreatetime(DateBuilder.now().mills());
-        d.setIfDishesPackage(0);
-        d.setOrderDishesIfchange(0);
-        d.setOrderDishesIfrefund(0);
-        d.setOrderDishesNums(item.getNums());
-        d.setOrderDishesSaletype(EnumOrderSaleType.NORMAL.type);
-        if (item.getDishesAttrs() != null) {
-            d.setOrderDishesOptions(Base64.encode(JSONObject.toJSONString(item.getDishesAttrs())));
-        } else {
-            d.setOrderDishesOptions(Base64.encode("[]"));
-        }
-        d.setOrderDishesDiscountInfo(Base64.encode(""));
+        for (int i = 0; i < item.getNums(); i++) {
+            OrderDishes d = new OrderDishes();
+            d.setOrderId(orderId);
+            d.setSubOrderId(subOrderId);
+            d.setDishesId(item.getDishesId());
+            if (dishesPrice != null) {
+                d.setDishesPriceId(dishesPrice.getDishesPriceId());
+                d.setOrderDishesPrice(dishesPrice.getDishesPrice());
+                d.setOrderDishesDiscountPrice(dishesPrice.getDishesPrice());
+            } else {
+                d.setDishesPriceId(0);
+                d.setOrderDishesPrice(dishes.getDishesPrice());
+                d.setOrderDishesDiscountPrice(dishes.getDishesPrice());
+            }
+            d.setDishesTypeId(dishes.getDishesTypeId());
+            d.setCreatetime(DateBuilder.now().mills());
+            d.setIfDishesPackage(0);
+            d.setOrderDishesIfchange(0);
+            d.setOrderDishesIfrefund(0);
+            d.setOrderDishesNums(1);
+            d.setOrderDishesSaletype(EnumOrderSaleType.NORMAL.type);
+            String options = JSONObject.toJSONString(OrElse.orGet(item.getDishesAttrs(), new ArrayList<>()));
+            d.setOrderDishesOptions(Const.KEEP_BASE64 ? Base64.encode(options) : options);
+            d.setOrderDishesDiscountInfo(Const.KEEP_BASE64 ? Base64.encode("") : "");
 
-        return d;
+            list.add(d);
+        }
+        return list;
     }
 
     private OrderDishes buildSendOrderDishes(SendOrderRequest item, Integer orderId, Integer subOrderId) {
@@ -323,26 +323,32 @@ public class CartService {
     }
 
 
-    private OrderDishes buildPackageCartItemVO(CartItemVO item, Integer orderId, Integer subOrderId) {
+    private List<OrderDishes> buildPackageCartItemVO(CartItemVO item, Integer orderId, Integer subOrderId) {
+        List<OrderDishes> list = new ArrayList<>();
         DishesPackage dishes = dishesPackageDAO.getByDishesPackageId(item.getDishesId());
-        OrderDishes d = new OrderDishes();
-        d.setOrderId(orderId);
-        d.setSubOrderId(subOrderId);
-        d.setDishesId(item.getDishesId());
-        d.setDishesPriceId(0);
-        d.setDishesTypeId(dishes.getDishesPackageType());
-        d.setOrderDishesPrice(dishes.getDishesPackagePrice());
-        d.setOrderDishesDiscountPrice(dishes.getDishesPackagePrice());
-        d.setCreatetime(DateBuilder.now().mills());
-        d.setIfDishesPackage(1);
-        d.setOrderDishesIfchange(0);
-        d.setOrderDishesIfrefund(0);
-        d.setOrderDishesNums(OrElse.orGet(item.getNums(), 1));
-        d.setOrderDishesSaletype(EnumOrderSaleType.NORMAL.type);
-        d.setOrderDishesOptions(Base64.encode("[]"));
-        d.setOrderDishesDiscountInfo(Base64.encode(""));
 
-        return d;
+        for (int i = 0; i < OrElse.orGet(item.getNums(), 1); i++) {
+            OrderDishes d = new OrderDishes();
+            d.setOrderId(orderId);
+            d.setSubOrderId(subOrderId);
+            d.setDishesId(item.getDishesId());
+            d.setDishesPriceId(0);
+            d.setDishesTypeId(dishes.getDishesPackageType());
+            d.setOrderDishesPrice(dishes.getDishesPackagePrice());
+            d.setOrderDishesDiscountPrice(dishes.getDishesPackagePrice());
+            d.setCreatetime(DateBuilder.now().mills());
+            d.setIfDishesPackage(1);
+            d.setOrderDishesIfchange(0);
+            d.setOrderDishesIfrefund(0);
+            d.setOrderDishesNums(1);
+            d.setOrderDishesSaletype(EnumOrderSaleType.NORMAL.type);
+            d.setOrderDishesOptions(Const.KEEP_BASE64 ? Base64.encode("[]") : "[]");
+            d.setOrderDishesDiscountInfo(Const.KEEP_BASE64 ? Base64.encode("") : "");
+
+            list.add(d);
+        }
+
+        return list;
     }
 
 
