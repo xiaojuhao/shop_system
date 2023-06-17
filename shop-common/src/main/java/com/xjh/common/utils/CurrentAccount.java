@@ -17,4 +17,8 @@ public class CurrentAccount {
         return get() != null ? get().getAccountId() : 1;
     }
 
+    public static String currentAccountCode() {
+        return get() != null ? get().getAccountUser() : "root";
+    }
+
 }

@@ -1,6 +1,8 @@
 package com.xjh.ws;
 
 import com.alibaba.fastjson.JSONObject;
+import com.xjh.common.utils.CurrentAccount;
+import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.valueobject.CartItemVO;
 import com.xjh.common.valueobject.CartVO;
 import com.xjh.service.domain.CartService;
@@ -24,7 +26,16 @@ public class NotifyService {
         JSONObject next = new JSONObject();
         next.put("API_TYPE", "orderCart");
         next.put("deskId", deskId);
-        // next.put("operateAccount", order.getAccountId());
+        next.put("operateAccount", CurrentAccount.currentAccountCode());
+        SocketUtils.asyncSendMsg(deskId, next);
+    }
+
+    public static void notifyReturnDishes(int deskId) {
+        // 通知前端更新购物车
+        JSONObject next = new JSONObject();
+        next.put("API_TYPE", "returnDishes");
+        next.put("deskId", deskId);
+        next.put("operateAccount", CurrentAccount.currentAccountCode());
         SocketUtils.asyncSendMsg(deskId, next);
     }
 

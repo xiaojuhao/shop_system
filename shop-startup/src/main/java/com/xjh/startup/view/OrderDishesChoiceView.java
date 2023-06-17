@@ -500,7 +500,7 @@ public class OrderDishesChoiceView extends VBox {
             Logger.info("购物车信息:" + JSON.toJSONString(addCartRs));
             if (addCartRs.isSuccess()) {
                 AlertBuilder.INFO("通知消息", "添加购物车成功");
-                cartSize.set(CollectionUtils.size(addCartRs.getData().getContents()));
+                cartSize.set(cartService.cartSize(addCartRs.getData()));
             } else {
                 AlertBuilder.ERROR(addCartRs.getMsg());
             }
@@ -561,7 +561,7 @@ public class OrderDishesChoiceView extends VBox {
 
     private void refreshCartSize() {
         try {
-            cartSize.set(cartService.getCartItems(param.getDeskId()).size());
+            cartSize.set(cartService.cartSize(cartService.getCart(param.getDeskId()).getData()));
         } catch (Exception ex) {
             Logger.error(ex.getMessage());
         }

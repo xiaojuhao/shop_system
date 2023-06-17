@@ -39,6 +39,8 @@ public class CartService {
     @Inject
     DeskService deskService;
     @Inject
+    CartDAO cartDAO;
+    @Inject
     DishesPriceDAO dishesPriceDAO;
     @Inject
     NotifyService notifyService;
@@ -70,7 +72,8 @@ public class CartService {
                 contentItems.add(item);
             }
             cart.setContents(contentItems);
-            Result<String> rs = CartStore.saveCart(cart);
+            // Result<String> rs = CartStore.saveCart(cart);
+            Result<String> rs = cartDAO.save(cart);
             if (!rs.isSuccess()) {
                 return Result.fail("添加购物车失败,保存数据库失败");
             }
@@ -85,12 +88,24 @@ public class CartService {
         }
     }
 
+    public int cartSize(CartVO cartVO){
+        int total = 0;
+        if(cartVO == null || cartVO.getContents() == null){
+            return total;
+        }
+        for(CartItemVO item : cartVO.getContents()){
+            total += CommonUtils.parseInt(item.getNums(), 0);
+        }
+        return total;
+    }
+
     public Result<CartVO> updateCart(Integer deskId, CartVO cart) {
         Runnable clear = CurrentRequest.resetRequestId();
         try {
 //            CartVO oldCart = getCart(deskId).getData();
 //            Set<Integer> chg = cmpCartNum(cart, oldCart);
-            Result<String> rs = CartStore.saveCart(cart);
+            // Result<String> rs = CartStore.saveCart(cart);
+            Result<String> rs = cartDAO.save(cart);
             if (!rs.isSuccess()) {
                 return Result.fail("添加购物车失败,保存数据库失败");
             }
@@ -107,7 +122,8 @@ public class CartService {
     }
 
     public List<CartItemVO> getCartItems(Integer deskId) {
-        CartVO cart = CartStore.getCart(deskId);
+        // CartVO cart = CartStore.getCart(deskId);
+        CartVO cart = cartDAO.getDeskCard(deskId);
         List<CartItemVO> items = cart.getContents();
         if (items == null) {
             return new ArrayList<>();
@@ -118,36 +134,13 @@ public class CartService {
 
     public Result<CartVO> getCart(Integer deskId) {
         try {
-            CartVO cart = CartStore.getCart(deskId);
+            // CartVO cart = CartStore.getCart(deskId);
+            CartVO cart = cartDAO.getDeskCard(deskId);
             return Result.success(cart);
         } catch (Exception ex) {
             Logger.error("getCartOfDesk:" + ex.getMessage());
             return Result.fail(ex.getMessage());
         }
-    }
-
-    public Set<Integer> cmpCartNum(CartVO cart, CartVO oldCart) {
-        Set<Integer> chg = new HashSet<>();
-        Map<Integer, Integer> dishesNum = cartDishesNum(cart);
-        Map<Integer, Integer> oldDishesNum = cartDishesNum(oldCart);
-        for (Integer cartDishesId : dishesNum.keySet()) {
-            Integer num = dishesNum.get(cartDishesId);
-            Integer oldNum = oldDishesNum.get(cartDishesId);
-            if (num != null && oldNum != null) {
-                chg.add(cartDishesId);
-            }
-        }
-        return chg;
-    }
-
-    public Map<Integer, Integer> cartDishesNum(CartVO cart) {
-        Map<Integer, Integer> map = new HashMap<>();
-        if (cart != null && cart.getContents() != null) {
-            for (int i = 0; i < cart.getContents().size(); i++) {
-                map.put(i, cart.getContents().get(i).getNums());
-            }
-        }
-        return map;
     }
 
     public Result<String> createSendOrder(SendOrderRequest request) {
@@ -184,6 +177,9 @@ public class CartService {
             // 更新订单状态
             orderService.updateByOrderId(order);
             Logger.info("赠送菜品: 订单号:" + orderId + ", 菜品:" + request.getDishesName() + "(" + request.getDishesId() + ")");
+
+            NotifyService.notifyCartCleared(request.getDeskId());
+
             return Result.success("下单成功");
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -198,13 +194,14 @@ public class CartService {
         try {
             Integer deskId = param.getDeskId();
             Integer orderId = param.getOrderId();
-            CartVO cartVO = CartStore.getCart(deskId);
+
             Order order = orderDAO.selectByOrderId(orderId).getData();
             if (order == null) {
                 return Result.fail("订单号不存在:" + orderId);
             }
+            Result<CartVO> cartRs = getCart(deskId);
             // 条件校验
-            if (cartVO.getContents() == null || cartVO.getContents().size() == 0) {
+            if (!cartRs.isSuccess() || CommonUtils.isEmpty(cartRs.getData().getContents())) {
                 Logger.error("购物车空:" + JSON.toJSONString(param));
                 return Result.fail("购物车空");
             }
@@ -223,7 +220,7 @@ public class CartService {
             }
             // order dishes
             List<OrderDishes> orderDishes = new ArrayList<>();
-            for (CartItemVO item : cartVO.getContents()) {
+            for (CartItemVO item : cartRs.getData().getContents()) {
                 int ifPackage = OrElse.orGet(item.getIfDishesPackage(), 0);
                 if (ifPackage == 1 || ifPackage == 2) {
                     orderDishes.addAll(buildPackageCartItemVO(item, orderId, subInsertRs.getData()));
@@ -353,7 +350,8 @@ public class CartService {
 
 
     public Result<String> clearCart(Integer deskId) {
-        return CartStore.clearCart(deskId);
+        // return CartStore.clearCart(deskId);
+        return cartDAO.clearCart(deskId);
     }
 
 

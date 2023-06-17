@@ -18,6 +18,7 @@ import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
 
+import com.xjh.ws.NotifyService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
@@ -71,6 +72,8 @@ public class OrderReturnDishesView extends SmallForm {
             returnReason.setReturnReason(reason);
             returnReason.setAddtime(DateBuilder.now().mills());
             returnReasonDAO.insert(returnReason);
+
+            NotifyService.notifyReturnDishes(req.getDeskId());
         }
     }
 
