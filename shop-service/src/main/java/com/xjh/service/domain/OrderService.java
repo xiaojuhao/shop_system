@@ -16,7 +16,7 @@ import com.xjh.dao.mapper.SubOrderDAO;
 import com.xjh.dao.query.OrderPayQuery;
 import com.xjh.dao.query.PageQueryOrderReq;
 import com.xjh.service.domain.model.CreateOrderParam;
-import com.xjh.ws.NotifyService;
+import com.xjh.service.ws.NotifyService;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;

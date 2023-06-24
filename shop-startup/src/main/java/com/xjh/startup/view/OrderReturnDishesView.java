@@ -7,7 +7,6 @@ import com.google.common.collect.Lists;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
-import com.xjh.common.utils.Logger;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.dao.dataobject.ReturnReasonDO;
@@ -18,7 +17,7 @@ import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
 
-import com.xjh.ws.NotifyService;
+import com.xjh.service.ws.NotifyService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;

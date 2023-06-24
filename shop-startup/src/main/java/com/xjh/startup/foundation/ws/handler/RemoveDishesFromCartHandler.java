@@ -1,4 +1,4 @@
-package com.xjh.ws.handler;
+package com.xjh.startup.foundation.ws.handler;
 
 import java.util.List;
 import java.util.Objects;
@@ -14,8 +14,8 @@ import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.CartItemVO;
 import com.xjh.common.valueobject.CartVO;
 import com.xjh.service.domain.CartService;
-import com.xjh.ws.WsApiType;
-import com.xjh.ws.WsHandler;
+import com.xjh.service.ws.WsApiType;
+import com.xjh.startup.foundation.ws.WsHandler;
 
 @Singleton
 @WsApiType("removeDishesFromCart")

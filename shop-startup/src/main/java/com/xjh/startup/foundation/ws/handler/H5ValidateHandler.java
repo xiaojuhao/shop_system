@@ -1,4 +1,4 @@
-package com.xjh.ws.handler;
+package com.xjh.startup.foundation.ws.handler;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -10,8 +10,8 @@ import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.DeskKey;
 import com.xjh.dao.mapper.DeskKeyDAO;
 import com.xjh.service.domain.DeskService;
-import com.xjh.ws.WsApiType;
-import com.xjh.ws.WsHandler;
+import com.xjh.service.ws.WsApiType;
+import com.xjh.startup.foundation.ws.WsHandler;
 
 @Singleton
 @WsApiType("h5Validate")

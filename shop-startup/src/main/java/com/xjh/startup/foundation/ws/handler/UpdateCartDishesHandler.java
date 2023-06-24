@@ -1,17 +1,16 @@
-package com.xjh.ws.handler;
+package com.xjh.startup.foundation.ws.handler;
 
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.enumeration.EnumIsPackage;
-import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.CartItemVO;
 import com.xjh.common.valueobject.CartVO;
-import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.service.domain.CartService;
-import com.xjh.ws.SocketUtils;
-import com.xjh.ws.WsApiType;
-import com.xjh.ws.WsAttachment;
-import com.xjh.ws.WsHandler;
+import com.xjh.service.ws.SocketUtils;
+import com.xjh.service.ws.WsApiType;
+import com.xjh.service.ws.WsAttachment;
+import com.xjh.startup.foundation.ws.WsHandler;
+import com.xjh.startup.view.OrderDishesChoiceView;
 import org.java_websocket.WebSocket;
 
 import javax.inject.Inject;
@@ -93,6 +92,8 @@ public class UpdateCartDishesHandler implements WsHandler {
                     jSONObjectReturn.put("msg", "更新失败");
                 }
             }
+
+            OrderDishesChoiceView.refreshCartSize(deskId);
 
         } catch (Exception e) {
             jSONObjectReturn.put("status", 1);

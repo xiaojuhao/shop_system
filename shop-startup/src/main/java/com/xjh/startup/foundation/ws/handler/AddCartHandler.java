@@ -1,5 +1,6 @@
-package com.xjh.ws.handler;
+package com.xjh.startup.foundation.ws.handler;
 
+import com.xjh.startup.view.OrderDishesChoiceView;
 import org.java_websocket.WebSocket;
 
 import com.alibaba.fastjson.JSONObject;
@@ -12,8 +13,8 @@ import com.xjh.common.valueobject.CartVO;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.service.domain.CartService;
-import com.xjh.ws.WsApiType;
-import com.xjh.ws.WsHandler;
+import com.xjh.service.ws.WsApiType;
+import com.xjh.startup.foundation.ws.WsHandler;
 
 @Singleton
 @WsApiType(value = "addDishesToCart")
@@ -43,6 +44,8 @@ public class AddCartHandler implements WsHandler {
         cartItem.setNums(dishesNum);
         cartItem.setIfDishesPackage(0);
         Result<CartVO> addCartRs = cartService.addItem(deskId, cartItem);
+
+        OrderDishesChoiceView.refreshCartSize(deskId);
 
         if (addCartRs.isSuccess()) {
             resp.put("status", 0);

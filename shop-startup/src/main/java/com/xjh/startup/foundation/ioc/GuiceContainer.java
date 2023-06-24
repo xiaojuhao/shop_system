@@ -9,7 +9,7 @@ import com.xjh.dao.DaoModule;
 import com.xjh.dao.DataSourceModule;
 import com.xjh.service.ServiceModule;
 import com.xjh.startup.foundation.printers.PrinterModule;
-import com.xjh.ws.WsHandlerModule;
+import com.xjh.startup.foundation.ws.WsHandlerModule;
 
 public class GuiceContainer {
     static Holder<Injector> injector = new Holder<>();

@@ -1,12 +1,12 @@
-package com.xjh.ws.handler;
+package com.xjh.startup.foundation.ws.handler;
 
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.dao.dataobject.Account;
 import com.xjh.dao.mapper.AccountDAO;
 import com.xjh.dao.mapper.StoreDAO;
-import com.xjh.ws.WsApiType;
-import com.xjh.ws.WsAttachment;
-import com.xjh.ws.WsHandler;
+import com.xjh.service.ws.WsApiType;
+import com.xjh.service.ws.WsAttachment;
+import com.xjh.startup.foundation.ws.WsHandler;
 import org.java_websocket.WebSocket;
 
 import javax.inject.Inject;

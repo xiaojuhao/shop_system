@@ -1,4 +1,4 @@
-package com.xjh.ws.handler;
+package com.xjh.startup.foundation.ws.handler;
 
 import java.util.List;
 
@@ -13,8 +13,8 @@ import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderDishesService;
-import com.xjh.ws.WsApiType;
-import com.xjh.ws.WsHandler;
+import com.xjh.service.ws.WsApiType;
+import com.xjh.startup.foundation.ws.WsHandler;
 
 @Singleton
 @WsApiType("returnDishes")

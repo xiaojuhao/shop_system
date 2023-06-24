@@ -1,4 +1,4 @@
-package com.xjh.ws;
+package com.xjh.service.ws;
 
 import com.xjh.common.utils.Safe;
 import lombok.Data;

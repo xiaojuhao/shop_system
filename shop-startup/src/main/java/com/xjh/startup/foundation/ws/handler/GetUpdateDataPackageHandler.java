@@ -1,4 +1,4 @@
-package com.xjh.ws.handler;
+package com.xjh.startup.foundation.ws.handler;
 
 import java.util.List;
 import java.util.Map;
@@ -33,8 +33,8 @@ import com.xjh.service.domain.DishesPackageService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.DishesTypeService;
 import com.xjh.service.domain.OrderService;
-import com.xjh.ws.WsApiType;
-import com.xjh.ws.WsHandler;
+import com.xjh.service.ws.WsApiType;
+import com.xjh.startup.foundation.ws.WsHandler;
 
 @Singleton
 @WsApiType("getUpdateDataPackage")

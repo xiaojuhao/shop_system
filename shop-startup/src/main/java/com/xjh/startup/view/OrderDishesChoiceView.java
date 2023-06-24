@@ -46,6 +46,7 @@ import javafx.stage.Window;
 import javafx.util.StringConverter;
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -65,6 +66,7 @@ public class OrderDishesChoiceView extends VBox {
 
     private final DeskOrderParam param;
     private final SimpleIntegerProperty cartSize = new SimpleIntegerProperty(0);
+    public static Holder<OrderDishesChoiceView> _this = new Holder<>();
     private final ObjectProperty<DishesQueryCond> qryDishesCond = new SimpleObjectProperty<>();
 
     public OrderDishesChoiceView(DeskOrderParam param, double prefWidth) {
@@ -74,6 +76,7 @@ public class OrderDishesChoiceView extends VBox {
         this.getChildren().add(initDishesView(prefWidth));
 
         refreshCartSize();
+        _this.hold(this);
     }
 
     private HBox topMenus() {
@@ -504,7 +507,6 @@ public class OrderDishesChoiceView extends VBox {
             Logger.info("购物车信息:" + JSON.toJSONString(addCartRs));
             if (addCartRs.isSuccess()) {
                 AlertBuilder.INFO("通知消息", "添加购物车成功");
-                cartSize.set(cartService.cartSize(addCartRs.getData()));
             } else {
                 AlertBuilder.ERROR(addCartRs.getMsg());
             }
@@ -568,6 +570,17 @@ public class OrderDishesChoiceView extends VBox {
             cartSize.set(cartService.cartSize(cartService.getCart(param.getDeskId()).getData()));
         } catch (Exception ex) {
             Logger.error(ex.getMessage());
+        }
+    }
+
+    public static void refreshCartSize(int deskId){
+        if(_this.get() != null){
+            System.out.println("刷新购物车信息" + _this.get().param.getDeskId() + ", " + deskId);
+            if(_this.get().param.getDeskId().equals(deskId)) {
+                Platform.runLater(() -> _this.get().refreshCartSize());
+            }
+        }else {
+            System.out.println("刷新购物车信息, 实例不存在");
         }
     }
 

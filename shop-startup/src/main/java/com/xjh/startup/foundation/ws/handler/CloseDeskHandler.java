@@ -1,4 +1,4 @@
-package com.xjh.ws.handler;
+package com.xjh.startup.foundation.ws.handler;
 
 import javax.inject.Inject;
 
@@ -6,8 +6,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Singleton;
 import com.xjh.common.utils.Result;
 import com.xjh.service.domain.DeskService;
-import com.xjh.ws.WsHandler;
-import com.xjh.ws.WsApiType;
+import com.xjh.startup.foundation.ws.WsHandler;
+import com.xjh.service.ws.WsApiType;
 import org.java_websocket.WebSocket;
 
 @Singleton

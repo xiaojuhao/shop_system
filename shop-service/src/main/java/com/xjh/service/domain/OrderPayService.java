@@ -21,7 +21,7 @@ import com.xjh.dao.mapper.OrderDAO;
 import com.xjh.dao.mapper.OrderPayDAO;
 import com.xjh.dao.query.OrderPayQuery;
 import com.xjh.service.domain.model.PaymentResult;
-import com.xjh.ws.NotifyService;
+import com.xjh.service.ws.NotifyService;
 
 @Singleton
 public class OrderPayService {

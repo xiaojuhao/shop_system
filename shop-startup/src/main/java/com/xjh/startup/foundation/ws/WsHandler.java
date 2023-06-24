@@ -1,4 +1,4 @@
-package com.xjh.ws;
+package com.xjh.startup.foundation.ws;
 
 
 import com.alibaba.fastjson.JSONObject;

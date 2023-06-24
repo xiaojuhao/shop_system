@@ -16,7 +16,7 @@ import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.mapper.DeskDAO;
 import com.xjh.service.domain.model.CreateOrderParam;
 import com.xjh.service.domain.model.OpenDeskParam;
-import com.xjh.ws.NotifyService;
+import com.xjh.service.ws.NotifyService;
 
 @Singleton
 public class DeskService {

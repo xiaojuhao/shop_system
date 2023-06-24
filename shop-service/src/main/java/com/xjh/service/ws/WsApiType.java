@@ -1,4 +1,4 @@
-package com.xjh.ws;
+package com.xjh.service.ws;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

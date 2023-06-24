@@ -1,15 +1,12 @@
-package com.xjh.ws.handler;
+package com.xjh.startup.foundation.ws.handler;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.xjh.common.enumeration.EnumIsPackage;
-import com.xjh.common.enumeration.EnumOrderType;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesAttributeValueVO;
-import com.xjh.dao.dataobject.DishesAttribute;
-import com.xjh.dao.dataobject.OrderDishes;
 import org.java_websocket.WebSocket;
 
 import com.alibaba.fastjson.JSONArray;
@@ -17,11 +14,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.xjh.service.domain.CartService;
 import com.xjh.common.valueobject.CartItemVO;
 import com.xjh.common.valueobject.CartVO;
-import com.xjh.ws.WsApiType;
-import com.xjh.ws.WsHandler;
+import com.xjh.service.ws.WsApiType;
+import com.xjh.startup.foundation.ws.WsHandler;
 
 import java.util.List;
-import java.util.concurrent.Executors;
 
 @Singleton
 @WsApiType("checkDeskCart")

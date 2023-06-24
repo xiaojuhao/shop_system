@@ -29,8 +29,8 @@ import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.model.CartItemBO;
 import com.xjh.startup.view.model.DeskOrderParam;
 
-import com.xjh.ws.NotifyService;
-import com.xjh.ws.SocketUtils;
+import com.xjh.service.ws.NotifyService;
+import com.xjh.service.ws.SocketUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;

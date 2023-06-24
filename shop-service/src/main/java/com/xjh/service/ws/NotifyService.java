@@ -1,8 +1,7 @@
-package com.xjh.ws;
+package com.xjh.service.ws;
 
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.CurrentAccount;
-import com.xjh.common.utils.CurrentRequest;
 import com.xjh.common.valueobject.CartItemVO;
 import com.xjh.common.valueobject.CartVO;
 import com.xjh.service.domain.CartService;

@@ -1,4 +1,4 @@
-package com.xjh.ws.handler;
+package com.xjh.startup.foundation.ws.handler;
 
 import javax.inject.Inject;
 
@@ -11,11 +11,11 @@ import com.xjh.dao.dataobject.Desk;
 import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
-import com.xjh.ws.WsApiType;
-import com.xjh.ws.WsHandler;
+import com.xjh.service.ws.WsApiType;
+import com.xjh.startup.foundation.ws.WsHandler;
 
-import static com.xjh.ws.NotifyService.FRONT_STS_FAILURE;
-import static com.xjh.ws.NotifyService.FRONT_STS_SUCCESS;
+import static com.xjh.service.ws.NotifyService.FRONT_STS_FAILURE;
+import static com.xjh.service.ws.NotifyService.FRONT_STS_SUCCESS;
 
 @Singleton
 @WsApiType("orderCart")

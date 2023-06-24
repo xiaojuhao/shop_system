@@ -11,9 +11,8 @@ import com.xjh.dao.dataobject.*;
 import com.xjh.dao.mapper.*;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
 import com.xjh.service.domain.model.SendOrderRequest;
-import com.xjh.service.store.CartStore;
-import com.xjh.ws.NotifyService;
-import com.xjh.ws.SocketUtils;
+import com.xjh.service.ws.NotifyService;
+import com.xjh.service.ws.SocketUtils;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -79,6 +78,7 @@ public class CartService {
             }
             // 通知到前段
             notifyService.cartAddOneRecord(deskId, item);
+
             return Result.success(cart);
         } catch (Exception ex) {
             ex.printStackTrace();

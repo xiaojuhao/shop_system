@@ -2,15 +2,14 @@ package com.xjh.startup.foundation.ws;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import cn.hutool.core.lang.Snowflake;
 import com.xjh.common.utils.CurrentRequest;
-import com.xjh.common.utils.Safe;
-import com.xjh.ws.SocketUtils;
-import com.xjh.ws.WsAttachment;
+import com.xjh.service.ws.SocketUtils;
+import com.xjh.service.ws.WsApiType;
+import com.xjh.service.ws.WsAttachment;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
@@ -19,8 +18,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
-import com.xjh.ws.WsApiType;
-import com.xjh.ws.WsHandler;
 
 import static com.xjh.common.utils.CommonUtils.abbr;
 

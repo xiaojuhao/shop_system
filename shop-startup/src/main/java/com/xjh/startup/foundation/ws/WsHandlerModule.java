@@ -1,9 +1,10 @@
-package com.xjh.ws;
+package com.xjh.startup.foundation.ws;
 
 import com.google.inject.AbstractModule;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.TimeRecord;
-import com.xjh.ws.handler.*;
+import com.xjh.service.ws.NotifyService;
+import com.xjh.startup.foundation.ws.handler.*;
 
 public class WsHandlerModule extends AbstractModule {
     @Override
