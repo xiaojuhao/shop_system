@@ -21,6 +21,7 @@ import com.xjh.dao.mapper.OrderDAO;
 import com.xjh.dao.mapper.OrderPayDAO;
 import com.xjh.dao.query.OrderPayQuery;
 import com.xjh.service.domain.model.PaymentResult;
+import com.xjh.ws.NotifyService;
 
 @Singleton
 public class OrderPayService {
@@ -87,6 +88,8 @@ public class OrderPayService {
                 updateDesk.setDeskId(order.getDeskId());
                 deskService.updateDeskByDeskId(updateDesk);
             }
+
+            NotifyService.checkOutResult(order.getDeskId(), order.getOrderStatus(), orderPay.getAmount());
             return Result.success("支付成功");
         } catch (Exception ex) {
             Logger.error("保存支付信息失败:" + ex.getMessage());

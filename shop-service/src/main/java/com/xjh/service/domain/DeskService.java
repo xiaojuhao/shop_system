@@ -16,6 +16,7 @@ import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.mapper.DeskDAO;
 import com.xjh.service.domain.model.CreateOrderParam;
 import com.xjh.service.domain.model.OpenDeskParam;
+import com.xjh.ws.NotifyService;
 
 @Singleton
 public class DeskService {
@@ -97,6 +98,8 @@ public class DeskService {
     public Result<Integer> useDesk(Desk desk) {
         try {
             int i = deskDAO.useDesk(desk);
+
+            NotifyService.changeDeskStatus(desk.getDeskId(), EnumDeskStatus.IN_USE.status());
             return Result.success(i);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -123,6 +126,8 @@ public class DeskService {
             } else {
                 // 清空购物车
                 cartService.clearCart(deskId);
+
+                NotifyService.changeDeskStatus(deskId, EnumDeskStatus.FREE.status());
                 return Result.success("关台成功");
             }
         } catch (Exception ex) {

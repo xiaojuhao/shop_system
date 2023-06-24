@@ -56,7 +56,7 @@ public class NotifyService {
         notify.put("dishesId", item.getDishesId());
         notify.put("type", "dishes");
         notify.put("deskId", cart.getDeskId());
-        notify.put("operateAccount", "root");
+        notify.put("operateAccount", CurrentAccount.currentAccountCode());
         notify.put("cartDishesesNums", cart.sumDishesNum());
         SocketUtils.asyncSendMsg(deskId, notify);
     }
@@ -70,10 +70,37 @@ public class NotifyService {
         JSONObject notify = new JSONObject();
         notify.put("API_TYPE", "removeDishesFromCart");
         notify.put("deskId", deskId);
-        notify.put("operateAccount", "root");
+        notify.put("operateAccount", CurrentAccount.currentAccountCode());
         notify.put("cartDishesesNums", cart.sumDishesNum());
         notify.put("totalPrice", cartService.sumCartPrice(cart));
         notify.put("cartDishesId", firstOf(removedCartDishesIds));
         SocketUtils.asyncSendMsg(deskId, notify);
+    }
+
+    public static void changeDeskStatus(int deskId, int newStatus){
+        JSONObject jSONObject = new JSONObject();
+        jSONObject.put("API_TYPE", "changeDeskStatus");
+        jSONObject.put("deskId", deskId);
+        jSONObject.put("newStatus", newStatus);
+        jSONObject.put("operateAccount", CurrentAccount.currentAccountCode());
+        SocketUtils.asyncSendMsg(deskId, jSONObject);
+    }
+
+    public static void deskErase(int deskId){
+        JSONObject jSONObject = new JSONObject();
+        jSONObject.put("API_TYPE", "deskErase");
+        jSONObject.put("deskId", deskId);
+        jSONObject.put("operateAccount", CurrentAccount.currentAccountCode());
+        SocketUtils.asyncSendMsg(deskId, jSONObject);
+    }
+
+    public static void checkOutResult(int deskId, int orderStatus, double payAmount){
+        JSONObject jSONObject = new JSONObject();
+        jSONObject.put("API_TYPE", "checkOutResult");
+        jSONObject.put("deskId", deskId);
+        jSONObject.put("operateAccount", CurrentAccount.currentAccountCode());
+        jSONObject.put("status", orderStatus);
+        jSONObject.put("payAmount", payAmount);
+        SocketUtils.asyncSendMsg(deskId, jSONObject);
     }
 }

@@ -16,6 +16,7 @@ import com.xjh.dao.mapper.SubOrderDAO;
 import com.xjh.dao.query.OrderPayQuery;
 import com.xjh.dao.query.PageQueryOrderReq;
 import com.xjh.service.domain.model.CreateOrderParam;
+import com.xjh.ws.NotifyService;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -143,6 +144,8 @@ public class OrderService {
             update.setOrderId(orderId);
             update.setOrderErase(eraseAmt);
             this.updateByOrderId(update);
+
+            NotifyService.deskErase(order.getDeskId());
             return Result.success("");
         } else {
             return Result.fail("订单信息不存在");
