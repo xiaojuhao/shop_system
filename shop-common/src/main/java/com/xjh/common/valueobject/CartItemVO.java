@@ -16,7 +16,7 @@ public class CartItemVO {
     int ifDishesPackage;
     List<DishesAttributeVO> dishesAttrs = new ArrayList<>();
     List<JSONObject> packagedishes = new ArrayList<>();
-    String contents = "[]";
+    List<JSONObject> contents = new ArrayList<>();
 
 
 
