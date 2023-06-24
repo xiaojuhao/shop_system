@@ -70,8 +70,8 @@ public class DishesAttributeService {
     }
 
     public DishesAttribute toDD(DishesAttributeVO vo) {
-        boolean isSync = vo.getIsSync() != null && vo.getIsSync();
-        boolean isValueRadio = vo.getIsValueRadio() != null && vo.getIsValueRadio();
+        boolean isSync = vo.getIsSync();
+        boolean isValueRadio = vo.getIsValueRadio();
         DishesAttribute dd = new DishesAttribute();
         dd.setDishesAttributeId(vo.getDishesAttributeId());
         dd.setDishesAttributeName(vo.getDishesAttributeName());

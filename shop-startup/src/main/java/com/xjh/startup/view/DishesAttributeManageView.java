@@ -113,7 +113,7 @@ public class DishesAttributeManageView extends LargeForm implements Initializabl
         bo.setDishesAttributeId(vo.getDishesAttributeId());
         bo.setDishesAttributeName(vo.getDishesAttributeName());
         bo.setDishesAttributeMarkInfo(vo.getDishesAttributeMarkInfo());
-        if (vo.getIsValueRadio() != null && vo.getIsValueRadio()) {
+        if (vo.getIsValueRadio()) {
             bo.setIsValueRadio(RichText.create("单选"));
         } else {
             bo.setIsValueRadio(RichText.create("多选"));
@@ -159,7 +159,7 @@ public class DishesAttributeManageView extends LargeForm implements Initializabl
 
     private void saveDishesAttr(DishesAttributeVO attr) {
         Logger.info("保存菜品属性:" + CommonUtils.reflectString(attr));
-        if (attr.getDishesAttributeId() != null) {
+        if (attr.getDishesAttributeId() > 0) {
             dishesAttributeService.updateById(attr);
         } else {
             dishesAttributeService.addNew(attr);

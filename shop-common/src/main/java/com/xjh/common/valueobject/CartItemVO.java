@@ -9,11 +9,11 @@ import lombok.Data;
 
 @Data
 public class CartItemVO {
-    Integer cartDishesId;
-    Integer dishesId;
-    Integer dishesPriceId;
-    Integer nums;
-    Integer ifDishesPackage;
+    int cartDishesId;
+    int dishesId;
+    int dishesPriceId;
+    int nums;
+    int ifDishesPackage;
     List<DishesAttributeVO> dishesAttrs = new ArrayList<>();
     List<JSONObject> packagedishes = new ArrayList<>();
 }

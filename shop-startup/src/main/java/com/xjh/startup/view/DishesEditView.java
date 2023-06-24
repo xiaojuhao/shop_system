@@ -208,7 +208,7 @@ public class DishesEditView extends SimpleGridForm {
         pubAttrInput.getChildren().addAll(pubAttrTV, pubAttrValTV);
         addLine(pubAttrOperations, pubAttrInput);
         collectData.add(() -> {
-            List<String> pubAttrIds = CommonUtils.collect(pubAttrTV.getItems(), it -> it.getDishesAttributeId().toString());
+            List<String> pubAttrIds = CommonUtils.collect(pubAttrTV.getItems(), it -> it.getDishesAttributeId()+"");
             dishes.setDishesPublicAttribute(String.join(",", pubAttrIds));
         });
 

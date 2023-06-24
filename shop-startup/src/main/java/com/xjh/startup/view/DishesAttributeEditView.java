@@ -46,7 +46,7 @@ public class DishesAttributeEditView extends SmallForm {
         ObservableList<String> options = FXCollections.observableArrayList("单选", "复选");
         ComboBox<String> modelSelect = new ComboBox<>(options);
         modelSelect.setPrefWidth(contentWidth);
-        modelSelect.getSelectionModel().select((attr.getIsValueRadio() != null && attr.getIsValueRadio()) ? "单选" : "复选");
+        modelSelect.getSelectionModel().select(attr.getIsValueRadio() ? "单选" : "复选");
         addPairLine(modelLabel, modelSelect);
         collectData.add(() -> data.setIsValueRadio("单选".equals(modelSelect.getSelectionModel().getSelectedItem())));
 

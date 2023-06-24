@@ -54,6 +54,7 @@ import java.util.stream.Collectors;
 
 import static com.xjh.common.utils.CommonUtils.collect;
 import static com.xjh.common.utils.ImageHelper.buildImageView;
+import static com.xjh.common.utils.OrElse.orGet;
 
 
 public class OrderDishesChoiceView extends VBox {
@@ -190,10 +191,10 @@ public class OrderDishesChoiceView extends VBox {
         nextPage.setOnMouseClicked(evt -> {
             DishesQueryCond _old = qryDishesCond.get();
             DishesQueryCond _new = CopyUtils.cloneObj(_old);
-            if(_old.arrivedMaxPageNo()){
+            if (_old.arrivedMaxPageNo()) {
                 AlertBuilder.ERROR("已经是最后一页了");
                 _new.setPageNo(_old.getPageNo());
-            }else {
+            } else {
                 _new.setPageNo(_old.getPageNo() + 1);
             }
             qryDishesCond.set(_new);
@@ -204,7 +205,7 @@ public class OrderDishesChoiceView extends VBox {
         prevPage.setOnMouseClicked(evt -> {
             DishesQueryCond _old = qryDishesCond.get();
             DishesQueryCond _new = CopyUtils.cloneObj(_old);
-            if(_old.getPageNo() == 1){
+            if (_old.getPageNo() == 1) {
                 AlertBuilder.ERROR("已经是第一页了");
             }
             _new.setPageNo(Math.max(1, _old.getPageNo() - 1));
@@ -487,9 +488,9 @@ public class OrderDishesChoiceView extends VBox {
         } else {
             cartItem.setDishesId(bo.getDishesId());
         }
-        cartItem.setIfDishesPackage(bo.getIfPackage());
-        cartItem.setDishesPriceId(bo.getDishesPriceId());
-        cartItem.setNums(bo.getNum() != null ? bo.getNum() : 1);
+        cartItem.setIfDishesPackage(orGet(bo.getIfPackage(), 0));
+        cartItem.setDishesPriceId(orGet(bo.getDishesPriceId(), 0));
+        cartItem.setNums(orGet(bo.getNum(), 1));
         cartItem.setDishesAttrs(dishesAttrs);
         this.addCartItem(cartItem);
     }
@@ -578,7 +579,7 @@ public class OrderDishesChoiceView extends VBox {
         } catch (Exception ex) {
             Logger.info("展示图片异常: " + ex.getMessage() + "," + path);
             ImageView iv = buildImageView("db/img/logo.png");
-            if(iv == null){
+            if (iv == null) {
                 iv = new ImageView();
             }
             iv.setFitWidth(width);
