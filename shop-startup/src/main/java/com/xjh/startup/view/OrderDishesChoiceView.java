@@ -310,6 +310,9 @@ public class OrderDishesChoiceView extends VBox {
                 if (!sendRs.isSuccess()) {
                     AlertBuilder.ERROR(sendRs.getMsg());
                 }
+                // 送菜成功，清空购物车
+                cartService.clearCart(param.getDeskId());
+
                 this.getScene().getWindow().hide();
             }
             // 打开套餐
