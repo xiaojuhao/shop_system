@@ -1,5 +1,6 @@
 package com.xjh.startup.foundation.ws.handler;
 
+import com.xjh.startup.view.CartView;
 import com.xjh.startup.view.OrderDishesChoiceView;
 import org.java_websocket.WebSocket;
 
@@ -46,6 +47,7 @@ public class AddCartHandler implements WsHandler {
         Result<CartVO> addCartRs = cartService.addItem(deskId, cartItem);
 
         OrderDishesChoiceView.refreshCartSize(deskId);
+        CartView.refreshCartList(deskId);
 
         if (addCartRs.isSuccess()) {
             resp.put("status", 0);

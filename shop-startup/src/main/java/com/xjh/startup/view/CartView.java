@@ -4,16 +4,11 @@ import static com.xjh.common.utils.CommonUtils.sizeOf;
 import static com.xjh.common.utils.TableViewUtils.newCol;
 import static com.xjh.service.domain.DishesTypeService.toDishesTypeName;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.xjh.common.utils.AlertBuilder;
-import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.CurrentAccount;
-import com.xjh.common.utils.DishesAttributeHelper;
-import com.xjh.common.utils.Logger;
-import com.xjh.common.utils.OrElse;
-import com.xjh.common.utils.Result;
+import com.xjh.common.utils.*;
 import com.xjh.common.utils.cellvalue.InputNumber;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.RichText;
@@ -31,6 +26,7 @@ import com.xjh.startup.view.model.DeskOrderParam;
 
 import com.xjh.service.ws.NotifyService;
 import com.xjh.service.ws.SocketUtils;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
@@ -51,15 +47,22 @@ public class CartView extends VBox {
     NotifyService notifyService = GuiceContainer.getInstance(NotifyService.class);
     Runnable onPlaceOrder;
 
+    TableView<CartItemBO> tv = new TableView<>();
+    DeskOrderParam param;
+
+    static Holder<WeakReference<CartView>> holder = new Holder<>();
+
     public CartView(DeskOrderParam param, Runnable onPlaceOrder) {
         this.onPlaceOrder = onPlaceOrder;
-        TableView<CartItemBO> tv = new TableView<>();
-        this.getChildren().add(tableList(param, tv));
+        this.param = param;
+        this.getChildren().add(tableList());
         this.getChildren().add(new Separator(Orientation.HORIZONTAL));
-        this.getChildren().add(buttons(param, tv));
+        this.getChildren().add(buttons());
+
+        holder.hold(new WeakReference<>(this));
     }
 
-    private HBox buttons(DeskOrderParam param, TableView<CartItemBO> tv) {
+    private HBox buttons() {
         HBox box = new HBox();
         box.setAlignment(Pos.CENTER);
         box.setSpacing(20);
@@ -74,17 +77,32 @@ public class CartView extends VBox {
         return box;
     }
 
-    private TableView<CartItemBO> tableList(DeskOrderParam param, TableView<CartItemBO> tv) {
+    private TableView<CartItemBO> tableList() {
         try {
-            tv.getColumns().addAll(newCol("序号", "seqNo", 100), newCol("菜品类型", "dishesTypeName", 100), newCol("菜品名称", "dishesName", 200), newCol("价格", "dishesPrice", 100), newCol("数量", "nums", 150), newCol("小计", "totalPrice", 100), newCol("备注", "attrRemark", 100));
-            reloadData(param, tv);
+            tv.getColumns().addAll(newCol("序号", "seqNo", 100), // 序号
+                    newCol("菜品类型", "dishesTypeName", 100), // 菜品类型
+                    newCol("菜品名称", "dishesName", 200), // 菜品名称
+                    newCol("价格", "dishesPrice", 100), // 价格
+                    newCol("数量", "nums", 150), // 数量
+                    newCol("小计", "totalPrice", 100), // 小计
+                    newCol("备注", "attrRemark", 100));
+            reloadData();
         } catch (Exception ex) {
             Logger.error("查询购物车异常:" + param.getDeskName() + ", " + ex.getMessage());
         }
         return tv;
     }
 
-    private void reloadData(DeskOrderParam param, TableView<CartItemBO> tv) {
+    public static void refreshCartList(int deskId) {
+        if (holder.get() == null || holder.get().get() == null) {
+            return;
+        }
+        if(holder.get().get().param.getDeskId().equals(deskId)) {
+            Platform.runLater(() -> holder.get().get().reloadData());
+        }
+    }
+
+    private void reloadData() {
         tv.setItems(FXCollections.observableList(loadCartItems(param)));
         tv.refresh();
     }
@@ -146,7 +164,7 @@ public class CartView extends VBox {
         cartVO.setContents(newItems);
         Result<CartVO> updateRs = cartService.updateCart(deskId, cartVO);
         if (updateRs.isSuccess()) {
-            reloadData(param, tv);
+            reloadData();
         } else {
             AlertBuilder.ERROR("删除失败," + updateRs.getMsg());
         }

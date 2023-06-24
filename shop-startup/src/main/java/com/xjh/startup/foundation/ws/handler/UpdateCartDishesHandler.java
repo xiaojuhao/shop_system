@@ -10,6 +10,7 @@ import com.xjh.service.ws.SocketUtils;
 import com.xjh.service.ws.WsApiType;
 import com.xjh.service.ws.WsAttachment;
 import com.xjh.startup.foundation.ws.WsHandler;
+import com.xjh.startup.view.CartView;
 import com.xjh.startup.view.OrderDishesChoiceView;
 import org.java_websocket.WebSocket;
 
@@ -94,6 +95,7 @@ public class UpdateCartDishesHandler implements WsHandler {
             }
 
             OrderDishesChoiceView.refreshCartSize(deskId);
+            CartView.refreshCartList(deskId);
 
         } catch (Exception e) {
             jSONObjectReturn.put("status", 1);
