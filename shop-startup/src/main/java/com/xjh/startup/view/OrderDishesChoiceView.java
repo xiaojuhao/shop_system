@@ -510,6 +510,7 @@ public class OrderDishesChoiceView extends VBox {
             } else {
                 AlertBuilder.ERROR(addCartRs.getMsg());
             }
+            refreshCartSize();
         } catch (Exception ex) {
             AlertBuilder.ERROR("报错消息", "添加购物车异常," + ex.getMessage());
         }

@@ -2,6 +2,7 @@ package com.xjh.startup.foundation.ws.handler;
 
 import javax.inject.Inject;
 
+import com.xjh.startup.view.OrderDetailView;
 import org.java_websocket.WebSocket;
 
 import com.alibaba.fastjson.JSONObject;
@@ -49,6 +50,7 @@ public class OrderCartHandler implements WsHandler {
         Result<String> createOrderRs = cartService.createOrder(param);
         if (createOrderRs.isSuccess()) {
             resp.put("status", FRONT_STS_SUCCESS);
+            OrderDetailView.refreshView(deskId);
         } else {
             resp.put("status", FRONT_STS_FAILURE);
             resp.put("msg", createOrderRs.getMsg());

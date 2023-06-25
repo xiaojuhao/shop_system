@@ -47,6 +47,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -69,9 +70,21 @@ public class OrderDetailView extends VBox implements Initializable {
 
     ObjectProperty<OrderOverviewVO> orderView = new SimpleObjectProperty<>();
     Desk desk;
-
+    Runnable refreshView = null;
+    static Holder<WeakReference<OrderDetailView>> _this = new Holder<>();
     public OrderDetailView(Desk desk) {
         this.desk = desk;
+        _this.hold(new WeakReference<>(this));
+    }
+
+    public static void refreshView(int deskId){
+        if(_this.get() == null || _this.get().get() == null) {
+            return;
+        }
+        OrderDetailView view = _this.get().get();
+        if(view != null && view.refreshView != null && view.desk != null && Objects.equals(view.desk.getDeskId(), deskId)){
+            view.refreshView.run();
+        }
     }
 
     public void initialize() {
@@ -80,7 +93,7 @@ public class OrderDetailView extends VBox implements Initializable {
         TimeRecord cost = TimeRecord.start();
         Integer orderId = desk.getOrderId();
         TableView<OrderDishesTableItemBO> tableView = new TableView<>();
-        Runnable refreshView = () -> {
+        refreshView = () -> {
             Order order = orderService.getOrder(orderId);
             List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(orderId);
             List<OrderPay> orderPays = orderPayService.selectByOrderId(orderId);
