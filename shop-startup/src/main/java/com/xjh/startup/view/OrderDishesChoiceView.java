@@ -66,7 +66,7 @@ public class OrderDishesChoiceView extends VBox {
 
     private final DeskOrderParam param;
     private final SimpleIntegerProperty cartSize = new SimpleIntegerProperty(0);
-    public static Holder<OrderDishesChoiceView> _this = new Holder<>();
+    public static Holder<WeakReference<OrderDishesChoiceView>> _this = new Holder<>();
     private final ObjectProperty<DishesQueryCond> qryDishesCond = new SimpleObjectProperty<>();
 
     public OrderDishesChoiceView(DeskOrderParam param, double prefWidth) {
@@ -76,7 +76,7 @@ public class OrderDishesChoiceView extends VBox {
         this.getChildren().add(initDishesView(prefWidth));
 
         refreshCartSize();
-        _this.hold(this);
+        _this.hold(new WeakReference<>(this));
     }
 
     private HBox topMenus() {
@@ -574,13 +574,17 @@ public class OrderDishesChoiceView extends VBox {
         }
     }
 
-    public static void refreshCartSize(int deskId){
-        if(_this.get() != null){
-            System.out.println("刷新购物车信息" + _this.get().param.getDeskId() + ", " + deskId);
-            if(_this.get().param.getDeskId().equals(deskId)) {
-                Platform.runLater(() -> _this.get().refreshCartSize());
+    public static void refreshCartSize(int deskId) {
+        if (_this.get() != null && _this.get().get() != null) {
+            OrderDishesChoiceView view = _this.get().get();
+            if (view == null) {
+                return;
             }
-        }else {
+            System.out.println("刷新购物车信息" + view.param.getDeskId() + ", " + deskId);
+            if (view.param.getDeskId().equals(deskId)) {
+                Platform.runLater(view::refreshCartSize);
+            }
+        } else {
             System.out.println("刷新购物车信息, 实例不存在");
         }
     }
