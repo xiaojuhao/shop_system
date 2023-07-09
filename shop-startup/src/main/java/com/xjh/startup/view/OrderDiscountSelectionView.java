@@ -3,6 +3,7 @@ package com.xjh.startup.view;
 import com.alibaba.fastjson.JSON;
 import com.xjh.common.enumeration.EnumDiscountType;
 import com.xjh.common.utils.*;
+import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.valueobject.OrderDiscountVO;
 import com.xjh.dao.dataobject.DiscountDO;
 import com.xjh.dao.dataobject.Order;
@@ -11,7 +12,9 @@ import com.xjh.dao.mapper.DiscountDAO;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.StoreService;
+import com.xjh.service.vo.DiscountResultVO;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
+import com.xjh.startup.view.base.OkCancelDialog;
 import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.DiscountApplyReq;
@@ -23,6 +26,7 @@ import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -130,31 +134,65 @@ public class OrderDiscountSelectionView extends SmallForm {
             addLine(discountContentLine);
         }
         {
-            Button cancel = new Button("取消");
-            cancel.setOnMouseClicked(evt -> this.getScene().getWindow().hide());
+            Button quit = new Button("关 闭");
+            quit.setOnMouseClicked(evt -> this.getScene().getWindow().hide());
 
             Button button = new Button("使用优惠");
             button.setOnMouseClicked(evt -> {
                 if (discountHolder.get() != null) {
                     DiscountApplyReq req = discountHolder.get().get();
-                    if (req == null) {
-                        AlertBuilder.ERROR("请选择折扣信息");
-                        return;
-                    }
-                    if (req.getType() == EnumDiscountType.MANAGER
-                            && !storeService.checkManagerPwd(req.getManagerPwd())) {
-                        AlertBuilder.ERROR("店长密码错误");
-                        return;
-                    }
-                    if (req.getDiscountRate() <= 0.001 || req.getDiscountRate() >= 0.999) {
-                        AlertBuilder.ERROR("折扣信息错误");
-                        return;
-                    }
-                    Logger.info(JSON.toJSONString(req));
-                    this.handleDiscount(param, req);
+                    useCoupon(req, param);
                 }
             });
-            addLine(newCenterLine(cancel, button));
+
+            addLine(newCenterLine(quit, button));
+
+            Button cancel = new Button("取消优惠");
+            cancel.setStyle("-fx-text-fill:#FF0000;");
+            cancel.setOnMouseClicked(evt -> {
+                Result<DiscountResultVO> cancelRs = cancelDiscount(param);
+                if(cancelRs.isSuccess()){
+                    AlertBuilder.INFO("取消折扣成功");
+                }else {
+                    AlertBuilder.ERROR(cancelRs.getMsg());
+                }
+            });
+            addLine(newCenterLine(cancel));
+        }
+    }
+
+    private void useCoupon(DiscountApplyReq req, DeskOrderParam param){
+        if (req == null) {
+            AlertBuilder.ERROR("请选择折扣信息");
+            return;
+        }
+        if (req.getType() == EnumDiscountType.MANAGER
+                && !storeService.checkManagerPwd(req.getManagerPwd())) {
+            AlertBuilder.ERROR("店长密码错误");
+            return;
+        }
+        if (req.getDiscountRate() <= 0.001 || req.getDiscountRate() >= 0.999) {
+            AlertBuilder.ERROR("折扣信息错误");
+            return;
+        }
+        Logger.info(JSON.toJSONString(req));
+        Result<DiscountResultVO> rs = this.calculateDiscount(param, req);
+        if(rs.isSuccess()) {
+            DiscountResultVO discountResult = rs.getData();
+            String tips = "折扣金额:"+new Money(discountResult.getDiscountAmount())+", 是否使用?";
+            OkCancelDialog dialog = new OkCancelDialog("折扣信息", tips);
+            Optional<ButtonType> decideRs = dialog.showAndWait();
+            if (decideRs.isPresent() && decideRs.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                rs = this.handleDiscount(param, req);
+                if(rs.isSuccess()) {
+                    AlertBuilder.INFO("优惠使用成功,优惠金额:" + new Money(discountResult.getDiscountAmount()));
+                }else {
+                    AlertBuilder.ERROR(rs.getMsg());
+                }
+            }
+            this.getScene().getWindow().hide();
+        }else {
+            AlertBuilder.ERROR(rs.getMsg());
         }
     }
 
@@ -179,10 +217,11 @@ public class OrderDiscountSelectionView extends SmallForm {
         return optList;
     }
 
-    private void handleDiscount(DeskOrderParam param, DiscountApplyReq req) {
+    private Result<DiscountResultVO> handleDiscount(DeskOrderParam param, DiscountApplyReq req) {
         if (param == null || req == null) {
-            return;
+            return Result.fail("入参错误");
         }
+        DiscountResultVO discountResult = new DiscountResultVO();
         Integer orderId = param.getOrderId();
         // 加载orderDishes
         List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(orderId);
@@ -192,13 +231,18 @@ public class OrderDiscountSelectionView extends SmallForm {
         List<OrderDishes> discountableOrderDishes = CommonUtils.filter(orderDishesList, discountChecker);
         //
         for (OrderDishes od : discountableOrderDishes) {
+            discountResult.addOldDiscountPrice(od.getOrderDishesDiscountPrice()); // 累计原折扣金额
+
             OrderDishes update = new OrderDishes();
             update.setOrderDishesId(od.getOrderDishesId());
             update.setOrderDishesDiscountPrice(od.getOrderDishesPrice() * req.getDiscountRate());
+
+            discountResult.addTotalPrice(od.getOrderDishesPrice()); // 累计总金额
+            discountResult.addDiscountPrice(update.getOrderDishesDiscountPrice()); // 累计折扣金额
+
             Result<Integer> rs = orderDishesService.updatePrimaryKey(update);
             if (!rs.isSuccess()) {
-                AlertBuilder.ERROR(rs.getMsg());
-                return;
+                return Result.fail(rs.getMsg());
             }
         }
         // 保存折扣信息
@@ -214,8 +258,71 @@ public class OrderDiscountSelectionView extends SmallForm {
         orderUpdate.setOrderDiscountInfo(tryEncodeBase64(JSON.toJSONString(orderDiscount)));
         orderUpdate.setDiscountReason(req.getDiscountName());
         orderService.updateByOrderId(orderUpdate);
-        AlertBuilder.INFO("优惠使用成功");
-        this.getScene().getWindow().hide();
+
+        return Result.success(discountResult);
+    }
+
+    private Result<DiscountResultVO> cancelDiscount(DeskOrderParam param) {
+        if (param == null) {
+            return Result.fail("入参错误");
+        }
+        DiscountResultVO discountResult = new DiscountResultVO();
+        Integer orderId = param.getOrderId();
+        // 加载orderDishes
+        List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(orderId);
+        // 加载discount Checker
+        Predicate<OrderDishes> discountChecker = orderDishesService.discountableChecker();
+        // 可以参加折扣的菜品
+        List<OrderDishes> discountableOrderDishes = CommonUtils.filter(orderDishesList, discountChecker);
+        //
+        for (OrderDishes od : discountableOrderDishes) {
+            discountResult.addOldDiscountPrice(od.getOrderDishesDiscountPrice()); // 累计原折扣金额
+
+            OrderDishes update = new OrderDishes();
+            update.setOrderDishesId(od.getOrderDishesId());
+            update.setOrderDishesDiscountPrice(od.getOrderDishesPrice());
+            Result<Integer> rs = orderDishesService.updatePrimaryKey(update);
+            if (!rs.isSuccess()) {
+                return Result.fail(rs.getMsg());
+            }
+        }
+        // 保存折扣信息
+        OrderDiscountVO orderDiscount = new OrderDiscountVO();
+
+        Order orderUpdate = new Order();
+        orderUpdate.setOrderId(param.getOrderId());
+        orderUpdate.setOrderDiscountInfo(tryEncodeBase64(JSON.toJSONString(orderDiscount)));
+        orderUpdate.setDiscountReason("无");
+        orderService.updateByOrderId(orderUpdate);
+
+        return Result.success(discountResult);
+    }
+
+
+    private Result<DiscountResultVO> calculateDiscount(DeskOrderParam param, DiscountApplyReq req) {
+        if (param == null || req == null) {
+            return Result.fail("入参错误");
+        }
+        DiscountResultVO discountResult = new DiscountResultVO();
+        Integer orderId = param.getOrderId();
+        // 加载orderDishes
+        List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(orderId);
+        // 加载discount Checker
+        Predicate<OrderDishes> discountChecker = orderDishesService.discountableChecker();
+        // 可以参加折扣的菜品
+        List<OrderDishes> discountableOrderDishes = CommonUtils.filter(orderDishesList, discountChecker);
+        //
+        for (OrderDishes od : discountableOrderDishes) {
+            discountResult.addOldDiscountPrice(od.getOrderDishesDiscountPrice()); // 累计原折扣金额
+            OrderDishes update = new OrderDishes();
+            update.setOrderDishesId(od.getOrderDishesId());
+            update.setOrderDishesDiscountPrice(od.getOrderDishesPrice() * req.getDiscountRate());
+            discountResult.addTotalPrice(od.getOrderDishesPrice()); // 累计总金额
+            discountResult.addDiscountPrice(update.getOrderDishesDiscountPrice()); // 累计折扣金额
+
+        }
+
+        return Result.success(discountResult);
     }
 
 }

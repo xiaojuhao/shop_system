@@ -5,12 +5,18 @@ import com.xjh.common.utils.CommonUtils;
 import javafx.geometry.Pos;
 import javafx.scene.paint.Color;
 
+import java.math.BigDecimal;
+
 public class Money {
     Double amount;
     Color color;
     Pos pos;
 
     public Money() {
+    }
+
+    public Money(BigDecimal amount) {
+        this(amount != null ? amount.doubleValue() : BigDecimal.ZERO.doubleValue());
     }
 
     public Money(Double amount) {

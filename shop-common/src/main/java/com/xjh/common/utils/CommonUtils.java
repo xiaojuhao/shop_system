@@ -914,4 +914,16 @@ public class CommonUtils {
         }
         return a.compareTo(b) > 0 ? a : b;
     }
+
+    public static BigDecimal add(Object a, Object b) {
+         a = parseDouble(a, 0D);
+         b = parseDouble(b, 0D);
+        return BigDecimal.valueOf((Double)a).add(BigDecimal.valueOf((Double)b));
+    }
+
+    public static BigDecimal subtract(Object a, Object b) {
+        a = parseDouble(a, 0D);
+        b = parseDouble(b, 0D);
+        return BigDecimal.valueOf((Double)a).subtract(BigDecimal.valueOf((Double)b));
+    }
 }
