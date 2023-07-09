@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.enumeration.EnumChoiceAction;
 import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
+import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.utils.*;
 import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.common.valueobject.OrderOverviewVO;
@@ -24,6 +25,7 @@ import com.xjh.startup.view.base.MediumForm;
 import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.OrderDishesTableItemBO;
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -46,6 +48,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.apache.commons.collections4.CollectionUtils;
+import sun.security.krb5.internal.crypto.Des;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
@@ -71,6 +74,7 @@ public class OrderDetailView extends VBox implements Initializable {
     ObjectProperty<OrderOverviewVO> orderView = new SimpleObjectProperty<>();
     Desk desk;
     Runnable refreshView = null;
+    Runnable refreshBtns = CommonUtils::emptyAction;
     static Holder<WeakReference<OrderDetailView>> _this = new Holder<>();
     public OrderDetailView(Desk desk) {
         this.desk = desk;
@@ -103,6 +107,8 @@ public class OrderDetailView extends VBox implements Initializable {
             tableView.setItems(buildTableItemList(orderDishesList));
             // 刷新列表
             tableView.refresh();
+
+            refreshBtns.run();
         };
 
         {
@@ -259,6 +265,22 @@ public class OrderDetailView extends VBox implements Initializable {
                     orderBtn, sendBtn, returnBtn, transferBtn, splitBtn, payBillBtn,
                     repay, orderErase, reduction, discount, printOrder);
             addLine(operationButtonPane);
+
+            refreshBtns = () -> {
+                Desk dd = deskService.getById(desk.getDeskId());
+                boolean btnDisabled = false;
+                if(dd != null && EnumDeskStatus.of(dd.getStatus()) == EnumDeskStatus.PAID){
+                    btnDisabled = true;
+                }
+                sendBtn.setDisable(btnDisabled);
+                returnBtn.setDisable(btnDisabled);
+                transferBtn.setDisable(btnDisabled);
+                payBillBtn.setDisable(btnDisabled);
+                orderErase.setDisable(btnDisabled);
+                reduction.setDisable(btnDisabled);
+                discount.setDisable(btnDisabled);
+                printOrder.setDisable(btnDisabled);
+            };
         }
         Logger.info("OrderDetail构建页面耗时: " + cost.getCostAndReset());
         // 刷新页面
@@ -561,6 +583,7 @@ public class OrderDetailView extends VBox implements Initializable {
         stg.showAndWait();
         // 窗口关闭之后执行回调函数
         CommonUtils.safeRun(param.getCallback());
+        Platform.runLater(() -> refreshBtns.run());
     }
 
     private void addHorizontalSeparator() {
