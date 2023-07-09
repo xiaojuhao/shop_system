@@ -30,4 +30,8 @@ public class DiscountResultVO {
     public BigDecimal getDiscountAmount() {
         return subtract(totalPrice, discountPrice);
     }
+
+    public BigDecimal getOldDiscountAmount() {
+        return subtract(totalPrice, oldDiscountPrice);
+    }
 }

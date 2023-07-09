@@ -64,6 +64,13 @@ public class CommonUtils {
         return new HashSet<>(Arrays.asList(ts));
     }
 
+    public static boolean isBiggerThanZERO(BigDecimal val) {
+        if (val == null) {
+            return false;
+        }
+        return val.doubleValue() > 0;
+    }
+
     public static <V> List<V> filter(List<V> list, Predicate<V> test) {
         if (list == null || list.size() == 0) {
             return new ArrayList<>();
@@ -916,14 +923,25 @@ public class CommonUtils {
     }
 
     public static BigDecimal add(Object a, Object b) {
-         a = parseDouble(a, 0D);
-         b = parseDouble(b, 0D);
-        return BigDecimal.valueOf((Double)a).add(BigDecimal.valueOf((Double)b));
+        a = parseDouble(a, 0D);
+        b = parseDouble(b, 0D);
+        return BigDecimal.valueOf((Double) a).add(BigDecimal.valueOf((Double) b));
     }
 
     public static BigDecimal subtract(Object a, Object b) {
         a = parseDouble(a, 0D);
         b = parseDouble(b, 0D);
-        return BigDecimal.valueOf((Double)a).subtract(BigDecimal.valueOf((Double)b));
+        return BigDecimal.valueOf((Double) a).subtract(BigDecimal.valueOf((Double) b));
+    }
+
+    public static BigDecimal abs(BigDecimal val) {
+        if (val == null) {
+            return null;
+        }
+        if (val.doubleValue() < 0) {
+            return BigDecimal.valueOf(-1 * val.doubleValue());
+        } else {
+            return val;
+        }
     }
 }

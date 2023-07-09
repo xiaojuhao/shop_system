@@ -25,13 +25,14 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.xjh.common.utils.CommonUtils.tryEncodeBase64;
+import static com.xjh.common.utils.CommonUtils.*;
 
 public class OrderDiscountSelectionView extends SmallForm {
     OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
@@ -81,9 +82,7 @@ public class OrderDiscountSelectionView extends SmallForm {
                     });
 
                     discountContentLine.getChildren().clear();
-                    discountContentLine.getChildren().addAll(
-                            newCenterLine(voucherLabel, voucher),
-                            newCenterLine(cardLabel, card));
+                    discountContentLine.getChildren().addAll(newCenterLine(voucherLabel, voucher), newCenterLine(cardLabel, card));
                 } else if (select == 2) {
                     Logger.info("店长折扣");
                     ComboBox<DiscountTypeBO> optList = getDiscountOptions();
@@ -109,9 +108,7 @@ public class OrderDiscountSelectionView extends SmallForm {
                     });
 
                     discountContentLine.getChildren().clear();
-                    discountContentLine.getChildren().addAll(
-                            newCenterLine(label, optList),
-                            newCenterLine(pwdLabel, pwd));
+                    discountContentLine.getChildren().addAll(newCenterLine(label, optList), newCenterLine(pwdLabel, pwd));
                 } else {
                     Logger.info("未知类型");
                 }
@@ -141,7 +138,15 @@ public class OrderDiscountSelectionView extends SmallForm {
             button.setOnMouseClicked(evt -> {
                 if (discountHolder.get() != null) {
                     DiscountApplyReq req = discountHolder.get().get();
-                    useCoupon(req, param);
+                    Result<String> rs = useCoupon(req, param);
+                    if (rs.isSuccess()) {
+                        if (!"CANCEL".equals(rs.getData())) {
+                            AlertBuilder.INFO(rs.getData());
+                            this.getScene().getWindow().hide();
+                        }
+                    } else {
+                        AlertBuilder.ERROR(rs.getMsg());
+                    }
                 }
             });
 
@@ -150,58 +155,67 @@ public class OrderDiscountSelectionView extends SmallForm {
             Button cancel = new Button("取消优惠");
             cancel.setStyle("-fx-text-fill:#FF0000;");
             cancel.setOnMouseClicked(evt -> {
-                Result<DiscountResultVO> cancelRs = cancelDiscount(param);
-                if(cancelRs.isSuccess()){
-                    AlertBuilder.INFO("取消折扣成功");
-                }else {
-                    AlertBuilder.ERROR(cancelRs.getMsg());
+                OkCancelDialog dialog = new OkCancelDialog("取消折扣","是否取消折扣？");
+                Optional<ButtonType> decideRs = dialog.showAndWait();
+                if (decideRs.isPresent() && decideRs.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                    Result<DiscountResultVO> cancelRs = cancelDiscount(param);
+                    if (cancelRs.isSuccess()) {
+                        DiscountResultVO discountResult = cancelRs.getData();
+                        AlertBuilder.INFO("取消折扣成功, 折扣金额:" + new Money(discountResult.getOldDiscountAmount()));
+                        this.getScene().getWindow().hide();
+                    } else {
+                        AlertBuilder.ERROR(cancelRs.getMsg());
+                    }
                 }
             });
             addLine(newCenterLine(cancel));
         }
     }
 
-    private void useCoupon(DiscountApplyReq req, DeskOrderParam param){
+    private Result<String> useCoupon(DiscountApplyReq req, DeskOrderParam param) {
         if (req == null) {
-            AlertBuilder.ERROR("请选择折扣信息");
-            return;
+            return Result.fail("请选择折扣信息");
         }
-        if (req.getType() == EnumDiscountType.MANAGER
-                && !storeService.checkManagerPwd(req.getManagerPwd())) {
-            AlertBuilder.ERROR("店长密码错误");
-            return;
+        if (req.getType() == EnumDiscountType.MANAGER && !storeService.checkManagerPwd(req.getManagerPwd())) {
+            return Result.fail("店长密码错误");
         }
         if (req.getDiscountRate() <= 0.001 || req.getDiscountRate() >= 0.999) {
-            AlertBuilder.ERROR("折扣信息错误");
-            return;
+            return Result.fail("折扣信息错误");
         }
         Logger.info(JSON.toJSONString(req));
         Result<DiscountResultVO> rs = this.calculateDiscount(param, req);
-        if(rs.isSuccess()) {
+        if (rs.isSuccess()) {
             DiscountResultVO discountResult = rs.getData();
-            String tips = "折扣金额:"+new Money(discountResult.getDiscountAmount())+", 是否使用?";
+            String tips = "折扣金额:" + new Money(discountResult.getDiscountAmount()) + "";
+            if (isBiggerThanZERO(discountResult.getOldDiscountPrice())) {
+                BigDecimal delta = subtract(discountResult.getDiscountPrice(), discountResult.getOldDiscountPrice());
+                if (isBiggerThanZERO(delta)) {
+                    tips += ",新折扣比原折扣多" + new Money(abs(delta));
+                } else {
+                    tips += ",新折扣比原折扣少" + new Money(abs(delta));
+                }
+            }
+            tips += ", 是否使用?";
             OkCancelDialog dialog = new OkCancelDialog("折扣信息", tips);
             Optional<ButtonType> decideRs = dialog.showAndWait();
             if (decideRs.isPresent() && decideRs.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
                 rs = this.handleDiscount(param, req);
-                if(rs.isSuccess()) {
-                    AlertBuilder.INFO("优惠使用成功,优惠金额:" + new Money(discountResult.getDiscountAmount()));
-                }else {
-                    AlertBuilder.ERROR(rs.getMsg());
+                if (rs.isSuccess()) {
+                    return Result.success("优惠使用成功,优惠金额:" + new Money(discountResult.getDiscountAmount()));
+                } else {
+                    return Result.fail(rs.getMsg());
                 }
+            } else {
+                return Result.success("CANCEL");
             }
-            this.getScene().getWindow().hide();
-        }else {
-            AlertBuilder.ERROR(rs.getMsg());
+        } else {
+            return Result.fail(rs.getMsg());
         }
     }
 
     private ComboBox<DiscountTypeBO> getDiscountOptions() {
         List<DiscountDO> discountList = discountDAO.selectList(new DiscountDO());
-        ObservableList<DiscountTypeBO> list =
-                FXCollections.observableArrayList(discountList.stream()
-                        .map(it -> new DiscountTypeBO(it.getDiscountName(), it.getRate()))
-                        .collect(Collectors.toSet()));
+        ObservableList<DiscountTypeBO> list = FXCollections.observableArrayList(discountList.stream().map(it -> new DiscountTypeBO(it.getDiscountName(), it.getRate())).collect(Collectors.toSet()));
         ComboBox<DiscountTypeBO> optList = new ComboBox<>(list);
         optList.setConverter(new StringConverter<DiscountTypeBO>() {
             @Override
@@ -277,10 +291,13 @@ public class OrderDiscountSelectionView extends SmallForm {
         //
         for (OrderDishes od : discountableOrderDishes) {
             discountResult.addOldDiscountPrice(od.getOrderDishesDiscountPrice()); // 累计原折扣金额
+            discountResult.addTotalPrice(od.getOrderDishesPrice()); // 累计总金额
 
             OrderDishes update = new OrderDishes();
             update.setOrderDishesId(od.getOrderDishesId());
             update.setOrderDishesDiscountPrice(od.getOrderDishesPrice());
+            discountResult.addDiscountPrice(update.getOrderDishesDiscountPrice()); // 累计折扣金额
+
             Result<Integer> rs = orderDishesService.updatePrimaryKey(update);
             if (!rs.isSuccess()) {
                 return Result.fail(rs.getMsg());

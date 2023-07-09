@@ -15,10 +15,7 @@ import com.xjh.dao.mapper.StoreDAO;
 import com.xjh.service.domain.model.StoreVO;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Singleton
 public class StoreService {
@@ -110,6 +107,9 @@ public class StoreService {
         StoreVO store = getStore().getData();
         if (store == null) {
             return false;
+        }
+        if(CommonUtils.isBlank(store.getOwnerPassword())){
+            return true;
         }
         return CommonUtils.eq(pwd, store.getOwnerPassword());
     }
