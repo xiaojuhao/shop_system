@@ -184,7 +184,7 @@ public class OrderDetailView extends VBox implements Initializable {
             Label orderErase = createLabel("抹零金额", width, c -> formatMoney(c.orderErase));
             gridPane.add(orderErase, 0, row);
 
-            Label mangerReduction = createLabel("店长折扣", width, c -> formatMoney(c.orderReduction));
+            Label mangerReduction = createLabel("店长减免", width, c -> formatMoney(c.orderReduction));
             gridPane.add(mangerReduction, 1, row);
 
             Label discount = createLabel("折扣金额", width, c -> formatMoney(c.discountAmount));

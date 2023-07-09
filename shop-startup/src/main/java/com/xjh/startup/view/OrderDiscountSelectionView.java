@@ -84,7 +84,7 @@ public class OrderDiscountSelectionView extends SmallForm {
                     discountContentLine.getChildren().clear();
                     discountContentLine.getChildren().addAll(newCenterLine(voucherLabel, voucher), newCenterLine(cardLabel, card));
                 } else if (select == 2) {
-                    Logger.info("店长折扣");
+                    Logger.info("店长减免");
                     ComboBox<DiscountTypeBO> optList = getDiscountOptions();
                     optList.setPrefWidth(160);
                     Label label = new Label("折扣类型:");
@@ -120,7 +120,7 @@ public class OrderDiscountSelectionView extends SmallForm {
             coupon.setToggleGroup(toggleGroup);
             coupon.setUserData(1);
 
-            RadioButton manager = new RadioButton("店长折扣");
+            RadioButton manager = new RadioButton("店长减免");
             manager.setToggleGroup(toggleGroup);
             manager.setUserData(2);
             manager.setSelected(true);
