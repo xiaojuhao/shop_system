@@ -7,6 +7,7 @@ import com.xjh.common.enumeration.*;
 import com.xjh.common.utils.*;
 import com.xjh.common.valueobject.CartItemVO;
 import com.xjh.common.valueobject.CartVO;
+import com.xjh.common.valueobject.OrderDiscountVO;
 import com.xjh.dao.dataobject.*;
 import com.xjh.dao.mapper.*;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
@@ -19,6 +20,9 @@ import javax.inject.Singleton;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.function.Predicate;
+
+import static com.xjh.common.utils.CommonUtils.jsonToObj;
 
 @Singleton
 public class CartService {
@@ -41,6 +45,8 @@ public class CartService {
     CartDAO cartDAO;
     @Inject
     DishesPriceDAO dishesPriceDAO;
+    @Inject
+    OrderDishesService orderDishesService;
     @Inject
     NotifyService notifyService;
 
@@ -223,9 +229,9 @@ public class CartService {
             for (CartItemVO item : cartRs.getData().getContents()) {
                 int ifPackage = OrElse.orGet(item.getIfDishesPackage(), 0);
                 if (ifPackage == 1 || ifPackage == 2) {
-                    orderDishes.addAll(buildPackageCartItemVO(item, orderId, subInsertRs.getData()));
+                    orderDishes.addAll(buildPackageCartItemVO(item, order, subInsertRs.getData()));
                 } else {
-                    orderDishes.addAll(buildCommonCartItemVO(item, orderId, subInsertRs.getData()));
+                    orderDishes.addAll(buildCommonCartItemVO(item, order, subInsertRs.getData()));
                 }
             }
             for (OrderDishes d : orderDishes) {
@@ -263,24 +269,28 @@ public class CartService {
         }
     }
 
-    private List<OrderDishes> buildCommonCartItemVO(CartItemVO item, Integer orderId, Integer subOrderId) {
+    private List<OrderDishes> buildCommonCartItemVO(CartItemVO item, Order order, Integer subOrderId) {
+        Predicate<OrderDishes> discountChecker = orderDishesService.discountableChecker();
         DishesPrice dishesPrice = dishesPriceDAO.queryByPriceId(item.getDishesPriceId());
         List<OrderDishes> list = new ArrayList<>();
         Dishes dishes = dishesDAO.getById(item.getDishesId());
+        OrderDishes example = new OrderDishes();
+        example.setDishesId(dishes.getDishesId());
+        example.setIfDishesPackage(0);
+        double discountRate = 1L;
+        String discountStr = "";
+        if(discountChecker.test(example)) {
+            OrderDiscountVO discount = jsonToObj(order.getOrderDiscountInfo(), OrderDiscountVO.class);
+            if (discount != null) {
+                discountRate = discount.getRate() > 0 ? discount.getRate() : 1;
+            }
+            discountStr = JSONObject.toJSONString(discount);
+        }
         for (int i = 0; i < item.getNums(); i++) {
             OrderDishes d = new OrderDishes();
-            d.setOrderId(orderId);
+            d.setOrderId(order.getOrderId());
             d.setSubOrderId(subOrderId);
             d.setDishesId(item.getDishesId());
-            if (dishesPrice != null) {
-                d.setDishesPriceId(dishesPrice.getDishesPriceId());
-                d.setOrderDishesPrice(dishesPrice.getDishesPrice());
-                d.setOrderDishesDiscountPrice(dishesPrice.getDishesPrice());
-            } else {
-                d.setDishesPriceId(0);
-                d.setOrderDishesPrice(dishes.getDishesPrice());
-                d.setOrderDishesDiscountPrice(dishes.getDishesPrice());
-            }
             d.setDishesTypeId(dishes.getDishesTypeId());
             d.setCreatetime(DateBuilder.now().mills());
             d.setIfDishesPackage(0);
@@ -290,7 +300,16 @@ public class CartService {
             d.setOrderDishesSaletype(EnumOrderSaleType.NORMAL.type);
             String options = JSONObject.toJSONString(OrElse.orGet(item.getDishesAttrs(), new ArrayList<>()));
             d.setOrderDishesOptions(Const.KEEP_BASE64 ? Base64.encode(options) : options);
-            d.setOrderDishesDiscountInfo(Const.KEEP_BASE64 ? Base64.encode("") : "");
+            if (dishesPrice != null) {
+                d.setDishesPriceId(dishesPrice.getDishesPriceId());
+                d.setOrderDishesPrice(dishesPrice.getDishesPrice());
+                d.setOrderDishesDiscountPrice(dishesPrice.getDishesPrice() * discountRate);
+            } else {
+                d.setDishesPriceId(0);
+                d.setOrderDishesPrice(dishes.getDishesPrice());
+                d.setOrderDishesDiscountPrice(dishes.getDishesPrice() * discountRate);
+            }
+            d.setOrderDishesDiscountInfo(Const.KEEP_BASE64 ? Base64.encode(discountStr) : discountStr);
 
             list.add(d);
         }
@@ -320,19 +339,24 @@ public class CartService {
     }
 
 
-    private List<OrderDishes> buildPackageCartItemVO(CartItemVO item, Integer orderId, Integer subOrderId) {
+    private List<OrderDishes> buildPackageCartItemVO(CartItemVO item, Order order, Integer subOrderId) {
         List<OrderDishes> list = new ArrayList<>();
         DishesPackage dishes = dishesPackageDAO.getByDishesPackageId(item.getDishesId());
-
+//        OrderDiscountVO discount = jsonToObj(order.getOrderDiscountInfo(), OrderDiscountVO.class);
+        double discountRate = 1L;
+//        if(discount != null){
+//            discountRate = discount.getRate() > 0 ? discount.getRate() : 1;
+//        }
+        String discountStr = "";//JSONObject.toJSONString(discount);
         for (int i = 0; i < OrElse.orGet(item.getNums(), 1); i++) {
             OrderDishes d = new OrderDishes();
-            d.setOrderId(orderId);
+            d.setOrderId(order.getOrderId());
             d.setSubOrderId(subOrderId);
             d.setDishesId(item.getDishesId());
             d.setDishesPriceId(0);
             d.setDishesTypeId(dishes.getDishesPackageType());
             d.setOrderDishesPrice(dishes.getDishesPackagePrice());
-            d.setOrderDishesDiscountPrice(dishes.getDishesPackagePrice());
+            d.setOrderDishesDiscountPrice(dishes.getDishesPackagePrice() * discountRate);
             d.setCreatetime(DateBuilder.now().mills());
             d.setIfDishesPackage(1);
             d.setOrderDishesIfchange(0);
@@ -340,7 +364,7 @@ public class CartService {
             d.setOrderDishesNums(1);
             d.setOrderDishesSaletype(EnumOrderSaleType.NORMAL.type);
             d.setOrderDishesOptions(Const.KEEP_BASE64 ? Base64.encode("[]") : "[]");
-            d.setOrderDishesDiscountInfo(Const.KEEP_BASE64 ? Base64.encode("") : "");
+            d.setOrderDishesDiscountInfo(Const.KEEP_BASE64 ? Base64.encode(discountStr) : discountStr);
 
             list.add(d);
         }

@@ -2,6 +2,8 @@ package com.xjh.common.utils;
 
 import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.sleepycat.utilint.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -910,6 +912,17 @@ public class CommonUtils {
         } else {
             return json;
         }
+    }
+
+    public static <T> T jsonToObj(String json, Class<T> clz){
+        if(isBlank(json)){
+            return null;
+        }
+        String str = tryDecodeBase64(json);
+        if(isBlank(str)){
+            return null;
+        }
+        return JSONObject.parseObject(str, clz);
     }
 
     public static <T extends Comparable<T>> T max(T a, T b) {
