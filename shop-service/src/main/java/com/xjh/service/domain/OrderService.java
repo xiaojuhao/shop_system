@@ -163,6 +163,9 @@ public class OrderService {
             update.setOrderId(orderId);
             update.setOrderReduction(amt);
             this.updateByOrderId(update);
+
+            NotifyService.useDiscount(order.getDeskId());
+
             return Result.success("");
         } else {
             return Result.fail("订单信息不存在");

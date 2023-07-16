@@ -40,6 +40,8 @@ public class OrderEraseView extends SmallForm {
             if (!rs.isSuccess()) {
                 AlertBuilder.ERROR(rs.getMsg());
                 return;
+            }else {
+                AlertBuilder.INFO("抹零操作成功");
             }
             this.getScene().getWindow().hide();
         });

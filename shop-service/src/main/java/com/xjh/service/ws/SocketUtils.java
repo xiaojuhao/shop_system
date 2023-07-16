@@ -67,6 +67,18 @@ public class SocketUtils {
         }
     }
 
+    public static void broadcastMsg(JSONObject msg) {
+        for (WebSocket ws : map.values()) {
+            try {
+                WsAttachment att = ws.getAttachment();
+                System.out.println("【 " + att.getRequestId() + " 】响应Socket: " + msg.toJSONString());
+                ws.send(msg.toJSONString());
+            } catch (Exception ex) {
+                System.out.println("【异常】响应Socket: " + ex.getMessage() + ", " + msg.toJSONString());
+            }
+        }
+    }
+
     static ExecutorService executorService2 = Executors.newSingleThreadExecutor();
 
     public static void asyncSendMsg(Integer deskId, JSONObject msg) {

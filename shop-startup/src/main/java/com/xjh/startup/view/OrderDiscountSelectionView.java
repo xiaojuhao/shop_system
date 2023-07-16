@@ -13,6 +13,7 @@ import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.StoreService;
 import com.xjh.service.vo.DiscountResultVO;
+import com.xjh.service.ws.NotifyService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.OkCancelDialog;
 import com.xjh.startup.view.base.SmallForm;
@@ -237,6 +238,7 @@ public class OrderDiscountSelectionView extends SmallForm {
         }
         DiscountResultVO discountResult = new DiscountResultVO();
         Integer orderId = param.getOrderId();
+        Order order = orderService.getOrder(orderId);
         // 加载orderDishes
         List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(orderId);
         // 加载discount Checker
@@ -272,6 +274,8 @@ public class OrderDiscountSelectionView extends SmallForm {
         orderUpdate.setOrderDiscountInfo(tryEncodeBase64(JSON.toJSONString(orderDiscount)));
         orderUpdate.setDiscountReason(req.getDiscountName());
         orderService.updateByOrderId(orderUpdate);
+
+        NotifyService.useDiscount(order.getDeskId());
 
         return Result.success(discountResult);
     }

@@ -20,6 +20,7 @@ import com.xjh.common.utils.Logger;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 
 import static com.xjh.common.utils.CommonUtils.abbr;
+import static com.xjh.service.ws.NotifyService.notifyServerClosed;
 
 public class XjhWebSocketServer extends WebSocketServer {
     private final Map<String, WsHandler> handlers = new ConcurrentHashMap<>();
@@ -61,6 +62,7 @@ public class XjhWebSocketServer extends WebSocketServer {
     public void stopQuietly() {
         try {
             Logger.info("停止WebSocket服务器......");
+            notifyServerClosed();
             this.stop();
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -93,6 +93,14 @@ public class NotifyService {
         SocketUtils.asyncSendMsg(deskId, jSONObject);
     }
 
+    public static void useDiscount(int deskId){
+        JSONObject jSONObject = new JSONObject();
+        jSONObject.put("API_TYPE", "useDiscount");
+        jSONObject.put("deskId", deskId);
+        jSONObject.put("operateAccount", CurrentAccount.currentAccountCode());
+        SocketUtils.asyncSendMsg(deskId, jSONObject);
+    }
+
     public static void checkOutResult(int deskId, int orderStatus, double payAmount){
         JSONObject jSONObject = new JSONObject();
         jSONObject.put("API_TYPE", "checkOutResult");
@@ -102,4 +110,12 @@ public class NotifyService {
         jSONObject.put("payAmount", payAmount);
         SocketUtils.asyncSendMsg(deskId, jSONObject);
     }
+
+    public static void notifyServerClosed(){
+        JSONObject jSONObject = new JSONObject();
+        jSONObject.put("API_TYPE", "close_connection");
+        jSONObject.put("msg", "server_close");
+        SocketUtils.broadcastMsg(jSONObject);
+    }
+
 }
