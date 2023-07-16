@@ -1,5 +1,6 @@
 package com.xjh.startup.view;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,6 +14,7 @@ import com.xjh.dao.dataobject.ReturnReasonDO;
 import com.xjh.dao.mapper.ReturnReasonDAO;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.OrderDishesService;
+import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
@@ -30,6 +32,7 @@ public class OrderReturnDishesView extends SmallForm {
     OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
     ReturnReasonDAO returnReasonDAO = GuiceContainer.getInstance(ReturnReasonDAO.class);
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
+    OrderService orderService = GuiceContainer.getInstance(OrderService.class);
 
     public OrderReturnDishesView(DeskOrderParam param) {
         // 标题
@@ -59,7 +62,18 @@ public class OrderReturnDishesView extends SmallForm {
         List<Integer> ids = req.getReturnList().stream()
                 .map(id -> CommonUtils.parseInt(id, null))
                 .collect(Collectors.toList());
+        // 查询选中的待退菜品信息
         List<OrderDishes> list = orderDishesService.selectByIdList(ids);
+        // 汇总待退菜品的金额
+        BigDecimal returnAmt = BigDecimal.ZERO;
+        for(OrderDishes d : list){
+            returnAmt = returnAmt.add(BigDecimal.valueOf(d.sumOrderDishesDiscountPrice()));
+        }
+        double notPaid = orderService.notPaidBillAmount(req.getOrderId());
+        if(returnAmt.doubleValue() > notPaid){
+            AlertBuilder.ERROR("退菜金额不能大于未支付金额");
+            return;
+        }
         for (OrderDishes d : list) {
             int i = orderDishesService.returnOrderDishes(d);
             Dishes dishes = dishesService.getById(d.getDishesId());
@@ -80,6 +94,8 @@ public class OrderReturnDishesView extends SmallForm {
         ObservableList<String> options = FXCollections.observableArrayList(
                 Lists.newArrayList("客人不要了", "多点或下错单", "菜品缺货", "菜品质量问题", "上菜太慢",  "其它")
         );
-        return new ComboBox<>(options);
+        ComboBox<String> cb = new ComboBox<>(options);
+        cb.getSelectionModel().select(0); // 默认选第一个
+        return cb;
     }
 }
