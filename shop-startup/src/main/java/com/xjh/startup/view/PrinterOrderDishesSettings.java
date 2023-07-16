@@ -83,34 +83,43 @@ public class PrinterOrderDishesSettings extends SimpleForm implements Initializa
         // 保存
         Button button = new Button("保存配置");
         button.setOnAction(evt -> {
-            JSONArray contents = new JSONArray();
-            tv.getItems().forEach(it -> {
-                IntStringPair selected = it.getPrinter().getSelectionModel().getSelectedItem();
-                if (selected != null) {
-                    JSONObject content = new JSONObject();
-                    content.put("deskTypeId", it.getDeskTypeId());
-                    content.put("deskTypeName", it.getDeskTypeName());
-                    content.put("printerId", selected.getKey());
-                    content.put("printerName", selected.getValue());
-                    contents.add(content);
+            try {
+                System.out.println("------------- 点餐打印 打印机策略 ----------------");
+                JSONArray contents = new JSONArray();
+                tv.getItems().forEach(it -> {
+                    try{
+                        IntStringPair selected = it.getPrinter().getSelectionModel().getSelectedItem();
+                        if (selected != null) {
+                            JSONObject content = new JSONObject();
+                            content.put("deskTypeId", it.getDeskTypeId());
+                            content.put("deskTypeName", it.getDeskTypeName());
+                            content.put("printerId", selected.getKey());
+                            content.put("printerName", selected.getValue());
+                            contents.add(content);
+                        }
+                    }catch (Exception ex){
+                        System.out.println("异常:"+ ex.getMessage());
+                    }
+                });
+                PrinterTaskDO cond = new PrinterTaskDO();
+                cond.setPrintTaskName("api.print.task.PrintTaskOrderSample");
+                PrinterTaskDO task = printerTaskDAO.selectList(cond)
+                        .stream().findFirst().orElse(null);
+                if (task == null) {
+                    AlertBuilder.ERROR("打印任务不存在:api.print.task.PrintTaskOrderSample");
+                    return;
                 }
-            });
-            PrinterTaskDO cond = new PrinterTaskDO();
-            cond.setPrintTaskName("api.print.task.PrintTaskOrderSample");
-            PrinterTaskDO task = printerTaskDAO.selectList(cond)
-                    .stream().findFirst().orElse(null);
-            if (task == null) {
-                AlertBuilder.ERROR("打印任务不存在:api.print.task.PrintTaskOrderSample");
-                return;
-            }
 
-            // 内容
-            JSONObject taskContent = new JSONObject();
-            taskContent.put("printerSelectStrategy", contents.toJSONString());
-            task.setPrintTaskContent(Base64.encode(taskContent.toJSONString()));
-            System.out.println("保存订单打印配置:" + JSON.toJSONString(task));
-            printerTaskDAO.updateById(task);
-            AlertBuilder.INFO("保存成功");
+                // 内容
+                JSONObject taskContent = new JSONObject();
+                taskContent.put("printerSelectStrategy", contents.toJSONString());
+                task.setPrintTaskContent(Base64.encode(taskContent.toJSONString()));
+                System.out.println("保存订单打印配置:" + JSON.toJSONString(task));
+                printerTaskDAO.updateById(task);
+                AlertBuilder.INFO("保存成功");
+            }catch (Exception ee){
+                System.out.println("保存订单打印配置-异常:" + ee.getMessage());
+            }
         });
         addLine(button);
     }

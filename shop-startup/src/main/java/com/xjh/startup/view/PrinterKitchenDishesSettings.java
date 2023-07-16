@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import com.xjh.common.utils.AlertBuilder;
-import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.DateBuilder;
-import com.xjh.common.utils.Result;
+import com.sleepycat.je.utilint.LoggerUtils;
+import com.xjh.common.utils.*;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.dao.dataobject.PrinterDishDO;
@@ -105,8 +103,10 @@ public class PrinterKitchenDishesSettings extends SimpleForm {
         // 保存
         Button save = new Button("保存配置");
         save.setOnAction(evt -> {
+            TimeRecord timeRecord = TimeRecord.start();
+            System.out.println("---------- 后厨打印配置 关联菜品 --------------");
             Result<Integer> deletedNum = printerDishDAO.deleteByPrinterId(printer.getPrinterId());
-
+            Logger.info("删除" + deletedNum.getData()+"条配置, 耗时: " + timeRecord.getCostAndReset());
             List<PrinterDishDO> newList = new ArrayList<>();
             List<BO> items = left.getItems();
             for (BO bo : items) {
@@ -117,11 +117,13 @@ public class PrinterKitchenDishesSettings extends SimpleForm {
                 dd.setModTime(DateBuilder.now().mills());
                 newList.add(dd);
             }
+            Logger.info("准备插入" + newList.size()+"条配置, 耗时: " + timeRecord.getCostAndReset());
             try {
                 for (PrinterDishDO dd : newList) {
                     printerDishDAO.insert(dd);
                 }
-
+                Logger.info("插入成功" + newList.size()+"条配置, 耗时: " + timeRecord.getCostAndReset());
+                AlertBuilder.INFO("保存成功");
             } catch (Exception ex) {
                 ex.printStackTrace();
                 AlertBuilder.ERROR("保存失败:" + ex.getMessage());
