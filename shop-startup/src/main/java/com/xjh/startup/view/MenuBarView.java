@@ -71,7 +71,7 @@ public class MenuBarView {
         dishesManager.setOnAction(evt -> openView("菜品管理", new DishesManageListView()));
 
         MenuItem dishesCollMenu = new MenuItem("菜品集合管理");
-
+        dishesCollMenu.setOnAction(evt -> openView("菜品集合管理", new DishesGroupManageListView(), 600, 500));
         // MenuItem menuManager = new MenuItem("菜单管理");
         // menuManager.setOnAction(e -> openWebView("菜单管理"));
 

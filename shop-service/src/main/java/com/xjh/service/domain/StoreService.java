@@ -17,6 +17,8 @@ import com.xjh.service.domain.model.StoreVO;
 import javax.inject.Inject;
 import java.util.*;
 
+import static com.xjh.common.utils.CommonUtils.tryDecodeBase64;
+
 @Singleton
 public class StoreService {
     @Inject
@@ -39,13 +41,20 @@ public class StoreService {
 
     public Set<Integer> getStoreDiscountableDishesIds() {
         Set<Integer> discountableDishesIds = new HashSet<>();
-        StoreVO store = this.getStore().getData();
-        if (store != null) {
-            CommonUtils.forEach(store.getStoreDishesGroups(), g -> {
-                if (g.getGroupIds() != null) {
-                    discountableDishesIds.addAll(g.getGroupIds());
-                }
-            });
+//        StoreVO store = this.getStore().getData();
+//        if (store != null) {
+//            CommonUtils.forEach(store.getStoreDishesGroups(), g -> {
+//                if (g.getGroupIds() != null) {
+//                    discountableDishesIds.addAll(g.getGroupIds());
+//                }
+//            });
+//        }
+        Result<DishesGroup> rs = dishesGroupDAO.selectByDishesGroupName("打折集合");
+        if(rs.getData() != null){
+            JSONArray allPrinterDishIds = JSONArray.parseArray(tryDecodeBase64(rs.getData().getDishesGroupContent()));
+            for (Object allPrinterDishId : allPrinterDishIds) {
+                discountableDishesIds.add(CommonUtils.parseInt(allPrinterDishId, -1));
+            }
         }
         return discountableDishesIds;
     }
@@ -55,8 +64,7 @@ public class StoreService {
         CopyUtils.copy(store, vo);
         if (CommonUtils.isNotBlank(store.getStoreDishesGroupIds())) {
             vo.setStoreDishesGroups(new ArrayList<>());
-            String a = Base64.decodeStr(store.getStoreDishesGroupIds());
-            List<Integer> arr = JSONArray.parseArray(a, Integer.class);
+            List<Integer> arr = JSONArray.parseArray(tryDecodeBase64(store.getStoreDishesGroupIds()), Integer.class);
             for (Integer id : arr) {
                 DishesGroup group = dishesGroupDAO.selectByDishesGroupId(id);
                 if (group != null) {
@@ -66,10 +74,7 @@ public class StoreService {
                     groupVO.setCreateTime(group.getCreateTime());
                     groupVO.setGroupIds(new ArrayList<>());
                     if (CommonUtils.isNotBlank(group.getDishesGroupContent())) {
-                        String json = group.getDishesGroupContent();
-                        if (!json.contains("[") && !json.contains("{")) {
-                            json = Base64.decodeStr(group.getDishesGroupContent());
-                        }
+                        String json = tryDecodeBase64(group.getDishesGroupContent());
                         groupVO.getGroupIds().addAll(JSONArray.parseArray(json, Integer.class));
                     }
                     vo.getStoreDishesGroups().add(groupVO);
@@ -79,8 +84,7 @@ public class StoreService {
 
         if (CommonUtils.isNotBlank(store.getManagerDishesGroupIds())) {
             vo.setManagerDishesGroups(new ArrayList<>());
-            String a = Base64.decodeStr(store.getManagerDishesGroupIds());
-            List<Integer> arr = JSONArray.parseArray(a, Integer.class);
+            List<Integer> arr = JSONArray.parseArray(tryDecodeBase64(store.getManagerDishesGroupIds()), Integer.class);
             for (Integer id : arr) {
                 DishesGroup group = dishesGroupDAO.selectByDishesGroupId(id);
                 if (group != null) {
@@ -90,10 +94,7 @@ public class StoreService {
                     groupVO.setCreateTime(group.getCreateTime());
                     groupVO.setGroupIds(new ArrayList<>());
                     if (CommonUtils.isNotBlank(group.getDishesGroupContent())) {
-                        String json = group.getDishesGroupContent();
-                        if (!json.contains("[") && !json.contains("{")) {
-                            json = Base64.decodeStr(group.getDishesGroupContent());
-                        }
+                        String json = tryDecodeBase64(group.getDishesGroupContent());
                         groupVO.getGroupIds().addAll(JSONArray.parseArray(json, Integer.class));
                     }
                     vo.getManagerDishesGroups().add(groupVO);
