@@ -1,7 +1,5 @@
 package com.xjh.startup.view;
 
-import java.util.Optional;
-
 import com.alibaba.fastjson.JSON;
 import com.xjh.common.enumeration.EnumPayAction;
 import com.xjh.common.enumeration.EnumPayMethod;
@@ -17,7 +15,6 @@ import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.paymethods.*;
-
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -26,6 +23,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.FlowPane;
+
+import java.util.Optional;
 
 import static com.xjh.common.enumeration.EnumPayMethod.*;
 
@@ -74,7 +73,8 @@ public class PayWayChoiceView extends SmallForm {
         button.setOnMouseClicked(event -> {
             PaymentDialogOfPreCard scene = new PaymentDialogOfPreCard(param, name, payMethod);
             ModelWindow window = new ModelWindow(this.getScene().getWindow());
-            window.setHeight(380);
+            window.setHeight(300);
+            window.setWidth(500);
             window.setScene(new Scene(scene));
             scene.initialize();
             window.showAndWait();
@@ -92,7 +92,8 @@ public class PayWayChoiceView extends SmallForm {
         button.setOnMouseClicked(event -> {
             PaymentDialogOfVoucher scene = new PaymentDialogOfVoucher(param, name, payMethod);
             ModelWindow window = new ModelWindow(this.getScene().getWindow());
-            window.setHeight(380);
+            window.setHeight(300);
+            window.setWidth(500);
             window.setScene(new Scene(scene));
             scene.initialize();
             window.showAndWait();
