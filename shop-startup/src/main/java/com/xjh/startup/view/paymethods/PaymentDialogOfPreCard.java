@@ -153,14 +153,6 @@ public class PaymentDialogOfPreCard extends SimpleForm implements Initializable 
         grid.add(newCenterLine(cancel, submit), 1, row);
     }
 
-
-    private ComboBox<IntStringPair> buildCombo(int type) {
-        CouponList cond = new CouponList();
-        cond.setType(type);
-        List<CouponList> list = couponListDAO.selectList(cond);
-        return new ComboBox<>(FXCollections.observableArrayList(list.stream().map(it -> new IntStringPair(it.getType(), it.getCouponName(), it)).collect(Collectors.toList())));
-    }
-
     private Label createTitleLabel(String labelName) {
         Label label = new Label(labelName + ":");
         label.setTextAlignment(TextAlignment.RIGHT);
