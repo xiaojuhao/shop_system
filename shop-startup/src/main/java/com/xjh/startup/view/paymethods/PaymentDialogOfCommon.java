@@ -1,5 +1,6 @@
 package com.xjh.startup.view.paymethods;
 
+import com.xjh.common.enumeration.EnumPayAction;
 import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.service.domain.OrderService;
@@ -61,7 +62,7 @@ public class PaymentDialogOfCommon extends Dialog<PaymentResult> {
             result.setOrderId(param.getOrderId());
             result.setPayMethod(method);
             if (btn == confirmPayBtn) {
-                result.setPayAction(1);
+                result.setPayAction(EnumPayAction.DO_PAY);
                 result.setPayAmount(CommonUtils.parseMoney(payAmountField.getText(), 0D));
                 result.setPayRemark(remarkField.getText());
                 result.setCardNumber(cardNumFiled.getText());
@@ -69,7 +70,7 @@ public class PaymentDialogOfCommon extends Dialog<PaymentResult> {
                     result.setErrorMsg("交易编号信息必输");
                 }
             } else {
-                result.setPayAction(0);
+                result.setPayAction(EnumPayAction.CANCEL_PAY);
                 result.setPayAmount(0D);
                 result.setPayRemark(null);
             }

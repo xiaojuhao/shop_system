@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.xjh.common.enumeration.EnumPayAction;
 import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.dao.dataobject.CouponList;
@@ -145,7 +146,7 @@ public class PaymentDialogOfCoupon extends SimpleForm implements Initializable {
         Button cancel = new Button("取 消");
         cancel.setOnAction(evt -> {
             PaymentResult result = new PaymentResult();
-            result.setPayAction(0);
+            result.setPayAction(EnumPayAction.CANCEL_PAY);
             this.getScene().getWindow().setUserData(result);
             this.getScene().getWindow().hide();
         });
@@ -153,7 +154,7 @@ public class PaymentDialogOfCoupon extends SimpleForm implements Initializable {
         submit.setOnAction(evt -> {
             List<String> cardNoList = serialNoList.stream().map(TextInputControl::getText).collect(Collectors.toList());
             PaymentResult result = new PaymentResult();
-            result.setPayAction(1);
+            result.setPayAction(EnumPayAction.DO_PAY);
             result.setOrderId(param.getOrderId());
             result.setActualAmount(CommonUtils.parseDouble(actualPay.getValue(), 0D));
             result.setPayAmount(CommonUtils.parseDouble(couponValue.getValue(), 0D));

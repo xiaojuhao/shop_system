@@ -1,5 +1,6 @@
 package com.xjh.service.domain.model;
 
+import com.xjh.common.enumeration.EnumPayAction;
 import com.xjh.common.enumeration.EnumPayMethod;
 
 import lombok.Data;
@@ -15,7 +16,7 @@ public class PaymentResult {
     String cardNumber;
     EnumPayMethod payMethod;
     // 0--取消  1--确认
-    int payAction;
+    EnumPayAction payAction;
 
     String errorMsg;
 }

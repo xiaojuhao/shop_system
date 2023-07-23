@@ -1,15 +1,9 @@
 package com.xjh.startup.view;
 
-import static com.xjh.common.enumeration.EnumPayMethod.BANKCARD;
-import static com.xjh.common.enumeration.EnumPayMethod.KOUBEI;
-import static com.xjh.common.enumeration.EnumPayMethod.MEITUAN_COUPON;
-import static com.xjh.common.enumeration.EnumPayMethod.MEITUAN_PACKAGE;
-import static com.xjh.common.enumeration.EnumPayMethod.UNIONPAY_POS;
-import static com.xjh.common.enumeration.EnumPayMethod.WANDA_PACKAGE;
-
 import java.util.Optional;
 
 import com.alibaba.fastjson.JSON;
+import com.xjh.common.enumeration.EnumPayAction;
 import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
@@ -26,6 +20,7 @@ import com.xjh.startup.view.paymethods.PaymentDialogOfCash;
 import com.xjh.startup.view.paymethods.PaymentDialogOfCommon;
 import com.xjh.startup.view.paymethods.PaymentDialogOfCoupon;
 
+import com.xjh.startup.view.paymethods.PaymentDialogOfPreCard;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -34,6 +29,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.FlowPane;
+
+import static com.xjh.common.enumeration.EnumPayMethod.*;
 
 public class PayWayChoiceView extends SmallForm {
     OrderPayService orderPayService = GuiceContainer.getInstance(OrderPayService.class);
@@ -55,7 +52,7 @@ public class PayWayChoiceView extends SmallForm {
         pane.getChildren().add(couponPaymentAction("美团套餐买单", param, 2, MEITUAN_PACKAGE));
         pane.getChildren().add(couponPaymentAction("假日套餐补差价结账", param, 4, WANDA_PACKAGE));
         pane.getChildren().add(createButton("代金券结账", this::notSupportConfirm));
-        pane.getChildren().add(createButton("充值卡结账", this::notSupportConfirm));
+        pane.getChildren().add(preCardPaymentAction("储值卡结账", param, STORECARD));
         pane.getChildren().add(createButton("逃单", () -> handleEscapeOrder(param)));
         pane.getChildren().add(createButton("免单", () -> handleFreeOrder(param)));
 
@@ -69,6 +66,23 @@ public class PayWayChoiceView extends SmallForm {
         button.setOnMouseClicked(event -> {
             Optional<PaymentResult> payResult = new PaymentDialogOfCommon(param, payMethod).showAndWait();
             addPay(payResult.get());
+        });
+        return button;
+    }
+
+    private Node preCardPaymentAction(String name, DeskOrderParam param, EnumPayMethod payMethod) {
+        Button button = new Button(name);
+        button.setMinWidth(100);
+        button.setMaxWidth(100);
+        button.setOnMouseClicked(event -> {
+            PaymentDialogOfPreCard scene = new PaymentDialogOfPreCard(param, name, payMethod);
+            ModelWindow window = new ModelWindow(this.getScene().getWindow());
+            window.setHeight(380);
+            window.setScene(new Scene(scene));
+            scene.initialize();
+            window.showAndWait();
+            System.out.println("返回值:" + JSON.toJSONString(window.getUserData()));
+            addPay((PaymentResult) window.getUserData());
         });
         return button;
     }
@@ -143,7 +157,7 @@ public class PayWayChoiceView extends SmallForm {
 
     private void addPay(PaymentResult paymentResult) {
         // 取消按钮
-        if (paymentResult.getPayAction() == 0) {
+        if (paymentResult.getPayAction() == EnumPayAction.CANCEL_PAY) {
             return;
         }
         if(CommonUtils.isNotBlank(paymentResult.getErrorMsg())){

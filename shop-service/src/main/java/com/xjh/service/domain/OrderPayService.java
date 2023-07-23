@@ -8,6 +8,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumOrderStatus;
+import com.xjh.common.enumeration.EnumPayAction;
 import com.xjh.common.enumeration.EnumPayStatus;
 import com.xjh.common.utils.CurrentAccount;
 import com.xjh.common.utils.CurrentRequest;
@@ -38,7 +39,7 @@ public class OrderPayService {
         Runnable clear = CurrentRequest.resetRequestId();
         try {
             // 取消支付
-            if (paymentResult.getPayAction() == 0) {
+            if (paymentResult.getPayAction() == EnumPayAction.CANCEL_PAY) {
                 return Result.success("取消支付");
             }
             Result<Order> orderRs = orderDAO.selectByOrderId(paymentResult.getOrderId());

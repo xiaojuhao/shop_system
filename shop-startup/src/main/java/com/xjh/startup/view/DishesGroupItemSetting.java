@@ -1,5 +1,6 @@
 package com.xjh.startup.view;
 
+import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSONArray;
 import com.xjh.common.utils.*;
 import com.xjh.dao.dataobject.Dishes;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.xjh.common.utils.CommonUtils.tryDecodeBase64;
+import static com.xjh.common.utils.Const.KEEP_BASE64;
 
 public class DishesGroupItemSetting extends SimpleForm {
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
@@ -41,8 +43,8 @@ public class DishesGroupItemSetting extends SimpleForm {
         //
         Set<Integer> addedDishesId = new HashSet<>();
         List<Dishes> allDishes = dishesService.getAllDishes();
-        DishesGroup dishesGroup = dishesGroupDAO.selectByDishesGroupName(input.getDishesGroupName()).getData();
-        if (dishesGroup != null) {
+        DishesGroup dishesGroup = OrElse.orGet(dishesGroupDAO.selectByDishesGroupName(input.getDishesGroupName()).getData(), new DishesGroup());
+        if (CommonUtils.isNotBlank(dishesGroup.getDishesGroupContent())) {
             JSONArray allPrinterDishIds = JSONArray.parseArray(tryDecodeBase64(dishesGroup.getDishesGroupContent()));
             for (Object allPrinterDishId : allPrinterDishIds) {
                 addedDishesId.add(CommonUtils.parseInt(allPrinterDishId, 0));
@@ -116,7 +118,8 @@ public class DishesGroupItemSetting extends SimpleForm {
             }
             Logger.info("打折集合ID：" + selectedDishesId);
             try {
-                dishesGroup.setDishesGroupContent(selectedDishesId.toString());
+                String content = selectedDishesId.toString();
+                dishesGroup.setDishesGroupContent(KEEP_BASE64 ? Base64.encode(content) : content);
                 dishesGroupDAO.saveDishesGroup(dishesGroup);
                 AlertBuilder.INFO("保存成功");
             } catch (Exception ex) {

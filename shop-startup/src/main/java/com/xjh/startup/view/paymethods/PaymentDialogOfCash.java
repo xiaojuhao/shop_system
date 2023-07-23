@@ -1,5 +1,6 @@
 package com.xjh.startup.view.paymethods;
 
+import com.xjh.common.enumeration.EnumPayAction;
 import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.service.domain.OrderService;
@@ -56,11 +57,11 @@ public class PaymentDialogOfCash extends Dialog<PaymentResult> {
             result.setOrderId(param.getOrderId());
             result.setPayMethod(EnumPayMethod.CASH);
             if (btn == confirmPayBtn) {
-                result.setPayAction(1);
+                result.setPayAction(EnumPayAction.DO_PAY);
                 result.setPayAmount(CommonUtils.parseMoney(payAmountField.getText(), 0D));
                 result.setPayRemark(remarkField.getText());
             } else {
-                result.setPayAction(0);
+                result.setPayAction(EnumPayAction.CANCEL_PAY);
                 result.setPayAmount(0D);
                 result.setPayRemark(null);
             }
