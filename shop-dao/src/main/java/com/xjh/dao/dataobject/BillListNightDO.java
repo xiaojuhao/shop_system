@@ -77,7 +77,7 @@ public class BillListNightDO {
     @SumActualPrice(EnumPayMethod.MEITUAN_COUPON)
     public double actualMeituanTotal;
     @Column
-    @SumTotalPrice(EnumPayMethod.COUPON)
+    @SumTotalPrice(EnumPayMethod.VOUCHER)
     public double methodCouponTotal;
     @Column
     public int methodCouponTotalNums;

@@ -1,18 +1,13 @@
 package com.xjh.service.remote;
 
 import cn.hutool.http.HttpUtil;
-import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.CurrentAccount;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
-import com.xjh.dao.dataobject.Order;
-import com.xjh.service.domain.StoreService;
-import com.xjh.service.domain.model.StoreVO;
 import com.xjh.service.vo.PrePaidCard;
-
-import javax.inject.Inject;
-import java.nio.charset.Charset;
+import com.xjh.service.vo.ManyCoupon;
+import com.xjh.service.vo.SerialNumber;
 
 public class RemoteService {
     static String cardCouponUrl = "http://www.xjhjprl.cn/cardCoupon/index";
@@ -76,12 +71,68 @@ public class RemoteService {
         Logger.info("更新储值卡余额: " + rs);
     }
 
+
+    /**
+     * 查询代金券
+     */
+    public Result<ManyCoupon> getManyCouponBy(int storeId, String code) {
+        Logger.info("查询代金券请求: code=" + code + ", storeId=" + storeId);
+        String whereString = " serial_number = '" + code + "'";
+        JSONObject jSONObject = new JSONObject();
+        jSONObject.put("API_TYPE", "getManyCouponBy()");
+        jSONObject.put("parameterType", "(String)");
+        jSONObject.put("whereString", whereString);
+        jSONObject.put("storeId", storeId);
+
+        String rs = HttpUtil.post(cardCouponUrl, jSONObject.toJSONString());
+        Logger.info("查询代金券结果: " + rs);
+        JSONObject json = JSONObject.parseObject(rs);
+        if (json.containsKey("isNull")) {
+            boolean isNull = json.getBoolean("isNull");
+            if (isNull) {
+                return Result.fail("代金券号不存在");
+            }
+        }
+        if (!json.containsKey("manyCoupon")) {
+            return Result.fail("代金券不存在");
+        }
+        ManyCoupon card = json.getObject("manyCoupon", ManyCoupon.class);
+        if (card.getStatus() == 0) {
+            return Result.fail("代金券已失效");
+        }
+        return Result.success(card);
+    }
+
+    public Result<SerialNumber> getOneSerialNumber(int storeId, String code) {
+        JSONObject jSONObject = new JSONObject();
+        jSONObject.put("API_TYPE", "getOneSerialNumber()");
+        jSONObject.put("parameterType", "(String)");
+        jSONObject.put("code", code);
+        jSONObject.put("storeId", storeId);
+
+        String rs = HttpUtil.post(cardCouponUrl, jSONObject.toJSONString());
+        Logger.info("查询代金券结果: " + rs);
+        JSONObject json = JSONObject.parseObject(rs);
+        if (json.containsKey("isNull")) {
+            boolean isNull = json.getBoolean("isNull");
+            if (isNull) {
+                return Result.fail("代金券号不存在");
+            }
+        }
+        if (!json.containsKey("serialNumber")) {
+            return Result.fail("代金券号不存在");
+        }
+        SerialNumber sn = json.getObject("serialNumber", SerialNumber.class);
+
+        return Result.success(sn);
+    }
+
     public static void main(String[] args) {
         RemoteService service = new RemoteService();
-        Result<PrePaidCard> rs = service.getOnePrePaidCard(333, "123321123");
+        Result<SerialNumber> rs = service.getOneSerialNumber(333, "17ir3cs0ne");
         System.out.println(JSONObject.toJSONString(rs, true));
 
-        service.prePaidCardConsume(333, rs.getData(), 1, 123123);
+
         System.exit(0);
     }
 

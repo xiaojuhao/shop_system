@@ -4,7 +4,7 @@ public enum EnumPayMethod {
     UNKNOWN(-1, "其他", false),
     CASH(1, "现金", false),
     BANKCARD(2, "银行卡", false),
-    COUPON(3, "代金券", true),
+    VOUCHER(3, "代金券", true),
     STORECARD(4, "储值卡", false),
     WECHAT(5, "微信支付", false),
     ALIPAY(6, "支付宝支付", false),

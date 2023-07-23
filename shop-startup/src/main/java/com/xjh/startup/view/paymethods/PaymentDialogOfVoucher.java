@@ -5,11 +5,15 @@ import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Result;
+import com.xjh.dao.dataobject.Order;
+import com.xjh.dao.dataobject.OrderDishes;
+import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.StoreService;
 import com.xjh.service.domain.model.PaymentResult;
 import com.xjh.service.domain.model.StoreVO;
 import com.xjh.service.remote.RemoteService;
+import com.xjh.service.vo.ManyCoupon;
 import com.xjh.service.vo.PrePaidCard;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
@@ -24,21 +28,28 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Window;
 
 import java.util.Optional;
+import java.util.function.Predicate;
 
-public class PaymentDialogOfPreCard extends SimpleForm implements Initializable {
+public class PaymentDialogOfVoucher extends SimpleForm implements Initializable {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
 
     RemoteService remoteService = GuiceContainer.getInstance(RemoteService.class);
 
     StoreService storeService = GuiceContainer.getInstance(StoreService.class);
+
+    OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
+
     DeskOrderParam param;
+
+    Order order;
     String name;
     EnumPayMethod payMethod;
 
-    public PaymentDialogOfPreCard(DeskOrderParam param, String name, EnumPayMethod payMethod) {
+    public PaymentDialogOfVoucher(DeskOrderParam param, String name, EnumPayMethod payMethod) {
         this.param = param;
         this.name = name;
         this.payMethod = payMethod;
+        order = orderService.getOrder(param.getOrderId());
     }
 
     @Override
@@ -55,7 +66,8 @@ public class PaymentDialogOfPreCard extends SimpleForm implements Initializable 
         grid.add(new Label(param.getDeskName()), 1, row);
 
         row++;
-        double needPayAmt = orderService.notPaidBillAmount(param.getOrderId());
+        Predicate<OrderDishes> discountableChecker = orderDishesService.discountableChecker();
+        double needPayAmt = orderService.notPaidBillAmount(order, discountableChecker);
 
         StringProperty actualPay = new SimpleStringProperty("0.0");
         grid.add(createTitleLabel("待支付"), 0, row);
@@ -69,10 +81,10 @@ public class PaymentDialogOfPreCard extends SimpleForm implements Initializable 
         grid.add(couponAmtLabel, 1, row);
 
         row++;
-        TextField cardNo = new TextField();
-        cardNo.setPromptText("储值卡号");
-        grid.add(createTitleLabel("储值卡号"), 0, row);
-        grid.add(cardNo, 1, row);
+        TextField voucherNo = new TextField();
+        voucherNo.setPromptText("代金券号");
+        grid.add(createTitleLabel("代金券号"), 0, row);
+        grid.add(voucherNo, 1, row);
 
         row++;
         TextArea remarkField = new TextArea();
@@ -94,9 +106,9 @@ public class PaymentDialogOfPreCard extends SimpleForm implements Initializable 
         });
         Button submit = new Button("确 定");
         submit.setOnAction(evt -> {
-            String preCardCode = CommonUtils.trim(cardNo.getText());
-            if (CommonUtils.length(preCardCode) < 3) {
-                AlertBuilder.ERROR("请输入储值卡号");
+            String voucherNoStr = CommonUtils.trim(voucherNo.getText());
+            if (CommonUtils.length(voucherNoStr) < 3) {
+                AlertBuilder.ERROR("请输入代金券号");
                 return;
             }
             PaymentResult result = new PaymentResult();
@@ -105,7 +117,7 @@ public class PaymentDialogOfPreCard extends SimpleForm implements Initializable 
             result.setActualAmount(CommonUtils.parseDouble(actualPay.getValue(), 0D));
             result.setPayAmount(CommonUtils.parseDouble(payAmtValue.getValue(), 0D));
             result.setVoucherNum(1);
-            result.setCardNumber(preCardCode);
+            result.setCardNumber(voucherNoStr);
             result.setPayMethod(payMethod);
             result.setPayRemark(remarkField.getText());
             if (result.getPayAmount() < 0.001) {
@@ -113,28 +125,17 @@ public class PaymentDialogOfPreCard extends SimpleForm implements Initializable 
                 return;
             }
             StoreVO store = storeService.getStore().getData();
-            Result<PrePaidCard> preCardQs = remoteService.getOnePrePaidCard(store.getStoreId(), preCardCode);
+            Result<ManyCoupon> preCardQs = remoteService.getManyCouponBy(store.getStoreId(), voucherNoStr);
             if (!preCardQs.isSuccess()) {
                 AlertBuilder.ERROR(preCardQs.getMsg());
                 return;
             }
-            if (preCardQs.getData().getBalance() < result.getPayAmount()) {
-                AlertBuilder.ERROR("储值卡余额不足");
-                return;
+            if (preCardQs.getData().getAmount() < result.getPayAmount()) {
+//                AlertBuilder.ERROR("代金券余额不足");
+//                return;
+                result.setPayAmount(preCardQs.getData().getAmount());
             }
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("储值卡支付");
-            alert.setHeaderText("确定要用储值卡[" + preCardCode + "]支付" + result.getPayAmount() + "元吗?");
-            Optional<ButtonType> confirmRs = alert.showAndWait();
-            if (confirmRs.orElse(null) != ButtonType.OK) {
-                return;
-            }
-            Result<String> consumeRs = remoteService.prePaidCardConsume(store.getStoreId(), preCardQs.getData(), result.getPayAmount(), param.getOrderId());
-            if (!consumeRs.isSuccess()) {
-                remoteService.updatePrePaidCardBalance(store.getStoreId(), preCardQs.getData(), preCardQs.getData().getBalance());
-                AlertBuilder.ERROR(consumeRs.getMsg());
-                return;
-            }
+
             this.getScene().getWindow().setUserData(result);
             this.getScene().getWindow().hide();
         });

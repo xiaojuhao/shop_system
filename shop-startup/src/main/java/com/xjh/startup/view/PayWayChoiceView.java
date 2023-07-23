@@ -16,11 +16,8 @@ import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DeskOrderParam;
-import com.xjh.startup.view.paymethods.PaymentDialogOfCash;
-import com.xjh.startup.view.paymethods.PaymentDialogOfCommon;
-import com.xjh.startup.view.paymethods.PaymentDialogOfCoupon;
+import com.xjh.startup.view.paymethods.*;
 
-import com.xjh.startup.view.paymethods.PaymentDialogOfPreCard;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -51,7 +48,7 @@ public class PayWayChoiceView extends SmallForm {
         pane.getChildren().add(couponPaymentAction("美团代金券", param, 1, MEITUAN_COUPON));
         pane.getChildren().add(couponPaymentAction("美团套餐买单", param, 2, MEITUAN_PACKAGE));
         pane.getChildren().add(couponPaymentAction("假日套餐补差价结账", param, 4, WANDA_PACKAGE));
-        pane.getChildren().add(createButton("代金券结账", this::notSupportConfirm));
+        pane.getChildren().add(voucherPaymentAction("代金券结账", param, VOUCHER));
         pane.getChildren().add(preCardPaymentAction("储值卡结账", param, STORECARD));
         pane.getChildren().add(createButton("逃单", () -> handleEscapeOrder(param)));
         pane.getChildren().add(createButton("免单", () -> handleFreeOrder(param)));
@@ -76,6 +73,24 @@ public class PayWayChoiceView extends SmallForm {
         button.setMaxWidth(100);
         button.setOnMouseClicked(event -> {
             PaymentDialogOfPreCard scene = new PaymentDialogOfPreCard(param, name, payMethod);
+            ModelWindow window = new ModelWindow(this.getScene().getWindow());
+            window.setHeight(380);
+            window.setScene(new Scene(scene));
+            scene.initialize();
+            window.showAndWait();
+            System.out.println("返回值:" + JSON.toJSONString(window.getUserData()));
+            addPay((PaymentResult) window.getUserData());
+        });
+        return button;
+    }
+
+    // 代金券支付
+    private Node voucherPaymentAction(String name, DeskOrderParam param, EnumPayMethod payMethod) {
+        Button button = new Button(name);
+        button.setMinWidth(100);
+        button.setMaxWidth(100);
+        button.setOnMouseClicked(event -> {
+            PaymentDialogOfVoucher scene = new PaymentDialogOfVoucher(param, name, payMethod);
             ModelWindow window = new ModelWindow(this.getScene().getWindow());
             window.setHeight(380);
             window.setScene(new Scene(scene));
@@ -124,10 +139,7 @@ public class PayWayChoiceView extends SmallForm {
     }
 
     private void handleEscapeOrder(DeskOrderParam param) {
-        Alert _alert = new Alert(Alert.AlertType.CONFIRMATION,
-                "您确定要为当前订单做逃单处理吗？",
-                new ButtonType("取消", ButtonBar.ButtonData.NO),
-                new ButtonType("确定", ButtonBar.ButtonData.YES));
+        Alert _alert = new Alert(Alert.AlertType.CONFIRMATION, "您确定要为当前订单做逃单处理吗？", new ButtonType("取消", ButtonBar.ButtonData.NO), new ButtonType("确定", ButtonBar.ButtonData.YES));
         _alert.setTitle("逃单信息");
         _alert.setHeaderText("逃单处理");
         Optional<ButtonType> _buttonType = _alert.showAndWait();
@@ -138,10 +150,7 @@ public class PayWayChoiceView extends SmallForm {
     }
 
     private void handleFreeOrder(DeskOrderParam param) {
-        Alert _alert = new Alert(Alert.AlertType.CONFIRMATION,
-                "您确定要为当前订单做免单处理吗？",
-                new ButtonType("取消", ButtonBar.ButtonData.NO),
-                new ButtonType("确定", ButtonBar.ButtonData.YES));
+        Alert _alert = new Alert(Alert.AlertType.CONFIRMATION, "您确定要为当前订单做免单处理吗？", new ButtonType("取消", ButtonBar.ButtonData.NO), new ButtonType("确定", ButtonBar.ButtonData.YES));
         _alert.setTitle("免单信息");
         _alert.setHeaderText("免单处理");
         Optional<ButtonType> _buttonType = _alert.showAndWait();
@@ -160,17 +169,20 @@ public class PayWayChoiceView extends SmallForm {
         if (paymentResult.getPayAction() == EnumPayAction.CANCEL_PAY) {
             return;
         }
-        if(CommonUtils.isNotBlank(paymentResult.getErrorMsg())){
+        if (CommonUtils.isNotBlank(paymentResult.getErrorMsg())) {
             AlertBuilder.ERROR(paymentResult.getErrorMsg());
             return;
         }
-        if(paymentResult.getPayAmount() < 0.001){
+        if (paymentResult.getPayAmount() < 0.001) {
             AlertBuilder.ERROR("支付金额不能为0");
             return;
         }
         // 确认支付处理
         Result<String> rs = orderPayService.handlePaymentResult(paymentResult);
         if (rs.isSuccess()) {
+            if (paymentResult.getPayMethod() == VOUCHER) {
+                AlertBuilder.INFO("代金券支付成功");
+            }
             this.getScene().getWindow().hide();
         } else {
             AlertBuilder.ERROR(rs.getMsg());

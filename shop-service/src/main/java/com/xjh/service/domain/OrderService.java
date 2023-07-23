@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 import static com.xjh.common.utils.CommonUtils.tryDecodeBase64;
 import static com.xjh.common.utils.CommonUtils.tryEncodeBase64;
@@ -99,8 +100,7 @@ public class OrderService {
         OrderPayQuery cond = new OrderPayQuery();
         cond.setOrderId(orderId);
         cond.setPaymentStatus(1);
-        cond.setExcludePayMethods(Lists.newArrayList(
-                EnumPayMethod.WECHAT.code, EnumPayMethod.ALIPAY.code));
+        cond.setExcludePayMethods(Lists.newArrayList(EnumPayMethod.WECHAT.code, EnumPayMethod.ALIPAY.code));
         orderPayService.deleteBy(cond);
         // 更新支付金额
         List<OrderPay> pays = orderPayService.selectByOrderId(orderId);
@@ -278,10 +278,7 @@ public class OrderService {
         }
     }
 
-    public Result<OrderOverviewVO> buildOrderOverview(
-            Order order,
-            List<OrderDishes> orderDishesList,
-            List<OrderPay> orderPays) {
+    public Result<OrderOverviewVO> buildOrderOverview(Order order, List<OrderDishes> orderDishesList, List<OrderPay> orderPays) {
         OrderOverviewVO v = new OrderOverviewVO();
         if (order != null) {
             v.deskId = order.getDeskId();
@@ -314,11 +311,7 @@ public class OrderService {
             // 支付信息
             StringBuilder payInfo = new StringBuilder();
             CommonUtils.forEach(orderPays, p -> {
-                payInfo.append(DateBuilder.base(p.getCreatetime()).timeStr())
-                        .append(" 收到付款:")
-                        .append(CommonUtils.formatMoney(p.getAmount()))
-                        .append(", 来自")
-                        .append(EnumPayMethod.of(p.getPaymentMethod()).name);
+                payInfo.append(DateBuilder.base(p.getCreatetime()).timeStr()).append(" 收到付款:").append(CommonUtils.formatMoney(p.getAmount())).append(", 来自").append(EnumPayMethod.of(p.getPaymentMethod()).name);
                 if (CommonUtils.isNotBlank(p.getCardNumber())) {
                     payInfo.append(",交易号:").append(p.getCardNumber());
                 }
@@ -330,18 +323,12 @@ public class OrderService {
     }
 
     private double sumTotalPrice(Order order, List<OrderDishes> orderDishesList) {
-        return CommonUtils.collect(orderDishesList, OrderDishes::sumOrderDishesPrice)
-                .stream().filter(Objects::nonNull)
-                .reduce(0D, Double::sum);
+        return CommonUtils.collect(orderDishesList, OrderDishes::sumOrderDishesPrice).stream().filter(Objects::nonNull).reduce(0D, Double::sum);
     }
 
     private double calcDiscountAmount(Order order, List<OrderDishes> orderDishesList) {
-        double total = CommonUtils.collect(orderDishesList, OrderDishes::sumOrderDishesPrice)
-                .stream().filter(Objects::nonNull)
-                .reduce(0D, Double::sum);
-        double discountedPrice = CommonUtils.collect(orderDishesList, OrderDishes::sumOrderDishesDiscountPrice)
-                .stream().filter(Objects::nonNull)
-                .reduce(0D, Double::sum);
+        double total = CommonUtils.collect(orderDishesList, OrderDishes::sumOrderDishesPrice).stream().filter(Objects::nonNull).reduce(0D, Double::sum);
+        double discountedPrice = CommonUtils.collect(orderDishesList, OrderDishes::sumOrderDishesDiscountPrice).stream().filter(Objects::nonNull).reduce(0D, Double::sum);
         return Math.max(0, total - discountedPrice);
     }
 
@@ -424,6 +411,15 @@ public class OrderService {
         return notPaidBillAmount(order, orderDishes);
     }
 
+    public double notPaidBillAmount(Order order, Predicate<OrderDishes> test) {
+        if (order == null) {
+            return 0;
+        }
+        List<OrderDishes> orderDishes = orderDishesService.selectByOrderId(order.getOrderId());
+        orderDishes = CommonUtils.filter(orderDishes, test);
+        return notPaidBillAmount(order, orderDishes);
+    }
+
     public double notPaidBillAmount(Order order, List<OrderDishes> orderDishes) {
         if (order == null) {
             return 0;
@@ -460,7 +456,7 @@ public class OrderService {
             order.setCreateTime(DateBuilder.now().mills());
 
             Result<Integer> rs = orderDAO.insert(order);
-            if(rs.isSuccess()){
+            if (rs.isSuccess()) {
                 order.setOrderId(rs.getData());
             } else {
                 return Result.fail(rs.getCode(), rs.getMsg());
@@ -480,6 +476,7 @@ public class OrderService {
             }
         }
     }
+
     @Deprecated
     public Integer createNewOrderId1() {
         LocalDateTime start = DateBuilder.base("2021-01-01 00:00:01").dateTime();
@@ -497,6 +494,7 @@ public class OrderService {
         Logger.info("创建订单号: " + diffHours + "," + nextId + "," + id);
         return id;
     }
+
     @Deprecated
     public synchronized int nextId(String group) {
         return SequenceDatabase.nextId("orderId:sequence:" + group);
