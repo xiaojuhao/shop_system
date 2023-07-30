@@ -43,6 +43,10 @@ public class OrderDishesService {
         }
     }
 
+    public Result<Integer> separateOrder(Integer subOrderId, Integer toOrderId) {
+        return orderDishesDAO.separateOrder(subOrderId, toOrderId);
+    }
+
     public List<OrderDishes> selectByOrderId(Integer orderId) {
         if (orderId == null) {
             return new ArrayList<>();

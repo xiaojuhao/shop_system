@@ -14,5 +14,8 @@ public class DeskOrderParam {
     Runnable callback;
     // 退菜时传入退菜记录
     List<String> returnList;
+    // 拆台清单
+    List<String> separateSubOrderIdList;
+
     EnumChoiceAction choiceAction;
 }

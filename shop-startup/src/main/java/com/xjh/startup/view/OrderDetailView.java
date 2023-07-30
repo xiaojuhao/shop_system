@@ -250,7 +250,7 @@ public class OrderDetailView extends VBox implements Initializable {
             Button sendBtn = createButton("送菜", width, e -> openSendDishesChoiceView(deskOrderParam));
             Button returnBtn = createButton("退菜", width, e -> returnDishesConfirm(deskOrderParam, tableView));
             Button transferBtn = createButton("转台", width, e -> openDeskChangeView(deskOrderParam));
-            Button splitBtn = createButton("拆台", width, null);
+            Button splitBtn = createButton("拆台", width, e -> separateOrderConfirm(deskOrderParam, tableView));
             Button payBillBtn = createButton("结账", width, evt -> openPayWayChoiceView(deskOrderParam));
 
             FlowPane.setMargin(payBillBtn, new Insets(0, 80, 0, 0));
@@ -458,6 +458,35 @@ public class OrderDetailView extends VBox implements Initializable {
         param.setReturnList(returnList);
         String title = "退菜[桌号:" + param.getDeskName() + "]";
         openView(title, param, new OrderReturnDishesView(param));
+    }
+
+    private void separateOrderConfirm(DeskOrderParam param, TableView<OrderDishesTableItemBO> tv) {
+        ObservableList<OrderDishesTableItemBO> list = tv.getSelectionModel().getSelectedItems();
+        List<String> subOrderIds = new ArrayList<>();
+        list.forEach(it -> subOrderIds.add(it.getSubOrderId()));
+        if (CollectionUtils.isEmpty(subOrderIds)) {
+            AlertBuilder.ERROR("请选择需要换台的子订单");
+            return;
+        }
+        param.setChoiceAction(EnumChoiceAction.SEPARATE);
+        param.setSeparateSubOrderIdList(subOrderIds);
+        String title = "拆台[桌号:" + param.getDeskName() + "]";
+
+        Stage stg = new Stage();
+        double width = this.getScene().getWindow().getWidth() * 0.4;
+        double height = this.getScene().getWindow().getHeight() * 0.68;
+        stg.initOwner(this.getScene().getWindow());
+        stg.initModality(Modality.WINDOW_MODAL);
+        stg.initStyle(StageStyle.DECORATED);
+        stg.centerOnScreen();
+        stg.setWidth(width);
+        stg.setHeight(height);
+        stg.setTitle(title);
+        stg.setScene(new Scene(new OrderSeparateView(param)));
+        stg.showAndWait();
+        // 窗口关闭之后执行回调函数
+        CommonUtils.safeRun(param.getCallback());
+
     }
 
     private void openDeskChangeView(DeskOrderParam param) {

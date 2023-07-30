@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.dao.foundation.EntityUtils;
 import com.zaxxer.hikari.HikariDataSource;
@@ -50,6 +51,21 @@ public class OrderDishesDAO {
         } catch (Exception ex) {
             ex.printStackTrace();
             return new ArrayList<>();
+        }
+    }
+
+    public Result<Integer> separateOrder(Integer subOrderId, Integer toOrderId) {
+        try {
+            String sql = "update order_dishes_list set orderId=" + toOrderId + " where subOrderId=" + subOrderId;
+            int rs = Db.use(ds).execute(sql);
+            if (rs > 0) {
+                return Result.success(rs);
+            } else {
+                return Result.fail("更新订单菜品记录失败(子订单号不存在)");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail(ex.getMessage());
         }
     }
 

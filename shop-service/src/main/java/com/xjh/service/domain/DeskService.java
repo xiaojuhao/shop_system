@@ -2,6 +2,8 @@ package com.xjh.service.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
 
 import com.alibaba.fastjson.JSON;
 import com.google.inject.Inject;
@@ -26,6 +28,10 @@ public class DeskService {
     DeskDAO deskDAO;
     @Inject
     CartService cartService;
+
+    public static Predicate<Desk> statusFilter(EnumDeskStatus status) {
+        return desk -> Objects.equals(desk.getStatus(), status.status());
+    }
 
     public Desk getById(Integer id) {
         if (id == null) {
@@ -78,7 +84,7 @@ public class DeskService {
             createOrderParam.setCustomerNum(param.getCustomerNum());
             Result<Order> order = orderService.createOrder(createOrderParam);
             Logger.info("下单成功: " + JSON.toJSONString(order));
-            if(!order.isSuccess()){
+            if (!order.isSuccess()) {
                 return Result.fail(order.getCode(), order.getMsg());
             }
             // 开桌

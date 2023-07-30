@@ -57,6 +57,40 @@ public class OrderService {
         }
     }
 
+    public Result<String> separateOrder(List<String> subOrderIds, Integer toDeskId) {
+        Desk toDesk = deskService.getById(toDeskId);
+        if (toDesk == null) {
+            return Result.fail("桌号不存在");
+        }
+        Order toOrder = getOrder(toDesk.getOrderId());
+        if (toOrder == null) {
+            return Result.fail("餐桌[" + toDesk.getDeskName() + "]未开台，或者订单不存在");
+        }
+        // 子订单校验
+        for(String subOrderIdStr : subOrderIds) {
+            Integer subOrderId = CommonUtils.parseInt(subOrderIdStr, null);
+            SubOrder subOrder = subOrderDAO.findBySubOrderId(subOrderId);
+            if (subOrder == null) {
+                return Result.fail("子订单号" + subOrderId + "不存在");
+            }
+        }
+        // 拆台操作
+        for(String subOrderIdStr : subOrderIds) {
+            Integer subOrderId = CommonUtils.parseInt(subOrderIdStr, null);
+            SubOrder subOrder = subOrderDAO.findBySubOrderId(subOrderId);
+            subOrder.setOrderId(toOrder.getOrderId());
+            Result<Integer> rs = subOrderDAO.updateById(subOrder);
+            if (!rs.isSuccess()) {
+                return Result.fail(rs.getMsg());
+            }
+            Result<Integer> separateRs = orderDishesService.separateOrder(subOrderId, toOrder.getOrderId());
+            if (!separateRs.isSuccess()) {
+                return Result.fail(separateRs.getMsg());
+            }
+        }
+        return Result.success("拆单成功");
+    }
+
     public Result<String> changeDesk(Integer orderId, Integer targetDeskId) {
         Order order = this.getOrder(orderId);
         if (order == null) {

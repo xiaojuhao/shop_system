@@ -57,8 +57,7 @@ public class SubOrderDAO {
         if (orderId == null) {
             return null;
         }
-        String sql = "select min(createtime) createtime" +
-                " from suborder_list where orderId = " + orderId;
+        String sql = "select min(createtime) createtime" + " from suborder_list where orderId = " + orderId;
         Entity rs = Db.use(ds).queryOne(sql);
         if (rs == null) {
             return null;
@@ -69,16 +68,20 @@ public class SubOrderDAO {
     public Result<Integer> insert(SubOrder subOrder) throws SQLException {
         // return Db.use(ds).insert(EntityUtils.create(subOrder));
         Long id = Db.use(ds).insertForGeneratedKey(EntityUtils.create(subOrder));
-        if(id == null){
+        if (id == null) {
             return Result.fail("插入SubOrder失败");
         }
         return Result.success(parseInt(id, null));
     }
 
-    public int updateById(SubOrder subOrder) throws SQLException {
-        return Db.use(ds).update(
-                EntityUtils.create(subOrder),
-                EntityUtils.idCond(subOrder));
+    public Result<Integer> updateById(SubOrder subOrder) {
+        try {
+            int i = Db.use(ds).update(EntityUtils.create(subOrder), EntityUtils.idCond(subOrder));
+            return Result.success(i);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail(ex.getMessage());
+        }
     }
 
     public List<SubOrder> selectList(SubOrder subOrder) {
@@ -96,10 +99,7 @@ public class SubOrderDAO {
             if (CommonUtils.isEmpty(orderIds)) {
                 return new ArrayList<>();
             }
-            String sql = "select * from suborder_list where orderId in (" +
-                    orderIds.stream().map(Object::toString)
-                            .collect(Collectors.joining(",", "", ""))
-                    + ")";
+            String sql = "select * from suborder_list where orderId in (" + orderIds.stream().map(Object::toString).collect(Collectors.joining(",", "", "")) + ")";
             List<Entity> list = Db.use(ds).query(sql);
             return EntityUtils.convertList(list, SubOrder.class);
         } catch (Exception ex) {

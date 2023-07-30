@@ -9,6 +9,9 @@ public enum EnumChoiceAction {
 
     RETURN,
 
+
+    SEPARATE,
+
     ERASE,
 
 
