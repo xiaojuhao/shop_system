@@ -39,12 +39,12 @@ public class OrderSeparateView extends MediumForm {
 
     public OrderSeparateView(DeskOrderParam param) {
         List<Desk> allDesks = deskService.getAllDesks();
-        List<DeskChangeView.Item> desks = allDesks.stream() //
+        List<Item> desks = allDesks.stream() //
                 .filter(DeskService.statusFilter(EnumDeskStatus.IN_USE)) // 正在使用中的
                 .filter(desk -> !Objects.equals(desk.getOrderId(), param.getOrderId())) // 过滤订单当前的桌子
-                .map(DeskChangeView.Item::new) // 转换成Item对象
+                .map(Item::new) // 转换成Item对象
                 .collect(Collectors.toList());
-        TableView<DeskChangeView.Item> tableView = new TableView<>();
+        TableView<Item> tableView = new TableView<>();
         tableView.setPadding(new Insets(5, 0, 0, 5));
         tableView.getColumns().addAll(
                 TableViewUtils.newCol("餐桌", "deskName", 200),
@@ -59,12 +59,12 @@ public class OrderSeparateView extends MediumForm {
 
         Button ok = new Button("确定拆台");
         ok.setOnMouseClicked(evt -> {
-            ObservableList<DeskChangeView.Item> selected = tableView.getSelectionModel().getSelectedItems();
+            ObservableList<Item> selected = tableView.getSelectionModel().getSelectedItems();
             if (selected.isEmpty()) {
                 AlertBuilder.INFO("请选择拆台目标餐桌");
                 return;
             }
-            DeskChangeView.Item item = selected.get(0);
+            Item item = selected.get(0);
             Result<String> changeRs = orderService.separateOrder(param.getSeparateSubOrderIdList(), item.getDeskId());
             if (!changeRs.isSuccess()) {
                 AlertBuilder.ERROR(changeRs.getMsg());
