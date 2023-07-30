@@ -1,6 +1,5 @@
 package com.xjh.service.vo;
 
-import com.xjh.common.utils.CommonUtils;
 import lombok.Data;
 
 import java.math.BigDecimal;

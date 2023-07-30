@@ -1,13 +1,13 @@
 package com.xjh.service.domain;
 
-import java.util.List;
-
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Account;
 import com.xjh.dao.mapper.AccountDAO;
+
+import java.util.List;
 
 @Singleton
 public class AccountService {

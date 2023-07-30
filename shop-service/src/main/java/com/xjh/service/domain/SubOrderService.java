@@ -1,14 +1,13 @@
 package com.xjh.service.domain;
 
-import java.time.LocalDateTime;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import com.xjh.common.store.SequenceDatabase;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Logger;
 import com.xjh.dao.mapper.SubOrderDAO;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.time.LocalDateTime;
 
 @Singleton
 public class SubOrderService {

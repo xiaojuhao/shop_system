@@ -2,7 +2,6 @@ package com.xjh.service.domain.model;
 
 import com.xjh.common.enumeration.EnumPayAction;
 import com.xjh.common.enumeration.EnumPayMethod;
-
 import lombok.Data;
 
 @Data

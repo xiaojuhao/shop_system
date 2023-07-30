@@ -1,13 +1,13 @@
 package com.xjh.service.domain;
 
-import java.util.List;
-
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.DishesPackage;
 import com.xjh.dao.mapper.DishesPackageDAO;
 import com.xjh.dao.query.DishesPackageQuery;
+
+import java.util.List;
 
 @Singleton
 public class DishesPackageService {

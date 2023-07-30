@@ -1,20 +1,12 @@
 package com.xjh.service.domain;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.enumeration.EnumPayAction;
 import com.xjh.common.enumeration.EnumPayStatus;
-import com.xjh.common.utils.CurrentAccount;
-import com.xjh.common.utils.CurrentRequest;
-import com.xjh.common.utils.DateBuilder;
-import com.xjh.common.utils.Logger;
-import com.xjh.common.utils.Result;
+import com.xjh.common.utils.*;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderPay;
@@ -23,6 +15,10 @@ import com.xjh.dao.mapper.OrderPayDAO;
 import com.xjh.dao.query.OrderPayQuery;
 import com.xjh.service.domain.model.PaymentResult;
 import com.xjh.service.ws.NotifyService;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Singleton
 public class OrderPayService {

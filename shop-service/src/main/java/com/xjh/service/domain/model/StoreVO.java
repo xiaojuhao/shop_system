@@ -1,10 +1,9 @@
 package com.xjh.service.domain.model;
 
-import java.util.List;
-
 import com.xjh.common.valueobject.DishesGroupVO;
-
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class StoreVO {

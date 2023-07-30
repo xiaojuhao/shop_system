@@ -1,15 +1,15 @@
 package com.xjh.service.domain;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.OrElse;
 import com.xjh.dao.dataobject.DishesType;
 import com.xjh.dao.mapper.DishesTypeDAO;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 @Singleton
 public class DishesTypeService {

@@ -5,6 +5,7 @@ import com.xjh.startup.foundation.constants.MainStageHolder;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.MediumForm;
 import com.xjh.startup.view.ordermanage.OrderDishesSaleStatisticsView;
+import com.xjh.startup.view.ordermanage.OrderDishesTypeSaleStatisticsView;
 import com.xjh.startup.view.ordermanage.OrderManageListView;
 import com.xjh.startup.view.ordermanage.OrderManageReturnedListView;
 
@@ -103,12 +104,13 @@ public class MenuBarView {
         MenuItem dishesSaleStatistics = new MenuItem("菜品销售统计");
         dishesSaleStatistics.setOnAction(evt -> openView("菜品销售统计", new OrderDishesSaleStatisticsView()));
 
-        MenuItem printJobMenu = new MenuItem("菜品分类销售统计");
+        MenuItem dishesTypeSaleStatistics = new MenuItem("菜品分类销售统计");
+        dishesTypeSaleStatistics.setOnAction(evt -> openView("菜品分类销售统计", new OrderDishesTypeSaleStatisticsView()));
 
         MenuItem returnedDishes = new MenuItem("退菜记录");
         returnedDishes.setOnAction(evt -> openView("退菜记录", new OrderManageReturnedListView()));
 
-        menu.getItems().addAll(orderList, dishesSaleStatistics, printJobMenu, returnedDishes);
+        menu.getItems().addAll(orderList, dishesSaleStatistics, dishesTypeSaleStatistics, returnedDishes);
         return menu;
     }
 

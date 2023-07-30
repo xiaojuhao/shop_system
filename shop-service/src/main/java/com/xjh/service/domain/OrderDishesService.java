@@ -1,13 +1,6 @@
 package com.xjh.service.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Predicate;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
+import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSONArray;
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.utils.CommonUtils;
@@ -16,10 +9,16 @@ import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.dao.mapper.OrderDishesDAO;
-
-import cn.hutool.core.codec.Base64;
 import com.xjh.service.domain.model.DishesSaleStatModel;
 import com.xjh.service.domain.model.DishesSaleStatReq;
+import com.xjh.service.domain.model.DishesTypeSaleStatModel;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
 
 @Singleton
 public class OrderDishesService {
@@ -97,5 +96,12 @@ public class OrderDishesService {
                 "from  order_dishes_list " +
                 " GROUP BY dishesId,ifDishesPackage,dishesPriceId order by count desc";
         return orderDishesDAO.query(sql, DishesSaleStatModel.class);
+    }
+
+    public Result<List<DishesTypeSaleStatModel>> statSalesType(DishesSaleStatReq req){
+        String sql = "select dishesTypeId,sum(orderDishesNums) as count,sum(orderDishesPrice) as allPrice " +
+                "from  order_dishes_list " +
+                " GROUP BY dishesTypeId order by count desc";
+        return orderDishesDAO.query(sql, DishesTypeSaleStatModel.class);
     }
 }

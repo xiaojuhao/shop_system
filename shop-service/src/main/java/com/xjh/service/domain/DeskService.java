@@ -1,10 +1,5 @@
 package com.xjh.service.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Predicate;
-
 import com.alibaba.fastjson.JSON;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -19,6 +14,11 @@ import com.xjh.dao.mapper.DeskDAO;
 import com.xjh.service.domain.model.CreateOrderParam;
 import com.xjh.service.domain.model.OpenDeskParam;
 import com.xjh.service.ws.NotifyService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
 
 @Singleton
 public class DeskService {
