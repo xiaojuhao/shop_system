@@ -12,8 +12,6 @@ import com.xjh.dao.query.PageQueryOrderReq;
 import com.xjh.service.domain.AccountService;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderDishesService;
-import com.xjh.service.domain.OrderService;
-import com.xjh.service.domain.model.DishesSaleStatModel;
 import com.xjh.service.domain.model.DishesSaleStatReq;
 import com.xjh.service.domain.model.DishesTypeSaleStatModel;
 import com.xjh.startup.foundation.ioc.GuiceContainer;

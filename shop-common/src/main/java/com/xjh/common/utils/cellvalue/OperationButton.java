@@ -1,10 +1,10 @@
 package com.xjh.common.utils.cellvalue;
 
-import java.util.function.Consumer;
-
 import javafx.beans.Observable;
 import javafx.beans.property.StringProperty;
 import lombok.Data;
+
+import java.util.function.Consumer;
 
 @Data
 public class OperationButton {

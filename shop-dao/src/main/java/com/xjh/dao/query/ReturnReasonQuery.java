@@ -1,13 +1,12 @@
 package com.xjh.dao.query;
 
-import java.time.LocalDate;
-
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.CopyUtils;
 import com.xjh.common.valueobject.PageCond;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.time.LocalDate;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

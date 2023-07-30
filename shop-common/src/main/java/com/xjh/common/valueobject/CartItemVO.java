@@ -1,11 +1,10 @@
 package com.xjh.common.valueobject;
 
+import com.alibaba.fastjson.JSONObject;
+import lombok.Data;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.alibaba.fastjson.JSONObject;
-
-import lombok.Data;
 
 @Data
 public class CartItemVO {

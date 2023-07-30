@@ -1,11 +1,5 @@
 package com.xjh.startup.view;
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
@@ -22,7 +16,6 @@ import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.LargeForm;
 import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.model.DishesAttributeBO;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -34,6 +27,12 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static com.xjh.common.utils.TableViewUtils.newCol;
 
 public class DishesAttributeManageView extends LargeForm implements Initializable {
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);

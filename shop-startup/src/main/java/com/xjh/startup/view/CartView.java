@@ -1,13 +1,5 @@
 package com.xjh.startup.view;
 
-import static com.xjh.common.utils.CommonUtils.sizeOf;
-import static com.xjh.common.utils.TableViewUtils.newCol;
-import static com.xjh.service.domain.DishesTypeService.toDishesTypeName;
-
-import java.lang.ref.WeakReference;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.xjh.common.utils.*;
 import com.xjh.common.utils.cellvalue.InputNumber;
 import com.xjh.common.utils.cellvalue.Money;
@@ -20,25 +12,31 @@ import com.xjh.service.domain.CartService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.DishesTypeService;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
+import com.xjh.service.ws.NotifyService;
+import com.xjh.service.ws.SocketUtils;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.model.CartItemBO;
 import com.xjh.startup.view.model.DeskOrderParam;
-
-import com.xjh.service.ws.NotifyService;
-import com.xjh.service.ws.SocketUtils;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Separator;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.xjh.common.utils.CommonUtils.sizeOf;
+import static com.xjh.common.utils.TableViewUtils.newCol;
+import static com.xjh.service.domain.DishesTypeService.toDishesTypeName;
 
 public class CartView extends VBox {
     CartService cartService = GuiceContainer.getInstance(CartService.class);

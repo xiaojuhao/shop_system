@@ -1,9 +1,5 @@
 package com.xjh.startup.view;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.OpenDeskResult;
 import com.xjh.common.utils.AlertBuilder;
@@ -17,7 +13,6 @@ import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.model.OpenDeskParam;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.model.OpenDeskInputParam;
-
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -30,6 +25,10 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DeskRectView extends VBox {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);

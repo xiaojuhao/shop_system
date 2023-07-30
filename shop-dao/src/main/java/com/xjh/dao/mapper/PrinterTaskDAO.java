@@ -1,20 +1,18 @@
 package com.xjh.dao.mapper;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
+import cn.hutool.db.Db;
+import cn.hutool.db.Entity;
 import com.google.inject.name.Named;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.PrinterTaskDO;
 import com.xjh.dao.foundation.EntityUtils;
 import com.zaxxer.hikari.HikariDataSource;
 
-import cn.hutool.db.Db;
-import cn.hutool.db.Entity;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Singleton
 public class PrinterTaskDAO {

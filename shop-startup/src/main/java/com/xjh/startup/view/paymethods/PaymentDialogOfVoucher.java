@@ -14,7 +14,6 @@ import com.xjh.service.domain.model.PaymentResult;
 import com.xjh.service.domain.model.StoreVO;
 import com.xjh.service.remote.RemoteService;
 import com.xjh.service.vo.ManyCoupon;
-import com.xjh.service.vo.PrePaidCard;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.SimpleForm;
@@ -22,12 +21,14 @@ import com.xjh.startup.view.model.DeskOrderParam;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Window;
 
-import java.util.Optional;
 import java.util.function.Predicate;
 
 public class PaymentDialogOfVoucher extends SimpleForm implements Initializable {

@@ -44,7 +44,6 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import javafx.util.StringConverter;
-import org.apache.commons.collections4.CollectionUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;

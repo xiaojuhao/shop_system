@@ -1,16 +1,10 @@
 package com.xjh.startup.view;
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.dao.mapper.PrinterDAO;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.SimpleForm;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -24,6 +18,11 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import lombok.Data;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.xjh.common.utils.TableViewUtils.newCol;
 
 public class PrinterKitchenSettings extends SimpleForm implements Initializable {
     PrinterDAO printerDAO = GuiceContainer.getInstance(PrinterDAO.class);

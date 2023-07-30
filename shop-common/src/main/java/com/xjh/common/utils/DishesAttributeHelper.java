@@ -1,9 +1,9 @@
 package com.xjh.common.utils;
 
-import java.util.List;
-
 import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesAttributeValueVO;
+
+import java.util.List;
 
 public class DishesAttributeHelper {
     public static String generateSelectedAttrDigest(List<DishesAttributeVO> attrs) {

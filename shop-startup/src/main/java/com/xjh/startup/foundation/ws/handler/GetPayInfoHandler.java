@@ -1,9 +1,5 @@
 package com.xjh.startup.foundation.ws.handler;
 
-import javax.inject.Inject;
-
-import org.java_websocket.WebSocket;
-
 import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Singleton;
 import com.xjh.dao.dataobject.Desk;
@@ -12,6 +8,9 @@ import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.ws.WsApiType;
 import com.xjh.startup.foundation.ws.WsHandler;
+import org.java_websocket.WebSocket;
+
+import javax.inject.Inject;
 
 @Singleton
 @WsApiType("getPayInfo")

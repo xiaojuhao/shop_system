@@ -1,22 +1,20 @@
 package com.xjh.startup.foundation.ws.handler;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import com.xjh.common.enumeration.EnumIsPackage;
-import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.valueobject.DishesAttributeVO;
-import com.xjh.common.valueobject.DishesAttributeValueVO;
-import org.java_websocket.WebSocket;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.xjh.service.domain.CartService;
+import com.xjh.common.enumeration.EnumIsPackage;
+import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.valueobject.CartItemVO;
 import com.xjh.common.valueobject.CartVO;
+import com.xjh.common.valueobject.DishesAttributeVO;
+import com.xjh.common.valueobject.DishesAttributeValueVO;
+import com.xjh.service.domain.CartService;
 import com.xjh.service.ws.WsApiType;
 import com.xjh.startup.foundation.ws.WsHandler;
+import org.java_websocket.WebSocket;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.List;
 
 @Singleton

@@ -1,12 +1,11 @@
 package com.xjh.dao.query;
 
-import static com.xjh.common.utils.CopyUtils.deepClone;
-
 import com.xjh.common.utils.CommonUtils;
-
 import com.xjh.common.valueobject.PageCond;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import static com.xjh.common.utils.CopyUtils.deepClone;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

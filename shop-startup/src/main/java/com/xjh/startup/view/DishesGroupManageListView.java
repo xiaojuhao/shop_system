@@ -1,32 +1,15 @@
 package com.xjh.startup.view;
 
 
-import com.xjh.common.enumeration.EnumPrinterStatus;
-import com.xjh.common.enumeration.EnumPrinterType;
-import com.xjh.common.utils.*;
 import com.xjh.common.utils.cellvalue.OperationButton;
 import com.xjh.common.utils.cellvalue.Operations;
-import com.xjh.common.utils.cellvalue.RichText;
-import com.xjh.dao.dataobject.Dishes;
-import com.xjh.dao.dataobject.DishesType;
-import com.xjh.dao.dataobject.PrinterDO;
-import com.xjh.service.domain.DishesService;
-import com.xjh.service.domain.DishesTypeService;
-import com.xjh.service.domain.PrinterService;
-import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
-import com.xjh.startup.view.base.ModelWindow;
-import com.xjh.startup.view.base.OkCancelDialog;
 import com.xjh.startup.view.base.SimpleForm;
-import com.xjh.startup.view.model.IntStringPair;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
+import javafx.scene.control.TableView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -35,7 +18,6 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.xjh.common.utils.TableViewUtils.newCol;

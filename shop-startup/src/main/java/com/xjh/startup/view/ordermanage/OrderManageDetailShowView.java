@@ -1,11 +1,6 @@
 package com.xjh.startup.view.ordermanage;
 
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
-import static com.xjh.common.utils.TableViewUtils.rowIndex;
-
-import java.util.List;
-
 import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.cellvalue.Money;
@@ -18,7 +13,6 @@ import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.OrderPayService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SimpleForm;
-
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -30,6 +24,11 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+
+import java.util.List;
+
+import static com.xjh.common.utils.TableViewUtils.newCol;
+import static com.xjh.common.utils.TableViewUtils.rowIndex;
 
 public class OrderManageDetailShowView extends SimpleForm {
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);

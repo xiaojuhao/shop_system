@@ -1,10 +1,5 @@
 package com.xjh.startup.view;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.alibaba.fastjson.JSON;
 import com.xjh.common.enumeration.EnumPrinterStatus;
 import com.xjh.common.enumeration.EnumPrinterType;
@@ -16,15 +11,15 @@ import com.xjh.service.domain.PrinterService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SimpleGridForm;
 import com.xjh.startup.view.model.IntStringPair;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PrinterEditView extends SimpleGridForm {
     PrinterService printerService = GuiceContainer.getInstance(PrinterService.class);

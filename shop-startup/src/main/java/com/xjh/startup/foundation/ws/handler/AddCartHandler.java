@@ -1,9 +1,5 @@
 package com.xjh.startup.foundation.ws.handler;
 
-import com.xjh.startup.view.CartView;
-import com.xjh.startup.view.OrderDishesChoiceView;
-import org.java_websocket.WebSocket;
-
 import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -16,6 +12,9 @@ import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.service.domain.CartService;
 import com.xjh.service.ws.WsApiType;
 import com.xjh.startup.foundation.ws.WsHandler;
+import com.xjh.startup.view.CartView;
+import com.xjh.startup.view.OrderDishesChoiceView;
+import org.java_websocket.WebSocket;
 
 @Singleton
 @WsApiType(value = "addDishesToCart")

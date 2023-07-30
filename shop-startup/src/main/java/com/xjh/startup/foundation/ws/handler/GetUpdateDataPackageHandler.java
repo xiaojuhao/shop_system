@@ -1,13 +1,5 @@
 package com.xjh.startup.foundation.ws.handler;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.java_websocket.WebSocket;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.enumeration.EnumDeskStatus;
@@ -15,26 +7,17 @@ import com.xjh.common.enumeration.EnumDeskType;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.ImageHelper;
-import com.xjh.dao.dataobject.Desk;
-import com.xjh.dao.dataobject.Dishes;
-import com.xjh.dao.dataobject.DishesPackage;
-import com.xjh.dao.dataobject.DishesPackageDishes;
-import com.xjh.dao.dataobject.DishesPrice;
-import com.xjh.dao.dataobject.DishesType;
-import com.xjh.dao.dataobject.Order;
-import com.xjh.dao.mapper.DeskDAO;
-import com.xjh.dao.mapper.DishesDAO;
-import com.xjh.dao.mapper.DishesPackageDishesDAO;
-import com.xjh.dao.mapper.DishesPackageUpdateDAO;
-import com.xjh.dao.mapper.DishesTypeUpdateDAO;
-import com.xjh.dao.mapper.DishesUpdateDAO;
-import com.xjh.service.domain.DeskService;
-import com.xjh.service.domain.DishesPackageService;
-import com.xjh.service.domain.DishesService;
-import com.xjh.service.domain.DishesTypeService;
-import com.xjh.service.domain.OrderService;
+import com.xjh.dao.dataobject.*;
+import com.xjh.dao.mapper.*;
+import com.xjh.service.domain.*;
 import com.xjh.service.ws.WsApiType;
 import com.xjh.startup.foundation.ws.WsHandler;
+import org.java_websocket.WebSocket;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.List;
+import java.util.Map;
 
 @Singleton
 @WsApiType("getUpdateDataPackage")

@@ -1,11 +1,5 @@
 package com.xjh.startup.view;
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.CopyUtils;
 import com.xjh.common.utils.cellvalue.OperationButton;
@@ -15,15 +9,16 @@ import com.xjh.common.valueobject.DishesAttributeValueVO;
 import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SmallForm;
 import com.xjh.startup.view.model.DishesAttributeValueBO;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
+import static com.xjh.common.utils.TableViewUtils.newCol;
 
 public class DishesAttributeEditView extends SmallForm {
     ObservableList<DishesAttributeValueBO> attrList = FXCollections.observableArrayList();

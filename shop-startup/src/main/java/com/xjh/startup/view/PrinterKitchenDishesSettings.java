@@ -1,10 +1,5 @@
 package com.xjh.startup.view;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import com.sleepycat.je.utilint.LoggerUtils;
 import com.xjh.common.utils.*;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.PrinterDO;
@@ -13,7 +8,6 @@ import com.xjh.dao.mapper.PrinterDishDAO;
 import com.xjh.service.domain.DishesService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SimpleForm;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
@@ -23,6 +17,10 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.VBox;
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class PrinterKitchenDishesSettings extends SimpleForm {
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);

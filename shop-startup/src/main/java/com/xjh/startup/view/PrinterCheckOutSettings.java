@@ -1,8 +1,6 @@
 package com.xjh.startup.view;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
+import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.dao.dataobject.PrinterDO;
@@ -13,8 +11,6 @@ import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.SimpleForm;
 import com.xjh.startup.view.model.IntStringPair;
-
-import cn.hutool.core.codec.Base64;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -23,6 +19,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import lombok.Data;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class PrinterCheckOutSettings extends SimpleForm implements Initializable {
     PrinterService printerService = GuiceContainer.getInstance(PrinterService.class);

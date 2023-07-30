@@ -8,7 +8,6 @@ import com.xjh.startup.view.ordermanage.OrderDishesSaleStatisticsView;
 import com.xjh.startup.view.ordermanage.OrderDishesTypeSaleStatisticsView;
 import com.xjh.startup.view.ordermanage.OrderManageListView;
 import com.xjh.startup.view.ordermanage.OrderManageReturnedListView;
-
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;

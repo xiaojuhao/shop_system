@@ -2,7 +2,6 @@ package com.xjh.startup.view;
 
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.SimpleForm;
-
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;

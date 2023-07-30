@@ -1,12 +1,6 @@
 package com.xjh.startup.view;
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -20,18 +14,19 @@ import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.SimpleForm;
 import com.xjh.startup.view.model.IntStringPair;
-
-import cn.hutool.core.codec.Base64;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import lombok.Data;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static com.xjh.common.utils.TableViewUtils.newCol;
 
 public class PrinterOrderDishesSettings extends SimpleForm implements Initializable {
     PrinterService printerService = GuiceContainer.getInstance(PrinterService.class);

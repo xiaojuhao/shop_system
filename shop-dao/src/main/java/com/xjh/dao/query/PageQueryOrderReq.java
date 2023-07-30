@@ -1,12 +1,11 @@
 package com.xjh.dao.query;
 
-import static com.xjh.common.utils.CopyUtils.deepClone;
+import com.xjh.common.utils.CommonUtils;
+import lombok.Data;
 
 import java.time.LocalDate;
 
-import com.xjh.common.utils.CommonUtils;
-
-import lombok.Data;
+import static com.xjh.common.utils.CopyUtils.deepClone;
 
 @Data
 public class PageQueryOrderReq {

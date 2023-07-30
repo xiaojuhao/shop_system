@@ -1,10 +1,6 @@
 package com.xjh.startup.another;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.xjh.common.utils.Logger;
-
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -18,6 +14,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DragTest extends Application {
     public static List<Circle> circles = new ArrayList<Circle>();

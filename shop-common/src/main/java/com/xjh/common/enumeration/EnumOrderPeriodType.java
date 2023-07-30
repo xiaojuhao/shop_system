@@ -1,8 +1,8 @@
 package com.xjh.common.enumeration;
 
-import java.time.LocalDateTime;
-
 import com.xjh.common.utils.DateBuilder;
+
+import java.time.LocalDateTime;
 
 public enum EnumOrderPeriodType {
     NOON(1, "午市"),

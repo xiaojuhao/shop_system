@@ -1,13 +1,5 @@
 package com.xjh.startup.foundation.ws.handler;
 
-import java.util.List;
-import java.util.Objects;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.java_websocket.WebSocket;
-
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Result;
@@ -16,6 +8,12 @@ import com.xjh.common.valueobject.CartVO;
 import com.xjh.service.domain.CartService;
 import com.xjh.service.ws.WsApiType;
 import com.xjh.startup.foundation.ws.WsHandler;
+import org.java_websocket.WebSocket;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.List;
+import java.util.Objects;
 
 @Singleton
 @WsApiType("removeDishesFromCart")

@@ -5,10 +5,10 @@
  */
 package com.xjh.startup.foundation.printers;
 
+import java.util.Arrays;
+
 import static com.xjh.startup.foundation.printers.PrinterCmdUtil.PRINTER_STATUS_NORMAL;
 import static com.xjh.startup.foundation.printers.PrinterCmdUtil.PRINTER_STATUS_PRINTING;
-
-import java.util.Arrays;
 
 /**
  * @author liangh

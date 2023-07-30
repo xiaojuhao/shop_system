@@ -1,6 +1,5 @@
 package com.xjh.dao.query;
 
-import com.xjh.common.utils.CommonUtils;
 import lombok.Data;
 
 import static com.xjh.common.utils.CopyUtils.deepClone;

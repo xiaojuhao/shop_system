@@ -1,11 +1,7 @@
 package com.xjh.dao.mapper;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
+import cn.hutool.db.Db;
+import cn.hutool.db.Entity;
 import cn.hutool.db.PageResult;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -17,10 +13,10 @@ import com.xjh.dao.foundation.EntityUtils;
 import com.xjh.dao.query.DishesQuery;
 import com.zaxxer.hikari.HikariDataSource;
 
-import cn.hutool.db.Db;
-import cn.hutool.db.Entity;
-
-import static cn.hutool.core.util.PageUtil.totalPage;
+import javax.inject.Inject;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Singleton
 public class DishesDAO {

@@ -1,7 +1,6 @@
 package com.xjh.startup.view.model;
 
 import com.xjh.common.enumeration.EnumDiscountType;
-
 import lombok.Data;
 
 @Data

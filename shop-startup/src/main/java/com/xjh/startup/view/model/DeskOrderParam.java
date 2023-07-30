@@ -1,10 +1,9 @@
 package com.xjh.startup.view.model;
 
-import java.util.List;
-
 import com.xjh.common.enumeration.EnumChoiceAction;
-
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class DeskOrderParam {

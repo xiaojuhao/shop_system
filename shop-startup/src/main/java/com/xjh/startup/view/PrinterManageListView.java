@@ -1,12 +1,6 @@
 package com.xjh.startup.view;
 
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import com.xjh.common.enumeration.EnumPrinterStatus;
 import com.xjh.common.enumeration.EnumPrinterType;
 import com.xjh.common.utils.AlertBuilder;
@@ -16,8 +10,10 @@ import com.xjh.common.utils.cellvalue.Operations;
 import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.service.domain.PrinterService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
-import com.xjh.startup.view.base.*;
-
+import com.xjh.startup.view.base.Initializable;
+import com.xjh.startup.view.base.MediumForm;
+import com.xjh.startup.view.base.ModelWindow;
+import com.xjh.startup.view.base.OkCancelDialog;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -30,6 +26,12 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
 import javafx.stage.Window;
 import lombok.Data;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static com.xjh.common.utils.TableViewUtils.newCol;
 
 public class PrinterManageListView extends MediumForm implements Initializable {
     PrinterService printerService = GuiceContainer.getInstance(PrinterService.class);

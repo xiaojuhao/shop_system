@@ -5,10 +5,10 @@
  */
 package com.xjh.startup.foundation.printers;
 
+import com.xjh.startup.foundation.constants.EnumAlign;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.xjh.startup.foundation.constants.EnumAlign;
 
 /**
  * @author liangh

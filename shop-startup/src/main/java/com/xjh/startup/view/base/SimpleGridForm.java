@@ -1,7 +1,6 @@
 package com.xjh.startup.view.base;
 
 import com.xjh.common.utils.CommonUtils;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;

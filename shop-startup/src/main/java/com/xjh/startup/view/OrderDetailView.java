@@ -7,7 +7,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.enumeration.EnumChoiceAction;
 import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
-import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.utils.*;
 import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.common.valueobject.OrderOverviewVO;
@@ -48,7 +47,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.apache.commons.collections4.CollectionUtils;
-import sun.security.krb5.internal.crypto.Des;
 
 import java.lang.ref.WeakReference;
 import java.util.*;

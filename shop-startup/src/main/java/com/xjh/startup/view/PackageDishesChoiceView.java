@@ -1,10 +1,5 @@
 package com.xjh.startup.view;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
 import com.xjh.common.enumeration.EnumChoseType;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
@@ -18,7 +13,6 @@ import com.xjh.dao.mapper.DishesPackageTypeDAO;
 import com.xjh.service.domain.DishesService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.model.DishesChoiceItemBO;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -29,6 +23,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class PackageDishesChoiceView extends Group {
     DishesPackageTypeDAO typeDAO = GuiceContainer.getInstance(DishesPackageTypeDAO.class);

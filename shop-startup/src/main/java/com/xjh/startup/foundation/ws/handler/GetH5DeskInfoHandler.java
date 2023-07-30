@@ -1,11 +1,5 @@
 package com.xjh.startup.foundation.ws.handler;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import com.xjh.service.ws.WsAttachment;
-import org.java_websocket.WebSocket;
-
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.enumeration.EnumDeskPhysicalStatus;
 import com.xjh.common.enumeration.EnumDeskStatus;
@@ -13,7 +7,12 @@ import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.service.domain.DeskService;
 import com.xjh.service.ws.WsApiType;
+import com.xjh.service.ws.WsAttachment;
 import com.xjh.startup.foundation.ws.WsHandler;
+import org.java_websocket.WebSocket;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 @Singleton
 @WsApiType("h5DeskInfo")

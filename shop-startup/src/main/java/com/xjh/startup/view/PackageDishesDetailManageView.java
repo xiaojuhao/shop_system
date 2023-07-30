@@ -1,14 +1,6 @@
 package com.xjh.startup.view;
 
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import com.xjh.common.enumeration.EnumDishesStatus;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
@@ -29,7 +21,6 @@ import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SimpleForm;
-
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -42,6 +33,14 @@ import javafx.scene.control.TableView;
 import javafx.scene.paint.Color;
 import javafx.stage.Window;
 import lombok.Data;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static com.xjh.common.utils.TableViewUtils.newCol;
 
 public class PackageDishesDetailManageView extends SimpleForm implements Initializable {
     static RichText STATUS_ON = RichText.create("上架").with(Color.BLUE);

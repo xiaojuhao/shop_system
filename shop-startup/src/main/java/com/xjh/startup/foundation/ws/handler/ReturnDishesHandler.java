@@ -1,12 +1,5 @@
 package com.xjh.startup.foundation.ws.handler;
 
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.java_websocket.WebSocket;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.dao.dataobject.Desk;
@@ -15,6 +8,11 @@ import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.ws.WsApiType;
 import com.xjh.startup.foundation.ws.WsHandler;
+import org.java_websocket.WebSocket;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.List;
 
 @Singleton
 @WsApiType("returnDishes")

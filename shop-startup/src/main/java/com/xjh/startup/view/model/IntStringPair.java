@@ -1,7 +1,6 @@
 package com.xjh.startup.view.model;
 
 import com.xjh.common.utils.CommonUtils;
-
 import javafx.scene.control.ComboBox;
 import lombok.Data;
 

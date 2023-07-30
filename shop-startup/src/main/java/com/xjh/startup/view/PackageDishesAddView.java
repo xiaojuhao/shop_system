@@ -1,14 +1,7 @@
 package com.xjh.startup.view;
 
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
 import com.xjh.common.enumeration.EnumDishesStatus;
 import com.xjh.common.utils.AlertBuilder;
@@ -30,25 +23,25 @@ import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.SimpleForm;
 import com.xjh.startup.view.model.IntStringPair;
-
-import cn.hutool.core.codec.Base64;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Window;
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static com.xjh.common.utils.TableViewUtils.newCol;
 
 public class PackageDishesAddView extends SimpleForm implements Initializable {
     static RichText STATUS_ON = RichText.create("上架").with(Color.BLUE);

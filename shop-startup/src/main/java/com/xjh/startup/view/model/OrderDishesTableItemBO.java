@@ -1,7 +1,6 @@
 package com.xjh.startup.view.model;
 
 import com.xjh.common.utils.cellvalue.RichText;
-
 import lombok.Data;
 
 @Data

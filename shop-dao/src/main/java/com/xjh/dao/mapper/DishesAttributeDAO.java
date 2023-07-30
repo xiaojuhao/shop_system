@@ -1,20 +1,18 @@
 package com.xjh.dao.mapper;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
+import cn.hutool.db.Db;
+import cn.hutool.db.Entity;
 import com.google.inject.name.Named;
 import com.xjh.common.utils.Result;
 import com.xjh.dao.dataobject.DishesAttribute;
 import com.xjh.dao.foundation.EntityUtils;
 import com.zaxxer.hikari.HikariDataSource;
 
-import cn.hutool.db.Db;
-import cn.hutool.db.Entity;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Singleton
 public class DishesAttributeDAO {

@@ -5,10 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.xjh.common.utils.*;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesGroup;
-import com.xjh.dao.dataobject.PrinterDO;
-import com.xjh.dao.dataobject.PrinterDishDO;
 import com.xjh.dao.mapper.DishesGroupDAO;
-import com.xjh.dao.mapper.PrinterDishDAO;
 import com.xjh.service.domain.DishesService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SimpleForm;
@@ -22,7 +19,6 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.VBox;
 import lombok.Data;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

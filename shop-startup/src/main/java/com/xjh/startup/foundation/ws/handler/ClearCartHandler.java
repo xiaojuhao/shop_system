@@ -1,15 +1,14 @@
 package com.xjh.startup.foundation.ws.handler;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.java_websocket.WebSocket;
-
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.Result;
 import com.xjh.service.domain.CartService;
 import com.xjh.service.ws.WsApiType;
 import com.xjh.startup.foundation.ws.WsHandler;
+import org.java_websocket.WebSocket;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 @Singleton
 @WsApiType("clearCart")

@@ -1,11 +1,7 @@
 package com.xjh.dao.mapper;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
+import cn.hutool.db.Db;
+import cn.hutool.db.Entity;
 import com.google.inject.name.Named;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.OrElse;
@@ -15,8 +11,10 @@ import com.xjh.dao.foundation.EntityUtils;
 import com.xjh.dao.query.ReturnReasonQuery;
 import com.zaxxer.hikari.HikariDataSource;
 
-import cn.hutool.db.Db;
-import cn.hutool.db.Entity;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.ArrayList;
+import java.util.List;
 
 @Singleton
 public class ReturnReasonDAO {

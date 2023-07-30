@@ -1,18 +1,16 @@
 package com.xjh.dao.mapper;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Singleton;
-
+import cn.hutool.db.Db;
+import cn.hutool.db.Entity;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.xjh.dao.dataobject.DeskKey;
 import com.xjh.dao.foundation.EntityUtils;
 import com.zaxxer.hikari.HikariDataSource;
 
-import cn.hutool.db.Db;
-import cn.hutool.db.Entity;
+import javax.inject.Singleton;
+import java.util.ArrayList;
+import java.util.List;
 
 @Singleton
 public class DeskKeyDAO {

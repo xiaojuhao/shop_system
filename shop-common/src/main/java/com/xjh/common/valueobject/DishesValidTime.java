@@ -1,8 +1,8 @@
 package com.xjh.common.valueobject;
 
-import java.time.LocalDateTime;
-
 import lombok.Data;
+
+import java.time.LocalDateTime;
 
 @Data
 public class DishesValidTime {

@@ -1,13 +1,8 @@
 package com.xjh.startup.another;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
-
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.RichText;
-
 import javafx.application.Application;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -23,6 +18,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class TableViewTest extends Application {
 

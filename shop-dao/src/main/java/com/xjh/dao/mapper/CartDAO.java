@@ -13,8 +13,6 @@ import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.CartItemVO;
 import com.xjh.common.valueobject.CartVO;
 import com.xjh.dao.dataobject.CartDO;
-import com.xjh.dao.dataobject.Desk;
-import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.foundation.EntityUtils;
 import com.zaxxer.hikari.HikariDataSource;
 

@@ -1,9 +1,9 @@
 package com.xjh.common.utils;
 
-import java.util.Map;
-
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.ReflectionUtils.PropertyDescriptor;
+
+import java.util.Map;
 
 public class CopyUtils {
 

@@ -1,9 +1,5 @@
 package com.xjh.startup.view.paymethods;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.xjh.common.enumeration.EnumPayAction;
 import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.utils.CommonUtils;
@@ -16,22 +12,21 @@ import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.SimpleForm;
 import com.xjh.startup.view.model.DeskOrderParam;
 import com.xjh.startup.view.model.IntStringPair;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputControl;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Window;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class PaymentDialogOfCoupon extends SimpleForm implements Initializable {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);

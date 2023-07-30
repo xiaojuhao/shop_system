@@ -1,8 +1,5 @@
 package com.xjh.startup.view;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CopyUtils;
 import com.xjh.common.utils.CurrentAccount;
@@ -12,7 +9,6 @@ import com.xjh.dao.dataobject.Account;
 import com.xjh.service.domain.AccountService;
 import com.xjh.startup.foundation.constants.MainStageHolder;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
-
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Rectangle2D;
@@ -26,6 +22,9 @@ import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+
+import java.net.URL;
+import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
     @FXML

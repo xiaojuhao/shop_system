@@ -4,13 +4,8 @@ import com.xjh.common.enumeration.OpenDeskResult;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.startup.view.model.OpenDeskInputParam;
-
 import javafx.geometry.Insets;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 
 public class OpenDeskDialog extends Dialog<OpenDeskInputParam> {

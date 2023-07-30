@@ -1,11 +1,10 @@
 package com.xjh.common.valueobject;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.OrElse;
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 public class CartVO {

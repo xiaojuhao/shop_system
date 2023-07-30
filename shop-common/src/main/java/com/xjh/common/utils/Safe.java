@@ -1,7 +1,6 @@
 package com.xjh.common.utils;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * TODO 类实现描述

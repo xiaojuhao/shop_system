@@ -1,8 +1,8 @@
 package com.xjh.dao.query;
 
-import java.util.List;
-
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class OrderPayQuery {
