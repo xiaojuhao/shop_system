@@ -18,6 +18,8 @@ import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.dao.mapper.OrderDishesDAO;
 
 import cn.hutool.core.codec.Base64;
+import com.xjh.service.domain.model.DishesSaleStatModel;
+import com.xjh.service.domain.model.DishesSaleStatReq;
 
 @Singleton
 public class OrderDishesService {
@@ -88,5 +90,12 @@ public class OrderDishesService {
         String options = Base64.decodeStr(orderDishes.getOrderDishesOptions());
         List<DishesAttributeVO> attrs = JSONArray.parseArray(options, DishesAttributeVO.class);
         return DishesAttributeHelper.generateSelectedAttrDigest(attrs);
+    }
+
+    public Result<List<DishesSaleStatModel>> statSales(DishesSaleStatReq req){
+        String sql = "select dishesId,ifDishesPackage,dishesPriceId,sum(orderDishesNums) as count,sum(orderDishesPrice) as allPrice " +
+                "from  order_dishes_list " +
+                " GROUP BY dishesId,ifDishesPackage,dishesPriceId order by count desc";
+        return orderDishesDAO.query(sql, DishesSaleStatModel.class);
     }
 }

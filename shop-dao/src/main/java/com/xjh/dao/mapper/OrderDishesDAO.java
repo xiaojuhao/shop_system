@@ -54,6 +54,16 @@ public class OrderDishesDAO {
         }
     }
 
+    public<T> Result<List<T>> query(String sql, Class<T> clz){
+        try{
+            List<Entity> list = Db.use(ds).query(sql);
+            return Result.success(EntityUtils.convertList(list, clz));
+        } catch (Exception ex){
+            ex.printStackTrace();
+            return Result.fail("");
+        }
+    }
+
     public Result<Integer> separateOrder(Integer subOrderId, Integer toOrderId) {
         try {
             String sql = "update order_dishes_list set orderId=" + toOrderId + " where subOrderId=" + subOrderId;
