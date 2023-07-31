@@ -5,7 +5,12 @@ import lombok.Data;
 
 @Data
 public class DishesTypeSaleStatModel {
-    @Column Integer dishesTypeId;
-    @Column Integer count;
-    @Column Double allPrice;
+    @Column
+    Integer dishesTypeId;
+    @Column
+    String dishesTypeName;
+    @Column
+    Integer count;
+    @Column
+    Double allPrice;
 }

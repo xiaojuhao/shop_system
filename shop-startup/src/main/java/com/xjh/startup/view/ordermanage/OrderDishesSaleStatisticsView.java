@@ -111,11 +111,10 @@ public class OrderDishesSaleStatisticsView extends SimpleForm implements Initial
 
     private void buildContent(double height) {
         // "编号", "菜品名称", "销售份数", "菜品总金额"
-        tableView.getColumns().addAll(
-                newCol("编号", rowIndex(), 30), //
-                newCol("菜品名称", BO::getDishesName, 100),  //
-                newCol("销售份数", BO::getCount, 30),  //
-                newCol("菜品总金额", BO::getAllPrice, 60)  //
+        tableView.getColumns().addAll(newCol("编号", rowIndex(), 60), //
+                newCol("菜品名称", BO::getDishesName, 200),  //
+                newCol("销售份数", BO::getCount, 100),  //
+                newCol("菜品总金额", BO::getAllPrice, 100)  //
         );
 
         tableView.setItems(items);
@@ -125,29 +124,7 @@ public class OrderDishesSaleStatisticsView extends SimpleForm implements Initial
     }
 
     private void buildFoot() {
-        Button prev = new Button("上一页");
-        prev.setOnMouseClicked(e -> {
-            DishesSaleStatReq c = cond.get().newVer();
-            int pageNo = c.getPageNo();
-            if (pageNo <= 1) {
-                c.setPageNo(1);
-            } else {
-                c.setPageNo(pageNo - 1);
-            }
-            cond.set(c);
-        });
-        Button next = new Button("下一页");
-        next.setOnMouseClicked(e -> {
-            DishesSaleStatReq c = cond.get().newVer();
-            c.setPageNo(c.getPageNo() + 1);
-            cond.set(c);
-        });
-        Label remark = new Label("双击查看订单明细");
-        remark.setPadding(new Insets(0, 0, 0, 150));
-        remark.setTextFill(Color.RED);
-        HBox line = newCenterLine(prev, next, remark);
-        line.setPadding(new Insets(10, 0, 0, 0));
-        addLine(line);
+
     }
 
     public void exportExcel(DishesSaleStatReq req) {
@@ -156,22 +133,24 @@ public class OrderDishesSaleStatisticsView extends SimpleForm implements Initial
         chooser.setInitialFileName("菜品销售统计.xls");
         chooser.getExtensionFilters().addAll(new ExtensionFilter("XLS", "*.xls"), new ExtensionFilter("XLSX", "*.xlsx"));
         File file = chooser.showSaveDialog(this.getScene().getWindow());
-        exportFile(req, file);
-        AlertBuilder.INFO("导出文件成功");
+        Result<String> exportRs =  exportFile(req, file);
+        if (exportRs.isSuccess()) {
+            AlertBuilder.INFO("导出文件成功");
+        } else {
+            AlertBuilder.ERROR(exportRs.getMsg());
+        }
     }
 
-    private void exportFile(DishesSaleStatReq req, File file) {
+    private Result<String> exportFile(DishesSaleStatReq req, File file) {
         DishesSaleStatReq cond = CopyUtils.deepClone(req);
         cond.setPageSize(10000000);
         Result<List<DishesSaleStatModel>> queryRs = orderDishesService.statSales(cond);
         if (!queryRs.isSuccess()) {
-            AlertBuilder.ERROR(queryRs.getMsg());
-            return;
+            return Result.fail(queryRs.getMsg());
         }
         List<DishesSaleStatModel> list = queryRs.getData();
         if (CommonUtils.isEmpty(list)) {
-            AlertBuilder.ERROR("没有待导出的数据");
-            return;
+            return Result.fail("没有待导出的数据");
         }
 
         HSSFWorkbook wb = new HSSFWorkbook();
@@ -208,8 +187,9 @@ public class OrderDishesSaleStatisticsView extends SimpleForm implements Initial
             wb.write(fout);
         } catch (Exception ex) {
             ex.printStackTrace();
-            AlertBuilder.ERROR(ex.getMessage());
+            return Result.fail("导出数据异常:" + ex.getMessage());
         }
+        return Result.success("");
     }
 
     @Data
@@ -222,7 +202,7 @@ public class OrderDishesSaleStatisticsView extends SimpleForm implements Initial
 
         public static BO convertToBO(DishesSaleStatModel m) {
             BO bo = new BO();
-            bo.setDishesName(m.getDishesId().toString());
+            bo.setDishesName(m.getDishesName());
             bo.setCount(m.getCount());
             bo.setAllPrice(new Money(m.getAllPrice()));
             return bo;

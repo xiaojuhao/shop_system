@@ -7,20 +7,26 @@ import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DishesAttributeHelper;
 import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.DishesAttributeVO;
+import com.xjh.dao.dataobject.Dishes;
+import com.xjh.dao.dataobject.DishesType;
 import com.xjh.dao.dataobject.OrderDishes;
 import com.xjh.dao.mapper.OrderDishesDAO;
 import com.xjh.service.domain.model.DishesSaleStatModel;
 import com.xjh.service.domain.model.DishesSaleStatReq;
 import com.xjh.service.domain.model.DishesTypeSaleStatModel;
+import org.apache.commons.collections4.CollectionUtils;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import static com.xjh.common.utils.CommonUtils.stringify;
 import static com.xjh.common.utils.DateBuilder.base;
+import static com.xjh.service.domain.DishesTypeService.toDishesTypeName;
 
 @Singleton
 public class OrderDishesService {
@@ -28,6 +34,10 @@ public class OrderDishesService {
     OrderDishesDAO orderDishesDAO;
     @Inject
     StoreService storeService;
+    @Inject
+    DishesService dishesService;
+    @Inject
+    DishesTypeService dishesTypeService;
 
     public Result<Integer> updatePrimaryKey(OrderDishes update) {
         try {
@@ -103,7 +113,17 @@ public class OrderDishesService {
             sql += " and createtime <= " + base(req.getEndDate()).mills();
         }
         sql += " GROUP BY dishesId,ifDishesPackage,dishesPriceId order by count desc";
-        return orderDishesDAO.query(sql, DishesSaleStatModel.class);
+        Result<List<DishesSaleStatModel>> rs = orderDishesDAO.query(sql, DishesSaleStatModel.class);
+        if (CollectionUtils.isNotEmpty(rs.getData())) {
+            for (DishesSaleStatModel m : rs.getData()) {
+                m.setDishesName(stringify(m.getDishesId()));
+                Dishes dishes = dishesService.getById(m.getDishesId());
+                if (dishes != null) {
+                    m.setDishesName(dishes.getDishesName());
+                }
+            }
+        }
+        return rs;
     }
 
     public Result<List<DishesTypeSaleStatModel>> statSalesType(DishesSaleStatReq req) {
@@ -116,6 +136,15 @@ public class OrderDishesService {
             sql += " and createtime <= " + base(req.getEndDate()).mills();
         }
         sql += " GROUP BY dishesTypeId order by count desc";
-        return orderDishesDAO.query(sql, DishesTypeSaleStatModel.class);
+        Result<List<DishesTypeSaleStatModel>> rs = orderDishesDAO.query(sql, DishesTypeSaleStatModel.class);
+
+        if (CollectionUtils.isNotEmpty(rs.getData())) {
+            Map<Integer, DishesType> typeMap = dishesTypeService.dishesTypeMap();
+            for (DishesTypeSaleStatModel m : rs.getData()) {
+                m.setDishesTypeName(toDishesTypeName(typeMap, m.getDishesTypeId()));
+            }
+        }
+
+        return rs;
     }
 }
