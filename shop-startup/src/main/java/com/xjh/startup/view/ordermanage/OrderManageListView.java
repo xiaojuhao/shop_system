@@ -264,7 +264,7 @@ public class OrderManageListView extends SimpleForm implements Initializable {
     public void exportExcel(PageQueryOrderReq req) {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("选择Excel文件");
-        chooser.setInitialFileName("hello.xls");
+        chooser.setInitialFileName("订单统计.xls");
         chooser.getExtensionFilters().addAll(
                 new ExtensionFilter("XLS", "*.xls"),
                 new ExtensionFilter("XLSX", "*.xlsx")

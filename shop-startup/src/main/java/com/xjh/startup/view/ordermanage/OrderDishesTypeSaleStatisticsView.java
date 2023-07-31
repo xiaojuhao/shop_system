@@ -7,18 +7,13 @@ import com.xjh.common.utils.CopyUtils;
 import com.xjh.common.utils.Result;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.dao.dataobject.Account;
-import com.xjh.dao.dataobject.Desk;
-import com.xjh.dao.query.PageQueryOrderReq;
 import com.xjh.service.domain.AccountService;
-import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderDishesService;
 import com.xjh.service.domain.model.DishesSaleStatReq;
 import com.xjh.service.domain.model.DishesTypeSaleStatModel;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
-import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SimpleForm;
-import com.xjh.startup.view.model.IntStringPair;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -26,10 +21,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Window;
@@ -43,7 +36,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.xjh.common.utils.TableViewUtils.newCol;
 import static com.xjh.common.utils.TableViewUtils.rowIndex;
@@ -51,9 +43,8 @@ import static com.xjh.common.utils.TableViewUtils.rowIndex;
 public class OrderDishesTypeSaleStatisticsView extends SimpleForm implements Initializable {
     AccountService accountService = GuiceContainer.getInstance(AccountService.class);
     OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
-    DeskService deskService = GuiceContainer.getInstance(DeskService.class);
 
-    ObjectProperty<PageQueryOrderReq> cond = new SimpleObjectProperty<>(new PageQueryOrderReq());
+    ObjectProperty<DishesSaleStatReq> cond = new SimpleObjectProperty<>(new DishesSaleStatReq());
     ObservableList<BO> items = FXCollections.observableArrayList();
     TableView<BO> tableView = new TableView<>();
     Map<Integer, Account> accountMap = new HashMap<>();
@@ -71,7 +62,7 @@ public class OrderDishesTypeSaleStatisticsView extends SimpleForm implements Ini
 
     private void loadData() {
         Platform.runLater(() -> {
-            Result<List<DishesTypeSaleStatModel>> rs = orderDishesService.statSalesType(new DishesSaleStatReq());
+            Result<List<DishesTypeSaleStatModel>> rs = orderDishesService.statSalesType(cond.get());
             if (!rs.isSuccess()) {
                 AlertBuilder.ERROR(rs.getMsg());
                 return;
@@ -85,42 +76,20 @@ public class OrderDishesTypeSaleStatisticsView extends SimpleForm implements Ini
 
     private void buildCond() {
         cond.addListener((ob, o, n) -> loadData());
-        // name
-        HBox nameCondBlock = new HBox();
-        Label nameLabel = new Label("业务员:");
-        ComboBox<IntStringPair> accountComBox = buildAccountComBox();
-        nameCondBlock.getChildren().add(newCenterLine(nameLabel, accountComBox));
-        // desk列表
-        HBox deskCondBlock = new HBox();
-        Label deskLabel = new Label("桌号:");
-        ComboBox<IntStringPair> deskCombo = buildDeskCombo();
-        deskCondBlock.getChildren().add(newCenterLine(deskLabel, deskCombo));
         // 时间选择
         HBox dateRangeBlock = new HBox();
         Label dateRangeLabel = new Label("订单日期:");
-        DatePicker datePickerStart = new DatePicker(LocalDate.now());
-        datePickerStart.setPrefWidth(120);
+        DatePicker datePickerStart = new DatePicker(LocalDate.now().minusDays(1));
+        datePickerStart.setPrefWidth(160);
         DatePicker datePickerEnd = new DatePicker(LocalDate.now());
-        datePickerEnd.setPrefWidth(120);
+        datePickerEnd.setPrefWidth(160);
         dateRangeBlock.getChildren().add(newCenterLine(dateRangeLabel, datePickerStart, new Label("至"), datePickerEnd));
         cond.get().setStartDate(LocalDate.now());
         cond.get().setEndDate(LocalDate.now());
 
         Button queryBtn = new Button("查询");
         queryBtn.setOnAction(evt -> {
-            PageQueryOrderReq q = cond.get().newVer();
-            IntStringPair selectedAccount = accountComBox.getSelectionModel().getSelectedItem();
-            if (selectedAccount != null) {
-                q.setAccountId(selectedAccount.getKey());
-            } else {
-                q.setAccountId(null);
-            }
-            IntStringPair selectedDesk = deskCombo.getSelectionModel().getSelectedItem();
-            if (selectedDesk != null) {
-                q.setDeskId(selectedDesk.getKey());
-            } else {
-                q.setDeskId(null);
-            }
+            DishesSaleStatReq q = cond.get().newVer();
             if (datePickerStart.getValue() != null) {
                 q.setStartDate(datePickerStart.getValue());
             }
@@ -133,10 +102,7 @@ public class OrderDishesTypeSaleStatisticsView extends SimpleForm implements Ini
         Button exportExcel = new Button("导出EXCEL");
         exportExcel.setOnAction(evt -> exportExcel(cond.get()));
 
-        Button showBill = new Button("查看报表");
-        showBill.setOnAction(evt -> showBill(cond.get()));
-
-        HBox line = newCenterLine(nameCondBlock, deskCondBlock, dateRangeBlock, queryBtn, new Separator(Orientation.VERTICAL), exportExcel, showBill);
+        HBox line = newCenterLine(dateRangeBlock, queryBtn, new Separator(Orientation.VERTICAL), exportExcel);
         line.setSpacing(20);
         line.setPadding(new Insets(5, 0, 5, 0));
         addLine(line);
@@ -159,7 +125,7 @@ public class OrderDishesTypeSaleStatisticsView extends SimpleForm implements Ini
     private void buildFoot() {
         Button prev = new Button("上一页");
         prev.setOnMouseClicked(e -> {
-            PageQueryOrderReq c = cond.get().newVer();
+            DishesSaleStatReq c = cond.get().newVer();
             int pageNo = c.getPageNo();
             if (pageNo <= 1) {
                 c.setPageNo(1);
@@ -170,39 +136,29 @@ public class OrderDishesTypeSaleStatisticsView extends SimpleForm implements Ini
         });
         Button next = new Button("下一页");
         next.setOnMouseClicked(e -> {
-            PageQueryOrderReq c = cond.get().newVer();
+            DishesSaleStatReq c = cond.get().newVer();
             c.setPageNo(c.getPageNo() + 1);
             cond.set(c);
         });
-        Label remark = new Label("双击查看订单明细");
-        remark.setPadding(new Insets(0, 0, 0, 150));
-        remark.setTextFill(Color.RED);
-        HBox line = newCenterLine(prev, next, remark);
+        HBox line = newCenterLine(prev, next);
         line.setPadding(new Insets(10, 0, 0, 0));
         addLine(line);
     }
 
-    public void showBill(PageQueryOrderReq req) {
-        ModelWindow mw = new ModelWindow(this.getScene().getWindow());
-        mw.setHeight(1000);
-        mw.setScene(new Scene(new OrderManageBillView(req, mw)));
-        mw.showAndWait();
-    }
-
-    public void exportExcel(PageQueryOrderReq req) {
+    public void exportExcel(DishesSaleStatReq req) {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("选择Excel文件");
-        chooser.setInitialFileName("hello.xls");
+        chooser.setInitialFileName("菜品类型销售统计.xls");
         chooser.getExtensionFilters().addAll(new ExtensionFilter("XLS", "*.xls"), new ExtensionFilter("XLSX", "*.xlsx"));
         File file = chooser.showSaveDialog(this.getScene().getWindow());
         exportFile(req, file);
         AlertBuilder.INFO("导出文件成功");
     }
 
-    private void exportFile(PageQueryOrderReq req, File file) {
-        PageQueryOrderReq cond = CopyUtils.deepClone(req);
+    private void exportFile(DishesSaleStatReq req, File file) {
+        DishesSaleStatReq cond = CopyUtils.deepClone(req);
         cond.setPageSize(10000000);
-        Result<List<DishesTypeSaleStatModel>> queryRs = orderDishesService.statSalesType(new DishesSaleStatReq());
+        Result<List<DishesTypeSaleStatModel>> queryRs = orderDishesService.statSalesType(cond);
         if (!queryRs.isSuccess()) {
             AlertBuilder.ERROR(queryRs.getMsg());
             return;
@@ -249,29 +205,6 @@ public class OrderDishesTypeSaleStatisticsView extends SimpleForm implements Ini
             ex.printStackTrace();
             AlertBuilder.ERROR(ex.getMessage());
         }
-    }
-
-    private ComboBox<IntStringPair> buildDeskCombo() {
-        List<Desk> deskList = deskService.getAllDesks();
-        Desk noDesk = new Desk();
-        noDesk.setDeskName("全部");
-        deskList.add(0, noDesk);
-        ObservableList<IntStringPair> desksOptions = FXCollections.observableArrayList(deskList.stream().map(it -> new IntStringPair(it.getDeskId(), it.getDeskName())).collect(Collectors.toList()));
-        ComboBox<IntStringPair> deskCombo = new ComboBox<>(desksOptions);
-        deskCombo.getSelectionModel().selectFirst();
-        return deskCombo;
-    }
-
-    private ComboBox<IntStringPair> buildAccountComBox() {
-        Account noAccount = new Account();
-        noAccount.setAccountNickName("全部");
-        List<Account> accountList = accountService.listAll();
-        accountList.add(0, noAccount);
-
-        ObservableList<IntStringPair> accountOptions = FXCollections.observableArrayList(accountList.stream().map(it -> new IntStringPair(it.getAccountId(), it.getAccountNickName())).collect(Collectors.toList()));
-        ComboBox<IntStringPair> accountSelect = new ComboBox<>(accountOptions);
-        accountSelect.getSelectionModel().selectFirst();
-        return accountSelect;
     }
 
     @Data

@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import static com.xjh.common.utils.DateBuilder.base;
+
 @Singleton
 public class OrderDishesService {
     @Inject
@@ -91,17 +93,29 @@ public class OrderDishesService {
         return DishesAttributeHelper.generateSelectedAttrDigest(attrs);
     }
 
-    public Result<List<DishesSaleStatModel>> statSales(DishesSaleStatReq req){
-        String sql = "select dishesId,ifDishesPackage,dishesPriceId,sum(orderDishesNums) as count,sum(orderDishesPrice) as allPrice " +
-                "from  order_dishes_list " +
-                " GROUP BY dishesId,ifDishesPackage,dishesPriceId order by count desc";
+    public Result<List<DishesSaleStatModel>> statSales(DishesSaleStatReq req) {
+        String sql = "select dishesId,ifDishesPackage,dishesPriceId,sum(orderDishesNums) as count,sum(orderDishesPrice) as allPrice ";
+        sql += "from  order_dishes_list where 1 = 1 ";
+        if (req.getStartDate() != null) {
+            sql += " and createtime >= " + base(req.getStartDate()).mills();
+        }
+        if (req.getEndDate() != null) {
+            sql += " and createtime <= " + base(req.getEndDate()).mills();
+        }
+        sql += " GROUP BY dishesId,ifDishesPackage,dishesPriceId order by count desc";
         return orderDishesDAO.query(sql, DishesSaleStatModel.class);
     }
 
-    public Result<List<DishesTypeSaleStatModel>> statSalesType(DishesSaleStatReq req){
-        String sql = "select dishesTypeId,sum(orderDishesNums) as count,sum(orderDishesPrice) as allPrice " +
-                "from  order_dishes_list " +
-                " GROUP BY dishesTypeId order by count desc";
+    public Result<List<DishesTypeSaleStatModel>> statSalesType(DishesSaleStatReq req) {
+        String sql = "select dishesTypeId,sum(orderDishesNums) as count,sum(orderDishesPrice) as allPrice ";
+        sql += " from  order_dishes_list  where 1 = 1  ";
+        if (req.getStartDate() != null) {
+            sql += " and createtime >= " + base(req.getStartDate()).mills();
+        }
+        if (req.getEndDate() != null) {
+            sql += " and createtime <= " + base(req.getEndDate()).mills();
+        }
+        sql += " GROUP BY dishesTypeId order by count desc";
         return orderDishesDAO.query(sql, DishesTypeSaleStatModel.class);
     }
 }
