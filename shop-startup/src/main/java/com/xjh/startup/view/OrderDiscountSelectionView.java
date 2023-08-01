@@ -2,14 +2,18 @@ package com.xjh.startup.view;
 
 import com.alibaba.fastjson.JSON;
 import com.xjh.common.enumeration.EnumDiscountType;
+import com.xjh.common.enumeration.EnumPayMethod;
+import com.xjh.common.enumeration.EnumPayStatus;
 import com.xjh.common.utils.*;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.valueobject.OrderDiscountVO;
 import com.xjh.dao.dataobject.DiscountDO;
 import com.xjh.dao.dataobject.Order;
 import com.xjh.dao.dataobject.OrderDishes;
+import com.xjh.dao.dataobject.OrderPay;
 import com.xjh.dao.mapper.DiscountDAO;
 import com.xjh.service.domain.OrderDishesService;
+import com.xjh.service.domain.OrderPayService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.StoreService;
 import com.xjh.service.vo.DiscountResultVO;
@@ -29,7 +33,9 @@ import org.apache.xmlbeans.ResourceLoader;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -38,6 +44,8 @@ import static com.xjh.common.utils.CommonUtils.*;
 
 public class OrderDiscountSelectionView extends SmallForm {
     OrderDishesService orderDishesService = GuiceContainer.getInstance(OrderDishesService.class);
+
+    OrderPayService orderPayService = GuiceContainer.getInstance(OrderPayService.class);
     StoreService storeService = GuiceContainer.getInstance(StoreService.class);
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
     DiscountDAO discountDAO = GuiceContainer.getInstance(DiscountDAO.class);
@@ -166,7 +174,11 @@ public class OrderDiscountSelectionView extends SmallForm {
                     Result<DiscountResultVO> cancelRs = cancelDiscount(param);
                     if (cancelRs.isSuccess()) {
                         DiscountResultVO discountResult = cancelRs.getData();
-                        AlertBuilder.INFO("取消折扣成功, 折扣金额:" + new Money(discountResult.getOldDiscountAmount()));
+                        if (CommonUtils.isBiggerThanZERO(discountResult.getOldDiscountAmount())) {
+                            AlertBuilder.INFO("取消折扣成功, 折扣金额:" + new Money(discountResult.getOldDiscountAmount()));
+                        } else {
+                            AlertBuilder.INFO("当前订单无折扣信息");
+                        }
                         this.getScene().getWindow().hide();
                     } else {
                         AlertBuilder.ERROR(cancelRs.getMsg());
@@ -290,6 +302,25 @@ public class OrderDiscountSelectionView extends SmallForm {
         }
         DiscountResultVO discountResult = new DiscountResultVO();
         Integer orderId = param.getOrderId();
+        List<OrderPay> orderPays = orderPayService.selectByOrderId(orderId);
+        for (OrderPay pay : orderPays) {
+            if (Objects.equals(pay.getPaymentStatus(), EnumPayStatus.PAID.code)) {
+                Set<Integer> payMethod = newHashset(EnumPayMethod.VOUCHER.code, //
+                        EnumPayMethod.MEITUAN_COUPON.code, EnumPayMethod.MEITUAN_PACKAGE.code, //
+                        EnumPayMethod.WECHAT_COUPON.code, EnumPayMethod.OHTER.code, //
+                        EnumPayMethod.WANDA_COUPON.code, EnumPayMethod.WANDA_PACKAGE.code); //
+                if (payMethod.contains(pay.getPaymentMethod())) {
+                    return Result.fail("已使用别的优惠方式，无法再进行打折操作");
+                }
+            }
+        }
+        Order order = orderService.getOrder(orderId);
+        if (CommonUtils.isNotBlank(order.getOrderDiscountInfo())) {
+            OrderDiscountVO d = JSON.parseObject(tryDecodeBase64(order.getOrderDiscountInfo()), OrderDiscountVO.class);
+            if (d != null && d.getType() != EnumDiscountType.MANAGER.code() && d.getType() != -1) {
+                return Result.fail("已使用别的优惠方式，无法再进行打折操作");
+            }
+        }
         // 加载orderDishes
         List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(orderId);
         // 加载discount Checker
