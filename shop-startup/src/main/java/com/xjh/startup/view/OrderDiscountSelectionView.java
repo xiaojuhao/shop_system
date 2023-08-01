@@ -25,6 +25,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
+import org.apache.xmlbeans.ResourceLoader;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -44,7 +45,7 @@ public class OrderDiscountSelectionView extends SmallForm {
     public OrderDiscountSelectionView(DeskOrderParam param) {
         VBox discountContentLine = new VBox();
         discountContentLine.setSpacing(10);
-        Holder<Supplier<DiscountApplyReq>> discountHolder = new Holder<>();
+        Holder<ResultSupplier<DiscountApplyReq>> discountHolder = new Holder<>();
         // 折扣方式选择
         {
             ToggleGroup toggleGroup = new ToggleGroup();
@@ -61,24 +62,23 @@ public class OrderDiscountSelectionView extends SmallForm {
                         String voucherNo = voucher.getText();
                         String cardNo = card.getText();
                         if (CommonUtils.isNotBlank(voucherNo) && CommonUtils.isNotBlank(cardNo)) {
-                            AlertBuilder.ERROR("折扣券和卡折扣只能使用一种");
-                            return null;
+                            return Result.fail("折扣券和卡折扣只能使用一种");
                         }
                         if (CommonUtils.isBlank(voucherNo) && CommonUtils.isBlank(cardNo)) {
-                            return null;
+                            return Result.fail("请录入折扣券或者折扣卡");
                         }
                         if (CommonUtils.isNotBlank(voucherNo)) {
                             DiscountApplyReq req = new DiscountApplyReq();
                             req.setType(EnumDiscountType.COUPON);
                             req.setDiscountName("优惠券");
                             req.setDiscountCode(voucherNo);
-                            return req;
+                            return Result.success(req);
                         } else {
                             DiscountApplyReq req = new DiscountApplyReq();
                             req.setType(EnumDiscountType.CARD);
                             req.setDiscountName("折扣卡");
                             req.setDiscountCode(cardNo);
-                            return req;
+                            return Result.success(req);
                         }
                     });
 
@@ -97,7 +97,7 @@ public class OrderDiscountSelectionView extends SmallForm {
                     discountHolder.hold(() -> {
                         DiscountTypeBO bo = optList.getSelectionModel().getSelectedItem();
                         if (bo == null) {
-                            return null;
+                            return Result.fail("请选择折扣类型");
                         }
                         DiscountApplyReq req = new DiscountApplyReq();
                         req.setType(EnumDiscountType.MANAGER);
@@ -105,7 +105,7 @@ public class OrderDiscountSelectionView extends SmallForm {
                         req.setDiscountRate(bo.getDiscountRate());
                         req.setDiscountCode(EnumDiscountType.MANAGER.name());
                         req.setManagerPwd(CommonUtils.trim(pwd.getText()));
-                        return req;
+                        return Result.success(req);
                     });
 
                     discountContentLine.getChildren().clear();
@@ -138,15 +138,19 @@ public class OrderDiscountSelectionView extends SmallForm {
             Button button = new Button("使用优惠");
             button.setOnMouseClicked(evt -> {
                 if (discountHolder.get() != null) {
-                    DiscountApplyReq req = discountHolder.get().get();
-                    Result<String> rs = useCoupon(req, param);
-                    if (rs.isSuccess()) {
-                        if (!"CANCEL".equals(rs.getData())) {
-                            AlertBuilder.INFO(rs.getData());
-                            this.getScene().getWindow().hide();
+                    Result<DiscountApplyReq> req = discountHolder.get().get();
+                    if (req.isSuccess()) {
+                        Result<String> rs = useCoupon(req.getData(), param);
+                        if (rs.isSuccess()) {
+                            if (!"CANCEL".equals(rs.getData())) {
+                                AlertBuilder.INFO(rs.getData());
+                                this.getScene().getWindow().hide();
+                            }
+                        } else {
+                            AlertBuilder.ERROR(rs.getMsg());
                         }
                     } else {
-                        AlertBuilder.ERROR(rs.getMsg());
+                        AlertBuilder.ERROR(req.getMsg());
                     }
                 }
             });
@@ -156,7 +160,7 @@ public class OrderDiscountSelectionView extends SmallForm {
             Button cancel = new Button("取消优惠");
             cancel.setStyle("-fx-text-fill:#FF0000;");
             cancel.setOnMouseClicked(evt -> {
-                OkCancelDialog dialog = new OkCancelDialog("取消折扣","是否取消折扣？");
+                OkCancelDialog dialog = new OkCancelDialog("取消折扣", "是否取消折扣？");
                 Optional<ButtonType> decideRs = dialog.showAndWait();
                 if (decideRs.isPresent() && decideRs.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
                     Result<DiscountResultVO> cancelRs = cancelDiscount(param);
