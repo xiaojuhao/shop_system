@@ -1,21 +1,13 @@
 package com.xjh.startup.view;
 
 import com.alibaba.fastjson.JSON;
-import com.xjh.common.enumeration.EnumDiscountType;
-import com.xjh.common.enumeration.EnumPayMethod;
-import com.xjh.common.enumeration.EnumPayStatus;
+import com.xjh.common.enumeration.*;
 import com.xjh.common.utils.*;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.valueobject.OrderDiscountVO;
-import com.xjh.dao.dataobject.DiscountDO;
-import com.xjh.dao.dataobject.Order;
-import com.xjh.dao.dataobject.OrderDishes;
-import com.xjh.dao.dataobject.OrderPay;
+import com.xjh.dao.dataobject.*;
 import com.xjh.dao.mapper.DiscountDAO;
-import com.xjh.service.domain.OrderDishesService;
-import com.xjh.service.domain.OrderPayService;
-import com.xjh.service.domain.OrderService;
-import com.xjh.service.domain.StoreService;
+import com.xjh.service.domain.*;
 import com.xjh.service.vo.DiscountResultVO;
 import com.xjh.service.ws.NotifyService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
@@ -48,6 +40,8 @@ public class OrderDiscountSelectionView extends SmallForm {
     OrderPayService orderPayService = GuiceContainer.getInstance(OrderPayService.class);
     StoreService storeService = GuiceContainer.getInstance(StoreService.class);
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
+
+    DeskService deskService = GuiceContainer.getInstance(DeskService.class);
     DiscountDAO discountDAO = GuiceContainer.getInstance(DiscountDAO.class);
 
     public OrderDiscountSelectionView(DeskOrderParam param) {
@@ -291,6 +285,16 @@ public class OrderDiscountSelectionView extends SmallForm {
         orderUpdate.setDiscountReason(req.getDiscountName());
         orderService.updateByOrderId(orderUpdate);
 
+        double notPaidBillAmount = orderService.notPaidBillAmount(order);
+        if (Math.abs(notPaidBillAmount) <= 0.01) {
+            order.setOrderStatus(EnumOrderStatus.PAID.status);
+            orderService.updateByOrderId(order);
+
+            Desk updateDesk = new Desk();
+            updateDesk.setStatus(EnumDeskStatus.PAID.status());
+            updateDesk.setDeskId(order.getDeskId());
+            deskService.updateDeskByDeskId(updateDesk);
+        }
         NotifyService.useDiscount(order.getDeskId());
 
         return Result.success(discountResult);

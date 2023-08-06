@@ -41,6 +41,9 @@ public class OrderService {
     @Inject
     DeskService deskService;
 
+    @Inject
+    OrderService orderService;
+
     public List<Order> pageQuery(PageQueryOrderReq req) {
         return orderDAO.pageQuery(req);
     }
@@ -199,6 +202,17 @@ public class OrderService {
             this.updateByOrderId(update);
 
             NotifyService.useDiscount(order.getDeskId());
+
+            double notPaidBillAmount = orderService.notPaidBillAmount(order);
+            if (Math.abs(notPaidBillAmount) <= 0.01) {
+                order.setOrderStatus(EnumOrderStatus.PAID.status);
+                orderService.updateByOrderId(order);
+
+                Desk updateDesk = new Desk();
+                updateDesk.setStatus(EnumDeskStatus.PAID.status());
+                updateDesk.setDeskId(order.getDeskId());
+                deskService.updateDeskByDeskId(updateDesk);
+            }
 
             return Result.success("");
         } else {
