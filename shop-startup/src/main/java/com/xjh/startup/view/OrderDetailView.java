@@ -277,7 +277,6 @@ public class OrderDetailView extends VBox implements Initializable {
                 orderErase.setDisable(btnDisabled);
                 reduction.setDisable(btnDisabled);
                 discount.setDisable(btnDisabled);
-                printOrder.setDisable(btnDisabled);
             };
         }
         Logger.info("OrderDetail构建页面耗时: " + cost.getCostAndReset());
