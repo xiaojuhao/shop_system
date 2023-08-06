@@ -41,8 +41,6 @@ public class OrderService {
     @Inject
     DeskService deskService;
 
-    @Inject
-    OrderService orderService;
 
     public List<Order> pageQuery(PageQueryOrderReq req) {
         return orderDAO.pageQuery(req);
@@ -203,10 +201,10 @@ public class OrderService {
 
             NotifyService.useDiscount(order.getDeskId());
 
-            double notPaidBillAmount = orderService.notPaidBillAmount(order);
+            double notPaidBillAmount = this.notPaidBillAmount(order);
             if (Math.abs(notPaidBillAmount) <= 0.01) {
                 order.setOrderStatus(EnumOrderStatus.PAID.status);
-                orderService.updateByOrderId(order);
+                this.updateByOrderId(order);
 
                 Desk updateDesk = new Desk();
                 updateDesk.setStatus(EnumDeskStatus.PAID.status());
