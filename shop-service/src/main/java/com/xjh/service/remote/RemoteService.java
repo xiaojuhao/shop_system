@@ -1,6 +1,7 @@
 package com.xjh.service.remote;
 
 import cn.hutool.http.HttpUtil;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.CurrentAccount;
 import com.xjh.common.utils.Logger;
@@ -40,14 +41,18 @@ public class RemoteService {
     }
 
     public Result<String> prePaidCardConsume(int storeId, PrePaidCard prePaidCard, double amount, int orderId) {
-        Logger.info("使用储值卡, 本次消费:" + amount + ", 储值卡信息:" + prePaidCard.toString());
+        JSONArray cards = new JSONArray();
+        cards.add(prePaidCard);
+        Logger.info("使用储值卡, 本次消费:" + amount + ", 储值卡信息:" + cards);
         JSONObject jSONObject = new JSONObject();
         jSONObject.put("API_TYPE", "prePaidCardConsume()");
         jSONObject.put("storeId", storeId);
         jSONObject.put("operator", CurrentAccount.currentAccountCode());
-        jSONObject.put("prePaidCard", prePaidCard.toJson());
+        jSONObject.put("prePaidCard", cards);
         jSONObject.put("amount", amount);
         jSONObject.put("orderId", orderId);
+        System.out.println("使用储值卡：请求地址:" + cardCouponUrl);
+        System.out.println("使用储值卡：请求报文:" + jSONObject.toJSONString());
         String rs = HttpUtil.post(cardCouponUrl, jSONObject.toJSONString());
         Logger.info("储值卡消费结果: " + rs);
         JSONObject json = JSONObject.parseObject(rs);

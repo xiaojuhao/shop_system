@@ -14,7 +14,7 @@ import com.xjh.service.domain.OrderService;
 import com.xjh.service.ws.NotifyService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SmallForm;
-import com.xjh.startup.view.model.DeskOrderParam;
+import com.xjh.common.model.DeskOrderParam;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;

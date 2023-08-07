@@ -8,7 +8,7 @@ import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesAttributeValueVO;
 import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SmallForm;
-import com.xjh.startup.view.model.DishesAttributeValueBO;
+import com.xjh.common.model.DishesAttributeValueBO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;

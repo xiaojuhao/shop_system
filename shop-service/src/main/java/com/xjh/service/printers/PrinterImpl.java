@@ -3,21 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.xjh.startup.foundation.printers;
+package com.xjh.service.printers;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.google.zxing.WriterException;
+import com.xjh.common.enumeration.EnumAlign;
+import com.xjh.common.enumeration.EnumComType;
 import com.xjh.common.enumeration.EnumPrinterType;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.OrElse;
 import com.xjh.dao.dataobject.PrinterDO;
-import com.xjh.startup.foundation.constants.EnumAlign;
-import com.xjh.startup.foundation.constants.EnumComType;
-import com.xjh.startup.foundation.printers.models.TableCellModel;
-import com.xjh.startup.foundation.printers.models.TableRowModel;
-import com.xjh.startup.foundation.printers.models.TextModel;
+import com.xjh.service.printers.models.TableCellModel;
+import com.xjh.service.printers.models.TableRowModel;
+import com.xjh.service.printers.models.TextModel;
 import lombok.Data;
 
 import java.io.IOException;
@@ -90,6 +89,7 @@ public class PrinterImpl implements Printer {
     }
 
     public synchronized PrintResult print(List<Object> contentItems, boolean isVoicce) throws Exception {
+        System.out.println("调用打印机: " + printerDO.getPrinterIp()+":"+printerDO.getPrinterPort());
         PrintResult printResult = new PrintResult(this, contentItems);
         SocketAddress socketAddress = new InetSocketAddress(printerDO.getPrinterIp(), printerDO.getPrinterPort());
         byte[] dataRead = new byte[0];
@@ -276,7 +276,7 @@ public class PrinterImpl implements Printer {
                         .behindEnterNum(behindEnterNum).frontLen(frontLen).behindLen(behindLen).build());
     }
 
-    private void printQRCode(OutputStream outputStream, JSONObject jsonObject) throws IOException, WriterException {
+    private void printQRCode(OutputStream outputStream, JSONObject jsonObject) throws Exception {
         int maxSize = (printerDO.getPrinterType() == 1 ? 48 : 32);
         String content = jsonObject.getString("Content");
         double width = jsonObject.getDouble("Size");
@@ -299,7 +299,7 @@ public class PrinterImpl implements Printer {
 
     }
 
-    private void printQRCode2(OutputStream outputStream, JSONObject jsonObject) throws IOException, WriterException {
+    private void printQRCode2(OutputStream outputStream, JSONObject jsonObject) throws Exception {
         int frontEnterNum = jsonObject.getInteger("FrontEnterNum");
         int behindEnterNum = jsonObject.getInteger("BehindEnterNum");
         int width = jsonObject.getInteger("Width");

@@ -1,9 +1,9 @@
-package com.xjh.startup.foundation.printers.models;
+package com.xjh.service.printers.models;
 
+import com.xjh.common.enumeration.EnumAlign;
 import com.xjh.common.enumeration.EnumPrinterType;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.OrElse;
-import com.xjh.startup.foundation.constants.EnumAlign;
 import lombok.Data;
 
 import java.nio.charset.Charset;
@@ -12,7 +12,7 @@ import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.xjh.common.utils.CommonUtils.collValueIsEmpty;
-import static com.xjh.startup.foundation.printers.StringUtil.alignString;
+import static com.xjh.service.printers.StringUtil.alignString;
 
 @Data
 public class TableRowModel {

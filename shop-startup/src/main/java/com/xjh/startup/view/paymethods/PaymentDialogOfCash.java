@@ -6,7 +6,7 @@ import com.xjh.common.utils.CommonUtils;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.model.PaymentResult;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
-import com.xjh.startup.view.model.DeskOrderParam;
+import com.xjh.common.model.DeskOrderParam;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;

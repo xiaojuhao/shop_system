@@ -17,7 +17,7 @@ import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SimpleComboBox;
 import com.xjh.startup.view.base.SimpleGridForm;
-import com.xjh.startup.view.model.DishesAttributeBO;
+import com.xjh.common.model.DishesAttributeBO;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;

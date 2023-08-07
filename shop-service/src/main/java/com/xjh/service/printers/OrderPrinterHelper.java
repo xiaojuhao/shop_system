@@ -1,18 +1,20 @@
-package com.xjh.startup.foundation.printers;
+package com.xjh.service.printers;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.xjh.common.enumeration.EnumAlign;
+import com.xjh.common.enumeration.EnumComType;
 import com.xjh.common.enumeration.EnumPayMethod;
+import com.xjh.common.model.DeskOrderParam;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
+import com.xjh.common.utils.OrElse;
 import com.xjh.common.valueobject.OrderOverviewVO;
 import com.xjh.dao.dataobject.*;
+import com.xjh.dao.mapper.PrinterDishDAO;
 import com.xjh.service.domain.*;
 import com.xjh.service.domain.model.StoreVO;
-import com.xjh.startup.foundation.constants.EnumAlign;
-import com.xjh.startup.foundation.constants.EnumComType;
-import com.xjh.startup.foundation.printers.models.TextModel;
-import com.xjh.startup.view.model.DeskOrderParam;
+import com.xjh.service.printers.models.TextModel;
 import org.apache.commons.collections4.CollectionUtils;
 
 import javax.inject.Inject;
@@ -38,6 +40,8 @@ public class OrderPrinterHelper {
     DishesService dishesService;
     @Inject
     OrderPayService orderPayService;
+    @Inject
+    PrinterDishDAO printerDishDAO;
 
     public List<Object> buildOrderPrintData(DeskOrderParam param) {
         // 可折扣的菜品信息
@@ -360,4 +364,140 @@ public class OrderPrinterHelper {
     private String formatMoney(double val) {
         return CommonUtils.formatMoney(val, "0.0");
     }
+
+
+    public List<Object> buildKitchenPrintData(Order order, SubOrder subOrder, OrderDishes orderDishes, Dishes dishes){
+        List<Object> data = new ArrayList<>();
+
+        Desk desk = deskService.getById(order.getDeskId());
+        JSONArray jSONArray = getOrderJsonArray80(subOrder, dishes, 0, desk, true, dishes.getDishesName(), null, false);
+        data.addAll(jSONArray);
+        return data;
+    }
+
+    private JSONArray getOrderJsonArray80(SubOrder subOrder, Dishes dishes, int i, Desk desk, boolean addDishesFlag, String realDishesName, Desk oldDesk, boolean ifChangeDesk)
+    {
+        JSONArray jsonArray = new JSONArray();
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("Name", "桌台");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "桌台信息:");
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        jsonArray.add(jsonObject);
+//        System.out.println("api.print.task.PrintTaskOrderSample.getOrderJsonArray()" + jsonArray.toString());
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "桌台值");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        if (ifChangeDesk)
+        {
+            jsonObject.put("SampleContent", oldDesk.getDeskName() + "-转到-" + desk.getDeskName());
+        }
+        else
+        {
+            // jsonObject.put("SampleContent", desk.getBelongDeskType().getTypeName() + "-" + desk.getDeskName());
+            jsonObject.put("SampleContent", desk.getDeskName());
+        }
+        jsonObject.put("Size", 2);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 1);
+        jsonArray.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "商品名称");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "名称:");
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 1);
+        jsonObject.put("BehindEnterNum", 0);
+        jsonArray.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "商品名称值");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        String orderDishesDetailedName = "";
+        if (addDishesFlag)
+        {
+            orderDishesDetailedName += "(加)";
+        }
+        if (ifChangeDesk)
+        {
+            orderDishesDetailedName += "(复)";
+        }
+        orderDishesDetailedName += "(套)";
+        orderDishesDetailedName += realDishesName;
+
+        jsonObject.put("SampleContent", orderDishesDetailedName);
+        jsonObject.put("Size", 2);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 2);
+        jsonArray.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "下单时间");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "下单时间:");
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        jsonArray.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "下单时间值");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", DateBuilder.base(subOrder.getCreatetime()).timeStr());
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 1);
+        jsonArray.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "流水号");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "打印队列时间:");
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        jsonArray.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "流水号值");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", DateBuilder.now().timeStr());
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        jsonArray.add(jsonObject);
+
+//        {"Size":20,"Content":"二维码样例内容","ComType":4,"FrontEnterNum":0,"Name":"5","BehindEnterNum":0}
+//        jsonObject = new JSONObject();
+//        jsonObject.put("Name", "二维码");
+//        jsonObject.put("ComType", TicketCom.TYPE_QRCODE);
+//        jsonObject.put("Content", "退菜地址");
+//        jsonObject.put("Size", 50);
+//        jsonObject.put("FrontEnterNum", 0);
+//        jsonObject.put("BehindEnterNum", 1);
+//        jsonArray.put(jsonObject);
+        return jsonArray;
+    }
+
 }

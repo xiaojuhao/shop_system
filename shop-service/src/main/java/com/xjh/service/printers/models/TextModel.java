@@ -1,4 +1,4 @@
-package com.xjh.startup.foundation.printers.models;
+package com.xjh.service.printers.models;
 
 import lombok.Builder;
 import lombok.Data;

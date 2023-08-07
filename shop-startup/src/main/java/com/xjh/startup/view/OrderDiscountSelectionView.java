@@ -13,15 +13,14 @@ import com.xjh.service.ws.NotifyService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.OkCancelDialog;
 import com.xjh.startup.view.base.SmallForm;
-import com.xjh.startup.view.model.DeskOrderParam;
-import com.xjh.startup.view.model.DiscountApplyReq;
-import com.xjh.startup.view.model.DiscountTypeBO;
+import com.xjh.common.model.DeskOrderParam;
+import com.xjh.common.model.DiscountApplyReq;
+import com.xjh.common.model.DiscountTypeBO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
-import org.apache.xmlbeans.ResourceLoader;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -29,7 +28,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.xjh.common.utils.CommonUtils.*;

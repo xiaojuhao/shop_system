@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.xjh.startup.foundation.printers;
+package com.xjh.service.printers;
 
-import com.xjh.startup.foundation.constants.EnumAlign;
+import com.xjh.common.enumeration.EnumAlign;
 
 import java.util.ArrayList;
 import java.util.List;

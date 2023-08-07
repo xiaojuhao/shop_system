@@ -1,4 +1,4 @@
-package com.xjh.startup.foundation.printers;
+package com.xjh.service.printers;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
@@ -337,7 +337,7 @@ public class PrinterCmdUtil {
             int xStart,
             int yStart,
             int width,
-            int height) throws WriterException {
+            int height) throws Exception {
         HashMap<EncodeHintType, Object> hints = new HashMap<>();
         hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
         hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);//纠错等级L,M,Q,H

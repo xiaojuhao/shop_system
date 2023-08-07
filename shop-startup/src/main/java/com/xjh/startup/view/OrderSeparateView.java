@@ -10,7 +10,7 @@ import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.MediumForm;
-import com.xjh.startup.view.model.DeskOrderParam;
+import com.xjh.common.model.DeskOrderParam;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;

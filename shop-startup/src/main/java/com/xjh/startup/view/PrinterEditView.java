@@ -10,7 +10,7 @@ import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.service.domain.PrinterService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SimpleGridForm;
-import com.xjh.startup.view.model.IntStringPair;
+import com.xjh.common.model.IntStringPair;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;

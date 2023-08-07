@@ -1,4 +1,4 @@
-package com.xjh.startup.foundation.constants;
+package com.xjh.common.enumeration;
 
 public enum EnumComType {
     TEXT(1, "文本"),

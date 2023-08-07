@@ -15,7 +15,7 @@ import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.LargeForm;
 import com.xjh.startup.view.base.ModelWindow;
-import com.xjh.startup.view.model.DishesAttributeBO;
+import com.xjh.common.model.DishesAttributeBO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;

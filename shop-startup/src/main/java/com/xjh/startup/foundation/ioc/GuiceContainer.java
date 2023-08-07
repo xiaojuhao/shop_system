@@ -8,7 +8,7 @@ import com.xjh.common.utils.TimeRecord;
 import com.xjh.dao.DaoModule;
 import com.xjh.dao.DataSourceModule;
 import com.xjh.service.ServiceModule;
-import com.xjh.startup.foundation.printers.PrinterModule;
+import com.xjh.service.printers.PrinterModule;
 import com.xjh.startup.foundation.ws.WsHandlerModule;
 
 public class GuiceContainer {

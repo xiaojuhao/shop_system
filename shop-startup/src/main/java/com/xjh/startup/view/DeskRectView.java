@@ -12,7 +12,7 @@ import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.model.OpenDeskParam;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
-import com.xjh.startup.view.model.OpenDeskInputParam;
+import com.xjh.common.model.OpenDeskInputParam;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.Scene;

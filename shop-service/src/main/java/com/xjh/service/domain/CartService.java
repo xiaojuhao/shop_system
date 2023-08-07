@@ -12,6 +12,10 @@ import com.xjh.dao.dataobject.*;
 import com.xjh.dao.mapper.*;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
 import com.xjh.service.domain.model.SendOrderRequest;
+import com.xjh.service.printers.OrderPrinterHelper;
+import com.xjh.service.printers.PrintResult;
+import com.xjh.service.printers.Printer;
+import com.xjh.service.printers.PrinterImpl;
 import com.xjh.service.ws.NotifyService;
 import com.xjh.service.ws.SocketUtils;
 
@@ -37,6 +41,14 @@ public class CartService {
     DishesDAO dishesDAO;
     @Inject
     DishesPackageDAO dishesPackageDAO;
+    @Inject
+    OrderPrinterHelper orderPrinterHelper;
+    @Inject
+    DishesService dishesService;
+    @Inject
+    PrinterDishDAO printerDishDAO;
+    @Inject
+    PrinterDAO printerDAO;
     @Inject
     OrderDishesDAO orderDishesDAO;
     @Inject
@@ -261,6 +273,27 @@ public class CartService {
 
             // 通知前端更新购物车
             SocketUtils.delay(() -> NotifyService.notifyCartCleared(deskId), 0);
+
+            // 打印小票
+            for (OrderDishes d : orderDishes) {
+                Dishes dishes = dishesService.getById(d.getDishesId());
+                // 不需要打印
+                if(dishes == null || OrElse.orGet(dishes.getIfNeedPrint(), 0) == 0){
+                    continue;
+                }
+                PrinterDishDO printer = printerDishDAO.queryByDishesId(dishes.getDishesId());
+                if(printer == null){
+                    continue;
+                }
+                PrinterDO dd = printerDAO.selectByPrinterId(printer.getPrinterId());
+                if (dd == null) {
+                    continue;
+                }
+                List<Object> tickets = orderPrinterHelper.buildKitchenPrintData(order, subOrder, d, dishes);
+                PrinterImpl printerImpl = new PrinterImpl(dd);
+                PrintResult rs = printerImpl.print(tickets, true);
+                Logger.info(JSON.toJSONString(rs));
+            }
 
             return Result.success("下单成功");
         } catch (Exception ex) {

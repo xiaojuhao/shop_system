@@ -1,4 +1,4 @@
-package com.xjh.startup.foundation.printers;
+package com.xjh.service.printers;
 
 import com.google.inject.AbstractModule;
 

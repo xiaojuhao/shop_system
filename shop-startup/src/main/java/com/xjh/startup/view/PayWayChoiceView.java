@@ -13,7 +13,7 @@ import com.xjh.service.domain.model.PaymentResult;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SmallForm;
-import com.xjh.startup.view.model.DeskOrderParam;
+import com.xjh.common.model.DeskOrderParam;
 import com.xjh.startup.view.paymethods.*;
 import javafx.geometry.Insets;
 import javafx.scene.Node;

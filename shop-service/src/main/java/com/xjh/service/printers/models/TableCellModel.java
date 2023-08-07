@@ -1,12 +1,9 @@
-package com.xjh.startup.foundation.printers.models;
+package com.xjh.service.printers.models;
 
 import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.xjh.startup.foundation.printers.models.TableRowModel.lengthOfChar;
-import static com.xjh.startup.foundation.printers.models.TableRowModel.lengthOfStr;
 
 @Data
 public class TableCellModel {
@@ -20,7 +17,7 @@ public class TableCellModel {
         if (text == null) {
             return 1;
         }
-        int textLen = lengthOfStr(text);
+        int textLen = TableRowModel.lengthOfStr(text);
         int charsPerLine = lineMaxNumChars * percents / 100;
         if (textLen % charsPerLine == 0) {
             return textLen / charsPerLine;
@@ -62,9 +59,9 @@ public class TableCellModel {
         for (int i = 0; i < size; i++) {
             StringBuilder sb = new StringBuilder();
             int cs = 0;
-            while (charIdx < chars.length && cs < perNum - lengthOfChar(chars[charIdx])) {
+            while (charIdx < chars.length && cs < perNum - TableRowModel.lengthOfChar(chars[charIdx])) {
                 sb.append(chars[charIdx]);
-                cs += lengthOfChar(chars[charIdx]);
+                cs += TableRowModel.lengthOfChar(chars[charIdx]);
                 charIdx++;
             }
             list.add(sb.length() > 0 ? sb.toString() : "");

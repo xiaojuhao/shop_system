@@ -8,7 +8,7 @@ import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.StoreService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SmallForm;
-import com.xjh.startup.view.model.DeskOrderParam;
+import com.xjh.common.model.DeskOrderParam;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;

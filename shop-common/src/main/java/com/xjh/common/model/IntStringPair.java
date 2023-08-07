@@ -1,4 +1,4 @@
-package com.xjh.startup.view.model;
+package com.xjh.common.model;
 
 import com.xjh.common.utils.CommonUtils;
 import javafx.scene.control.ComboBox;

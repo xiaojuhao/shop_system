@@ -3,7 +3,7 @@ package com.xjh.startup.view;
 import com.xjh.common.enumeration.OpenDeskResult;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.dao.dataobject.Desk;
-import com.xjh.startup.view.model.OpenDeskInputParam;
+import com.xjh.common.model.OpenDeskInputParam;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;

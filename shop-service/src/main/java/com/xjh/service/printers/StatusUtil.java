@@ -3,12 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.xjh.startup.foundation.printers;
+package com.xjh.service.printers;
 
 import java.util.Arrays;
-
-import static com.xjh.startup.foundation.printers.PrinterCmdUtil.PRINTER_STATUS_NORMAL;
-import static com.xjh.startup.foundation.printers.PrinterCmdUtil.PRINTER_STATUS_PRINTING;
 
 /**
  * @author liangh
@@ -42,7 +39,7 @@ public class StatusUtil {
      * @return true表示打印机正常，false表示出现了某种错误
      */
     public static boolean checkStatus(byte[] data) {
-        return Arrays.equals(PRINTER_STATUS_NORMAL, data) || Arrays.equals(PRINTER_STATUS_PRINTING, data);
+        return Arrays.equals(PrinterCmdUtil.PRINTER_STATUS_NORMAL, data) || Arrays.equals(PrinterCmdUtil.PRINTER_STATUS_PRINTING, data);
     }
 
     /**
@@ -55,9 +52,9 @@ public class StatusUtil {
         byte d1 = data[1];
         byte d2 = data[2];
         byte d3 = data[3];
-        if (Arrays.equals(PRINTER_STATUS_NORMAL, data)) {
+        if (Arrays.equals(PrinterCmdUtil.PRINTER_STATUS_NORMAL, data)) {
             return PrinterStatus.NORMAL.status;
-        } else if (Arrays.equals(PRINTER_STATUS_PRINTING, data)) {
+        } else if (Arrays.equals(PrinterCmdUtil.PRINTER_STATUS_PRINTING, data)) {
             return PrinterStatus.PRINTING.status;
         } else if (byteAndEqual(d2, b223)) {
             return PrinterStatus.NO_PAPER.status;
