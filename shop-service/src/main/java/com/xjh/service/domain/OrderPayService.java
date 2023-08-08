@@ -1,5 +1,9 @@
 package com.xjh.service.domain;
 
+import cn.hutool.core.codec.Base64;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.xjh.common.enumeration.EnumDeskStatus;
@@ -7,13 +11,16 @@ import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.enumeration.EnumPayAction;
 import com.xjh.common.enumeration.EnumPayStatus;
 import com.xjh.common.utils.*;
-import com.xjh.dao.dataobject.Desk;
-import com.xjh.dao.dataobject.Order;
-import com.xjh.dao.dataobject.OrderPay;
+import com.xjh.dao.dataobject.*;
 import com.xjh.dao.mapper.OrderDAO;
 import com.xjh.dao.mapper.OrderPayDAO;
+import com.xjh.dao.mapper.PrinterDAO;
+import com.xjh.dao.mapper.PrinterTaskDAO;
 import com.xjh.dao.query.OrderPayQuery;
 import com.xjh.service.domain.model.PaymentResult;
+import com.xjh.service.printers.OrderPrinterHelper;
+import com.xjh.service.printers.PrintResult;
+import com.xjh.service.printers.PrinterImpl;
 import com.xjh.service.ws.NotifyService;
 
 import java.sql.SQLException;
@@ -28,6 +35,12 @@ public class OrderPayService {
     OrderDAO orderDAO;
     @Inject
     OrderService orderService;
+    @Inject
+    PrinterTaskDAO printerTaskDAO;
+    @Inject
+    PrinterDAO printerDAO;
+    @Inject
+    OrderPrinterHelper orderPrinterHelper;
     @Inject
     DeskService deskService;
 
@@ -87,8 +100,27 @@ public class OrderPayService {
             }
 
             NotifyService.checkOutResult(order.getDeskId(), order.getOrderStatus(), orderPay.getAmount());
+
+            // 结账打印
+            PrinterTaskDO task = printerTaskDAO.selectByPrintTaskName("api.print.task.PrintTaskCheckOutSample");
+            if (task != null) {
+                JSONObject taskContent = JSON.parseObject(Base64.decodeStr(task.getPrintTaskContent()));
+                JSONObject array = JSON.parseObject(taskContent.getString("printerSelectStrategy"));
+                if (array != null) {
+                    Integer printerId = array.getInteger("printerId");
+                    PrinterDO dd = printerDAO.selectByPrinterId(printerId);
+                    if(dd != null){
+                        PrinterImpl printer = new PrinterImpl(dd);
+                        List<Object> printData = orderPrinterHelper.buildCheckOutPrintData(order);
+                        PrintResult rs = printer.print(printData, true);
+                        System.out.println(rs);
+                    }
+                }
+            }
+
             return Result.success("支付成功");
         } catch (Exception ex) {
+            ex.printStackTrace();
             Logger.error("保存支付信息失败:" + ex.getMessage());
             return Result.fail("保存支付信息失败:" + ex.getMessage());
         } finally {

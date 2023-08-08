@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.text.DecimalFormat;
@@ -157,6 +158,19 @@ public class CommonUtils {
             return new DecimalFormat(format).format(0D);
         }
         return new DecimalFormat(format).format(value);
+    }
+
+    public static String formatScale(Double val, int scale){
+        if(val == null){
+            return "0.00";
+        }
+        return scaleDecimal(BigDecimal.valueOf(val), scale);
+    }
+    public static String scaleDecimal(BigDecimal bigDecimal, int scale){
+        if(bigDecimal == null){
+            return "0.00";
+        }
+        return bigDecimal.setScale(scale, RoundingMode.HALF_UP).toString();
     }
 
     public static String formatSeconds(long seconds) {

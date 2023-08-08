@@ -1,5 +1,6 @@
 package com.xjh.dao.dataobject;
 
+import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.utils.OrElse;
 import com.xjh.dao.foundation.Column;
 import com.xjh.dao.foundation.Id;
@@ -8,6 +9,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.function.Predicate;
 
 @Data
 @Table("order_dishes_list")
@@ -58,5 +60,11 @@ public class OrderDishes {
         BigDecimal singlePrice = BigDecimal.valueOf(OrElse.orGet(this.orderDishesDiscountPrice, 0D));
         BigDecimal num = BigDecimal.valueOf(OrElse.orGet(this.orderDishesNums, 1));
         return singlePrice.multiply(num).setScale(2, RoundingMode.HALF_UP).doubleValue();
+    }
+
+    public static Predicate<OrderDishes> isReturnDishes(){
+        return od -> {
+          return od != null && EnumOrderSaleType.of(od.getOrderDishesSaletype()) == EnumOrderSaleType.RETURN;
+        };
     }
 }

@@ -76,6 +76,14 @@ public class DishesPackageDishesDAO {
             return Result.fail(ex.getMessage());
         }
     }
+    public List<DishesPackageDishes> getByDishesPackageId(Integer packageId) {
+        if (packageId == null) {
+            return new ArrayList<>();
+        }
+        DishesPackageDishes cond = new DishesPackageDishes();
+        cond.setDishesPackageId(packageId);
+        return selectList(cond);
+    }
 
     public List<DishesPackageDishes> getByDishesPackageTypeId(Integer packageId, Integer dishesPackageTypeId) {
         if (dishesPackageTypeId == null) {

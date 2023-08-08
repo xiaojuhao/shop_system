@@ -420,6 +420,18 @@ public class OrderService {
         }
     }
 
+    // 总的打折金额
+    public double sumDiscountPrice(List<OrderDishes> orderDishes) {
+        if (CommonUtils.isEmpty(orderDishes)) {
+            return 0;
+        }
+        double discount = 0;
+        for (OrderDishes od : orderDishes) {
+            discount += od.sumOrderDishesPrice() - od.sumOrderDishesDiscountPrice();
+        }
+        return discount;
+    }
+
     public double sumBillAmount(List<OrderDishes> orderDishes) {
         if (CommonUtils.isEmpty(orderDishes)) {
             return 0;
