@@ -4,6 +4,7 @@ import com.xjh.common.enumeration.EnumPayAction;
 import com.xjh.common.enumeration.EnumPayMethod;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.StoreService;
@@ -131,6 +132,7 @@ public class PaymentDialogOfPreCard extends SimpleForm implements Initializable 
             }
             Result<String> consumeRs = remoteService.prePaidCardConsume(store.getStoreId(), preCardQs.getData(), result.getPayAmount(), param.getOrderId());
             if (!consumeRs.isSuccess()) {
+                Logger.info("使用失败，恢复储值卡金额");
                 remoteService.updatePrePaidCardBalance(store.getStoreId(), preCardQs.getData(), preCardQs.getData().getBalance());
                 AlertBuilder.ERROR(consumeRs.getMsg());
                 return;

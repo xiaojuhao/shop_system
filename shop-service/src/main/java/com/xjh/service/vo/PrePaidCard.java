@@ -1,7 +1,10 @@
 package com.xjh.service.vo;
 
 import com.alibaba.fastjson.JSONObject;
+import com.xjh.common.utils.ReflectionUtils;
 import lombok.Data;
+
+import java.sql.Ref;
 
 @Data
 public class PrePaidCard {
@@ -16,7 +19,11 @@ public class PrePaidCard {
     Long startTime;
     Long endTime;
 
-    public String toJson() {
-        return JSONObject.toJSONString(this);
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        for(ReflectionUtils.PropertyDescriptor pd : ReflectionUtils.resolvePDList(this.getClass())){
+            json.put(pd.getField().getName(), pd.readValue(this));
+        }
+        return json;
     }
 }

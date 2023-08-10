@@ -41,6 +41,8 @@ public class MenuBarView {
         bar.getMenus().add(createPreserveMenu());
         // 登录
         bar.getMenus().add(createAccountMenu());
+        // 配置管理
+        bar.getMenus().add(createConfigMenu());
         return bar;
     }
 
@@ -48,6 +50,14 @@ public class MenuBarView {
         Menu menu = new Menu();
         Label label = new Label("主页");
         label.setOnMouseClicked(evt -> root.setCenter(new DeskListView()));
+        menu.setGraphic(label);
+        return menu;
+    }
+
+    private Menu createConfigMenu() {
+        Menu menu = new Menu();
+        Label label = new Label("系统配置");
+        label.setOnMouseClicked(evt -> openView("系统配置", new ConfigurationView()));
         menu.setGraphic(label);
         return menu;
     }

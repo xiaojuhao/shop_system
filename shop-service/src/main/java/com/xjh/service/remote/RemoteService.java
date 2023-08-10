@@ -1,7 +1,7 @@
 package com.xjh.service.remote;
 
 import cn.hutool.http.HttpUtil;
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.CurrentAccount;
 import com.xjh.common.utils.Logger;
@@ -21,7 +21,7 @@ public class RemoteService {
         jSONObject.put("code", code);
         jSONObject.put("storeId", storeId);
 
-        String rs = HttpUtil.post(cardCouponUrl, jSONObject.toJSONString());
+        String rs = postJson(cardCouponUrl, jSONObject);
         Logger.info("储值卡查询结果: " + rs);
         JSONObject json = JSONObject.parseObject(rs);
         if (json.containsKey("isNull")) {
@@ -41,26 +41,29 @@ public class RemoteService {
     }
 
     public Result<String> prePaidCardConsume(int storeId, PrePaidCard prePaidCard, double amount, int orderId) {
-        JSONArray cards = new JSONArray();
-        cards.add(prePaidCard);
-        Logger.info("使用储值卡, 本次消费:" + amount + ", 储值卡信息:" + cards);
-        JSONObject jSONObject = new JSONObject();
-        jSONObject.put("API_TYPE", "prePaidCardConsume()");
-        jSONObject.put("storeId", storeId);
-        jSONObject.put("operator", CurrentAccount.currentAccountCode());
-        jSONObject.put("prePaidCard", cards);
-        jSONObject.put("amount", amount);
-        jSONObject.put("orderId", orderId);
-        System.out.println("使用储值卡：请求地址:" + cardCouponUrl);
-        System.out.println("使用储值卡：请求报文:" + jSONObject.toJSONString());
-        String rs = HttpUtil.post(cardCouponUrl, jSONObject.toJSONString());
-        Logger.info("储值卡消费结果: " + rs);
-        JSONObject json = JSONObject.parseObject(rs);
-        int status = json.getInteger("status");
-        if (status == 1) {
-            return Result.success("");
-        } else {
-            return Result.fail("储值卡消费失败");
+        try {
+            Logger.info("使用储值卡, 本次消费:" + amount + ", 储值卡信息:" + JSONObject.toJSONString(prePaidCard));
+            JSONObject jSONObject = new JSONObject();
+            jSONObject.put("API_TYPE", "prePaidCardConsume()");
+            jSONObject.put("storeId", storeId);
+            jSONObject.put("operator", CurrentAccount.currentAccountCode());
+            jSONObject.put("prePaidCard", prePaidCard.toJson());
+            jSONObject.put("amount", amount);
+            jSONObject.put("orderId", orderId);
+            System.out.println("使用储值卡：请求地址:" + cardCouponUrl);
+            System.out.println("使用储值卡：请求报文:" + jSONObject);
+            String rs = postJson(cardCouponUrl, jSONObject);
+            Logger.info("储值卡消费结果: " + rs);
+            JSONObject json = JSONObject.parseObject(rs);
+            int status = json.getInteger("status");
+            if (status == 1) {
+                return Result.success("");
+            } else {
+                return Result.fail("储值卡消费失败");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail("使用储值卡失败:" + ex.getMessage());
         }
     }
 
@@ -72,7 +75,7 @@ public class RemoteService {
         jSONObject.put("operator", CurrentAccount.currentAccountCode());
         jSONObject.put("prePaidCard", prePaidCard.toJson());
         jSONObject.put("newBalance", newBalance);
-        String rs = HttpUtil.post(cardCouponUrl, jSONObject.toJSONString());
+        String rs = postJson(cardCouponUrl, jSONObject);
         Logger.info("更新储值卡余额: " + rs);
     }
 
@@ -89,7 +92,7 @@ public class RemoteService {
         jSONObject.put("whereString", whereString);
         jSONObject.put("storeId", storeId);
 
-        String rs = HttpUtil.post(cardCouponUrl, jSONObject.toJSONString());
+        String rs = postJson(cardCouponUrl, jSONObject);
         Logger.info("查询代金券结果: " + rs);
         JSONObject json = JSONObject.parseObject(rs);
         if (json.containsKey("isNull")) {
@@ -115,7 +118,7 @@ public class RemoteService {
         jSONObject.put("code", code);
         jSONObject.put("storeId", storeId);
 
-        String rs = HttpUtil.post(cardCouponUrl, jSONObject.toJSONString());
+        String rs = postJson(cardCouponUrl, jSONObject);
         Logger.info("查询代金券结果: " + rs);
         JSONObject json = JSONObject.parseObject(rs);
         if (json.containsKey("isNull")) {
@@ -132,11 +135,17 @@ public class RemoteService {
         return Result.success(sn);
     }
 
+    static String postJson(String url, JSONObject body) {
+        return HttpUtil.createPost(url).contentType("application/json").body(JSONObject.toJSONString(body)).execute().body();
+    }
+
     public static void main(String[] args) {
         RemoteService service = new RemoteService();
-        Result<SerialNumber> rs = service.getOneSerialNumber(333, "17ir3cs0ne");
+        Result<PrePaidCard> rs = service.getOnePrePaidCard(333, "123321123");
         System.out.println(JSONObject.toJSONString(rs, true));
 
+        Result<String> cs = service.prePaidCardConsume(333, rs.getData(), 1, 1222);
+        System.out.println(JSON.toJSON(cs));
 
         System.exit(0);
     }

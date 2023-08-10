@@ -4,10 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ReflectionUtils {
@@ -30,11 +27,26 @@ public class ReflectionUtils {
             return pdCache.get(clazz);
         }
         Map<String, PropertyDescriptor> pdMap = new HashMap<>();
+        for(PropertyDescriptor pd : resolvePDList(clazz)){
+            pdMap.put(pd.name, pd);
+        }
+        pdCache.put(clazz, pdMap);
+        return pdMap;
+    }
+
+    public static List<PropertyDescriptor> resolvePDList(Class<?> clazz) {
+        List<PropertyDescriptor> pds = new ArrayList<>();
         Map<String, Method> methodMap = new HashMap<>();
-        Map<String, Field> fieldMap = new HashMap<>();
+        List<Field> fieldMap = new ArrayList<>();
         resolveMethods(clazz, methodMap);
         resolveFields(clazz, fieldMap);
-        fieldMap.forEach((name, f) -> {
+        Set<String> added = new HashSet<>();
+        fieldMap.forEach(f -> {
+            String name = f.getName();
+            if(added.contains(name)){
+                return;
+            }
+            added.add(name);
             Method read = methodMap.get("get" + capitalize(name));
             Method write = methodMap.get("set" + capitalize(name));
             if (read != null && write != null) {
@@ -42,11 +54,11 @@ public class ReflectionUtils {
                 pd.field = f;
                 pd.read = read;
                 pd.write = write;
-                pdMap.putIfAbsent(name, pd);
+                pd.name = name;
+                pds.add(pd);
             }
         });
-        pdCache.put(clazz, pdMap);
-        return pdMap;
+        return pds;
     }
 
     public static void resolveMethods(Class<?> clazz, Map<String, Method> methodMap) {
@@ -79,20 +91,16 @@ public class ReflectionUtils {
                 && !(m.getName().contains("$"));
     }
 
-    public static void resolveFields(Class<?> clazz, Map<String, Field> fieldMap) {
+    private static void resolveFields(Class<?> clazz, List<Field> fieldList) {
         Field[] fields = clazz.getFields();
-        for (Field f : fields) {
-            fieldMap.putIfAbsent(f.getName(), f);
-        }
+        fieldList.addAll(Arrays.asList(fields));
         fields = clazz.getDeclaredFields();
-        for (Field f : fields) {
-            fieldMap.putIfAbsent(f.getName(), f);
-        }
+        fieldList.addAll(Arrays.asList(fields));
         if (clazz.getSuperclass() != null) {
-            resolveFields(clazz.getSuperclass(), fieldMap);
+            resolveFields(clazz.getSuperclass(), fieldList);
         }
         for (Class<?> intf : clazz.getInterfaces()) {
-            resolveFields(intf, fieldMap);
+            resolveFields(intf, fieldList);
         }
     }
 
@@ -104,6 +112,7 @@ public class ReflectionUtils {
     }
 
     public static class PropertyDescriptor {
+        String name;
         Field field;
         Method read;
         Method write;
