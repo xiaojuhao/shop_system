@@ -27,6 +27,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.xjh.common.utils.CommonUtils.tryDecodeBase64;
+
 @Singleton
 public class OrderPayService {
     @Inject
@@ -104,7 +106,7 @@ public class OrderPayService {
             // 结账打印
             PrinterTaskDO task = printerTaskDAO.selectByPrintTaskName("api.print.task.PrintTaskCheckOutSample");
             if (task != null) {
-                JSONObject taskContent = JSON.parseObject(Base64.decodeStr(task.getPrintTaskContent()));
+                JSONObject taskContent = JSON.parseObject(tryDecodeBase64(task.getPrintTaskContent()));
                 JSONObject array = JSON.parseObject(taskContent.getString("printerSelectStrategy"));
                 if (array != null) {
                     Integer printerId = array.getInteger("printerId");
