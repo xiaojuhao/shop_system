@@ -26,6 +26,7 @@ import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -35,7 +36,7 @@ public class PackageDishesChoiceView extends Group {
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
     GridPane grid = new GridPane();
 
-    public PackageDishesChoiceView(DishesChoiceItemBO bo, Consumer<CartItemVO> addCartItemCb) {
+    public PackageDishesChoiceView(DishesChoiceItemBO bo, Consumer<CartItemVO> addCartItemCb, AtomicInteger lines) {
         Integer packageId = bo.getDishesPackageId();
 
         grid.setVgap(15);
@@ -54,6 +55,8 @@ public class PackageDishesChoiceView extends Group {
             Label name = new Label(bo.getDishesName());
             grid.add(label, 0, row);
             grid.add(name, 1, row);
+
+            lines.incrementAndGet();
         }
 
         {
@@ -82,7 +85,12 @@ public class PackageDishesChoiceView extends Group {
                 choices.setVgap(5);
                 choices.setHgap(5);
                 List<Supplier<DishesPackageDishes>> typeSelected = new ArrayList<>();
+                int dishesIndex = 0;
                 for (DishesPackageDishes pd : packageDishes) {
+                    dishesIndex ++;
+                    if(dishesIndex % 3 == 2){
+                        lines.incrementAndGet();
+                    }
                     Dishes dishes = dishesService.getById(pd.getDishesId());
                     if (dishes == null) {
                         continue;
@@ -95,6 +103,8 @@ public class PackageDishesChoiceView extends Group {
                     }
                     choices.getChildren().add(cb);
                     typeSelected.add(() -> cb.isSelected() ? pd : null);
+
+
                 }
                 dishesSources.add(() -> CommonUtils.collect(typeSelected, Supplier::get));
                 if (chose == EnumChoseType.ALL) {
@@ -122,6 +132,8 @@ public class PackageDishesChoiceView extends Group {
                     });
                 }
                 grid.add(choices, 1, row);
+
+                lines.incrementAndGet();
             }
         }
         //
@@ -137,6 +149,8 @@ public class PackageDishesChoiceView extends Group {
             addNumSp = () -> CommonUtils.parseInt(numInput.getText(), 1);
             grid.add(label, 0, row);
             grid.add(numInput, 1, row);
+
+            lines.incrementAndGet();
         }
         //
         {
@@ -146,6 +160,9 @@ public class PackageDishesChoiceView extends Group {
             box.getChildren().add(saveBtn);
             box.setAlignment(Pos.CENTER);
             grid.add(box, 0, row, 2, 1);
+
+            lines.incrementAndGet();
+
             saveBtn.setOnMouseClicked(evt -> {
                 for (Supplier<String> checker : dishesCheckers) {
                     String errmsg = checker.get();

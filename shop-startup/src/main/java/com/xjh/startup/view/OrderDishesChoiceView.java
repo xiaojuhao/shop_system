@@ -50,6 +50,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.xjh.common.utils.CommonUtils.collect;
@@ -340,28 +342,35 @@ public class OrderDishesChoiceView extends VBox {
     }
 
     private void openPackageAddDialog(DishesChoiceItemBO bo) {
+        AtomicInteger lines = new AtomicInteger();
+        PackageDishesChoiceView view = new PackageDishesChoiceView(bo, this::addCartItem, lines);
         Stage stage = new Stage();
         Window owner = this.getScene().getWindow();
         stage.initOwner(owner);
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initStyle(StageStyle.DECORATED);
         stage.centerOnScreen();
-        stage.setWidth(owner.getWidth() / 5 * 3);
-        stage.setHeight(owner.getHeight() / 3 * 2);
+        if(lines.get() <= 5){
+            stage.setWidth(500);
+            stage.setHeight(300);
+        }else {
+            stage.setWidth(owner.getWidth() / 5 * 3);
+            stage.setHeight(owner.getHeight() / 3 * 2);
+        }
         stage.setTitle("点菜[桌号:" + param.getDeskName() + "]");
-        stage.setScene(new Scene(new PackageDishesChoiceView(bo, this::addCartItem)));
+        stage.setScene(new Scene(view));
+
         stage.showAndWait();
     }
 
     private void openAddDishesDialog(DishesChoiceItemBO bo) {
+        AtomicInteger lines = new AtomicInteger();
         Stage stage = new Stage();
         Window owner = this.getScene().getWindow();
         stage.initOwner(owner);
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initStyle(StageStyle.DECORATED);
         stage.centerOnScreen();
-        stage.setWidth(owner.getWidth() / 2);
-        stage.setHeight(owner.getHeight() / 2);
         stage.setTitle("点菜[桌号:" + param.getDeskName() + "]");
         List<DishesAttributeVO> dishesAttrs = dishesService.getDishesAttribute(bo.getDishesId());
         SimpleForm form = new SimpleForm();
@@ -410,6 +419,8 @@ public class OrderDishesChoiceView extends VBox {
             line.setSpacing(15);
             line.setPadding(new Insets(0, 0, 0, 10));
             form.addLine(line);
+
+            lines.incrementAndGet();
         }
         // 价格
         List<DishesPrice> priceList = dishesPriceDAO.queryByDishesId(bo.getDishesId());
@@ -437,6 +448,8 @@ public class OrderDishesChoiceView extends VBox {
             });
 
             HBox line = form.newLine(name, optionBox);
+            lines.incrementAndGet();
+
             line.setSpacing(15);
             line.setPadding(new Insets(15, 0, 0, 10));
             form.addLine(line);
@@ -449,10 +462,12 @@ public class OrderDishesChoiceView extends VBox {
             HBox numLine = form.newCenterLine(inputNumberLabel, inputNumber);
             numLine.setPadding(new Insets(20, 0, 0, 0));
             form.addLine(numLine);
+            lines.incrementAndGet();
         } else {
             Label inputNumberLabel = new Label("下单数量:");
             inputNumberLabel.setPrefWidth(100);
             form.addLine(form.newLine(inputNumberLabel, inputNumber));
+            lines.incrementAndGet();
         }
 
         // 按钮
@@ -469,7 +484,16 @@ public class OrderDishesChoiceView extends VBox {
             }
             stage.close();
         });
+        if(lines.get() <= 5){
+            stage.setWidth(500);
+            stage.setHeight(300);
+        }else {
+            stage.setWidth(owner.getWidth() / 2);
+            stage.setHeight(owner.getHeight() / 2);
+        }
         form.addLine(form.newCenterLine(add));
+        lines.incrementAndGet();
+
         stage.setScene(new Scene(form));
         stage.showAndWait();
     }
