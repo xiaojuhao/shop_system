@@ -372,14 +372,28 @@ public class OrderPrinterHelper {
     }
 
 
-    public List<Object> buildKitchenPrintData(Order order, SubOrder subOrder, OrderDishes orderDishes, Dishes dishes) {
+    public List<Object> buildKitchenPrintData0(Order order, SubOrder subOrder, List<OrderDishes> subOrderContainDishes) {
+        Desk desk = deskService.getById(order.getDeskId());
+
         List<Object> data = new ArrayList<>();
+
+        JSONArray data0 = getOrderJsonArray80(subOrder, desk, subOrderContainDishes);
+        data.addAll(data0);
+
+        return data;
+
+    }
+    public List<Object> buildKitchenPrintData(Order order, SubOrder subOrder, OrderDishes orderDishes, Dishes dishes) {
+        Desk desk = deskService.getById(order.getDeskId());
+
+        List<Object> data = new ArrayList<>();
+
         boolean addDishesFlag = false;
         Result<List<SubOrder>> subOrders = orderService.findSubOrders(order.getOrderId());
         if(CommonUtils.sizeOf(subOrders.getData()) > 1){
             addDishesFlag = true;
         }
-        Desk desk = deskService.getById(order.getDeskId());
+
         JSONArray jSONArray = getOrderJsonArray80(subOrder,
                 orderDishes, dishes,
                 0, desk, addDishesFlag,
@@ -391,7 +405,7 @@ public class OrderPrinterHelper {
     }
 
 
-    private JSONArray getOrderJsonArray80(SubOrder subOrder, Desk desk) throws Exception{
+    private JSONArray getOrderJsonArray80(SubOrder subOrder, Desk desk, List<OrderDishes> subOrderContainDishes) {
         StoreVO store = storeService.getStore().getData();
         Integer storeId = store.getStoreId();
         ConfigurationBO cfg = configService.loadConfiguration();
@@ -588,7 +602,6 @@ public class OrderPrinterHelper {
 
         //获取合并菜
         // List<OrderDishes> subOrderContainDishes = orderManager.getSubOrderDishesesMerge(subOrder.getSubOrderId());
-        List<OrderDishes> subOrderContainDishes = new ArrayList<>();//orderManager.getSubOrderDishesesMerge(subOrder.getSubOrderId());
 //        List<OrderDishes> subOrderContainDishes = subOrder.getSubOrderContainDishes();
         for(OrderDishes orderDishes : subOrderContainDishes ){
             // DishesPrice dishesPrice = dishesManager.getDishesPriceOne(orderDishes.getDishesPriceId());
@@ -613,7 +626,8 @@ public class OrderPrinterHelper {
                     {
                         orderDishesDetailedName += "(试吃)";
                     }
-                    orderDishesDetailedName += dishes.getDishesName() + orderDishes.getOrderDishesOptions() + dishesPriceString;
+                    // orderDishesDetailedName += dishes.getDishesName() + orderDishes.getOrderDishesOptions() + dishesPriceString;
+                    orderDishesDetailedName += dishes.getDishesName() + dishesPriceString;
                     oneRow.add(orderDishesDetailedName);
                     oneRow.add(orderDishes.getOrderDishesNums() + "");
                     oneRow.add(formatMoney((double)orderDishes.getOrderDishesPrice()) + "");

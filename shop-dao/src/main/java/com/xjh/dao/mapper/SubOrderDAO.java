@@ -84,6 +84,7 @@ public class SubOrderDAO {
         if (id == null) {
             return Result.fail("插入SubOrder失败");
         }
+        subOrder.setSubOrderId(parseInt(id, null));
         return Result.success(parseInt(id, null));
     }
 

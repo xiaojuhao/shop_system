@@ -2,6 +2,7 @@ package com.xjh.service.domain;
 
 import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.enumeration.*;
 import com.xjh.common.utils.*;
@@ -49,6 +50,8 @@ public class CartService {
     PrinterDishDAO printerDishDAO;
     @Inject
     PrinterDAO printerDAO;
+    @Inject
+    PrinterTaskDAO printerTaskDAO;
     @Inject
     OrderDishesDAO orderDishesDAO;
     @Inject
@@ -213,6 +216,8 @@ public class CartService {
         Runnable clear = CurrentRequest.resetRequestId();
         try {
             Integer deskId = param.getDeskId();
+            Desk desk = deskService.getById(deskId);
+
             Integer orderId = param.getOrderId();
 
             Order order = orderDAO.selectByOrderId(orderId).getData();
@@ -274,26 +279,11 @@ public class CartService {
             // 通知前端更新购物车
             SocketUtils.delay(() -> NotifyService.notifyCartCleared(deskId), 0);
 
-            // 打印小票
-            for (OrderDishes d : orderDishes) {
-                Dishes dishes = dishesService.getById(d.getDishesId());
-                // 不需要打印
-                if(dishes == null || OrElse.orGet(dishes.getIfNeedPrint(), 0) == 0){
-                    continue;
-                }
-                PrinterDishDO printer = printerDishDAO.queryByDishesId(dishes.getDishesId());
-                if(printer == null){
-                    continue;
-                }
-                PrinterDO dd = printerDAO.selectByPrinterId(printer.getPrinterId());
-                if (dd == null) {
-                    continue;
-                }
-                List<Object> tickets = orderPrinterHelper.buildKitchenPrintData(order, subOrder, d, dishes);
-                PrinterImpl printerImpl = new PrinterImpl(dd);
-                PrintResult rs = printerImpl.print(tickets, true);
-                Logger.info(JSON.toJSONString(rs));
-            }
+
+            printKitchen0(order, subOrder, desk, orderDishes);
+
+            // 后厨打印
+            printKitchen(order, subOrder, orderDishes);
 
             return Result.success("下单成功");
         } catch (Exception ex) {
@@ -301,6 +291,59 @@ public class CartService {
             return Result.fail("下单失败:" + ex.getMessage());
         } finally {
             clear.run();
+        }
+    }
+
+    private void printKitchen0(Order order, SubOrder subOrder, Desk desk, List<OrderDishes> subOrderContainDishes) throws Exception {
+        PrinterTaskDO task = printerTaskDAO.selectByPrintTaskName("api.print.task.PrintTaskOrderSample");
+        if (task == null) {
+            AlertBuilder.ERROR("打印机配置错误,请检查");
+            return;
+        }
+        JSONObject taskContent = JSON.parseObject(Base64.decodeStr(task.getPrintTaskContent()));
+        JSONArray array = JSON.parseArray(taskContent.getString("printerSelectStrategy"));
+        if (array == null) {
+            AlertBuilder.ERROR("打印机配置错误,请检查2");
+            return;
+        }
+        Integer printerId = null;
+        for (int i = 0; i < array.size(); i++) {
+            JSONObject conf = array.getJSONObject(i);
+            if (CommonUtils.eq(conf.getInteger("deskTypeId"), desk.getBelongDeskType())) {
+                printerId = conf.getInteger("printerId");
+            }
+        }
+        PrinterDO dd = printerDAO.selectByPrinterId(printerId);
+        if (dd == null) {
+            AlertBuilder.ERROR("打印机配置错误,请检查3");
+            return;
+        }
+        List<Object> tickets = orderPrinterHelper.buildKitchenPrintData0(order, subOrder, subOrderContainDishes);
+        PrinterImpl printerImpl = new PrinterImpl(dd);
+        PrintResult rs = printerImpl.print(tickets, true);
+        Logger.info(JSON.toJSONString(rs));
+    }
+
+    private void printKitchen(Order order, SubOrder subOrder, List<OrderDishes> orderDishes) throws Exception {
+        // 打印小票
+        for (OrderDishes d : orderDishes) {
+            Dishes dishes = dishesService.getById(d.getDishesId());
+            // 不需要打印
+            if(dishes == null || OrElse.orGet(dishes.getIfNeedPrint(), 0) == 0){
+                continue;
+            }
+            PrinterDishDO printer = printerDishDAO.queryByDishesId(dishes.getDishesId());
+            if(printer == null){
+                continue;
+            }
+            PrinterDO dd = printerDAO.selectByPrinterId(printer.getPrinterId());
+            if (dd == null) {
+                continue;
+            }
+            List<Object> tickets = orderPrinterHelper.buildKitchenPrintData(order, subOrder, d, dishes);
+            PrinterImpl printerImpl = new PrinterImpl(dd);
+            PrintResult rs = printerImpl.print(tickets, true);
+            Logger.info(JSON.toJSONString(rs));
         }
     }
 
