@@ -111,7 +111,17 @@ public class CommonUtils {
             return coll.stream().findFirst().orElse(null);
         }
     }
-
+    public static <T> T lastOf(Collection<T> coll) {
+        if (coll == null || coll.size() == 0) {
+            return null;
+        } else {
+            T t = null;
+            for(T it : coll){
+                t = it;
+            }
+            return t;
+        }
+    }
     public static <T> Iterator<T> createIter(T[] arr) {
         int arrLen = arr.length;
         AtomicInteger index = new AtomicInteger(0);

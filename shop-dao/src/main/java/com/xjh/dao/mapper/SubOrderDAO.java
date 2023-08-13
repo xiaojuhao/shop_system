@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,6 +52,20 @@ public class SubOrderDAO {
         }
     }
 
+    public List<SubOrder> findByOrderId(Integer orderId) {
+        try {
+            if (orderId == null) {
+                return new ArrayList<>();
+            }
+            SubOrder cond = new SubOrder();
+            cond.setOrderId(orderId);
+            return selectList(cond);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
     public Long firsSubOrderTime(Integer orderId) throws SQLException {
         if (orderId == null) {
             return null;
@@ -85,7 +100,9 @@ public class SubOrderDAO {
     public List<SubOrder> selectList(SubOrder subOrder) {
         try {
             List<Entity> list = Db.use(ds).find(EntityUtils.create(subOrder));
-            return EntityUtils.convertList(list, SubOrder.class);
+            List<SubOrder> rs = EntityUtils.convertList(list, SubOrder.class);
+            rs.sort(Comparator.comparing(SubOrder::getSubOrderId));
+            return rs;
         } catch (Exception ex) {
             ex.printStackTrace();
             return new ArrayList<>();

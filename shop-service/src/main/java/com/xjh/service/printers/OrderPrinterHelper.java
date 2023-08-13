@@ -376,12 +376,24 @@ public class OrderPrinterHelper {
             addDishesFlag = true;
         }
         Desk desk = deskService.getById(order.getDeskId());
-        JSONArray jSONArray = getOrderJsonArray80(subOrder, dishes, 0, desk, addDishesFlag, dishes.getDishesName(), null, false);
+        JSONArray jSONArray = getOrderJsonArray80(subOrder,
+                orderDishes, dishes,
+                0, desk, addDishesFlag,
+                dishes.getDishesName(),
+                null,
+                false);
         data.addAll(jSONArray);
         return data;
     }
 
-    private JSONArray getOrderJsonArray80(SubOrder subOrder, Dishes dishes, int i, Desk desk, boolean addDishesFlag, String realDishesName, Desk oldDesk, boolean ifChangeDesk) {
+    public JSONArray getOrderJsonArray80(SubOrder subOrder,
+                                          OrderDishes orderDishes,
+                                          Dishes dishes, int i,
+                                          Desk desk,
+                                          boolean addDishesFlag,
+                                          String realDishesName,
+                                          Desk oldDesk,
+                                          boolean ifChangeDesk) {
         JSONArray jsonArray = new JSONArray();
 
         JSONObject jsonObject = new JSONObject();
@@ -433,9 +445,24 @@ public class OrderPrinterHelper {
         if (ifChangeDesk) {
             orderDishesDetailedName += "(复)";
         }
-        orderDishesDetailedName += "(套)";
+        Integer isPackage = OrElse.orGet(orderDishes.getIfDishesPackage(), EnumIsPackage.NO.code);
+        if(isPackage == EnumIsPackage.YES_NEW.code || isPackage == EnumIsPackage.YES.code) {
+            orderDishesDetailedName += "(套)";
+        }
+        if (orderDishes.getOrderDishesSaletype() == EnumOrderSaleType.SEND.type)
+        {
+            orderDishesDetailedName += "(赠）";
+        }
+        else if (orderDishes.getOrderDishesSaletype() == EnumOrderSaleType.TASTED.type)
+        {
+            orderDishesDetailedName += "(试吃）";
+        }
         orderDishesDetailedName += realDishesName;
-
+        DishesPrice dishesPrice = dishesPriceDAO.queryByPriceId(orderDishes.getDishesPriceId());
+        if (dishesPrice != null)
+        {
+            orderDishesDetailedName += "(" + dishesPrice.getDishesPriceName() + ")";
+        }
         jsonObject.put("SampleContent", orderDishesDetailedName);
         jsonObject.put("Size", 2);
         jsonObject.put("FrontLen", 0);
