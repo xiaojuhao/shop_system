@@ -5,10 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.enumeration.*;
 import com.xjh.common.model.ConfigurationBO;
 import com.xjh.common.model.DeskOrderParam;
-import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.DateBuilder;
-import com.xjh.common.utils.OrElse;
-import com.xjh.common.utils.Result;
+import com.xjh.common.utils.*;
 import com.xjh.common.valueobject.OrderOverviewVO;
 import com.xjh.dao.dataobject.*;
 import com.xjh.dao.mapper.DeskKeyDAO;
@@ -19,6 +16,7 @@ import com.xjh.service.domain.model.StoreVO;
 import com.xjh.service.printers.models.TextModel;
 import com.xjh.service.remote.RemoteService;
 import com.xjh.service.vo.PrePaidCard;
+import jdk.nashorn.internal.runtime.regexp.joni.Config;
 import org.apache.commons.collections4.CollectionUtils;
 
 import javax.inject.Inject;
@@ -31,6 +29,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static cn.hutool.core.util.NumberUtil.mul;
+import static cn.hutool.core.util.NumberUtil.sub;
 import static com.xjh.common.enumeration.EnumPayMethod.*;
 import static com.xjh.common.utils.CommonUtils.formatScale;
 
@@ -391,6 +390,349 @@ public class OrderPrinterHelper {
         return data;
     }
 
+
+    private JSONArray getOrderJsonArray80(SubOrder subOrder, Desk desk) throws Exception{
+        StoreVO store = storeService.getStore().getData();
+        Integer storeId = store.getStoreId();
+        ConfigurationBO cfg = configService.loadConfiguration();
+        JSONArray jsonArray = new JSONArray();
+
+        Order order = orderService.getOrder(subOrder.getOrderId());
+
+        List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(order.getOrderId());
+        List<OrderDishes> orderDishesNoReteurn = orderDishesList.stream().filter(OrderDishes.isReturnDishes().negate()).collect(Collectors.toList());
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("Name", "桌台");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "桌台:");
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 4);
+        jsonObject.put("BehindEnterNum", 0);
+        jsonArray.add(jsonObject);
+//        System.out.println("api.print.task.PrintTaskOrderSample.getOrderJsonArray()" + jsonArray.toString());
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "桌台值");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        // jsonObject.put("SampleContent", desk.getBelongDeskType().getTypeName() + "-" + desk.getDeskName());
+        jsonObject.put("SampleContent", desk.getDeskName());
+        jsonObject.put("Size", 2);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        jsonArray.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "分割线1");
+        jsonObject.put("ComType", EnumComType.LINE.type);
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        jsonArray.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "单号");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "单号:");
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        jsonArray.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "单号值");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        // jsonObject.put("SampleContent", subOrder.getSerialNumber());
+        jsonObject.put("SampleContent", subOrder.getCreatetime() + subOrder.getSubOrderId());
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 1);
+        jsonArray.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "点菜员");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "点菜员:");
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        jsonArray.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "点菜员值");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        // jsonObject.put("SampleContent", subOrder.getSubOrderAccount().getAccountNickName());
+        jsonObject.put("SampleContent", CurrentAccount.currentAccountCode());
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 1);
+        jsonArray.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "下单时间");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "下单时间:");
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        jsonArray.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "下单时间值");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", DateBuilder.base(subOrder.getCreatetime()).timeStr());
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 1);
+        jsonArray.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "订单总金额");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "订单总金额:");
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        jsonArray.add(jsonObject);
+
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "订单总金额值");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        // jsonObject.put("SampleContent", orderManager.getOrderDishesTotalPriceExcludeReturn(order.getOrderId()) + "");
+        jsonObject.put("SampleContent", orderService.sumBillAmount(orderDishesNoReteurn));
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 1);
+        jsonArray.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "商品名称");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "商品名称");
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 0);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        jsonArray.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "数量");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "数量");
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 24);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        jsonArray.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "单价");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "单价");
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 6);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        jsonArray.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "分割线2");
+        jsonObject.put("ComType", EnumComType.LINE.type);
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        jsonArray.add(jsonObject);
+
+        //表添加模块
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "点菜菜单表");
+        jsonObject.put("ComType", EnumComType.TABLE.type);
+
+        JSONArray columnNames = new JSONArray();
+        columnNames.add("");
+        columnNames.add("");
+        columnNames.add("");
+        jsonObject.put("columnNames", columnNames);
+
+        JSONArray columnWidths = new JSONArray();
+        columnWidths.add(67);
+        columnWidths.add(13);
+        columnWidths.add(20);
+        jsonObject.put("columnWidths", columnWidths);
+
+        JSONArray rows = new JSONArray();
+
+        //获取合并菜
+        // List<OrderDishes> subOrderContainDishes = orderManager.getSubOrderDishesesMerge(subOrder.getSubOrderId());
+        List<OrderDishes> subOrderContainDishes = new ArrayList<>();//orderManager.getSubOrderDishesesMerge(subOrder.getSubOrderId());
+//        List<OrderDishes> subOrderContainDishes = subOrder.getSubOrderContainDishes();
+        for(OrderDishes orderDishes : subOrderContainDishes ){
+            // DishesPrice dishesPrice = dishesManager.getDishesPriceOne(orderDishes.getDishesPriceId());
+            DishesPrice dishesPrice = dishesPriceDAO.queryByPriceId(orderDishes.getDishesPriceId());
+            String dishesPriceString = "";
+            if (dishesPrice != null)
+            {
+                dishesPriceString = "(" + dishesPrice.getDishesPriceName() + ")";
+            }
+            // if (orderDishes.getIfDishesPackage() == OrderDishes.ORDER_TYPE_NO_DISHESPACKAGE)
+            if (orderDishes.getIfDishesPackage() == EnumIsPackage.NO.code)
+            {
+                Dishes dishes = dishesService.getById(orderDishes.getDishesId());
+                if(dishes.getIfNeedPrint() == 1){
+                    JSONArray oneRow = new JSONArray();
+                    String orderDishesDetailedName = "";
+                    if (orderDishes.getOrderDishesSaletype() == EnumOrderSaleType.SEND.type)
+                    {
+                        orderDishesDetailedName += "(赠)";
+                    }
+                    else if (orderDishes.getOrderDishesSaletype() == EnumOrderSaleType.TASTED.type)
+                    {
+                        orderDishesDetailedName += "(试吃)";
+                    }
+                    orderDishesDetailedName += dishes.getDishesName() + orderDishes.getOrderDishesOptions() + dishesPriceString;
+                    oneRow.add(orderDishesDetailedName);
+                    oneRow.add(orderDishes.getOrderDishesNums() + "");
+                    oneRow.add(formatMoney((double)orderDishes.getOrderDishesPrice()) + "");
+                    rows.add(oneRow);
+                }
+            }
+            else if(orderDishes.getIfDishesPackage() == 2)
+            {
+                // DishesPackageNew orderDishesPackage = dishesPackageManagerNew.getOneDishesPackages(orderDishes.getDishesId());
+                DishesPackage dishesPackage = dishesPackageService.getByDishesPackageId(orderDishes.getDishesId());
+                JSONArray oneRow = new JSONArray();
+                oneRow.add("(套)" + dishesPackage.getDishesPackageName());
+                oneRow.add(orderDishes.getOrderDishesNums() + "");
+                oneRow.add(formatMoney((double)orderDishes.getOrderDishesPrice()) + "");
+                rows.add(oneRow);
+                List<OrderPackageDishes> orderPackageDisheses = new ArrayList<>();//orderpa.getByDishesPackageId(orderDishes.getOrderDishesId());
+                for (OrderPackageDishes orderPackageDishes : orderPackageDisheses)
+                {
+                    Dishes dishes = dishesService.getById(orderPackageDishes.getDishesid());
+                    String dishesPriceSonString = "";
+                    if (orderPackageDishes.getDishespriceid()>0)
+                    {
+                        DishesPrice dishesPriceSon = dishesPriceDAO.queryByPriceId(orderPackageDishes.getDishespriceid());
+
+                        if (dishesPriceSon != null)
+                        {
+                            dishesPriceSonString = "(" + dishesPriceSon.getDishesPriceName() + ")";
+                        }
+                    }
+                    JSONArray oneRow1 = new JSONArray();
+                    oneRow1.add(dishes.getDishesName() + orderPackageDishes.getOrderDishesOptionsString() + dishesPriceSonString);
+                    oneRow1.add("");
+                    oneRow1.add("");
+                    rows.add(oneRow1);
+                }
+            }
+            else
+            {
+                DishesPackage orderDishesPackage = dishesPackageService.getByDishesPackageId(orderDishes.getDishesId());
+                JSONArray oneRow = new JSONArray();
+                oneRow.add("(套)" + orderDishesPackage.getDishesPackageName());
+                oneRow.add(orderDishes.getOrderDishesNums() + "");
+                oneRow.add(formatMoney((double)orderDishes.getOrderDishesPrice()) + "");
+                rows.add(oneRow);
+                List<Dishes> disheses = dishesPackageService.queryPackageDishes(orderDishesPackage.getDishesPackageId());
+                for (Dishes dishes : disheses)
+                {
+                    JSONArray oneRow1 = new JSONArray();
+                    oneRow1.add(dishes.getDishesName());
+                    oneRow1.add("");
+                    oneRow1.add("");
+                    rows.add(oneRow1);
+                }
+            }
+
+        }
+        jsonObject.put("rows", rows);
+
+        JSONArray columnAligns = new JSONArray();
+        columnAligns.add(EnumAlign.LEFT.type);
+        columnAligns.add(EnumAlign.CENTER.type);
+        columnAligns.add(EnumAlign.RIGHT.type);
+        jsonObject.put("columnAligns", columnAligns);
+
+        jsonObject.put("Size", 2);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        jsonArray.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "分割线3");
+        jsonObject.put("ComType", EnumComType.LINE.type);
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        jsonArray.add(jsonObject);
+
+        DeskKey deskKey = deskKeyDAO.getByDeskId(desk.getDeskId());
+        String deskKeyString = deskKey != null ? deskKey.getDeskKey() : "";
+        String deskCode = LocalDeskCode.getDeskCode(desk.getDeskName());
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "双二维码");
+        jsonObject.put("ComType", EnumComType.QRCODE2.type);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        jsonObject.put("Width", 560);
+        jsonObject.put("Height", 260);
+        jsonObject.put("QrWidth", 250);
+        jsonObject.put("LeftPadding1", 30);
+        jsonObject.put("LeftPadding2", 30);
+        jsonObject.put("Text1", cfg.getTickedUrl()+"?d="+deskCode+"&s="+storeId+"&k="+deskKeyString);
+        jsonObject.put("Text2", cfg.getPublicAddress());
+        jsonArray.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "微信扫一扫");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "微信扫一扫,加菜,结账");
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 3);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 0);
+        jsonArray.add(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Name", "关注微信公众号");
+        jsonObject.put("ComType", EnumComType.TEXT.type);
+        jsonObject.put("SampleContent", "关注微信公众号");
+        jsonObject.put("Size", 1);
+        jsonObject.put("FrontLen", 6);
+        jsonObject.put("BehindLen", 0);
+        jsonObject.put("FrontEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 1);
+        jsonArray.add(jsonObject);
+        return jsonArray;
+    }
+
     public JSONArray getOrderJsonArray80(SubOrder subOrder,
                                           OrderDishes orderDishes,
                                           Dishes dishes, int i,
@@ -528,7 +870,7 @@ public class OrderPrinterHelper {
 //        jsonObject.put("Size", 50);
 //        jsonObject.put("FrontEnterNum", 0);
 //        jsonObject.put("BehindEnterNum", 1);
-//        jsonArray.put(jsonObject);
+//        jsonArray.add(jsonObject);
         return jsonArray;
     }
 
@@ -1924,7 +2266,7 @@ public class OrderPrinterHelper {
 //        jsonObject.put("Size", 50);
 //        jsonObject.put("FrontEnterNum", 0);
 //        jsonObject.put("BehindEnterNum", 1);
-//        jsonArray.put(jsonObject);
+//        jsonArray.add(jsonObject);
         return jsonArray;
     }
 
