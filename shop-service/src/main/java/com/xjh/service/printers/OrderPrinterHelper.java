@@ -3,6 +3,7 @@ package com.xjh.service.printers;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.enumeration.*;
+import com.xjh.common.model.ConfigurationBO;
 import com.xjh.common.model.DeskOrderParam;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
@@ -40,6 +41,8 @@ public class OrderPrinterHelper {
     DeskKeyDAO deskKeyDAO;
     @Inject
     RemoteService remoteService;
+    @Inject
+    ConfigService configService;
     @Inject
     OrderDishesService orderDishesService;
     @Inject
@@ -81,8 +84,7 @@ public class OrderPrinterHelper {
         array.addAll(dishesItems("特价菜及酒水", discountableList, sumPrice));
         // 支付信息
         List<OrderPay> orderPays = orderPayService.selectByOrderId(param.getOrderId());
-        OrderOverviewVO billView = orderService.buildOrderOverview(
-                order, orderDishesList, orderPays).getData();
+        OrderOverviewVO billView = orderService.buildOrderOverview(order, orderDishesList, orderPays).getData();
         array.addAll(paymentInfos(orderPays, sumPrice.doubleValue(), billView));
         // 二维码
         array.addAll(qrCode());
@@ -142,13 +144,7 @@ public class OrderPrinterHelper {
     }
 
     private TextModel simpleLineText(String text) {
-        return TextModel.builder()
-                .name("一行简单文本")
-                .comType(EnumComType.TEXT.type)
-                .sampleContent(text)
-                .size(1)
-                .behindEnterNum(1)
-                .build();
+        return TextModel.builder().name("一行简单文本").comType(EnumComType.TEXT.type).sampleContent(text).size(1).behindEnterNum(1).build();
     }
 
     private JSONObject crlf() {
@@ -202,9 +198,7 @@ public class OrderPrinterHelper {
         // 间隔
         details.put("columnWidths", asArray(50, 15, 15, 20));
         // 对齐方式
-        JSONArray columnAligns = asArray(
-                EnumAlign.LEFT.type, EnumAlign.RIGHT.type,
-                EnumAlign.RIGHT.type, EnumAlign.RIGHT.type);
+        JSONArray columnAligns = asArray(EnumAlign.LEFT.type, EnumAlign.RIGHT.type, EnumAlign.RIGHT.type, EnumAlign.RIGHT.type);
         details.put("columnAligns", columnAligns);
         // 内容
         List<Integer> dishesIds = CommonUtils.collect(orderDishesList, OrderDishes::getDishesId);
@@ -214,11 +208,7 @@ public class OrderPrinterHelper {
         for (OrderDishes orderDishes : orderDishesList) {
             Dishes dishes = dishesMap.get(orderDishes.getDishesId());
             sumPrices += orderDishes.sumOrderDishesPrice();
-            rows.add(asArray(
-                    dishes.getDishesName(),
-                    formatMoney(orderDishes.sumOrderDishesPrice()),
-                    orderDishes.getOrderDishesNums(),
-                    orderDishes.sumOrderDishesPrice()));
+            rows.add(asArray(dishes.getDishesName(), formatMoney(orderDishes.sumOrderDishesPrice()), orderDishes.getOrderDishesNums(), orderDishes.sumOrderDishesPrice()));
         }
         details.put("rows", rows);
 
@@ -241,10 +231,7 @@ public class OrderPrinterHelper {
         return list;
     }
 
-    private List<JSONObject> paymentInfos(
-            List<OrderPay> orderPays,
-            double sumPrice,
-            OrderOverviewVO bill) {
+    private List<JSONObject> paymentInfos(List<OrderPay> orderPays, double sumPrice, OrderOverviewVO bill) {
         if (bill == null) {
             bill = new OrderOverviewVO();
         }
@@ -380,7 +367,7 @@ public class OrderPrinterHelper {
     }
 
 
-    public List<Object> buildKitchenPrintData(Order order, SubOrder subOrder, OrderDishes orderDishes, Dishes dishes){
+    public List<Object> buildKitchenPrintData(Order order, SubOrder subOrder, OrderDishes orderDishes, Dishes dishes) {
         List<Object> data = new ArrayList<>();
 
         Desk desk = deskService.getById(order.getDeskId());
@@ -389,8 +376,7 @@ public class OrderPrinterHelper {
         return data;
     }
 
-    private JSONArray getOrderJsonArray80(SubOrder subOrder, Dishes dishes, int i, Desk desk, boolean addDishesFlag, String realDishesName, Desk oldDesk, boolean ifChangeDesk)
-    {
+    private JSONArray getOrderJsonArray80(SubOrder subOrder, Dishes dishes, int i, Desk desk, boolean addDishesFlag, String realDishesName, Desk oldDesk, boolean ifChangeDesk) {
         JSONArray jsonArray = new JSONArray();
 
         JSONObject jsonObject = new JSONObject();
@@ -408,12 +394,9 @@ public class OrderPrinterHelper {
         jsonObject = new JSONObject();
         jsonObject.put("Name", "桌台值");
         jsonObject.put("ComType", EnumComType.TEXT.type);
-        if (ifChangeDesk)
-        {
+        if (ifChangeDesk) {
             jsonObject.put("SampleContent", oldDesk.getDeskName() + "-转到-" + desk.getDeskName());
-        }
-        else
-        {
+        } else {
             // jsonObject.put("SampleContent", desk.getBelongDeskType().getTypeName() + "-" + desk.getDeskName());
             jsonObject.put("SampleContent", desk.getDeskName());
         }
@@ -439,12 +422,10 @@ public class OrderPrinterHelper {
         jsonObject.put("Name", "商品名称值");
         jsonObject.put("ComType", EnumComType.TEXT.type);
         String orderDishesDetailedName = "";
-        if (addDishesFlag)
-        {
+        if (addDishesFlag) {
             orderDishesDetailedName += "(加)";
         }
-        if (ifChangeDesk)
-        {
+        if (ifChangeDesk) {
             orderDishesDetailedName += "(复)";
         }
         orderDishesDetailedName += "(套)";
@@ -514,25 +495,15 @@ public class OrderPrinterHelper {
         return jsonArray;
     }
 
-    private OrderDishes getOrderDishExist(List<OrderDishes> orderDishesesMerge, OrderDishes orderDish)
-    {
+    private OrderDishes getOrderDishExist(List<OrderDishes> orderDishesesMerge, OrderDishes orderDish) {
         loop1:
-        for (int i = 0; i < orderDishesesMerge.size(); i++)
-        {
+        for (int i = 0; i < orderDishesesMerge.size(); i++) {
             OrderDishes aod = orderDishesesMerge.get(i);
-            if (aod.getOrderDishesSaletype() == orderDish.getOrderDishesSaletype()
-                    && aod.getIfDishesPackage() == orderDish.getIfDishesPackage()
-                    && aod.getDishesId() == orderDish.getDishesId()
-                    && Math.abs(aod.getOrderDishesPrice() - orderDish.getOrderDishesPrice()) < 0.001
-                    && Math.abs(aod.getOrderDishesDiscountPrice() - orderDish.getOrderDishesDiscountPrice()) < 0.001)
-            {
+            if (aod.getOrderDishesSaletype() == orderDish.getOrderDishesSaletype() && aod.getIfDishesPackage() == orderDish.getIfDishesPackage() && aod.getDishesId() == orderDish.getDishesId() && Math.abs(aod.getOrderDishesPrice() - orderDish.getOrderDishesPrice()) < 0.001 && Math.abs(aod.getOrderDishesDiscountPrice() - orderDish.getOrderDishesDiscountPrice()) < 0.001) {
 
-                if (orderDish.getIfDishesPackage() == EnumIsPackage.YES.code || orderDish.getIfDishesPackage() == EnumIsPackage.YES_NEW.code)
-                {
+                if (orderDish.getIfDishesPackage() == EnumIsPackage.YES.code || orderDish.getIfDishesPackage() == EnumIsPackage.YES_NEW.code) {
                     return aod;
-                }
-                else
-                {
+                } else {
 //                    JSONObject dishesAttributeA = dishAttributeConvert(aod.getDishesAttributes());
 //                    JSONObject dishesAttributeB = dishAttributeConvert(orderDish.getDishesAttributes());
 //                    Set<String> keySetA = dishesAttributeA.keySet();
@@ -556,27 +527,23 @@ public class OrderPrinterHelper {
         return null;
     }
 
-    private List<OrderDishes> sortOrderDish(List<OrderDishes> orderDishesesOrign)
-    {
+    private List<OrderDishes> sortOrderDish(List<OrderDishes> orderDishesesOrign) {
         List<OrderDishes> orderDishesMerge = new ArrayList<>();
-        for (int i = 0; i < orderDishesesOrign.size(); i++)
-        {
+        for (int i = 0; i < orderDishesesOrign.size(); i++) {
             OrderDishes aod = orderDishesesOrign.get(i);
             OrderDishes orderDishExist = getOrderDishExist(orderDishesMerge, aod);
-            if (orderDishExist != null)
-            {
+            if (orderDishExist != null) {
 //                OrderDishesDefault orderDishExist2 = (OrderDishesDefault) orderDishExist;
 //                orderDishExist2.setOrderDishesNums(orderDishExist.getOrderDishesNums() + aod.getOrderDishesNums());
-            }
-            else
-            {
+            } else {
                 orderDishesMerge.add(aod);
             }
         }
         return orderDishesMerge;
     }
 
-    public JSONArray buildCheckOutPrintData(Order order)  {
+    public JSONArray buildCheckOutPrintData(Order order) {
+        ConfigurationBO cfg = configService.loadConfiguration();
         JSONArray jsonArray = new JSONArray();
         JSONObject jsonObject = new JSONObject();
 
@@ -594,7 +561,7 @@ public class OrderPrinterHelper {
         jsonObject = new JSONObject();
         jsonObject.put("Name", "单号值");
         jsonObject.put("ComType", EnumComType.TEXT.type);
-        jsonObject.put("SampleContent", order.getCreateTime()+order.getOrderId());
+        jsonObject.put("SampleContent", order.getCreateTime() + order.getOrderId());
         jsonObject.put("Size", 1);
         jsonObject.put("FrontLen", 0);
         jsonObject.put("BehindLen", 0);
@@ -809,37 +776,27 @@ public class OrderPrinterHelper {
         double discountDishesSum = 0;  //打折菜总计
         double noDiscountDishesSum = 0;
         Set<Integer> discountableDishes = storeService.getStoreDiscountableDishesIds();
-        for (OrderDishes orderDishes : orderDishesesMergesExcludeReturn)
-        {
+        for (OrderDishes orderDishes : orderDishesesMergesExcludeReturn) {
 //            DishesPrice dishesPrice = dishesManager.getDishesPriceOne(orderDishes.getDishesPriceId());
             DishesPrice dishesPrice = dishesPriceDAO.queryByPriceId(orderDishes.getDishesPriceId());
             Dishes dishes = dishesService.getById(orderDishes.getDishesId());
             String dishesPriceString = "";
-            if (dishesPrice != null)
-            {
+            if (dishesPrice != null) {
                 dishesPriceString = "(" + dishesPrice.getDishesPriceName() + ")";
             }
-            if (orderDishes.getIfDishesPackage() == EnumIsPackage.NO.code)
-            {
-                if (discountableDishes.contains(orderDishes.getDishesId()) == false)
-                {
+            if (orderDishes.getIfDishesPackage() == EnumIsPackage.NO.code) {
+                if (discountableDishes.contains(orderDishes.getDishesId()) == false) {
                     hasNoDiscountDishesFalg = true;
-                }
-                else
-                {
+                } else {
                     JSONArray oneRow = new JSONArray();
                     String orderDishesDetailedName = "";
-                    if (orderDishes.getOrderDishesSaletype() == EnumOrderSaleType.SEND.type)
-                    {
+                    if (orderDishes.getOrderDishesSaletype() == EnumOrderSaleType.SEND.type) {
                         orderDishesDetailedName += "(赠)";
-                    }
-                    else if (orderDishes.getOrderDishesSaletype() == EnumOrderSaleType.TASTED.type)
-                    {
+                    } else if (orderDishes.getOrderDishesSaletype() == EnumOrderSaleType.TASTED.type) {
                         orderDishesDetailedName += "(试吃)";
                     }
                     orderDishesDetailedName += dishes.getDishesName() + orderDishes.getOrderDishesOptions() + dishesPriceString;
-                    if (orderDishesDetailedName.length() > 12)
-                    {
+                    if (orderDishesDetailedName.length() > 12) {
                         orderDishesDetailedName = orderDishesDetailedName.substring(0, 12);
                     }
                     oneRow.add(orderDishesDetailedName);
@@ -850,9 +807,7 @@ public class OrderPrinterHelper {
                     discountDishesSum += mul(orderDishes.getOrderDishesPrice(), orderDishes.getOrderDishesNums()).doubleValue();
                 }
 
-            }
-            else
-            {
+            } else {
                 hasNoDiscountDishesFalg = true;
             }
 
@@ -892,8 +847,7 @@ public class OrderPrinterHelper {
         jsonArray.add(jsonObject);
 
         //如果有不打折的菜或者套餐的话，就要有常规菜的表
-        if (hasNoDiscountDishesFalg)
-        {
+        if (hasNoDiscountDishesFalg) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "特价菜以及酒水");
             jsonObject.put("ComType", EnumComType.TEXT.type);
@@ -983,33 +937,25 @@ public class OrderPrinterHelper {
             List<OrderDishes> orderDishesList2 = orderDishesService.selectByOrderId(order.getOrderId());
             List<OrderDishes> orderDishesesMergesExcludeReturn2 = orderDishesList.stream().filter(OrderDishes.isReturnDishes().negate()).collect(Collectors.toList());
             orderDishesesMergesExcludeReturn2 = sortOrderDish(orderDishesesMergesExcludeReturn);//对所有相同的菜进行合并，不管他们有没有设置合并
-            for (OrderDishes orderDishes : orderDishesesMergesExcludeReturn2)
-            {
+            for (OrderDishes orderDishes : orderDishesesMergesExcludeReturn2) {
                 // DishesPrice dishesPrice = dishesManager.getDishesPriceOne(orderDishes.getDishesPriceId());
                 DishesPrice dishesPrice = dishesPriceDAO.queryByPriceId(orderDishes.getDishesPriceId());
                 Dishes dishes = dishesService.getById(orderDishes.getDishesId());
                 String dishesPriceString = "";
-                if (dishesPrice != null)
-                {
+                if (dishesPrice != null) {
                     dishesPriceString = "(" + dishesPrice.getDishesPriceName() + ")";
                 }
-                if (orderDishes.getIfDishesPackage() == EnumIsPackage.NO.code)
-                {
-                    if (discountableDishes.contains(orderDishes.getDishesId()) == false)
-                    {
+                if (orderDishes.getIfDishesPackage() == EnumIsPackage.NO.code) {
+                    if (discountableDishes.contains(orderDishes.getDishesId()) == false) {
                         JSONArray oneRow = new JSONArray();
                         String orderDishesDetailedName = "";
-                        if (orderDishes.getOrderDishesSaletype() == EnumOrderSaleType.SEND.type)
-                        {
+                        if (orderDishes.getOrderDishesSaletype() == EnumOrderSaleType.SEND.type) {
                             orderDishesDetailedName += "(赠)";
-                        }
-                        else if (orderDishes.getOrderDishesSaletype() == EnumOrderSaleType.TASTED.type)
-                        {
+                        } else if (orderDishes.getOrderDishesSaletype() == EnumOrderSaleType.TASTED.type) {
                             orderDishesDetailedName += "(试吃)";
                         }
                         orderDishesDetailedName += dishes.getDishesName() + orderDishes.getOrderDishesOptions() + dishesPriceString;
-                        if (orderDishesDetailedName.length() > 12)
-                        {
+                        if (orderDishesDetailedName.length() > 12) {
                             orderDishesDetailedName = orderDishesDetailedName.substring(0, 12);
                         }
                         oneRow.add(orderDishesDetailedName);
@@ -1020,16 +966,13 @@ public class OrderPrinterHelper {
                         rows2.add(oneRow);
                         noDiscountDishesSum += mul(orderDishes.getOrderDishesPrice(), orderDishes.getOrderDishesNums()).doubleValue();
                     }
-                }
-                else if (orderDishes.getIfDishesPackage() == EnumIsPackage.YES_NEW.code)
-                {
+                } else if (orderDishes.getIfDishesPackage() == EnumIsPackage.YES_NEW.code) {
 //                    DishesPackageNew dishesPackage = dishesPackageManagerNew.getOneDishesPackages(orderDishes.getDishesId());
                     DishesPackage dishesPackage = dishesPackageService.getByDishesPackageId(orderDishes.getDishesId());
                     JSONArray oneRow = new JSONArray();
                     String orderDishesDetailedName = "(套)";
                     orderDishesDetailedName += dishesPackage.getDishesPackageName();
-                    if (orderDishesDetailedName.length() > 12)
-                    {
+                    if (orderDishesDetailedName.length() > 12) {
                         orderDishesDetailedName = orderDishesDetailedName.substring(0, 12);
                     }
                     oneRow.add(orderDishesDetailedName);
@@ -1040,16 +983,13 @@ public class OrderPrinterHelper {
 
 //                    List<OrderPackageDishes> orderPackageDisheses = orderManager.getOrderPackageDisheses(orderDishes.getOrderDishesId());
                     List<OrderPackageDishes> orderPackageDisheses = new ArrayList<>();
-                    for (OrderPackageDishes orderPackageDishes : orderPackageDisheses)
-                    {
+                    for (OrderPackageDishes orderPackageDishes : orderPackageDisheses) {
                         Dishes dishes2 = dishesService.getById(orderPackageDishes.getDishesid());
                         String dishesPriceSonString = "";
-                        if (orderPackageDishes.getDishespriceid() > 0)
-                        {
+                        if (orderPackageDishes.getDishespriceid() > 0) {
                             DishesPrice dishesPriceSon = dishesPriceDAO.queryByPriceId(orderPackageDishes.getDishespriceid());
 
-                            if (dishesPriceSon != null)
-                            {
+                            if (dishesPriceSon != null) {
                                 dishesPriceSonString = "(" + dishesPriceSon.getDishesPriceName() + ")";
                             }
                         }
@@ -1061,16 +1001,13 @@ public class OrderPrinterHelper {
                         rows2.add(oneRow1);
                     }
                     noDiscountDishesSum += mul(orderDishes.getOrderDishesPrice(), orderDishes.getOrderDishesNums()).doubleValue();
-                }
-                else
-                {
+                } else {
                     // DishesPackage dishesPackage = orderDishes.getOrderDishesPackage();
                     DishesPackage dishesPackage = dishesPackageService.getByDishesPackageId(orderDishes.getDishesId());
                     JSONArray oneRow = new JSONArray();
                     String orderDishesDetailedName = "(套)";
                     orderDishesDetailedName += dishesPackage.getDishesPackageName();
-                    if (orderDishesDetailedName.length() > 12)
-                    {
+                    if (orderDishesDetailedName.length() > 12) {
                         orderDishesDetailedName = orderDishesDetailedName.substring(0, 12);
                     }
                     oneRow.add(orderDishesDetailedName);
@@ -1081,8 +1018,7 @@ public class OrderPrinterHelper {
 
                     // List<Dishes> disheses = dishesPackage.getDisheses();
                     List<Dishes> disheses = dishesPackageService.queryPackageDishes(dishesPackage.getDishesPackageId());
-                    for (Dishes dishes3 : disheses)
-                    {
+                    for (Dishes dishes3 : disheses) {
                         JSONArray oneRow1 = new JSONArray();
                         oneRow1.add(dishes3.getDishesName());
                         oneRow1.add("");
@@ -1214,108 +1150,72 @@ public class OrderPrinterHelper {
         //新添加的东西---------begin
         List<OrderPay> orderPays = orderPayService.selectByOrderId(order.getOrderId());
         List<OrderPay> orderPaysPreCard = new ArrayList<>();//专门用来存储用储值卡支付过的记录
-        for (int j = 0; j < orderPays.size(); j++)
-        {
+        for (int j = 0; j < orderPays.size(); j++) {
             OrderPay orderPay = orderPays.get(j);
             int paymentMethod = orderPay.getPaymentMethod();
-            if (orderPay.getPaymentStatus() == EnumPayStatus.PAID.code)
-            {
-                if (paymentMethod == EnumPayMethod.CASH.code)
-                {
+            if (orderPay.getPaymentStatus() == EnumPayStatus.PAID.code) {
+                if (paymentMethod == EnumPayMethod.CASH.code) {
                     methodCashTotal = methodCashTotal + orderPay.getAmount();
-                }
-                else if (paymentMethod == EnumPayMethod.BANKCARD.code)
-                {
+                } else if (paymentMethod == EnumPayMethod.BANKCARD.code) {
                     methodBankcardTotal = methodBankcardTotal + orderPay.getAmount();
-                }
-                else if (paymentMethod == EnumPayMethod.VOUCHER.code)
-                {
+                } else if (paymentMethod == EnumPayMethod.VOUCHER.code) {
                     methodCouponTotal = methodCouponTotal + orderPay.getAmount();
-                }
-                else if (paymentMethod == EnumPayMethod.STORECARD.code)
-                {
+                } else if (paymentMethod == EnumPayMethod.STORECARD.code) {
                     methodStoreCardTotal = methodStoreCardTotal + orderPay.getAmount();
                     orderPaysPreCard.add(orderPay);
-                }
-                else if (paymentMethod == EnumPayMethod.WECHAT.code)
-                {
+                } else if (paymentMethod == EnumPayMethod.WECHAT.code) {
                     methodWechatTotal = methodWechatTotal + orderPay.getAmount();
-                }
-                else if (paymentMethod == EnumPayMethod.ALIPAY.code)
-                {
+                } else if (paymentMethod == EnumPayMethod.ALIPAY.code) {
                     methodAlipayTotal = methodAlipayTotal + orderPay.getAmount();
-                }
-                else if (paymentMethod == EnumPayMethod.MEITUAN_COUPON.code)
-                {
+                } else if (paymentMethod == EnumPayMethod.MEITUAN_COUPON.code) {
                     methodMeituanTotal = methodMeituanTotal + orderPay.getAmount();
                     numMeituan = numMeituan + orderPay.getVoucherNums();
-                }
-                else if (paymentMethod == EnumPayMethod.KOUBEI.code)
-                {
+                } else if (paymentMethod == EnumPayMethod.KOUBEI.code) {
                     methodKouBeiTotal = methodKouBeiTotal + orderPay.getAmount();
                     numKoubei = numKoubei + orderPay.getVoucherNums();
-                }
-                else if (paymentMethod == EnumPayMethod.WECHAT_OFFICIAL.code)
-                {
+                } else if (paymentMethod == EnumPayMethod.WECHAT_OFFICIAL.code) {
                     methodPublicSignalTotal = methodPublicSignalTotal + orderPay.getAmount();
-                }
-                else if (paymentMethod == EnumPayMethod.WECHAT_COUPON.code)
-                {
+                } else if (paymentMethod == EnumPayMethod.WECHAT_COUPON.code) {
                     methodWechatCouponTotal = methodWechatCouponTotal + orderPay.getAmount();
-                }
-                else if (paymentMethod == EnumPayMethod.STORE_REDUCTION.code)
-                {
+                } else if (paymentMethod == EnumPayMethod.STORE_REDUCTION.code) {
                     methodStoreReduceTotal = methodStoreReduceTotal + orderPay.getAmount();
-                }
-                else if (paymentMethod == EnumPayMethod.MEITUAN_PACKAGE.code)
-                {
+                } else if (paymentMethod == EnumPayMethod.MEITUAN_PACKAGE.code) {
                     methodPackageTotal = methodPackageTotal + orderPay.getAmount();
-                }
-                else if (paymentMethod == EnumPayMethod.OHTER.code)
-                {
+                } else if (paymentMethod == EnumPayMethod.OHTER.code) {
                     methodOtherTotal = methodOtherTotal + orderPay.getAmount();
-                }
-                else if (paymentMethod == TINY_LIFE_COUPON.code)//微生活代金券
+                } else if (paymentMethod == TINY_LIFE_COUPON.code)//微生活代金券
                 {
-                    methodTinyLifeCouponTotal = methodTinyLifeCouponTotal + orderPay.getAmount();;
-                }
-                else if (paymentMethod == TINY_LIFE_INTEGRAL_DEDUCTION.code)//微生活积分抵扣
+                    methodTinyLifeCouponTotal = methodTinyLifeCouponTotal + orderPay.getAmount();
+                    ;
+                } else if (paymentMethod == TINY_LIFE_INTEGRAL_DEDUCTION.code)//微生活积分抵扣
                 {
                     methodTinyLifeIntegralDeductionTotal = methodTinyLifeIntegralDeductionTotal + orderPay.getAmount();
-                }
-                else if (paymentMethod == TINY_LIFE_STORECARD.code)//微生活储值卡
+                } else if (paymentMethod == TINY_LIFE_STORECARD.code)//微生活储值卡
                 {
                     methodTinyLifeStorecardTotal = methodTinyLifeStorecardTotal + orderPay.getAmount();
-                }
-                else if (paymentMethod == WECHAT_UNIONPAY_PAYMEN.code)//微信银联支付
+                } else if (paymentMethod == WECHAT_UNIONPAY_PAYMEN.code)//微信银联支付
                 {
                     methodWeChatUnionpayPayMentTotal = methodWeChatUnionpayPayMentTotal + orderPay.getAmount();
-                }
-                else if (paymentMethod == 外卖.code)//外卖
+                } else if (paymentMethod == 外卖.code)//外卖
                 {
                     methodTakeOutTotal = methodTakeOutTotal + orderPay.getAmount();
                     numTakeOut = numTakeOut + orderPay.getVoucherNums();
-                }
-                else if (paymentMethod == UNIONPAY_POS.code)//银联pos
+                } else if (paymentMethod == UNIONPAY_POS.code)//银联pos
                 {
                     methodUnionpayPosTotal = methodUnionpayPosTotal + orderPay.getAmount();
-                }
-                else if (paymentMethod == TRAFFIC_ACTIVITIES.code)//交行活动
+                } else if (paymentMethod == TRAFFIC_ACTIVITIES.code)//交行活动
                 {
                     methodTrafficActivitiesTotal = methodTrafficActivitiesTotal + orderPay.getAmount();
                     numTrafficActivities = numTrafficActivities + orderPay.getVoucherNums();
-                }
-                else if (paymentMethod == MERCHANTS_ACTIVITIES.code)//招行活动
+                } else if (paymentMethod == MERCHANTS_ACTIVITIES.code)//招行活动
                 {
                     methodMerchantsActivitiesTotal = methodMerchantsActivitiesTotal + orderPay.getAmount();
                     numMerchantsActivities = numMerchantsActivities + orderPay.getVoucherNums();
-                }
-                else if (paymentMethod == MARKET_ACTIVITIES.code)//商场活动
+                } else if (paymentMethod == MARKET_ACTIVITIES.code)//商场活动
                 {
                     methodMarketActivitiesTotal = methodMarketActivitiesTotal + orderPay.getAmount();
                     numMarketActivities = numMarketActivities + orderPay.getVoucherNums();
-                }
-                else if (paymentMethod == MEITUAN_SHANHUI.code)//美团闪惠
+                } else if (paymentMethod == MEITUAN_SHANHUI.code)//美团闪惠
                 {
                     methodMeituanShanhuiTotal = methodMeituanShanhuiTotal + orderPay.getAmount();
                     numMeituanShanhui = numMeituanShanhui + orderPay.getVoucherNums();
@@ -1323,8 +1223,7 @@ public class OrderPrinterHelper {
             }
         }
 
-        if (methodCashTotal > 0)
-        {
+        if (methodCashTotal > 0) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+现金");
             jsonObject.put("SampleContent", "+现金:");
@@ -1348,8 +1247,7 @@ public class OrderPrinterHelper {
             jsonArray.add(jsonObject);
         }
 
-        if (methodBankcardTotal > 0)
-        {
+        if (methodBankcardTotal > 0) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+银行卡");
             jsonObject.put("SampleContent", "+银行卡:");
@@ -1372,8 +1270,7 @@ public class OrderPrinterHelper {
             jsonObject.put("ComType", 1);
             jsonArray.add(jsonObject);
         }
-        if (methodWechatTotal > 0)
-        {
+        if (methodWechatTotal > 0) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+微信");
             jsonObject.put("SampleContent", "+微信:");
@@ -1396,8 +1293,7 @@ public class OrderPrinterHelper {
             jsonObject.put("ComType", 1);
             jsonArray.add(jsonObject);
         }
-        if (methodAlipayTotal > 0)
-        {
+        if (methodAlipayTotal > 0) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+支付宝");
             jsonObject.put("SampleContent", "+支付宝:");
@@ -1420,23 +1316,18 @@ public class OrderPrinterHelper {
             jsonObject.put("ComType", 1);
             jsonArray.add(jsonObject);
         }
-        if (methodStoreCardTotal > 0)
-        {
+        if (methodStoreCardTotal > 0) {
             String preCardValue = formatMoney(methodStoreCardTotal) + "";
-            try
-            {
+            try {
                 //如果有多张储值卡，多次支付的话，这里只显示1张储值卡的余额
                 OrderPay orderPay1 = orderPaysPreCard.get(0);
 //                CardManager cardManager = (CardManager) parameterPackage.getObject(CardManager.class.getName());
 //                PrePaidCard prePaidCard = cardManager.getOnePrePaidCard(orderPay1.getCardNumber());
                 PrePaidCard prePaidCard = remoteService.getOnePrePaidCard(store.getStoreId(), orderPay1.getCardNumber()).getData();
-                if (prePaidCard != null)
-                {
+                if (prePaidCard != null) {
                     preCardValue += "(余额:" + prePaidCard.getBalance() + ")";
                 }
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 // parameterPackage.getLogManager().submitException(e);
                 throw new RuntimeException(e);
             }
@@ -1463,8 +1354,7 @@ public class OrderPrinterHelper {
             jsonObject.put("ComType", 1);
             jsonArray.add(jsonObject);
         }
-        if (methodMeituanTotal > 0)
-        {
+        if (methodMeituanTotal > 0) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+美团券");
             jsonObject.put("SampleContent", "+美团券:");
@@ -1487,8 +1377,7 @@ public class OrderPrinterHelper {
             jsonObject.put("ComType", 1);
             jsonArray.add(jsonObject);
         }
-        if (methodCouponTotal > 0)
-        {
+        if (methodCouponTotal > 0) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+代金券");
             jsonObject.put("SampleContent", "+代金券:");
@@ -1511,8 +1400,7 @@ public class OrderPrinterHelper {
             jsonObject.put("ComType", 1);
             jsonArray.add(jsonObject);
         }
-        if (methodKouBeiTotal > 0)
-        {
+        if (methodKouBeiTotal > 0) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+口碑商家");
             jsonObject.put("SampleContent", "+口碑商家:");
@@ -1535,8 +1423,7 @@ public class OrderPrinterHelper {
             jsonObject.put("ComType", 1);
             jsonArray.add(jsonObject);
         }
-        if (methodTakeOutTotal > 0)
-        {
+        if (methodTakeOutTotal > 0) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+外卖");
             jsonObject.put("SampleContent", "+外卖:");
@@ -1559,8 +1446,7 @@ public class OrderPrinterHelper {
             jsonObject.put("ComType", 1);
             jsonArray.add(jsonObject);
         }
-        if (methodUnionpayPosTotal > 0)
-        {
+        if (methodUnionpayPosTotal > 0) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+银联pos机");
             jsonObject.put("SampleContent", "+银联pos机:");
@@ -1583,8 +1469,7 @@ public class OrderPrinterHelper {
             jsonObject.put("ComType", 1);
             jsonArray.add(jsonObject);
         }
-        if (methodTrafficActivitiesTotal > 0)
-        {
+        if (methodTrafficActivitiesTotal > 0) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+交行活动");
             jsonObject.put("SampleContent", "+交行活动:");
@@ -1607,8 +1492,7 @@ public class OrderPrinterHelper {
             jsonObject.put("ComType", 1);
             jsonArray.add(jsonObject);
         }
-        if (methodMerchantsActivitiesTotal > 0)
-        {
+        if (methodMerchantsActivitiesTotal > 0) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+招行活动");
             jsonObject.put("SampleContent", "+招行活动:");
@@ -1631,8 +1515,7 @@ public class OrderPrinterHelper {
             jsonObject.put("ComType", 1);
             jsonArray.add(jsonObject);
         }
-        if (methodMarketActivitiesTotal > 0)
-        {
+        if (methodMarketActivitiesTotal > 0) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+商场活动");
             jsonObject.put("SampleContent", "+商场活动:");
@@ -1655,8 +1538,7 @@ public class OrderPrinterHelper {
             jsonObject.put("ComType", 1);
             jsonArray.add(jsonObject);
         }
-        if (methodMeituanShanhuiTotal > 0)
-        {
+        if (methodMeituanShanhuiTotal > 0) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+美团闪惠");
             jsonObject.put("SampleContent", "+美团闪惠:");
@@ -1679,8 +1561,7 @@ public class OrderPrinterHelper {
             jsonObject.put("ComType", 1);
             jsonArray.add(jsonObject);
         }
-        if (methodPublicSignalTotal > 0)
-        {
+        if (methodPublicSignalTotal > 0) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+公众号");
             jsonObject.put("SampleContent", "+公众号:");
@@ -1703,8 +1584,7 @@ public class OrderPrinterHelper {
             jsonObject.put("ComType", 1);
             jsonArray.add(jsonObject);
         }
-        if (methodWechatCouponTotal > 0)
-        {
+        if (methodWechatCouponTotal > 0) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+公众号优惠");
             jsonObject.put("SampleContent", "+公众号优惠:");
@@ -1727,8 +1607,7 @@ public class OrderPrinterHelper {
             jsonObject.put("ComType", 1);
             jsonArray.add(jsonObject);
         }
-        if (methodStoreReduceTotal > 0)
-        {
+        if (methodStoreReduceTotal > 0) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+店铺满减");
             jsonObject.put("SampleContent", "+店铺满减:");
@@ -1751,8 +1630,7 @@ public class OrderPrinterHelper {
             jsonObject.put("ComType", 1);
             jsonArray.add(jsonObject);
         }
-        if (methodPackageTotal > 0)
-        {
+        if (methodPackageTotal > 0) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+套餐买单");
             jsonObject.put("SampleContent", "+套餐买单:");
@@ -1775,8 +1653,7 @@ public class OrderPrinterHelper {
             jsonObject.put("ComType", 1);
             jsonArray.add(jsonObject);
         }
-        if (methodOtherTotal > 0)
-        {
+        if (methodOtherTotal > 0) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+其它优惠");
             jsonObject.put("SampleContent", "+其它优惠:");
@@ -1799,8 +1676,7 @@ public class OrderPrinterHelper {
             jsonObject.put("ComType", 1);
             jsonArray.add(jsonObject);
         }
-        if (methodTinyLifeCouponTotal > 0)
-        {
+        if (methodTinyLifeCouponTotal > 0) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+微生活代金券");
             jsonObject.put("SampleContent", "+微生活代金券:");
@@ -1823,8 +1699,7 @@ public class OrderPrinterHelper {
             jsonObject.put("ComType", 1);
             jsonArray.add(jsonObject);
         }
-        if (methodTinyLifeIntegralDeductionTotal > 0)
-        {
+        if (methodTinyLifeIntegralDeductionTotal > 0) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+微生活积分折扣");
             jsonObject.put("SampleContent", "+微生活积分折扣:");
@@ -1847,8 +1722,7 @@ public class OrderPrinterHelper {
             jsonObject.put("ComType", 1);
             jsonArray.add(jsonObject);
         }
-        if (methodTinyLifeStorecardTotal > 0)
-        {
+        if (methodTinyLifeStorecardTotal > 0) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+微生活存储卡");
             jsonObject.put("SampleContent", "+微生活存储卡:");
@@ -1871,8 +1745,7 @@ public class OrderPrinterHelper {
             jsonObject.put("ComType", 1);
             jsonArray.add(jsonObject);
         }
-        if (methodWeChatUnionpayPayMentTotal > 0)
-        {
+        if (methodWeChatUnionpayPayMentTotal > 0) {
             jsonObject = new JSONObject();
             jsonObject.put("Name", "+微信银联支付");
             jsonObject.put("SampleContent", "+微信银联支付:");
@@ -1981,8 +1854,8 @@ public class OrderPrinterHelper {
         jsonObject.put("QrWidth", 250);
         jsonObject.put("LeftPadding1", 30);
         jsonObject.put("LeftPadding2", 30);
-        jsonObject.put("Text1", "http://www.xiaojuhao.org/pay/?d=" + deskCode + "&s=" + store.getStoreId() + "&k=" + deskKeyString);
-        jsonObject.put("Text2", "LocalServerConfig.publicAddress");
+        jsonObject.put("Text1", cfg.getTickedUrl() + "?d=" + deskCode + "&s=" + store.getStoreId() + "&k=" + deskKeyString);
+        jsonObject.put("Text2", cfg.getPublicAddress());
         jsonArray.add(jsonObject);
 
         jsonObject = new JSONObject();

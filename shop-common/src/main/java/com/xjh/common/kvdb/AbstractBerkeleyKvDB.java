@@ -38,7 +38,13 @@ public abstract class AbstractBerkeleyKvDB<T> implements KvDB<T> {
     @Override
     public void put(String key, T val) {
         DatabaseEntry theKey = new DatabaseEntry(key.getBytes(StandardCharsets.UTF_8));
-        DatabaseEntry newData = new DatabaseEntry(JSON.toJSONString(val).getBytes(StandardCharsets.UTF_8));
+        String storeV;
+        if(val instanceof String){
+            storeV = val.toString();
+        }else {
+            storeV = JSON.toJSONString(val);
+        }
+        DatabaseEntry newData = new DatabaseEntry(storeV.getBytes(StandardCharsets.UTF_8));
         OperationStatus status = getDB().put(transaction.get(), theKey, newData);
         // Logger.info("保存KV数据, key=" + key +", status="+ status +", val=" + CommonUtils.reflectString(val));
 
@@ -70,6 +76,9 @@ public abstract class AbstractBerkeleyKvDB<T> implements KvDB<T> {
         try {
             if (theData.getData() != null) {
                 String value = new String(theData.getData());
+                if(clz == String.class){
+                    return (T)value;
+                }
                 if (CommonUtils.isNotBlank(value)) {
                     return JSON.parseObject(value, clz);
                 }
