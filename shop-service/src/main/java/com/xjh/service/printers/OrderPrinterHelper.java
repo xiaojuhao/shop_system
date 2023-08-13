@@ -88,7 +88,7 @@ public class OrderPrinterHelper {
         OrderOverviewVO billView = orderService.buildOrderOverview(order, orderDishesList, orderPays).getData();
         array.addAll(paymentInfos(orderPays, sumPrice.doubleValue(), billView));
         // 二维码
-        array.addAll(qrCode());
+        array.addAll(qrCode(store, desk));
 
         JSONArray rs = new JSONArray();
         rs.addAll(array);
@@ -317,7 +317,12 @@ public class OrderPrinterHelper {
         return list;
     }
 
-    private List<JSONObject> qrCode() {
+    private List<JSONObject> qrCode(StoreVO store, Desk desk) {
+        ConfigurationBO cfg = configService.loadConfiguration();
+        DeskKey deskKey = deskKeyDAO.getByDeskId(desk.getDeskId());
+        String deskKeyString = deskKey != null ? deskKey.getDeskKey() : "";
+        String deskCode = LocalDeskCode.getDeskCode(desk.getDeskName());
+
         List<JSONObject> qrcode = new ArrayList<>();
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("Name", "双二维码");
@@ -329,8 +334,8 @@ public class OrderPrinterHelper {
         jsonObject.put("QrWidth", 250);
         jsonObject.put("LeftPadding1", 30);
         jsonObject.put("LeftPadding2", 30);
-        jsonObject.put("Text1", "http://www.xiaojuhao.org/pay/?d=");
-        jsonObject.put("Text2", "LocalServerConfig.publicAddress");
+        jsonObject.put("Text1", cfg.getTickedUrl() + "?d=" + deskCode + "&s=" + store.getStoreId() + "&k=" + deskKeyString);
+        jsonObject.put("Text2", cfg.getPublicAddress());
         qrcode.add(jsonObject);
 
         jsonObject = new JSONObject();
