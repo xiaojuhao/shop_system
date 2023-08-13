@@ -8,6 +8,7 @@ import com.xjh.common.model.DeskOrderParam;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.OrElse;
+import com.xjh.common.utils.Result;
 import com.xjh.common.valueobject.OrderOverviewVO;
 import com.xjh.dao.dataobject.*;
 import com.xjh.dao.mapper.DeskKeyDAO;
@@ -369,9 +370,13 @@ public class OrderPrinterHelper {
 
     public List<Object> buildKitchenPrintData(Order order, SubOrder subOrder, OrderDishes orderDishes, Dishes dishes) {
         List<Object> data = new ArrayList<>();
-
+        boolean addDishesFlag = false;
+        Result<List<SubOrder>> subOrders = orderService.findSubOrders(order.getOrderId());
+        if(CommonUtils.sizeOf(subOrders.getData()) > 1){
+            addDishesFlag = true;
+        }
         Desk desk = deskService.getById(order.getDeskId());
-        JSONArray jSONArray = getOrderJsonArray80(subOrder, dishes, 0, desk, true, dishes.getDishesName(), null, false);
+        JSONArray jSONArray = getOrderJsonArray80(subOrder, dishes, 0, desk, addDishesFlag, dishes.getDishesName(), null, false);
         data.addAll(jSONArray);
         return data;
     }
@@ -462,7 +467,7 @@ public class OrderPrinterHelper {
         jsonArray.add(jsonObject);
 
         jsonObject = new JSONObject();
-        jsonObject.put("Name", "流水号");
+        jsonObject.put("Name", "打印队列时间");
         jsonObject.put("ComType", EnumComType.TEXT.type);
         jsonObject.put("SampleContent", "打印队列时间:");
         jsonObject.put("Size", 1);
@@ -473,7 +478,7 @@ public class OrderPrinterHelper {
         jsonArray.add(jsonObject);
 
         jsonObject = new JSONObject();
-        jsonObject.put("Name", "流水号值");
+        jsonObject.put("Name", "打印队列时间值");
         jsonObject.put("ComType", EnumComType.TEXT.type);
         jsonObject.put("SampleContent", DateBuilder.now().timeStr());
         jsonObject.put("Size", 1);
