@@ -569,17 +569,7 @@ public class OrderDetailView extends VBox implements Initializable {
             PrinterImpl printer = new PrinterImpl(dd);
 
             List<Object> printData = orderPrinterHelper.buildOrderPrintData(param);
-            PrintResult rs = printer.print(printData, true);
-            Logger.info(JSON.toJSONString(rs));
-            if (!rs.isSuccess()) {
-                PrinterStatus sts = PrinterStatus.of(rs.getResultCode());
-                if (sts == PrinterStatus.UNKNOWN) {
-                    AlertBuilder.ERROR("打印机配置错误,请检查4");
-                } else {
-                    AlertBuilder.ERROR(sts.remark);
-                }
-
-            }
+            printer.submitTask(printData, true);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {

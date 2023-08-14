@@ -166,8 +166,7 @@ public class OrderService {
                         true);
                 tickets.addAll(jSONArray);
                 PrinterImpl printerImpl = new PrinterImpl(dd);
-                PrintResult printRs = printerImpl.print(tickets, true);
-                Logger.info(JSON.toJSONString(printRs));
+                printerImpl.submitTask(tickets, true);
             }catch (Exception ex){
                 ex.printStackTrace();
             }

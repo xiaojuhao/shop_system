@@ -320,8 +320,7 @@ public class CartService {
         }
         List<Object> tickets = orderPrinterHelper.buildKitchenPrintData0(order, subOrder, subOrderContainDishes);
         PrinterImpl printerImpl = new PrinterImpl(dd);
-        PrintResult rs = printerImpl.print(tickets, true);
-        Logger.info(JSON.toJSONString(rs));
+        printerImpl.submitTask(tickets, true);
     }
 
     private void printKitchen(Order order, SubOrder subOrder, List<OrderDishes> orderDishes) throws Exception {
@@ -342,8 +341,7 @@ public class CartService {
             }
             List<Object> tickets = orderPrinterHelper.buildKitchenPrintData(order, subOrder, d, dishes);
             PrinterImpl printerImpl = new PrinterImpl(dd);
-            PrintResult rs = printerImpl.print(tickets, true);
-            Logger.info(JSON.toJSONString(rs));
+            printerImpl.submitTask(tickets, true);
         }
     }
 

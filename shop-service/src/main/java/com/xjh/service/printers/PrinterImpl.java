@@ -5,6 +5,7 @@
  */
 package com.xjh.service.printers;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.enumeration.EnumAlign;
@@ -43,8 +44,8 @@ public class PrinterImpl implements Printer {
     PrinterDO printerDO;
     private EnumPrinterType printerType = EnumPrinterType.T58;
     // 默认58毫米打印32个字符
-    private int timeout = 3 * 1000; //输入流读取超时时间
-    private int connectTimeout = 3 * 1000; //socket连接超时时间
+    private int timeout = 30 * 1000; //输入流读取超时时间
+    private int connectTimeout = 30 * 1000; //socket连接超时时间
     ExecutorService executorService = new ThreadPoolExecutor(
             1, 1,
             60, TimeUnit.SECONDS,
@@ -78,17 +79,20 @@ public class PrinterImpl implements Printer {
     public Future<PrintResult> submitTask(List<Object> contentItems, boolean isVoicce) {
         return executorService.submit(() -> {
             try {
-                return print(contentItems, isVoicce);
+                PrintResult rs = print(contentItems, isVoicce);
+                Logger.info(JSON.toJSONString(rs));
+                return rs;
             } catch (Exception ex) {
                 ex.printStackTrace();
                 PrintResult fail = new PrintResult(this, contentItems);
                 fail.toFailure(PrinterStatus.UNKNOWN.status);
+                Logger.info(JSON.toJSONString(fail));
                 return fail;
             }
         });
     }
 
-    public synchronized PrintResult print(List<Object> contentItems, boolean isVoicce) throws Exception {
+    private synchronized PrintResult print(List<Object> contentItems, boolean isVoicce) throws Exception {
         System.out.println("调用打印机: " + printerDO.getPrinterIp()+":"+printerDO.getPrinterPort());
         PrintResult printResult = new PrintResult(this, contentItems);
         SocketAddress socketAddress = new InetSocketAddress(printerDO.getPrinterIp(), printerDO.getPrinterPort());
