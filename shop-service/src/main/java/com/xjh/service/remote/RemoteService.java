@@ -56,7 +56,7 @@ public class RemoteService {
             Logger.info("储值卡消费结果: " + rs);
             JSONObject json = JSONObject.parseObject(rs);
             int status = json.getInteger("status");
-            if (status == 1) {
+            if (status == 0) {
                 return Result.success("");
             } else {
                 return Result.fail("储值卡消费失败");
