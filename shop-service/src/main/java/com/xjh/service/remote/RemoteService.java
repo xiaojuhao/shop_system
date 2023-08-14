@@ -6,6 +6,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.CurrentAccount;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
+import com.xjh.dao.dataobject.Order;
+import com.xjh.service.domain.model.StoreVO;
 import com.xjh.service.vo.ManyCoupon;
 import com.xjh.service.vo.PrePaidCard;
 import com.xjh.service.vo.SerialNumber;
@@ -139,13 +141,21 @@ public class RemoteService {
         return HttpUtil.createPost(url).contentType("application/json").body(JSONObject.toJSONString(body)).execute().body();
     }
 
+    public String checkOrderResult(Integer orderId, int storeId){
+        JSONObject body = new JSONObject();
+        body.put("API_TYPE","checkOrderResult");
+        body.put("orderId", orderId);
+        body.put("storeId", storeId);
+        String resp = postJson("http://www.xjhjprl.cn/cardCoupon/query", body);
+        System.out.println("************* 检查订单支付结果 ***************");
+        System.out.println("req = " + body);
+        System.out.println("resp = "+resp);
+        return resp;
+    }
+
     public static void main(String[] args) {
         RemoteService service = new RemoteService();
-        Result<PrePaidCard> rs = service.getOnePrePaidCard(333, "123321123");
-        System.out.println(JSONObject.toJSONString(rs, true));
-
-        Result<String> cs = service.prePaidCardConsume(333, rs.getData(), 1, 1222);
-        System.out.println(JSON.toJSON(cs));
+        service.checkOrderResult(1, 333);
 
         System.exit(0);
     }

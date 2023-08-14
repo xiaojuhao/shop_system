@@ -14,6 +14,8 @@ import com.xjh.dao.dataobject.*;
 import com.xjh.dao.mapper.PrinterDAO;
 import com.xjh.dao.mapper.PrinterTaskDAO;
 import com.xjh.service.domain.*;
+import com.xjh.service.domain.model.StoreVO;
+import com.xjh.service.remote.RemoteService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.service.printers.OrderPrinterHelper;
 import com.xjh.service.printers.PrintResult;
@@ -68,6 +70,10 @@ public class OrderDetailView extends VBox implements Initializable {
     OrderPrinterHelper orderPrinterHelper = GuiceContainer.getInstance(OrderPrinterHelper.class);
     PrinterDAO printerDAO = GuiceContainer.getInstance(PrinterDAO.class);
     PrinterTaskDAO printerTaskDAO = GuiceContainer.getInstance(PrinterTaskDAO.class);
+
+    RemoteService remoteService = GuiceContainer.getInstance(RemoteService.class);
+
+    StoreService storeService = GuiceContainer.getInstance(StoreService.class);
 
     ObjectProperty<OrderOverviewVO> orderView = new SimpleObjectProperty<>();
     Desk desk;
@@ -148,7 +154,10 @@ public class OrderDetailView extends VBox implements Initializable {
 
             Button checkPayStatus = new Button("检测支付结果");
             checkPayStatus.setMinWidth(100);
-            checkPayStatus.setOnMouseClicked(evt -> refreshView.run());
+            checkPayStatus.setOnMouseClicked(evt -> {
+                StoreVO store = storeService.getStore().getData();
+                remoteService.checkOrderResult(orderId, store.getStoreId());
+            });
             gridPane.add(checkPayStatus, 4, rowIndex);
             addLine(gridPane);
         }
