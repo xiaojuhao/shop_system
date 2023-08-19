@@ -75,7 +75,7 @@ public class OrderDetailView extends VBox implements Initializable {
 
     StoreService storeService = GuiceContainer.getInstance(StoreService.class);
 
-    ObjectProperty<OrderOverviewVO> orderView = new SimpleObjectProperty<>();
+    ObjectProperty<OrderOverviewVO> orderView = new SimpleObjectProperty<>(new OrderOverviewVO());
     Desk desk;
     Runnable refreshView = null;
     Runnable refreshBtns = CommonUtils::emptyAction;
@@ -304,7 +304,10 @@ public class OrderDetailView extends VBox implements Initializable {
         Label label = new Label(name);
         label.setMinWidth(swdith);
         if (onChage != null) {
-            orderView.addListener((a, b, c) -> label.setText(name + ": " + onChage.apply(c)));
+            orderView.addListener((a, b, c) -> {
+                label.setText(name + ": " + onChage.apply(c));
+                System.out.println(name+" changed " + onChage.apply(c));
+            });
         }
         return label;
     }
@@ -341,12 +344,12 @@ public class OrderDetailView extends VBox implements Initializable {
             // 可参与优惠价格
             double discountableAmount = sumDishesPrice(discountableList);
             orderView.get().discountableAmount = discountableAmount;
-            orderView.set(CopyUtils.cloneObj(orderView.get()));
+            orderView.set(orderView.get().newVer());
             items.add(new OrderDishesTableItemBO(
                     "",
                     "",
                     RichText.EMPTY,
-                    new RichText("参与优惠合计:" + discountableAmount).with(Color.RED).with(Pos.CENTER_RIGHT),
+                    new RichText("参与优惠合计:" + orderView.get().discountableAmount).with(Color.RED).with(Pos.CENTER_RIGHT),
                     RichText.EMPTY,
                     "",
                     RichText.EMPTY));
@@ -615,17 +618,9 @@ public class OrderDetailView extends VBox implements Initializable {
         addLine(new Separator(Orientation.HORIZONTAL));
     }
 
-    private boolean notReturn(OrderDishes x) {
-        if (x == null) {
-            return true;
-        }
-        return EnumOrderSaleType.of(x.getOrderDishesSaletype()) != EnumOrderSaleType.RETURN;
-    }
-
-
     private double sumDishesPrice(List<OrderDishes> orderDishes) {
         return orderDishes.stream()
-                .filter(this::notReturn)
+                .filter(OrderDishes.isReturnDishes().negate())
                 .map(OrderDishes::sumOrderDishesPrice)
                 .filter(Objects::nonNull)
                 .reduce(0D, Double::sum);

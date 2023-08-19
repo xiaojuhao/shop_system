@@ -28,9 +28,9 @@ public class OrderDishes {
     @Column
     Integer dishesId;
     @Column
-    Double orderDishesPrice;
+    Double orderDishesPrice; // 原价
     @Column
-    Double orderDishesDiscountPrice;
+    Double orderDishesDiscountPrice; // 折扣价（如果未打折，则等于原价）
     @Column
     Integer orderDishesNums;
     @Column

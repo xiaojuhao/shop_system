@@ -371,6 +371,7 @@ public class OrderService {
 
     public Result<OrderOverviewVO> buildOrderOverview(Order order, List<OrderDishes> orderDishesList, List<OrderPay> orderPays) {
         OrderOverviewVO v = new OrderOverviewVO();
+        Predicate<OrderDishes> discountableChecker = orderDishesService.discountableChecker();
         if (order != null) {
             v.deskId = order.getDeskId();
             v.deskName = deskService.getDeskName(order.getDeskId());
@@ -383,6 +384,7 @@ public class OrderService {
             v.totalPrice = sumTotalPrice(order, orderDishesList);
             v.returnedCash = OrElse.orGet(order.getOrderReturnCash(), 0D);
             v.discountAmount = calcDiscountAmount(order, orderDishesList);
+            v.discountableAmount = calcDiscountableAmount(order, orderDishesList, discountableChecker);
             v.payStatusName = EnumOrderStatus.of(order.getOrderStatus()).remark;
             v.deduction = order.getFullReduceDishesPrice();
             v.returnDishesPrice = this.sumReturnDishesPrice(orderDishesList);
@@ -418,9 +420,19 @@ public class OrderService {
     }
 
     private double calcDiscountAmount(Order order, List<OrderDishes> orderDishesList) {
-        double total = CommonUtils.collect(orderDishesList, OrderDishes::sumOrderDishesPrice).stream().filter(Objects::nonNull).reduce(0D, Double::sum);
-        double discountedPrice = CommonUtils.collect(orderDishesList, OrderDishes::sumOrderDishesDiscountPrice).stream().filter(Objects::nonNull).reduce(0D, Double::sum);
+        // 去掉退菜记录
+        orderDishesList = CommonUtils.filter(orderDishesList, OrderDishes.isReturnDishes().negate());
+        double total = CommonUtils.collect(orderDishesList, OrderDishes::sumOrderDishesPrice).stream().reduce(0D, Double::sum);
+        double discountedPrice = CommonUtils.collect(orderDishesList, OrderDishes::sumOrderDishesDiscountPrice).stream().reduce(0D, Double::sum);
         return Math.max(0, total - discountedPrice);
+    }
+    private double calcDiscountableAmount(Order order, List<OrderDishes> orderDishesList, Predicate<OrderDishes> discountableChecker) {
+        // 去掉退菜记录
+        orderDishesList = CommonUtils.filter(orderDishesList, OrderDishes.isReturnDishes().negate());
+        // 去掉不可打折的菜品
+        orderDishesList = CommonUtils.filter(orderDishesList, discountableChecker);
+
+        return CommonUtils.collect(orderDishesList, OrderDishes::sumOrderDishesPrice).stream().reduce(0D, Double::sum);
     }
 
     public Result<Integer> countSubOrder(Integer orderId) {
@@ -493,11 +505,11 @@ public class OrderService {
         if (CommonUtils.isEmpty(orderDishes)) {
             return 0;
         }
+        // 拿到退菜记录
+        orderDishes = CommonUtils.filter(orderDishes, OrderDishes.isReturnDishes());
         double returnAmt = 0;
         for (OrderDishes od : orderDishes) {
-            if (EnumOrderSaleType.of(od.getOrderDishesSaletype()) == EnumOrderSaleType.RETURN) {
-                returnAmt += od.sumOrderDishesDiscountPrice();
-            }
+            returnAmt += od.sumOrderDishesPrice(); // 退菜金额汇总是原价
         }
         return returnAmt;
     }
