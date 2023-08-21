@@ -489,6 +489,17 @@ public class OrderService {
         return discount;
     }
 
+    public double sumBillOriAmount(List<OrderDishes> orderDishes) {
+        if (CommonUtils.isEmpty(orderDishes)) {
+            return 0;
+        }
+        double billAmount = 0;
+        for (OrderDishes od : orderDishes) {
+            billAmount += od.sumOrderDishesPrice();
+        }
+        return billAmount;
+    }
+
     public double sumBillAmount(List<OrderDishes> orderDishes) {
         if (CommonUtils.isEmpty(orderDishes)) {
             return 0;

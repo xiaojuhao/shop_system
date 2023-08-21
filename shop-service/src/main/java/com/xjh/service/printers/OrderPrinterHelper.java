@@ -1471,7 +1471,7 @@ public class OrderPrinterHelper {
         jsonObject = new JSONObject();
         jsonObject.put("Name", "订单合计值");
         jsonObject.put("ComType", EnumComType.TEXT.type);
-        jsonObject.put("SampleContent", orderService.sumBillAmount(orderDishesesMergesExcludeReturn));
+        jsonObject.put("SampleContent", orderService.sumBillOriAmount(orderDishesesMergesExcludeReturn));
         jsonObject.put("Size", 1);
         jsonObject.put("FrontLen", 0);
         jsonObject.put("BehindLen", 0);

@@ -114,6 +114,7 @@ public class OrderPayService {
                     if(dd != null){
                         PrinterImpl printer = new PrinterImpl(dd);
                         List<Object> printData = orderPrinterHelper.buildCheckOutPrintData(order);
+                        // System.out.println(JSON.toJSONString(printData, true));
                         printer.submitTask(printData, true);
                     }
                 }
