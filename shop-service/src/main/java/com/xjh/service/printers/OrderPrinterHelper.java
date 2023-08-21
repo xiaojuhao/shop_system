@@ -29,9 +29,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static cn.hutool.core.util.NumberUtil.mul;
-import static cn.hutool.core.util.NumberUtil.sub;
 import static com.xjh.common.enumeration.EnumPayMethod.*;
 import static com.xjh.common.utils.CommonUtils.formatScale;
+import static com.xjh.common.utils.CommonUtils.tryDecodeBase64;
 
 @Singleton
 public class OrderPrinterHelper {
@@ -935,6 +935,10 @@ public class OrderPrinterHelper {
         return orderDishesMerge;
     }
 
+    private static String resolveOrderDishesOptions(String attr){
+        return "";
+    }
+
     public JSONArray buildCheckOutPrintData(Order order) {
         ConfigurationBO cfg = configService.loadConfiguration();
         JSONArray jsonArray = new JSONArray();
@@ -1188,7 +1192,7 @@ public class OrderPrinterHelper {
                     } else if (orderDishes.getOrderDishesSaletype() == EnumOrderSaleType.TASTED.type) {
                         orderDishesDetailedName += "(试吃)";
                     }
-                    orderDishesDetailedName += dishes.getDishesName() + orderDishes.getOrderDishesOptions() + dishesPriceString;
+                    orderDishesDetailedName += dishes.getDishesName() + resolveOrderDishesOptions(orderDishes.getOrderDishesOptions()) + dishesPriceString;
                     if (orderDishesDetailedName.length() > 12) {
                         orderDishesDetailedName = orderDishesDetailedName.substring(0, 12);
                     }
@@ -1347,7 +1351,7 @@ public class OrderPrinterHelper {
                         } else if (orderDishes.getOrderDishesSaletype() == EnumOrderSaleType.TASTED.type) {
                             orderDishesDetailedName += "(试吃)";
                         }
-                        orderDishesDetailedName += dishes.getDishesName() + orderDishes.getOrderDishesOptions() + dishesPriceString;
+                        orderDishesDetailedName += dishes.getDishesName() + resolveOrderDishesOptions(orderDishes.getOrderDishesOptions()) + dishesPriceString;
                         if (orderDishesDetailedName.length() > 12) {
                             orderDishesDetailedName = orderDishesDetailedName.substring(0, 12);
                         }
