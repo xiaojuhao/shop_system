@@ -31,8 +31,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import static com.xjh.common.utils.CommonUtils.tryDecodeBase64;
-import static com.xjh.common.utils.CommonUtils.tryEncodeBase64;
+import static com.xjh.common.utils.CommonUtils.*;
 
 @Singleton
 public class OrderService {
@@ -399,6 +398,7 @@ public class OrderService {
             v.orderRefund = OrElse.orGet(order.getOrderRefund(), 0D);
             v.totalPrice = sumTotalPrice(order, orderDishesList);
             v.returnedCash = OrElse.orGet(order.getOrderReturnCash(), 0D);
+            v.returnCashReason = stringify(order.getReturnCashReason());
             v.discountAmount = calcDiscountAmount(order, orderDishesList);
             v.discountableAmount = calcDiscountableAmount(order, orderDishesList, discountableChecker);
             v.payStatusName = EnumOrderStatus.of(order.getOrderStatus()).remark;

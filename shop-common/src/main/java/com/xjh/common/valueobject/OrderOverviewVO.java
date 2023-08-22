@@ -24,6 +24,8 @@ public class OrderOverviewVO {
     public double orderErase;
     public double returnDishesPrice;
     public double returnedCash;
+
+    public String returnCashReason;
     public String payInfoRemark;
 
     public long copytime;

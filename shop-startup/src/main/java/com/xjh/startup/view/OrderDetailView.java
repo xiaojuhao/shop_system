@@ -195,13 +195,16 @@ public class OrderDetailView extends VBox implements Initializable {
 //            gridPane.add(mangerReduction, 1, row);
 
             Label discount = createLabel("折扣金额", width, c -> formatMoney(c.discountAmount));
-            gridPane.add(discount, 2, row);
+            gridPane.add(discount, 1, row);
 
             Label refund = createLabel("退菜金额", width, c -> formatMoney(c.returnDishesPrice));
-            gridPane.add(refund, 3, row);
+            gridPane.add(refund, 2, row);
 
-            Label fan = createLabel("反结账金额", width, c -> "0.00");
-            gridPane.add(fan, 4, row);
+            Label fan = createLabel("退现金", width, c -> formatMoney(c.returnedCash));
+            gridPane.add(fan, 3, row);
+
+            Label returnCashReason = createLabel("退现金原因", width, c -> c.returnCashReason);
+            gridPane.add(returnCashReason, 4, row);
 
             addLine(gridPane);
         }
