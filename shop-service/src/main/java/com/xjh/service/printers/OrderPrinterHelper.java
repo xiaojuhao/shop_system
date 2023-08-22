@@ -936,7 +936,27 @@ public class OrderPrinterHelper {
     }
 
     private static String resolveOrderDishesOptions(String attr){
-        return "";
+        if(CommonUtils.isBlank(attr)){
+            return "";
+        }
+        String str = attr;
+        try{
+            str = tryDecodeBase64(attr);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        if(str.startsWith("[")) {
+            JSONArray arr = JSONArray.parseArray(str);
+            StringBuilder s = new StringBuilder();
+            for(Object obj : arr){
+                if(s.length() > 0){
+                    s.append(",");
+                }
+                s.append(obj.toString());
+            }
+            return s.toString();
+        }
+        return str;
     }
 
     public JSONArray buildCheckOutPrintData(Order order) {
