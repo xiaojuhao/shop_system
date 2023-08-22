@@ -339,6 +339,11 @@ public class OrderService {
         if (EnumDeskStatus.of(desk.getStatus()) != EnumDeskStatus.FREE) {
             return Result.fail("餐桌[" + desk.getDeskName() + "]正在使用中，不可以恢复");
         }
+        String today = DateBuilder.today().format("yyyyMMdd");
+        String orderDate = DateBuilder.base(order.getCreateTime()).format("yyyyMMdd");
+        if(!Objects.equals(today, orderDate)){
+            return Result.fail("恢复关台失败：只能操作当天订单");
+        }
         try {
             // 恢复订单状态
             Desk deskUpdate = new Desk();

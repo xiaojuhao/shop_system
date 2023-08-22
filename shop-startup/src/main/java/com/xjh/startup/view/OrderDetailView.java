@@ -191,8 +191,8 @@ public class OrderDetailView extends VBox implements Initializable {
             Label orderErase = createLabel("抹零金额", width, c -> formatMoney(c.orderErase));
             gridPane.add(orderErase, 0, row);
 
-            Label mangerReduction = createLabel("店长减免", width, c -> formatMoney(c.orderReduction));
-            gridPane.add(mangerReduction, 1, row);
+//            Label mangerReduction = createLabel("店长减免", width, c -> formatMoney(c.orderReduction));
+//            gridPane.add(mangerReduction, 1, row);
 
             Label discount = createLabel("折扣金额", width, c -> formatMoney(c.discountAmount));
             gridPane.add(discount, 2, row);
@@ -264,13 +264,13 @@ public class OrderDetailView extends VBox implements Initializable {
 
             Button orderErase = createButton("抹零", width, evt -> openOrderEraseView(deskOrderParam));
             Button repay = createButton("重新结账", width, evt -> orderRepay(deskOrderParam));
-            Button reduction = createButton("店长减免", width, evt -> openOrderReductionDialog(deskOrderParam));
+            // Button reduction = createButton("店长减免", width, evt -> openOrderReductionDialog(deskOrderParam));
             Button discount = createButton("选择折扣", width, evt -> openDiscountSelectionDialog(deskOrderParam));
             Button printOrder = createButton("打印账单", width, evt -> submitPrintOrderInfo(deskOrderParam));
             // add all buttons
             operationButtonPane.getChildren().addAll(
                     orderBtn, sendBtn, returnBtn, transferBtn, splitBtn, payBillBtn,
-                    repay, orderErase, reduction, discount, printOrder);
+                    repay, orderErase, /*reduction,*/ discount, printOrder);
             addLine(operationButtonPane);
 
             refreshBtns = () -> {
@@ -284,7 +284,7 @@ public class OrderDetailView extends VBox implements Initializable {
                 transferBtn.setDisable(btnDisabled);
                 payBillBtn.setDisable(btnDisabled);
                 orderErase.setDisable(btnDisabled);
-                reduction.setDisable(btnDisabled);
+                // reduction.setDisable(btnDisabled);
                 discount.setDisable(btnDisabled);
             };
         }

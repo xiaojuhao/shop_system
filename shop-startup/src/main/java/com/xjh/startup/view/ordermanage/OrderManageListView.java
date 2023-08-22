@@ -40,9 +40,7 @@ import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.xjh.common.utils.TableViewUtils.newCol;
@@ -398,6 +396,13 @@ public class OrderManageListView extends SimpleForm implements Initializable {
             AlertBuilder.ERROR("请选择操作订单");
             return;
         }
+        String today = DateBuilder.today().format("yyyyMMdd");
+        Order o = orderService.getOrder(bo.getOrderId());
+        String orderDate = DateBuilder.base(o.getCreateTime()).format("yyyyMMdd");
+        if(!Objects.equals(today, orderDate)){
+            AlertBuilder.ERROR("退现金失败：只能操作当天订单");
+            return;
+        }
         ModelWindow mw = new ModelWindow(parent);
         mw.setHeight(200);
         mw.setWidth(300);
@@ -462,30 +467,31 @@ public class OrderManageListView extends SimpleForm implements Initializable {
         mw.setScene(new Scene(form));
         form.addLine(newCenterLine(new Label("订单号:"), new Label(bo.getOrderId().toString())));
         //
-        Button escape = new Button("逃单");
-        escape.setTextFill(Color.RED);
-        escape.setOnAction(evt -> {
-            orderService.escapeOrder(bo.getOrderId());
-            loadData();
-            AlertBuilder.INFO("设置逃单成功");
-            mw.close();
-        });
-        Button free = new Button("免单");
-        free.setTextFill(Color.RED);
-        free.setOnAction(evt -> {
-            orderService.freeOrder(bo.getOrderId());
-            loadData();
-            AlertBuilder.INFO("设置免单成功");
-            mw.close();
-        });
+//        Button escape = new Button("逃单");
+//        escape.setTextFill(Color.RED);
+//        escape.setOnAction(evt -> {
+//            orderService.escapeOrder(bo.getOrderId());
+//            loadData();
+//            AlertBuilder.INFO("设置逃单成功");
+//            mw.close();
+//        });
+
+//        Button free = new Button("免单");
+//        free.setTextFill(Color.RED);
+//        free.setOnAction(evt -> {
+//            orderService.freeOrder(bo.getOrderId());
+//            loadData();
+//            AlertBuilder.INFO("设置免单成功");
+//            mw.close();
+//        });
         Button changePayStatus = new Button("已付款");
-        form.addLine(newCenterLine(escape, free, changePayStatus));
         changePayStatus.setOnAction(evt -> {
             orderService.changeOrderToPaid(bo.getOrderId());
             loadData();
             AlertBuilder.INFO("设置订单已付款成功");
             mw.close();
         });
+        form.addLine(newCenterLine(/*escape, free, */ changePayStatus));
         //
         Button returnMoney = new Button("退现金");
         returnMoney.setOnAction(evt -> showOrderStatusChangeWindow(mw));
