@@ -73,7 +73,7 @@ public class OrderPayDAO {
             params.add(cond.getPaymentStatus());
         }
         if (CommonUtils.isNotEmpty(cond.getExcludePayMethods())) {
-            sql.append(" and paymentMethod in (")
+            sql.append(" and paymentMethod not in (")
                     .append(cond.getExcludePayMethods().stream().map(i -> i + "").collect(Collectors.joining(",")))
                     .append(")");
         }

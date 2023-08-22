@@ -180,7 +180,18 @@ public class OrderService {
         OrderPayQuery cond = new OrderPayQuery();
         cond.setOrderId(orderId);
         cond.setPaymentStatus(1);
-        cond.setExcludePayMethods(Lists.newArrayList(EnumPayMethod.WECHAT.code, EnumPayMethod.ALIPAY.code));
+        cond.setExcludePayMethods(Lists.newArrayList(
+                EnumPayMethod.WECHAT_UNIONPAY_PAYMEN.code,
+                EnumPayMethod.TINY_LIFE_STORECARD.code,
+                EnumPayMethod.TINY_LIFE_INTEGRAL_DEDUCTION.code,
+                EnumPayMethod.TINY_LIFE_COUPON.code,
+                EnumPayMethod.VOUCHER.code,
+                EnumPayMethod.WECHAT_COUPON.code,
+                EnumPayMethod.WECHAT_OFFICIAL.code,
+                EnumPayMethod.STORECARD.code,
+                EnumPayMethod.WECHAT.code,
+                EnumPayMethod.ALIPAY.code
+        ));
         orderPayService.deleteBy(cond);
         // 更新支付金额
         List<OrderPay> pays = orderPayService.selectByOrderId(orderId);
