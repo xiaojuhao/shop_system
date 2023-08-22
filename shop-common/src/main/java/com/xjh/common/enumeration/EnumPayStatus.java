@@ -10,4 +10,13 @@ public enum EnumPayStatus {
         this.code = code;
         this.name = name;
     }
+
+    public static EnumPayStatus of(Integer code){
+        for(EnumPayStatus e : EnumPayStatus.values()){
+            if(code != null && code.equals(e.code)){
+                return e;
+            }
+        }
+        return null;
+    }
 }

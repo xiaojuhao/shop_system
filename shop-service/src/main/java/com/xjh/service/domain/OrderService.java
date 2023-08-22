@@ -418,6 +418,8 @@ public class OrderService {
             }
 
             // 支付信息
+            orderPays = CommonUtils.filter(orderPays, OrderPay.isPaid()); // 只展示已支付的记录
+
             StringBuilder payInfo = new StringBuilder();
             CommonUtils.forEach(orderPays, p -> {
                 payInfo.append(DateBuilder.base(p.getCreatetime()).timeStr()).append(" 收到付款:").append(CommonUtils.formatMoney(p.getAmount())).append(", 来自").append(EnumPayMethod.of(p.getPaymentMethod()).name);
