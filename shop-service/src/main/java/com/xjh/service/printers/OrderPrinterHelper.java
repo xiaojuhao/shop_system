@@ -2224,7 +2224,7 @@ public class OrderPrinterHelper {
         jsonObject.put("Name", "折扣合计值");
         jsonObject.put("ComType", EnumComType.TEXT.type);
 //        jsonObject.put("SampleContent", orderManager.getOrderDiscountPrice(order.getOrderId()) + "");
-        jsonObject.put("SampleContent", orderService.sumDiscountPrice(orderDishesesMergesExcludeReturn));
+        jsonObject.put("SampleContent", formatMoney(orderService.sumDiscountPrice(orderDishesesMergesExcludeReturn)));
         jsonObject.put("Size", 1);
         jsonObject.put("FrontLen", 0);
         jsonObject.put("BehindLen", 0);
