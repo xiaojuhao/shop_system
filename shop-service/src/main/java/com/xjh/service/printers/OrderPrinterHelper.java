@@ -593,9 +593,9 @@ public class OrderPrinterHelper {
         jsonObject.put("columnNames", columnNames);
 
         JSONArray columnWidths = new JSONArray();
-        columnWidths.add(67);
-        columnWidths.add(13);
-        columnWidths.add(20);
+        columnWidths.add(33);
+        columnWidths.add(6);
+        columnWidths.add(11);
         jsonObject.put("columnWidths", columnWidths);
 
         JSONArray rows = new JSONArray();
