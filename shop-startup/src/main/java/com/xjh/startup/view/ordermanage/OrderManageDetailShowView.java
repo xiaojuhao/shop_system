@@ -74,7 +74,7 @@ public class OrderManageDetailShowView extends SimpleForm {
         orderTimeName.setFont(Font.font(16));
         Label orderTime = new Label(data.getOrderTime());
         orderTime.setFont(Font.font(16));
-        addLine(newLine(
+        addLine(newRegularLine(
                 orderNoName, orderNo,
                 orderStatusName, orderStatus,
                 deskName, desk,
@@ -118,7 +118,7 @@ public class OrderManageDetailShowView extends SimpleForm {
         reductionName.setAlignment(Pos.CENTER_RIGHT);
         Label reduction = new Label(data.getReductionAmt().toString());
 
-        addLine(newLine(
+        addLine(newRegularLine(
                 needPayName, needPay,
                 paidAmtName, paidAmt,
                 totalPriceName, totalPrice,
@@ -195,7 +195,7 @@ public class OrderManageDetailShowView extends SimpleForm {
     }
 
     private Node newSeparator() {
-        HBox separator = newLine(new Separator(Orientation.HORIZONTAL));
+        HBox separator = newRegularLine(new Separator(Orientation.HORIZONTAL));
         separator.setPadding(new Insets(5, 0, 5, 0));
         return separator;
     }

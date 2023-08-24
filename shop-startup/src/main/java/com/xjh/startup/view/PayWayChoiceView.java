@@ -105,7 +105,7 @@ public class PayWayChoiceView extends SmallForm {
         button.setOnMouseClicked(event -> {
             PaymentDialogOfCoupon scene = new PaymentDialogOfCoupon(param, type, name, payMethod);
             ModelWindow window = new ModelWindow(this.getScene().getWindow());
-            window.setHeight(300);
+            window.setHeight(330);
             window.setScene(new Scene(scene));
             scene.initialize();
             window.showAndWait();

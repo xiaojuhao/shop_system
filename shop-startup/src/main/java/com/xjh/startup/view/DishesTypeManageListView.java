@@ -82,20 +82,20 @@ public class DishesTypeManageListView extends SimpleForm implements Initializabl
         form.setSpacing(6);
         // 分类名称
         TextField typeName = new TextField(type.getTypeName());
-        form.addLine(newLine(createDefLabel("分类名称:"), typeName));
+        form.addLine(newRegularLine(createDefLabel("分类名称:"), typeName));
         // 反结账
         ComboBox<IntStringPair> ifRefund = new ComboBox<>(FXCollections.observableArrayList(
                 new IntStringPair(0, "否"), new IntStringPair(1, "是")));
         IntStringPair.select(ifRefund, type.getIfRefund(), 1);
-        form.addLine(newLine(createDefLabel("是否可以反结账:"), ifRefund));
+        form.addLine(newRegularLine(createDefLabel("是否可以反结账:"), ifRefund));
         // 顺序
         TextField sortBy = new TextField(OrElse.orGet(type.getSortby(), 0).toString());
-        form.addLine(newLine(createDefLabel("顺序:"), sortBy));
+        form.addLine(newRegularLine(createDefLabel("顺序:"), sortBy));
         // H5是否可显示
         ComboBox<IntStringPair> h5hidden = new ComboBox<>(FXCollections.observableArrayList(
                 new IntStringPair(1, "否"), new IntStringPair(0, "是")));
         IntStringPair.select(h5hidden, type.getHiddenH5(), 0);
-        form.addLine(newLine(createDefLabel("h5是否可以显示:"), h5hidden));
+        form.addLine(newRegularLine(createDefLabel("h5是否可以显示:"), h5hidden));
         // 提交
         Button submit = new Button("提交");
         submit.setOnAction(evt -> {

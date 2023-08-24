@@ -239,7 +239,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         // 菜品信息
         Label dishesNameLabel = new Label("菜品名称:");
         Label dishesName = new Label(dishes.getDishesName());
-        form.addLine(newLine(dishesNameLabel, dishesName));
+        form.addLine(newRegularLine(dishesNameLabel, dishesName));
         // 价格列表
         TableView<DishesPrice> tv = new TableView<>();
         tv.getColumns().addAll(
@@ -418,8 +418,8 @@ public class DishesManageListView extends SimpleForm implements Initializable {
         if (dishesPrice.getDishesPriceId() != null) {
             priceInput.setText(new Money(dishesPrice.getDishesPrice()).toString());
         }
-        form.addLine(newLine(priceName, priceNameInput));
-        form.addLine(newLine(price, priceInput));
+        form.addLine(newRegularLine(priceName, priceNameInput));
+        form.addLine(newRegularLine(price, priceInput));
         //
         Button button = new Button("确 定");
         button.setOnAction(evt -> {

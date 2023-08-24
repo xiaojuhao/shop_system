@@ -23,7 +23,15 @@ public class SimpleForm extends VBox {
         addLine(newCenterLine(title, content));
     }
 
-    public HBox newLine(Node... nodes) {
+    public static HBox newTightLine(Node... nodes) {
+        HBox line = new HBox();
+        for (Node n : nodes) {
+            line.getChildren().add(n);
+        }
+        return line;
+    }
+
+    public static HBox newRegularLine(Node... nodes) {
         HBox line = new HBox();
         line.setSpacing(Const.REGULAR_SPACING);
         line.setPadding(new Insets(0, 0, 0, 10));
@@ -33,7 +41,7 @@ public class SimpleForm extends VBox {
         return line;
     }
 
-    public HBox newCenterLine(Node... nodes) {
+    public static HBox newCenterLine(Node... nodes) {
         HBox line = new HBox();
         line.setAlignment(Pos.CENTER);
         line.setSpacing(Const.REGULAR_SPACING);

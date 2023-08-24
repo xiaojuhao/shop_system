@@ -104,7 +104,7 @@ public class PaymentDialogOfCoupon extends SimpleForm implements Initializable {
                 Label serialNoLabel = new Label("序列号" + i + ":");
                 serialNoLabel.setPrefWidth(60);
                 serialNoList.add(serialNoInput);
-                groupBox.getChildren().add(newLine(serialNoLabel, serialNoInput));
+                groupBox.getChildren().add(newRegularLine(serialNoLabel, serialNoInput));
 
                 CouponList coupon = (CouponList) combo.getSelectionModel().getSelectedItem().getAttachment();
                 if (coupon != null) {

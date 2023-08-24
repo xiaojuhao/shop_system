@@ -50,13 +50,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static com.xjh.common.utils.CommonUtils.collect;
+import static com.xjh.common.utils.CommonUtils.*;
 import static com.xjh.common.utils.ImageHelper.buildImageView;
 import static com.xjh.common.utils.OrElse.orGet;
+import static com.xjh.startup.view.base.SimpleForm.*;
 
 
 public class OrderDishesChoiceView extends VBox {
@@ -415,7 +415,7 @@ public class OrderDishesChoiceView extends VBox {
                     attr.setSelectedAttributeValues(getSelectedAttr(attr.getAllAttributeValues(), selectedVal));
                 });
             }
-            HBox line = form.newLine(name, optionBox);
+            HBox line = newRegularLine(name, optionBox);
             line.setSpacing(15);
             line.setPadding(new Insets(0, 0, 0, 10));
             form.addLine(line);
@@ -447,7 +447,7 @@ public class OrderDishesChoiceView extends VBox {
                 bo.setDishesPrice(selectPrice.getDishesPrice());
             });
 
-            HBox line = form.newLine(name, optionBox);
+            HBox line = newRegularLine(name, optionBox);
             lines.incrementAndGet();
 
             line.setSpacing(15);
@@ -455,18 +455,22 @@ public class OrderDishesChoiceView extends VBox {
             form.addLine(line);
         }
         // 添加数量
+        Label inputNumberLabel = new Label("下单数量:");
         TextField inputNumber = new TextField();
         inputNumber.setText("1");
+        inputNumber.setPrefWidth(120);
+        Button plus = new Button("+");
+        plus.setOnMouseClicked(evt -> inputNumber.setText(incr(inputNumber.getText())));
+        Button minus = new Button("-");
+        minus.setOnMouseClicked(evt -> inputNumber.setText(minus(inputNumber.getText())));
         if (dishesAttrs.isEmpty()) {
-            Label inputNumberLabel = new Label("下单数量:");
-            HBox numLine = form.newCenterLine(inputNumberLabel, inputNumber);
+            HBox numLine = newCenterLine(inputNumberLabel, newTightLine(inputNumber, plus, minus));
             numLine.setPadding(new Insets(20, 0, 0, 0));
             form.addLine(numLine);
             lines.incrementAndGet();
         } else {
-            Label inputNumberLabel = new Label("下单数量:");
             inputNumberLabel.setPrefWidth(100);
-            form.addLine(form.newLine(inputNumberLabel, inputNumber));
+            form.addLine(newRegularLine(inputNumberLabel, inputNumber, plus, minus));
             lines.incrementAndGet();
         }
 
@@ -491,11 +495,21 @@ public class OrderDishesChoiceView extends VBox {
             stage.setWidth(owner.getWidth() / 2);
             stage.setHeight(owner.getHeight() / 2);
         }
-        form.addLine(form.newCenterLine(add));
+        form.addLine(newCenterLine(add));
         lines.incrementAndGet();
 
         stage.setScene(new Scene(form));
         stage.showAndWait();
+    }
+
+    static String incr(String num){
+        int n = CommonUtils.parseInt(num, 1) + 1;
+        return stringify(max(1, n));
+    }
+
+    static String minus(String num){
+        int n = CommonUtils.parseInt(num, 1) - 1;
+        return stringify(max(1, n));
     }
 
     private List<DishesAttributeValueVO> getSelectedAttr(List<DishesAttributeValueVO> all, List<String> selectedVals) {
