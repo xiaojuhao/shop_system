@@ -35,6 +35,7 @@ public class OpenDeskDialog extends Dialog<OpenDeskInputParam> {
         this.setResultConverter(btn -> {
             OpenDeskInputParam rs = new OpenDeskInputParam();
             rs.setCustomerNum(CommonUtils.parseInt(custNum.getText(), 0));
+            rs.setCustomerNum(CommonUtils.parseInt(custNum.getText(), 0));
             rs.setResult(openDesk == btn ? OpenDeskResult.OPEN : OpenDeskResult.CANCEL);
             return rs;
         });

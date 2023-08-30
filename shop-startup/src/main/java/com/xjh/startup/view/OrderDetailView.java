@@ -314,7 +314,7 @@ public class OrderDetailView extends VBox implements Initializable {
         if (onChage != null) {
             orderView.addListener((a, b, c) -> {
                 label.setText(name + ": " + onChage.apply(c));
-                System.out.println(name+" changed " + onChage.apply(c));
+                // System.out.println(name+" changed " + onChage.apply(c));
             });
         }
         return label;

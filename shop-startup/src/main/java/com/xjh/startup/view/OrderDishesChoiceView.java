@@ -572,7 +572,7 @@ public class OrderDishesChoiceView extends VBox {
             Result<String> createOrderRs = cartService.createOrder(req);
             if (createOrderRs.isSuccess()) {
                 refreshCartSize();
-                AlertBuilder.INFO("通知消息", "下单成功");
+                AlertBuilder.INFO("通知消息", "下单成功", 1);
                 this.getScene().getWindow().hide();
             } else {
                 AlertBuilder.ERROR(createOrderRs.getMsg());

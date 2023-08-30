@@ -1,6 +1,7 @@
 package com.xjh.service.ws;
 
 import com.alibaba.fastjson.JSONObject;
+import com.xjh.common.utils.DelayedRunnable;
 import com.xjh.common.utils.Safe;
 import org.java_websocket.WebSocket;
 
@@ -83,31 +84,6 @@ public class SocketUtils {
 
     public static void asyncSendMsg(Integer deskId, JSONObject msg) {
         executorService2.submit(() -> sendMsg(deskId, msg));
-    }
-
-    public static class DelayedRunnable implements Delayed {
-        Runnable runnable;
-        long startMills;
-
-        public DelayedRunnable(Runnable runnable, long delayedSec) {
-            this.runnable = runnable;
-            this.startMills = delayedSec * 1000 + System.currentTimeMillis();
-        }
-
-        @Override
-        public long getDelay(TimeUnit unit) {
-            long diff = startMills - System.currentTimeMillis();
-            return unit.convert(diff, TimeUnit.MILLISECONDS);
-        }
-
-        @Override
-        public int compareTo(Delayed o) {
-            if (!(o instanceof DelayedRunnable)) {
-                return 0;
-            }
-            DelayedRunnable dr = (DelayedRunnable) o;
-            return Long.compare(this.startMills, dr.startMills);
-        }
     }
 
 }
