@@ -2,6 +2,8 @@ package com.xjh.startup.view.paymethods;
 
 import com.xjh.common.enumeration.EnumPayAction;
 import com.xjh.common.enumeration.EnumPayMethod;
+import com.xjh.common.model.DeskOrderParam;
+import com.xjh.common.model.IntStringPair;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.dao.dataobject.CouponList;
 import com.xjh.dao.mapper.CouponListDAO;
@@ -10,8 +12,6 @@ import com.xjh.service.domain.model.PaymentResult;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.SimpleForm;
-import com.xjh.common.model.DeskOrderParam;
-import com.xjh.common.model.IntStringPair;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -93,7 +93,7 @@ public class PaymentDialogOfCoupon extends SimpleForm implements Initializable {
         List<TextField> serialNoList = new ArrayList<>();
 
         couponNum.setPromptText("张数");
-        couponNum.setText("0");
+        couponNum.setText("1");
         couponNum.setPrefWidth(40);
         couponNum.textProperty().addListener((obs, old, _new) -> {
             serialNoList.clear();
