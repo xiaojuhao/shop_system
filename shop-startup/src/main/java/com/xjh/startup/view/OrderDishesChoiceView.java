@@ -4,6 +4,9 @@ import cn.hutool.db.PageResult;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.xjh.common.enumeration.EnumChoiceAction;
+import com.xjh.common.model.DeskOrderParam;
+import com.xjh.common.model.DishesChoiceItemBO;
+import com.xjh.common.model.DishesQueryCond;
 import com.xjh.common.utils.*;
 import com.xjh.common.valueobject.*;
 import com.xjh.dao.dataobject.Dishes;
@@ -20,9 +23,6 @@ import com.xjh.service.domain.model.PlaceOrderFromCartReq;
 import com.xjh.service.domain.model.SendOrderRequest;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SimpleForm;
-import com.xjh.common.model.DeskOrderParam;
-import com.xjh.common.model.DishesChoiceItemBO;
-import com.xjh.common.model.DishesQueryCond;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -36,6 +36,8 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -125,6 +127,15 @@ public class OrderDishesChoiceView extends VBox {
             DishesQueryCond newCond = CopyUtils.cloneObj(qryDishesCond.get()).newVersion();
             newCond.setPageNo(1);
             qryDishesCond.setValue(newCond);
+        });
+        dishesNameField.addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
+            // 回车事件
+            if (evt.getCode() == KeyCode.ENTER) {
+                qryDishesCond.get().setDishesName(dishesNameField.getText());
+                DishesQueryCond newCond = CopyUtils.cloneObj(qryDishesCond.get()).newVersion();
+                newCond.setPageNo(1);
+                qryDishesCond.setValue(newCond);
+            }
         });
         hbox.getChildren().add(queryBtn);
 
