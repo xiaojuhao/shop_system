@@ -1,9 +1,10 @@
 package com.xjh.startup.view;
 
 import com.xjh.common.enumeration.OpenDeskResult;
+import com.xjh.common.model.OpenDeskInputParam;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.dao.dataobject.Desk;
-import com.xjh.common.model.OpenDeskInputParam;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
@@ -37,5 +38,7 @@ public class OpenDeskDialog extends Dialog<OpenDeskInputParam> {
             rs.setResult(openDesk == btn ? OpenDeskResult.OPEN : OpenDeskResult.CANCEL);
             return rs;
         });
+        // 给人数字段设置焦点
+        Platform.runLater(custNum::requestFocus);
     }
 }
