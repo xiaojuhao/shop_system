@@ -7,6 +7,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.enumeration.EnumChoiceAction;
 import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumOrderSaleType;
+import com.xjh.common.model.DeskOrderParam;
+import com.xjh.common.model.OrderDishesTableItemBO;
 import com.xjh.common.utils.*;
 import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.common.valueobject.OrderOverviewVO;
@@ -15,17 +17,13 @@ import com.xjh.dao.mapper.PrinterDAO;
 import com.xjh.dao.mapper.PrinterTaskDAO;
 import com.xjh.service.domain.*;
 import com.xjh.service.domain.model.StoreVO;
+import com.xjh.service.printers.OrderPrinterHelper;
+import com.xjh.service.printers.PrinterImpl;
 import com.xjh.service.remote.RemoteService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
-import com.xjh.service.printers.OrderPrinterHelper;
-import com.xjh.service.printers.PrintResult;
-import com.xjh.service.printers.PrinterImpl;
-import com.xjh.service.printers.PrinterStatus;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.MediumForm;
 import com.xjh.startup.view.base.SmallForm;
-import com.xjh.common.model.DeskOrderParam;
-import com.xjh.common.model.OrderDishesTableItemBO;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -39,6 +37,8 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
@@ -136,7 +136,12 @@ public class OrderDetailView extends VBox implements Initializable {
             GridPane.setMargin(closeDeskBtn, new Insets(0, 0, 30, 0));
             closeDeskBtn.setOnMouseClicked(evt -> doCloseDesk(desk));
             gridPane.add(closeDeskBtn, 4, rowIndex, 1, 2);
-
+            // ------ 关台按钮监听空格键 ------
+            closeDeskBtn.addEventHandler(KeyEvent.KEY_PRESSED, evt -> {
+                if (evt.getCode() == KeyCode.SPACE) {
+                    doCloseDesk(desk);
+                }
+            });
 
             // 第二行
             rowIndex++;
