@@ -1,5 +1,6 @@
 package com.xjh.startup.view;
 
+import com.xjh.common.model.DishesAttributeBO;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
@@ -15,7 +16,6 @@ import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.LargeForm;
 import com.xjh.startup.view.base.ModelWindow;
-import com.xjh.common.model.DishesAttributeBO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;

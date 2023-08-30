@@ -20,7 +20,6 @@ import com.xjh.dao.query.OrderPayQuery;
 import com.xjh.dao.query.PageQueryOrderReq;
 import com.xjh.service.domain.model.CreateOrderParam;
 import com.xjh.service.printers.OrderPrinterHelper;
-import com.xjh.service.printers.PrintResult;
 import com.xjh.service.printers.PrinterImpl;
 import com.xjh.service.ws.NotifyService;
 

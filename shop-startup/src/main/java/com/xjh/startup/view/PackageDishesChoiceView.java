@@ -1,6 +1,7 @@
 package com.xjh.startup.view;
 
 import com.xjh.common.enumeration.EnumChoseType;
+import com.xjh.common.model.DishesChoiceItemBO;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.JSONBuilder;
@@ -12,7 +13,6 @@ import com.xjh.dao.mapper.DishesPackageDishesDAO;
 import com.xjh.dao.mapper.DishesPackageTypeDAO;
 import com.xjh.service.domain.DishesService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
-import com.xjh.common.model.DishesChoiceItemBO;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;

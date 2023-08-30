@@ -3,9 +3,6 @@ package com.xjh.common.kvdb.impl;
 import com.xjh.common.kvdb.AbstractBerkeleyKvDB;
 import com.xjh.common.kvdb.Committable;
 import com.xjh.common.utils.Logger;
-import com.xjh.common.valueobject.CartVO;
-
-import java.util.Properties;
 
 public class SysCfgDB extends AbstractBerkeleyKvDB<String> {
     private static class Inst {

@@ -2,6 +2,7 @@ package com.xjh.startup.view.paymethods;
 
 import com.xjh.common.enumeration.EnumPayAction;
 import com.xjh.common.enumeration.EnumPayMethod;
+import com.xjh.common.model.DeskOrderParam;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Result;
@@ -17,7 +18,6 @@ import com.xjh.service.vo.ManyCoupon;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.SimpleForm;
-import com.xjh.common.model.DeskOrderParam;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;

@@ -1,5 +1,6 @@
 package com.xjh.startup.view;
 
+import com.xjh.common.model.DishesAttributeValueBO;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.CopyUtils;
 import com.xjh.common.utils.cellvalue.OperationButton;
@@ -8,7 +9,6 @@ import com.xjh.common.valueobject.DishesAttributeVO;
 import com.xjh.common.valueobject.DishesAttributeValueVO;
 import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SmallForm;
-import com.xjh.common.model.DishesAttributeValueBO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;

@@ -1,5 +1,6 @@
 package com.xjh.startup.view;
 
+import com.xjh.common.model.DeskOrderParam;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
@@ -7,7 +8,6 @@ import com.xjh.common.utils.Result;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SmallForm;
-import com.xjh.common.model.DeskOrderParam;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;

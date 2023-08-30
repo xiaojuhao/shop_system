@@ -16,13 +16,10 @@ import com.xjh.service.domain.model.StoreVO;
 import com.xjh.service.printers.models.TextModel;
 import com.xjh.service.remote.RemoteService;
 import com.xjh.service.vo.PrePaidCard;
-import jdk.nashorn.internal.runtime.regexp.joni.Config;
 import org.apache.commons.collections4.CollectionUtils;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.atomic.DoubleAdder;
 import java.util.function.Predicate;

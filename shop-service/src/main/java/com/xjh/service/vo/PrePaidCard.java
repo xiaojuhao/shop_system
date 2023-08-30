@@ -4,8 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.ReflectionUtils;
 import lombok.Data;
 
-import java.sql.Ref;
-
 @Data
 public class PrePaidCard {
     String prePaidCardId;

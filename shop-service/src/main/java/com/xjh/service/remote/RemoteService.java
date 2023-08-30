@@ -1,13 +1,10 @@
 package com.xjh.service.remote;
 
 import cn.hutool.http.HttpUtil;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.utils.CurrentAccount;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
-import com.xjh.dao.dataobject.Order;
-import com.xjh.service.domain.model.StoreVO;
 import com.xjh.service.vo.ManyCoupon;
 import com.xjh.service.vo.PrePaidCard;
 import com.xjh.service.vo.SerialNumber;

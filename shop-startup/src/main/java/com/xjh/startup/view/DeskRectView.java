@@ -2,6 +2,7 @@ package com.xjh.startup.view;
 
 import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.OpenDeskResult;
+import com.xjh.common.model.OpenDeskInputParam;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
@@ -12,7 +13,6 @@ import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.model.OpenDeskParam;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
-import com.xjh.common.model.OpenDeskInputParam;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.Scene;

@@ -1,6 +1,7 @@
 package com.xjh.startup.view;
 
 import com.google.common.collect.Lists;
+import com.xjh.common.model.DeskOrderParam;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
@@ -14,7 +15,6 @@ import com.xjh.service.domain.OrderService;
 import com.xjh.service.ws.NotifyService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SmallForm;
-import com.xjh.common.model.DeskOrderParam;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;

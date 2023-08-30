@@ -1,5 +1,7 @@
 package com.xjh.startup.view;
 
+import com.xjh.common.model.CartItemBO;
+import com.xjh.common.model.DeskOrderParam;
 import com.xjh.common.utils.*;
 import com.xjh.common.utils.cellvalue.InputNumber;
 import com.xjh.common.utils.cellvalue.Money;
@@ -15,8 +17,6 @@ import com.xjh.service.domain.model.PlaceOrderFromCartReq;
 import com.xjh.service.ws.NotifyService;
 import com.xjh.service.ws.SocketUtils;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
-import com.xjh.common.model.CartItemBO;
-import com.xjh.common.model.DeskOrderParam;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

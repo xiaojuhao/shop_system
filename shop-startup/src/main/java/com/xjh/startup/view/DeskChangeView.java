@@ -1,6 +1,7 @@
 package com.xjh.startup.view;
 
 import com.xjh.common.enumeration.EnumDeskStatus;
+import com.xjh.common.model.DeskOrderParam;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.Result;
 import com.xjh.common.utils.TableViewUtils;
@@ -10,7 +11,6 @@ import com.xjh.service.domain.DeskService;
 import com.xjh.service.domain.OrderService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.MediumForm;
-import com.xjh.common.model.DeskOrderParam;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;

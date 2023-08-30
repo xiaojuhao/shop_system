@@ -2,6 +2,7 @@ package com.xjh.startup.view;
 
 import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSONObject;
+import com.xjh.common.model.IntStringPair;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.dao.dataobject.PrinterDO;
 import com.xjh.dao.dataobject.PrinterTaskDO;
@@ -10,7 +11,6 @@ import com.xjh.service.domain.PrinterService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.SimpleForm;
-import com.xjh.common.model.IntStringPair;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;

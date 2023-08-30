@@ -1,12 +1,10 @@
 package com.xjh.startup.view;
 
-import com.xjh.common.model.ConfigurationBO;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.service.domain.ConfigService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.MediumForm;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.stage.Screen;

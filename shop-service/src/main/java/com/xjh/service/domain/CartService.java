@@ -14,8 +14,6 @@ import com.xjh.dao.mapper.*;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
 import com.xjh.service.domain.model.SendOrderRequest;
 import com.xjh.service.printers.OrderPrinterHelper;
-import com.xjh.service.printers.PrintResult;
-import com.xjh.service.printers.Printer;
 import com.xjh.service.printers.PrinterImpl;
 import com.xjh.service.ws.NotifyService;
 import com.xjh.service.ws.SocketUtils;
