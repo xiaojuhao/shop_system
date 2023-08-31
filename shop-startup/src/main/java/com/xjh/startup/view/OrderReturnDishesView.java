@@ -15,16 +15,20 @@ import com.xjh.service.domain.OrderService;
 import com.xjh.service.ws.NotifyService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SmallForm;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class OrderReturnDishesView extends SmallForm {
@@ -34,20 +38,37 @@ public class OrderReturnDishesView extends SmallForm {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
 
     public OrderReturnDishesView(DeskOrderParam param) {
+        TextField otherReason = new TextField();
         // 标题
         Label title = new Label("退菜[桌号:" + param.getDeskName() + "]");
         title.setFont(Font.font(16));
         title.setTextFill(Color.RED);
         addLine(title);
         // 退菜原因
-        ComboBox<String> reasonList = buildReasonCombo();
+        ComboBox<String> reasonList = buildReasonCombo(newValue -> {
+            System.out.println(newValue);
+            if (CommonUtils.eq(newValue, "其它")) {
+                otherReason.setDisable(false);
+            } else {
+                otherReason.setText("");
+                otherReason.setDisable(true);
+            }
+        });
         reasonList.setPrefWidth(200);
         addLine(newCenterLine(new Label("退菜原因: "), reasonList));
+        // 其他原因录入
+
+        otherReason.setDisable(true);
+        otherReason.setPrefWidth(200);
+        addLine(newCenterLine(new Label("其他原因: "), otherReason));
         // 退菜按钮
         Button returnBtn = new Button("退菜");
         returnBtn.setOnMouseClicked(evt -> {
             String r = reasonList.getSelectionModel().getSelectedItem();
-            if(CommonUtils.isBlank(r)){
+            if (CommonUtils.eq(r, "其它")) {
+                r = CommonUtils.trim(otherReason.getText());
+            }
+            if (CommonUtils.isBlank(r)) {
                 AlertBuilder.ERROR("请选择退菜原因");
                 return;
             }
@@ -89,12 +110,17 @@ public class OrderReturnDishesView extends SmallForm {
         }
     }
 
-    private ComboBox<String> buildReasonCombo(){
+    private ComboBox<String> buildReasonCombo(Consumer<String> onChange) {
         ObservableList<String> options = FXCollections.observableArrayList(
-                Lists.newArrayList("客人不要了", "多点或下错单", "菜品缺货", "菜品质量问题", "上菜太慢",  "其它")
+                Lists.newArrayList("客人不要了", "多点或下错单", "菜品缺货", "菜品质量问题", "上菜太慢", "其它")
         );
         ComboBox<String> cb = new ComboBox<>(options);
         cb.getSelectionModel().select(0); // 默认选第一个
+        cb.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                onChange.accept(newValue);
+            }
+        });
         return cb;
     }
 }
