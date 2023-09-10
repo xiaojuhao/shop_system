@@ -67,12 +67,15 @@ public class OrderPrinterHelper {
         array.add(simpleLineText("订单编号:" + order.getCreateTime() + "" + order.getOrderId()));
         array.add(simpleLineText("门店名称:" + store.getName()));
         array.add(simpleLineText("开台时间:" + DateBuilder.base(order.getCreateTime()).timeStr()));
-        array.add(simpleLineText("桌台信息:" + desk.getBelongDeskType() + desk.getDeskName()));
+        array.add(simpleLineText("桌台信息: 小句号料理-" + desk.getDeskName()));
         array.add(simpleLineText("用餐人数:" + order.getOrderCustomerNums()));
         array.add(simpleLineText("点菜员:点菜员1"));
         array.add(crlf()); // 换行
         // 订单菜品
         List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(param.getOrderId());
+        // 过滤退菜记录
+        orderDishesList = CommonUtils.filter(orderDishesList, OrderDishes.isReturnDishes().negate());
+
         List<OrderDishes> discountableList = CommonUtils.filter(orderDishesList, discountableChecker);
         List<OrderDishes> nonDiscountableList = CommonUtils.filter(orderDishesList, discountableChecker.negate());
         DoubleAdder sumPrice = new DoubleAdder();
@@ -770,7 +773,7 @@ public class OrderPrinterHelper {
         jsonObject.put("Name", "桌台值");
         jsonObject.put("ComType", EnumComType.TEXT.type);
         if (ifChangeDesk) {
-            jsonObject.put("SampleContent", oldDesk.getDeskName() + "-转到-" + desk.getDeskName());
+            jsonObject.put("SampleContent", "小句号料理-"+oldDesk.getDeskName() + "-转到-" + desk.getDeskName());
         } else {
             // jsonObject.put("SampleContent", desk.getBelongDeskType().getTypeName() + "-" + desk.getDeskName());
             jsonObject.put("SampleContent", desk.getDeskName());
@@ -1045,7 +1048,7 @@ public class OrderPrinterHelper {
         jsonObject.put("Name", "桌台信息值");
         jsonObject.put("ComType", EnumComType.TEXT.type);
         // jsonObject.put("SampleContent", orderDesk.getBelongDeskType().getTypeName() + "-" + orderDesk.getDeskName());
-        jsonObject.put("SampleContent", orderDesk.getDeskName());
+        jsonObject.put("SampleContent", "小句号料理-"+orderDesk.getDeskName());
         jsonObject.put("Size", 1);
         jsonObject.put("FrontLen", 0);
         jsonObject.put("BehindLen", 0);
