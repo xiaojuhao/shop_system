@@ -432,12 +432,12 @@ public class OrderPrinterHelper {
         jsonObject.put("Name", "桌台值");
         jsonObject.put("ComType", EnumComType.TEXT.type);
         // jsonObject.put("SampleContent", desk.getBelongDeskType().getTypeName() + "-" + desk.getDeskName());
-        jsonObject.put("SampleContent", desk.getDeskName());
+        jsonObject.put("SampleContent", "小句号日料-"+desk.getDeskName());
         jsonObject.put("Size", 2);
         jsonObject.put("FrontLen", 0);
         jsonObject.put("BehindLen", 0);
         jsonObject.put("FrontEnterNum", 0);
-        jsonObject.put("BehindEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 1);
         jsonArray.add(jsonObject);
 
         jsonObject = new JSONObject();
@@ -445,7 +445,7 @@ public class OrderPrinterHelper {
         jsonObject.put("ComType", EnumComType.LINE.type);
         jsonObject.put("Size", 1);
         jsonObject.put("FrontEnterNum", 0);
-        jsonObject.put("BehindEnterNum", 0);
+        jsonObject.put("BehindEnterNum", 1);
         jsonArray.add(jsonObject);
 
         jsonObject = new JSONObject();
@@ -776,7 +776,7 @@ public class OrderPrinterHelper {
             jsonObject.put("SampleContent", "小句号料理-"+oldDesk.getDeskName() + "-转到-" + desk.getDeskName());
         } else {
             // jsonObject.put("SampleContent", desk.getBelongDeskType().getTypeName() + "-" + desk.getDeskName());
-            jsonObject.put("SampleContent", desk.getDeskName());
+            jsonObject.put("SampleContent", "小句号日料-"+desk.getDeskName());
         }
         jsonObject.put("Size", 2);
         jsonObject.put("FrontLen", 0);
