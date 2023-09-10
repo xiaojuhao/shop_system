@@ -189,7 +189,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 newCol("状态", "dishesStatus", 80),
                 newCol("价格", "dishesPrice", 100),
                 newCol("库存", "dishesStock", 100),
-                newCol("操作", "operations", 400)
+                newCol("操作", "operations", 500)
         );
         tableView.setItems(items);
         tableView.setPrefHeight(height);

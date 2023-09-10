@@ -55,10 +55,10 @@ public class DishesTypeManageListView extends SimpleForm implements Initializabl
                 newCol("分类名称", DishesType::getTypeName, 200),
                 newCol("是否可以反结账", this::transferIfRefund, 80),
                 newCol("状态", this::transferStatus, 80),
-                newCol("创建时间", it -> DateBuilder.base(it.getCreatTime()).timeStr(), 100),
+                newCol("创建时间", it -> DateBuilder.base(it.getCreatTime()).timeStr(), 260),
                 newCol("排序顺序", DishesType::getSortby, 100),
                 newCol("H5是否显示", this::transferH5Status, 100),
-                newCol("操作", this::operations, 200)
+                newCol("操作", this::operations, 260)
         );
         tableView.setPrefHeight(height);
         addLine(tableView);
