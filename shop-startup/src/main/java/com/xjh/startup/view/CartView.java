@@ -37,6 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.xjh.common.utils.CommonUtils.sizeOf;
 import static com.xjh.common.utils.TableViewUtils.newCol;
 import static com.xjh.service.domain.DishesTypeService.toDishesTypeName;
+import static java.lang.Math.max;
 
 public class CartView extends VBox {
     CartService cartService = GuiceContainer.getInstance(CartService.class);
@@ -66,9 +67,11 @@ public class CartView extends VBox {
         box.setSpacing(20);
 
         Button removeBtn = new Button("删除");
+        removeBtn.setStyle("-fx-font-size:16px;");
         removeBtn.setOnMouseClicked(evt -> doDeleteItem(param, tv));
 
         Button placeBtn = new Button("确定下单");
+        placeBtn.setStyle("-fx-font-size:16px;");
         placeBtn.setOnMouseClicked(evt -> doPlaceOrder(param));
 
         box.getChildren().addAll(removeBtn, placeBtn);
@@ -76,14 +79,15 @@ public class CartView extends VBox {
     }
 
     private TableView<CartItemBO> tableList() {
+        double tblWidth = 1500 * 0.9;
         try {
-            tv.getColumns().addAll(newCol("序号", "seqNo", 100), // 序号
-                    newCol("菜品类型", "dishesTypeName", 100), // 菜品类型
-                    newCol("菜品名称", "dishesName", 200), // 菜品名称
-                    newCol("价格", "dishesPrice", 100), // 价格
-                    newCol("数量", "nums", 150), // 数量
-                    newCol("小计", "totalPrice", 100), // 小计
-                    newCol("备注", "attrRemark", 100));
+            tv.getColumns().addAll(newCol("序号", "seqNo", max(100, tblWidth * 0.1)), // 序号
+                    newCol("菜品类型", "dishesTypeName",  max(100, tblWidth * 0.1)), // 菜品类型
+                    newCol("菜品名称", "dishesName",  max(100, tblWidth * 0.3)), // 菜品名称
+                    newCol("价格", "dishesPrice",  max(100, tblWidth * 0.1)), // 价格
+                    newCol("数量", "nums",  max(100, tblWidth * 0.15)), // 数量
+                    newCol("小计", "totalPrice",  max(100, tblWidth * 0.1)), // 小计
+                    newCol("备注", "attrRemark",  max(100, tblWidth * 0.1)));
             reloadData();
         } catch (Exception ex) {
             Logger.error("查询购物车异常:" + param.getDeskName() + ", " + ex.getMessage());

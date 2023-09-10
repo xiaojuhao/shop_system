@@ -58,6 +58,7 @@ import java.util.stream.Collectors;
 
 import static com.xjh.common.utils.CommonUtils.formatMoney;
 import static com.xjh.common.utils.TableViewUtils.newCol;
+import static java.lang.Math.max;
 
 public class OrderDetailView extends VBox implements Initializable {
     // 依赖服务
@@ -96,7 +97,8 @@ public class OrderDetailView extends VBox implements Initializable {
     }
 
     public void initialize() {
-        double width = this.getScene().getWidth();
+        double tblWidth = 1500;
+        double width = tblWidth;
         double height = this.getScene().getHeight();
         TimeRecord cost = TimeRecord.start();
         Integer orderId = desk.getOrderId();
@@ -225,13 +227,13 @@ public class OrderDetailView extends VBox implements Initializable {
             }
             tableView.setPadding(new Insets(5, 0, 0, 5));
             tableView.getColumns().addAll(
-                    newCol("序号", "orderDishesId", 100),
-                    newCol("子订单", "subOrderId", 100),
-                    newCol("菜名名称", "dishesName", 300),
-                    newCol("单价", "price", 160),
-                    newCol("折后价", "discountPrice", 100),
-                    newCol("数量", "orderDishesNum", 100),
-                    newCol("类型", "saleType", 100)
+                    newCol("序号", "orderDishesId", max(100, tblWidth/10)),
+                    newCol("子订单", "subOrderId", max(100, tblWidth/10)),
+                    newCol("菜名名称", "dishesName", max(100, tblWidth/10*3)),
+                    newCol("单价", "price", max(100, tblWidth/10)*1.6),
+                    newCol("折后价", "discountPrice", max(100, tblWidth/10)),
+                    newCol("数量", "orderDishesNum", max(100, tblWidth/10)),
+                    newCol("类型", "saleType", max(100, tblWidth/10))
             );
             addLine(tableView);
         }
@@ -307,10 +309,11 @@ public class OrderDetailView extends VBox implements Initializable {
     }
 
     private Label createLabel(String name, double width, Function<OrderOverviewVO, String> onChage) {
-        double swdith = Math.max(200, width / 5 - 20);
+        double swdith = max(200, width / 5 - 20);
 
         Label label = new Label(name);
         label.setMinWidth(swdith);
+        label.setStyle("-fx-font-size:16px;");
         if (onChage != null) {
             orderView.addListener((a, b, c) -> {
                 label.setText(name + ": " + onChage.apply(c));
@@ -321,13 +324,14 @@ public class OrderDetailView extends VBox implements Initializable {
     }
 
     private Button createButton(String name, double width, EventHandler<? super MouseEvent> onClick) {
-        width = Math.max(66, (width - 12 * 15) / 12);
+        width = max(66, (width - 12 * 15) / 12);
         if (width > 100) {
             width = 100;
         }
         Button btn = new Button(name);
         btn.setMinWidth(width);
         btn.setMinHeight(width / 5 * 3);
+        btn.setStyle("-fx-font-size:16px;");
         if (onClick != null) {
             btn.setOnMouseClicked(onClick);
         }

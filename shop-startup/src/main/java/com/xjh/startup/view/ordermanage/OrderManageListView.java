@@ -190,20 +190,20 @@ public class OrderManageListView extends SimpleForm implements Initializable {
         // "应付款", "菜品总额", "折扣金额", "抹零金额", "退菜金额", "已付金额", "店长减免", "已退现金", "支付状态"
         tableView.getColumns().addAll(
                 newCol("编号", rowIndex(), 30),
-                newCol("订单号", BO::getOrderId, 100),
+                newCol("订单号", BO::getOrderId, 150),
                 newCol("桌号", BO::getDeskName, 30),
-                newCol("下单员工", BO::getAccountNickname, 60),
+                newCol("下单员工", BO::getAccountNickname, 100),
                 newCol("就餐人数", BO::getOrderCustomerNums, 30),
-                newCol("下单时间", BO::getOrderTime, 150),
-                newCol("应付款", BO::getNeedPayAmt, 50),
-                newCol("菜品总额", BO::getTotalPrice, 50),
-                newCol("折扣金额", BO::getDiscountAmt, 50),
-                newCol("抹零金额", BO::getEraseAmt, 50),
-                newCol("退菜金额", BO::getReturnDishesPrice, 50),
-                newCol("已付金额", BO::getPaidAmt, 50),
-                newCol("店长减免", BO::getReductionAmt, 50),
-                newCol("已退现金", BO::getReturnedCash, 50),
-                newCol("支付状态", BO::getPaymentStatus, 50)
+                newCol("下单时间", BO::getOrderTime, 220),
+                newCol("应付款", BO::getNeedPayAmt, 80),
+                newCol("菜品总额", BO::getTotalPrice, 80),
+                newCol("折扣金额", BO::getDiscountAmt, 80),
+                newCol("抹零金额", BO::getEraseAmt, 80),
+                newCol("退菜金额", BO::getReturnDishesPrice, 80),
+                newCol("已付金额", BO::getPaidAmt, 80),
+                newCol("店长减免", BO::getReductionAmt, 80),
+                newCol("已退现金", BO::getReturnedCash, 80),
+                newCol("支付状态", BO::getPaymentStatus, 80)
         );
         tableView.setRowFactory(tv -> {
             TableRow<BO> row = new TableRow<>();

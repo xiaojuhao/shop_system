@@ -50,7 +50,7 @@ public class TableViewUtils {
             Callback<CellDataFeatures<T, Object>, ObservableValue<Object>> value,
             double width) {
         TableColumn<T, Object> c = new TableColumn<>(colTitle);
-        c.setStyle("-fx-border-width: 0px; ");
+        c.setStyle("-fx-border-width: 0px; -fx-font-size: 18px;");
         if (width > 0) {
             c.setMinWidth(width);
         }

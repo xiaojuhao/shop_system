@@ -157,11 +157,11 @@ public class OrderManageDetailShowView extends SimpleForm {
         addLine(label);
         TableView<OrderDishes> tableView = new TableView<>();
         tableView.getColumns().addAll(
-                newCol("序号", rowIndex(), 60),
-                newCol("菜品名称", orderDishes -> getDishesName(orderDishes.getDishesId()), 150),
+                newCol("序号", rowIndex(), 100),
+                newCol("菜品名称", orderDishes -> getDishesName(orderDishes.getDishesId()), 300),
                 newCol("单价", orderDishes -> new Money(orderDishes.getOrderDishesPrice()), 100),
                 newCol("折扣单价", OrderDishes::getOrderDishesDiscountPrice, 100),
-                newCol("数量", OrderDishes::getOrderDishesNums, 80),
+                newCol("数量", OrderDishes::getOrderDishesNums, 100),
                 newCol("备注", o -> null, 0)
         );
         tableView.setItems(FXCollections.observableArrayList(orderDishesList));
