@@ -112,7 +112,7 @@ public class StoreService {
             return false;
         }
         if(CommonUtils.isBlank(store.getOwnerPassword())){
-            return true;
+            return false;
         }
         return CommonUtils.eq(pwd, store.getOwnerPassword());
     }
