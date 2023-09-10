@@ -6,18 +6,23 @@ import com.xjh.common.utils.cellvalue.RichText;
 import javafx.application.Application;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,14 +34,14 @@ public class TableViewTest extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         TableView<DataModel> tv = new TableView<>();
+        tv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
         ObservableList<TableColumn<DataModel, ?>> list = tv.getColumns();
-        list.addAll(
-                newCol("菜品ID", "dishesId", 100),
-                newCol("菜品名称", "dishesName", 200),
-                newPriceColumn(),
-                newCol("数量", "nums", 100),
-                newCol("小计", "totalPrice", 100)
-        );
+        list.addAll(newCol("菜品ID", "dishesId", 100), //
+                newCol("菜品名称", "dishesName", 200), //
+                newPriceColumn(), //
+                newCol("数量", "nums", 100), //
+                newCol("小计", "totalPrice", 100));
         tv.getItems().addAll(loadData());
         primaryStage.setScene(new Scene(tv, 800, 800));
         primaryStage.show();
@@ -47,7 +52,6 @@ public class TableViewTest extends Application {
     }
 
 
-    static AtomicLong index = new AtomicLong();
     private TableColumn<DataModel, Money> newPriceColumn() {
         TableColumn<DataModel, Money> column = new TableColumn<>("价格");
         column.setStyle("-fx-border-width: 0px; ");
@@ -167,6 +171,7 @@ public class TableViewTest extends Application {
         return list;
     }
 
+    @Data
     public static class DataModel {
         Integer dishesId;
         RichText dishesName;
@@ -175,61 +180,5 @@ public class TableViewTest extends Application {
         String nums;
         String totalPrice;
         String ifDishesPackage;
-
-        public Integer getDishesId() {
-            return dishesId;
-        }
-
-        public void setDishesId(Integer dishesId) {
-            this.dishesId = dishesId;
-        }
-
-        public RichText getDishesName() {
-            return dishesName;
-        }
-
-        public void setDishesName(RichText dishesName) {
-            this.dishesName = dishesName;
-        }
-
-        public String getDishesPriceId() {
-            return dishesPriceId;
-        }
-
-        public void setDishesPriceId(String dishesPriceId) {
-            this.dishesPriceId = dishesPriceId;
-        }
-
-        public Double getDishesPrice() {
-            return dishesPrice;
-        }
-
-        public void setDishesPrice(Double dishesPrice) {
-            this.dishesPrice = dishesPrice;
-        }
-
-        public String getNums() {
-            return nums;
-        }
-
-        public void setNums(String nums) {
-            this.nums = nums;
-        }
-
-        public String getIfDishesPackage() {
-            return ifDishesPackage;
-        }
-
-        public void setIfDishesPackage(String ifDishesPackage) {
-            this.ifDishesPackage = ifDishesPackage;
-        }
-
-        public String getTotalPrice() {
-            return totalPrice;
-        }
-
-        public void setTotalPrice(String totalPrice) {
-            this.totalPrice = totalPrice;
-        }
     }
 }

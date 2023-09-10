@@ -6,6 +6,7 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -14,6 +15,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseDragEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.util.Callback;
 
@@ -55,7 +58,7 @@ public class TableViewUtils {
         // 属性
         c.setCellValueFactory(value);
         c.setCellFactory(col -> {
-            TableCell<T, Object> cell = new TableCell<>();
+            TableCell<T, Object> cell = new DragSelectionCell<T, Object>();
             cell.itemProperty().addListener((obs, ov, nv) -> render(cell, obs, nv));
             return cell;
         });
@@ -146,6 +149,28 @@ public class TableViewUtils {
             sp.addListener((x, o, n) -> render(cell, obs, n));
         } else if(nv != null){
             cell.textProperty().set(CommonUtils.stringify(nv));
+        }
+    }
+
+    public static class DragSelectionCell<S,T> extends TableCell<S, T> {
+        public DragSelectionCell() {
+            setOnDragDetected(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    startFullDrag();
+                    // getTableColumn().getTableView().getSelectionModel().select(getIndex(), getTableColumn());
+                    getTableColumn().getTableView().getSelectionModel().select(getIndex());
+                }
+            });
+
+
+            setOnMouseDragEntered(new EventHandler<MouseDragEvent>() {
+                @Override
+                public void handle(MouseDragEvent event) {
+                    // getTableColumn().getTableView().getSelectionModel().select(getIndex(), getTableColumn());
+                    getTableColumn().getTableView().getSelectionModel().select(getIndex());
+                }
+            });
         }
     }
 }
