@@ -87,11 +87,11 @@ public class PrinterManageListView extends MediumForm implements Initializable {
 
         tableView.getColumns().addAll(
                 newCol("ID", "printerId", 100),
-                newCol("名称", "printerName", 100),
-                newCol("IP", "printerIp", 120),
+                newCol("名称", "printerName", 150),
+                newCol("IP", "printerIp", 160),
                 newCol("端口", "printerPort", 80),
-                newCol("备注", "printerInfo", 100),
-                newCol("类型", "printerType", 100),
+                newCol("备注", "printerInfo", 130),
+                newCol("类型", "printerType", 130),
                 newCol("状态", "printerStatus", 100),
                 newCol("操作", "operations", 200)
         );
