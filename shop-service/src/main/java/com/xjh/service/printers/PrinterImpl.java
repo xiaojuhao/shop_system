@@ -78,17 +78,18 @@ public class PrinterImpl implements Printer {
 
     public Future<PrintResult> submitTask(List<Object> contentItems, boolean isVoicce) {
         return executorService.submit(() -> {
-            try {
-                PrintResult rs = print(contentItems, isVoicce);
-                Logger.info(JSON.toJSONString(rs));
-                return rs;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                PrintResult fail = new PrintResult(this, contentItems);
-                fail.toFailure(PrinterStatus.UNKNOWN.status);
-                Logger.info(JSON.toJSONString(fail));
-                return fail;
+            PrintResult fail = new PrintResult(this, contentItems);
+            fail.toFailure(PrinterStatus.UNKNOWN.status);
+            for(int i = 0; i < 10; i++){
+                try {
+                    PrintResult rs = print(contentItems, isVoicce);
+                    Logger.info(JSON.toJSONString(rs));
+                    return rs;
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
+            return fail;
         });
     }
 
