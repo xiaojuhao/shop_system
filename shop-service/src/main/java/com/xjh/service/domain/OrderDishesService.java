@@ -120,7 +120,7 @@ public class OrderDishesService {
             sql += " and createtime >= " + base(req.getStartDate()).mills();
         }
         if (req.getEndDate() != null) {
-            sql += " and createtime <= " + base(req.getEndDate()).mills();
+            sql += " and createtime <= " + base(req.getEndDate()).plusDays(1).mills();
         }
         sql += " GROUP BY dishesId,ifDishesPackage,dishesPriceId order by count desc";
         Result<List<DishesSaleStatModel>> rs = orderDishesDAO.query(sql, DishesSaleStatModel.class);
@@ -143,7 +143,7 @@ public class OrderDishesService {
             sql += " and createtime >= " + base(req.getStartDate()).mills();
         }
         if (req.getEndDate() != null) {
-            sql += " and createtime <= " + base(req.getEndDate()).mills();
+            sql += " and createtime <= " + base(req.getEndDate()).plusDays(1).mills();
         }
         sql += " GROUP BY dishesTypeId order by count desc";
         Result<List<DishesTypeSaleStatModel>> rs = orderDishesDAO.query(sql, DishesTypeSaleStatModel.class);

@@ -78,7 +78,7 @@ public class OrderDishesSaleStatisticsView extends SimpleForm implements Initial
         // 时间选择
         HBox dateRangeBlock = new HBox();
         Label dateRangeLabel = new Label("订单日期:");
-        DatePicker datePickerStart = new DatePicker(LocalDate.now().minusDays(1));
+        DatePicker datePickerStart = new DatePicker(LocalDate.now());
         datePickerStart.setPrefWidth(160);
         DatePicker datePickerEnd = new DatePicker(LocalDate.now());
         datePickerEnd.setPrefWidth(160);
@@ -110,10 +110,10 @@ public class OrderDishesSaleStatisticsView extends SimpleForm implements Initial
 
     private void buildContent(double height) {
         // "编号", "菜品名称", "销售份数", "菜品总金额"
-        tableView.getColumns().addAll(newCol("编号", rowIndex(), 60), //
-                newCol("菜品名称", BO::getDishesName, 200),  //
-                newCol("销售份数", BO::getCount, 100),  //
-                newCol("菜品总金额", BO::getAllPrice, 100)  //
+        tableView.getColumns().addAll(newCol("编号", rowIndex(), 100), //
+                newCol("菜品名称", BO::getDishesName, 360),  //
+                newCol("销售份数", BO::getCount, 150),  //
+                newCol("菜品总金额", BO::getAllPrice, 150)  //
         );
 
         tableView.setItems(items);

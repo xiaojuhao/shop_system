@@ -95,10 +95,10 @@ public class OrderManageReturnedListView extends SimpleForm implements Initializ
 
     private void buildContent(double height) {
         tableView.getColumns().addAll(
-                newCol("桌号", ReturnReasonDO::getDeskName, 30),
-                newCol("菜品名称", ReturnReasonDO::getDishesName, 250),
-                newCol("退菜原因", ReturnReasonDO::getReturnReason, 200),
-                newCol("退菜时间", it -> DateBuilder.base(it.getAddtime()).timeStr(), 200)
+                newCol("桌号", ReturnReasonDO::getDeskName, 60),
+                newCol("菜品名称", ReturnReasonDO::getDishesName, 360),
+                newCol("退菜原因", ReturnReasonDO::getReturnReason, 360),
+                newCol("退菜时间", it -> DateBuilder.base(it.getAddtime()).timeStr(), 220)
         );
         tableView.setPrefHeight(height);
         addLine(tableView);
