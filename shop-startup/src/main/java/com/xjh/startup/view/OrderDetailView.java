@@ -454,6 +454,12 @@ public class OrderDetailView extends VBox implements Initializable {
             AlertBuilder.ERROR("请选择退菜记录");
             return;
         }
+        for(OrderDishesTableItemBO bo : list){
+            if(CommonUtils.isBlank(bo.getOrderDishesId())){
+                AlertBuilder.ERROR("请选择正确的退菜记录");
+                return;
+            }
+        }
         List<String> returnList = new ArrayList<>();
         list.forEach(it -> returnList.add(it.getOrderDishesId()));
 
