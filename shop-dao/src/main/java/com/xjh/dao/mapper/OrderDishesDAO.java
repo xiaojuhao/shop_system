@@ -62,21 +62,6 @@ public class OrderDishesDAO {
         }
     }
 
-    public Result<Integer> separateOrder(Integer subOrderId, Integer toOrderId) {
-        try {
-            String sql = "update order_dishes_list set orderId=" + toOrderId + " where subOrderId=" + subOrderId;
-            int rs = Db.use(ds).execute(sql);
-            if (rs > 0) {
-                return Result.success(rs);
-            } else {
-                return Result.fail("更新订单菜品记录失败(子订单号不存在)");
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return Result.fail(ex.getMessage());
-        }
-    }
-
     public List<OrderDishes> select(OrderDishes example) {
         try {
             List<Entity> list = Db.use(ds).find(EntityUtils.create(example));

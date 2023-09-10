@@ -55,7 +55,7 @@ public class OrderSeparateView extends MediumForm {
                 return;
             }
             Item item = selected.get(0);
-            Result<String> changeRs = orderService.separateOrder(param.getSeparateSubOrderIdList(), item.getDeskId());
+            Result<String> changeRs = orderService.separateOrder(param.getSeparateOrderDishedsIds(), item.getDeskId());
             if (!changeRs.isSuccess()) {
                 AlertBuilder.ERROR(changeRs.getMsg());
                 return;

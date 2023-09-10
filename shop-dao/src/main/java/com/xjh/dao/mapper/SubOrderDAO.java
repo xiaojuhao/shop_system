@@ -88,6 +88,17 @@ public class SubOrderDAO {
         return Result.success(parseInt(id, null));
     }
 
+    public Result<Integer> deleteBySubOrderId(Integer subOrderId) {
+        try {
+            String sql = " delete from suborder_list where subOrderId = " + subOrderId;
+            int i = Db.use(ds).execute(sql);
+            return Result.success(i);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Result.fail(ex.getMessage());
+        }
+    }
+
     public Result<Integer> updateById(SubOrder subOrder) {
         try {
             int i = Db.use(ds).update(EntityUtils.create(subOrder), EntityUtils.idCond(subOrder));

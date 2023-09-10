@@ -2,6 +2,7 @@ package com.xjh.service.domain;
 
 import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSONArray;
+import com.google.common.collect.Lists;
 import com.xjh.common.enumeration.EnumOrderSaleType;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DishesAttributeHelper;
@@ -56,8 +57,13 @@ public class OrderDishesService {
         }
     }
 
-    public Result<Integer> separateOrder(Integer subOrderId, Integer toOrderId) {
-        return orderDishesDAO.separateOrder(subOrderId, toOrderId);
+    public List<OrderDishes> selectBySubOrderId(Integer subOrderId) {
+        if (subOrderId == null) {
+            return new ArrayList<>();
+        }
+        OrderDishes c = new OrderDishes();
+        c.setSubOrderId(subOrderId);
+        return orderDishesDAO.select(c);
     }
 
     public List<OrderDishes> selectByOrderId(Integer orderId) {
@@ -67,6 +73,10 @@ public class OrderDishesService {
         OrderDishes c = new OrderDishes();
         c.setOrderId(orderId);
         return orderDishesDAO.select(c);
+    }
+
+    public OrderDishes selectById(Integer orderDishesId){
+        return CommonUtils.firstOf(selectByIdList(Lists.newArrayList(orderDishesId)));
     }
 
     public List<OrderDishes> selectByIdList(List<Integer> ids) {

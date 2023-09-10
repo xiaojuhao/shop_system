@@ -25,9 +25,7 @@ import com.xjh.service.ws.NotifyService;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Predicate;
 
 import static com.xjh.common.utils.CommonUtils.*;
@@ -70,38 +68,61 @@ public class OrderService {
         }
     }
 
-    public Result<String> separateOrder(List<String> subOrderIds, Integer toDeskId) {
-        Desk toDesk = deskService.getById(toDeskId);
-        if (toDesk == null) {
-            return Result.fail("桌号不存在");
-        }
-        Order toOrder = getOrder(toDesk.getOrderId());
-        if (toOrder == null) {
-            return Result.fail("餐桌[" + toDesk.getDeskName() + "]未开台，或者订单不存在");
-        }
-        // 子订单校验
-        for(String subOrderIdStr : subOrderIds) {
-            Integer subOrderId = CommonUtils.parseInt(subOrderIdStr, null);
-            SubOrder subOrder = subOrderDAO.findBySubOrderId(subOrderId);
-            if (subOrder == null) {
-                return Result.fail("子订单号" + subOrderId + "不存在");
+    public Result<String> separateOrder(List<Integer> separateOrderDishedsIds, Integer toDeskId) {
+        try{
+            Desk toDesk = deskService.getById(toDeskId);
+            if (toDesk == null) {
+                return Result.fail("桌号不存在");
             }
-        }
-        // 拆台操作
-        for(String subOrderIdStr : subOrderIds) {
-            Integer subOrderId = CommonUtils.parseInt(subOrderIdStr, null);
-            SubOrder subOrder = subOrderDAO.findBySubOrderId(subOrderId);
+            Order toOrder = getOrder(toDesk.getOrderId());
+            if (toOrder == null) {
+                return Result.fail("餐桌[" + toDesk.getDeskName() + "]未开台，或者订单不存在");
+            }
+
+            Set<Integer> origSubOrderId = new HashSet<>();
+
+            // 子订单校验
+            for(Integer orderDishesId : separateOrderDishedsIds) {
+                // ********* 将菜品转到目标子订单上 **********8
+                OrderDishes orderDishes = orderDishesService.selectById(orderDishesId);
+                if (orderDishes == null) {
+                    return Result.fail("拆单记录不存在");
+                }
+                origSubOrderId.add(orderDishes.getSubOrderId());
+            }
+            // ************ 创建一个新的子订单 ***********
+            SubOrder subOrder = new SubOrder();
             subOrder.setOrderId(toOrder.getOrderId());
-            Result<Integer> rs = subOrderDAO.updateById(subOrder);
-            if (!rs.isSuccess()) {
-                return Result.fail(rs.getMsg());
+            subOrder.setOrderType(EnumSubOrderType.ORDINARY.getType());
+            subOrder.setSubOrderStatus(0);
+            subOrder.setAccountId(CurrentAccount.currentAccountId());
+            subOrder.setCreatetime(DateBuilder.now().mills());
+            Result<Integer> subInsertRs = subOrderDAO.insert(subOrder);
+            if(!subInsertRs.isSuccess()){
+                return Result.fail(subInsertRs.getMsg());
             }
-            Result<Integer> separateRs = orderDishesService.separateOrder(subOrderId, toOrder.getOrderId());
-            if (!separateRs.isSuccess()) {
-                return Result.fail(separateRs.getMsg());
+            int newSubOrderId = subInsertRs.getData();
+            // 拆台操作
+            for(Integer orderDishesId : separateOrderDishedsIds) {
+                // ********* 将菜品转到目标子订单上 **********
+                OrderDishes orderDishes = orderDishesService.selectById(orderDishesId);
+                orderDishes.setSubOrderId(newSubOrderId);
+                orderDishes.setOrderId(toOrder.getOrderId());
+                orderDishesService.updatePrimaryKey(orderDishes);
             }
+            // **************** 判断原来的子订单是不是还有菜品 ****************
+            for(Integer subOrderId : origSubOrderId){
+                List<OrderDishes> orderDishesList = orderDishesService.selectBySubOrderId(subOrderId);
+                // ===> 原来的子订单已经没有菜品了，删除子订单
+                if(CommonUtils.isEmpty(orderDishesList)){
+                    subOrderDAO.deleteBySubOrderId(subOrderId);
+                }
+            }
+            return Result.success("拆单成功");
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return Result.fail("拆单失败:" + ex.getMessage());
         }
-        return Result.success("拆单成功");
     }
 
     public Result<String> changeDesk(Integer orderId, Integer targetDeskId) {

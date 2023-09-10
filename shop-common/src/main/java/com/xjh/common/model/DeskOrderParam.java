@@ -14,7 +14,8 @@ public class DeskOrderParam {
     // 退菜时传入退菜记录
     List<String> returnList;
     // 拆台清单
-    List<String> separateSubOrderIdList;
+    // List<String> separateSubOrderIdList;
+    List<Integer> separateOrderDishedsIds;
 
     EnumChoiceAction choiceAction;
 }

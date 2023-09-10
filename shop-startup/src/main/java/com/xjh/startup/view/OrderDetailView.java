@@ -57,6 +57,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.xjh.common.utils.CommonUtils.formatMoney;
+import static com.xjh.common.utils.CommonUtils.parseInt;
 import static com.xjh.common.utils.TableViewUtils.newCol;
 import static java.lang.Math.max;
 
@@ -489,14 +490,14 @@ public class OrderDetailView extends VBox implements Initializable {
 
     private void separateOrderConfirm(DeskOrderParam param, TableView<OrderDishesTableItemBO> tv) {
         ObservableList<OrderDishesTableItemBO> list = tv.getSelectionModel().getSelectedItems();
-        List<String> subOrderIds = new ArrayList<>();
-        list.forEach(it -> subOrderIds.add(it.getSubOrderId()));
-        if (CollectionUtils.isEmpty(subOrderIds)) {
+        List<Integer> separateOrderDishedsIds = new ArrayList<>();
+        list.forEach(it -> separateOrderDishedsIds.add(parseInt(it.getOrderDishesId(), 0)));
+        if (CollectionUtils.isEmpty(separateOrderDishedsIds)) {
             AlertBuilder.ERROR("请选择需要换台的子订单");
             return;
         }
         param.setChoiceAction(EnumChoiceAction.SEPARATE);
-        param.setSeparateSubOrderIdList(subOrderIds);
+        param.setSeparateOrderDishedsIds(separateOrderDishedsIds);
         String title = "拆台[桌号:" + param.getDeskName() + "]";
 
         Stage stg = new Stage();
