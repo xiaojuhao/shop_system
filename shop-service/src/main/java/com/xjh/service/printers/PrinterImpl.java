@@ -63,6 +63,7 @@ public class PrinterImpl implements Printer {
         try (Socket s = new Socket()) {
             s.connect(socketAddress, connectTimeout);
             s.setSoTimeout(timeout);
+            s.setReuseAddress(true); // 链接断开后可以立即重用端口
             try (OutputStream outputStream = s.getOutputStream();
                  InputStream inputStream = s.getInputStream()) {
                 openAutoReturn(outputStream);
