@@ -20,6 +20,8 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 
+import static com.xjh.common.utils.Const.role_su;
+
 public class MenuBarView {
     BorderPane root;
 
@@ -42,7 +44,9 @@ public class MenuBarView {
         // 登录
         bar.getMenus().add(createAccountMenu());
         // 配置管理
-        bar.getMenus().add(createConfigMenu());
+        if (CurrentAccount.hasRole(role_su)) {
+            bar.getMenus().add(createConfigMenu());
+        }
         return bar;
     }
 

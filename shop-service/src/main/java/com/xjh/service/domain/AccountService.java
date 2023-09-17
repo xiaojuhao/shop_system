@@ -39,8 +39,8 @@ public class AccountService {
         if ("1".equals(username)) {
             Account mock = new Account();
             mock.setAccountId(1);
-            mock.setAccountUser("mockuser");
-            mock.setAccountNickName("模拟用户");
+            mock.setAccountUser("manager");
+            mock.setAccountNickName("管理员");
             return Result.success(mock);
 
         }

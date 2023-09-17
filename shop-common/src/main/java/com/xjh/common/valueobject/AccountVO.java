@@ -18,4 +18,11 @@ public class AccountVO {
     Long creatTime;
 
     public Set<String> roles = new HashSet<>();
+
+    public void addRole(String role) {
+        if (roles == null) {
+            roles = new HashSet<>();
+        }
+        roles.add(role);
+    }
 }
