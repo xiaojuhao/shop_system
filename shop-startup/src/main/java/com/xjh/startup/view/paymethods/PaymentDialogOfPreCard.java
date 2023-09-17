@@ -7,6 +7,7 @@ import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Result;
+import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.service.domain.OrderService;
 import com.xjh.service.domain.StoreService;
 import com.xjh.service.domain.model.PaymentResult;
@@ -119,21 +120,26 @@ public class PaymentDialogOfPreCard extends SimpleForm implements Initializable 
                 AlertBuilder.ERROR(preCardQs.getMsg());
                 return;
             }
-            if (preCardQs.getData().getBalance() < result.getPayAmount()) {
+            PrePaidCard preCard = preCardQs.getData();
+            double cardBalance = preCard.getBalance();
+            if (cardBalance < result.getPayAmount()) {
                 AlertBuilder.ERROR("储值卡余额不足");
                 return;
             }
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("储值卡支付");
-            alert.setHeaderText("确定要用储值卡[" + preCardCode + "]支付" + result.getPayAmount() + "元吗?");
+            alert.setHeaderText("确定使用用储值卡支付" + result.getPayAmount() + "元吗?" // tips
+                    + "\n 卡号: " + preCardCode // 卡号
+                    + "\n 余额: " + new Money(cardBalance) + "元" // 余额
+            );
             Optional<ButtonType> confirmRs = alert.showAndWait();
             if (confirmRs.orElse(null) != ButtonType.OK) {
                 return;
             }
-            Result<String> consumeRs = remoteService.prePaidCardConsume(store.getStoreId(), preCardQs.getData(), result.getPayAmount(), param.getOrderId());
+            Result<String> consumeRs = remoteService.prePaidCardConsume(store.getStoreId(), preCard, result.getPayAmount(), param.getOrderId());
             if (!consumeRs.isSuccess()) {
                 Logger.info("使用失败，恢复储值卡金额");
-                remoteService.updatePrePaidCardBalance(store.getStoreId(), preCardQs.getData(), preCardQs.getData().getBalance());
+                remoteService.updatePrePaidCardBalance(store.getStoreId(), preCard, cardBalance);
                 AlertBuilder.ERROR(consumeRs.getMsg());
                 return;
             }
