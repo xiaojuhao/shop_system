@@ -109,6 +109,9 @@ public class TableViewUtils {
             HBox hbox = new HBox();
             hbox.setSpacing(3);
             for (OperationButton ob : ops.getOperations()) {
+                if (!ob.checkRoles()) {
+                    continue;
+                }
                 RichText title = ob.getTitle();
                 Button op = new Button(title.getText().toString());
                 if (title.getColor() != null) {

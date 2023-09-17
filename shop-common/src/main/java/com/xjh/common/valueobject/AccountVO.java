@@ -2,6 +2,9 @@ package com.xjh.common.valueobject;
 
 import lombok.Data;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Data
 public class AccountVO {
     Integer accountId;
@@ -13,4 +16,6 @@ public class AccountVO {
     Double removeLimit;
     Integer isDefault;
     Long creatTime;
+
+    public Set<String> roles = new HashSet<>();
 }

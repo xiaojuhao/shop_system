@@ -106,6 +106,7 @@ public class DishesManageListView extends SimpleForm implements Initializable {
 
                 Operations operations = new Operations();
                 OperationButton edit = new OperationButton("编辑", () -> openEditor(dishes));
+                edit.withRoles(Const.role_su);
                 OperationButton onoff = new OperationButton("上下架", cv -> {
                     if (onOffTitle.get().equals("上架")) {
                         changeDishesStatus(dishes.getDishesId(), EnumDishesStatus.ON);
@@ -120,8 +121,11 @@ public class DishesManageListView extends SimpleForm implements Initializable {
                 onoff.setTitleProperty(onOffTitle);
                 OperationButton del = new OperationButton("删除", () -> {
                 });
+                del.withRoles(Const.role_su);
                 OperationButton editPrice = new OperationButton("编辑多价格", () -> openPriceEditor(dishes));
+                editPrice.withRoles(Const.role_su);
                 OperationButton editValidTime = new OperationButton("编辑有效期", () -> openValidTimeEditor(dishes));
+                editValidTime.withRoles(Const.role_su);
                 operations.add(edit);
                 operations.add(onoff);
                 operations.add(del);
