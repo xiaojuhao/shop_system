@@ -45,6 +45,7 @@ public class PaymentDialogOfPreCard extends SimpleForm implements Initializable 
 
     @Override
     public void initialize() {
+        Integer orderId = param.getOrderId();
         Window pwindow = this.getScene().getWindow();
         double oriHeight = pwindow.getHeight();
         GridPane grid = new GridPane();
@@ -57,7 +58,7 @@ public class PaymentDialogOfPreCard extends SimpleForm implements Initializable 
         grid.add(new Label(param.getDeskName()), 1, row);
 
         row++;
-        double needPayAmt = orderService.notPaidBillAmount(param.getOrderId());
+        double needPayAmt = orderService.notPaidBillAmount(orderId);
 
         StringProperty actualPay = new SimpleStringProperty("0.0");
         grid.add(createTitleLabel("待支付"), 0, row);
@@ -103,7 +104,7 @@ public class PaymentDialogOfPreCard extends SimpleForm implements Initializable 
             }
             PaymentResult result = new PaymentResult();
             result.setPayAction(EnumPayAction.DO_PAY);
-            result.setOrderId(param.getOrderId());
+            result.setOrderId(orderId);
             result.setActualAmount(CommonUtils.parseDouble(actualPay.getValue(), 0D));
             result.setPayAmount(CommonUtils.parseDouble(payAmtValue.getValue(), 0D));
             result.setVoucherNum(1);
@@ -136,7 +137,7 @@ public class PaymentDialogOfPreCard extends SimpleForm implements Initializable 
             if (confirmRs.orElse(null) != ButtonType.OK) {
                 return;
             }
-            Result<String> consumeRs = remoteService.prePaidCardConsume(store.getStoreId(), preCard, result.getPayAmount(), param.getOrderId());
+            Result<String> consumeRs = remoteService.prePaidCardConsume(store.getStoreId(), preCard, result.getPayAmount(), orderId);
             if (!consumeRs.isSuccess()) {
                 Logger.info("使用失败，恢复储值卡金额");
                 remoteService.updatePrePaidCardBalance(store.getStoreId(), preCard, cardBalance);
