@@ -801,7 +801,10 @@ public class OrderPrinterHelper {
         jsonObject.put("ComType", EnumComType.TEXT.type);
         String orderDishesDetailedName = "";
         if (addDishesFlag) {
-            orderDishesDetailedName += "(加)";
+            orderDishesDetailedName = "(加)";
+        }
+        if(orderDishes.getOrderDishesIfrefund() == 1){
+            orderDishesDetailedName = "(退)";
         }
         if (ifChangeDesk) {
             orderDishesDetailedName += "(复)";

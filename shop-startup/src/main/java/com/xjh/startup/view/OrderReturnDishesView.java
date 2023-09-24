@@ -5,13 +5,9 @@ import com.xjh.common.model.DeskOrderParam;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.DateBuilder;
-import com.xjh.dao.dataobject.Dishes;
-import com.xjh.dao.dataobject.OrderDishes;
-import com.xjh.dao.dataobject.ReturnReasonDO;
+import com.xjh.dao.dataobject.*;
 import com.xjh.dao.mapper.ReturnReasonDAO;
-import com.xjh.service.domain.DishesService;
-import com.xjh.service.domain.OrderDishesService;
-import com.xjh.service.domain.OrderService;
+import com.xjh.service.domain.*;
 import com.xjh.service.ws.NotifyService;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SmallForm;
@@ -36,6 +32,10 @@ public class OrderReturnDishesView extends SmallForm {
     ReturnReasonDAO returnReasonDAO = GuiceContainer.getInstance(ReturnReasonDAO.class);
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);
+
+    SubOrderService subOrderService = GuiceContainer.getInstance(SubOrderService.class);
+
+    CartService cartService = GuiceContainer.getInstance(CartService.class);
 
     public OrderReturnDishesView(DeskOrderParam param) {
         TextField otherReason = new TextField();
@@ -79,6 +79,7 @@ public class OrderReturnDishesView extends SmallForm {
     }
 
     private void doReturnDishes(DeskOrderParam req, String reason) {
+        Order order = orderService.getOrder(req.getOrderId());
         List<Integer> ids = req.getReturnList().stream()
                 .map(id -> CommonUtils.parseInt(id, null))
                 .collect(Collectors.toList());
@@ -94,7 +95,9 @@ public class OrderReturnDishesView extends SmallForm {
             AlertBuilder.ERROR("退菜金额不能大于未支付金额");
             return;
         }
+        SubOrder subOrder = null;
         for (OrderDishes d : list) {
+            subOrder = subOrderService.findSubOrderBySubOrderId(d.getSubOrderId());
             int i = orderDishesService.returnOrderDishes(d);
             Dishes dishes = dishesService.getById(d.getDishesId());
             // 退菜原因记录
@@ -108,6 +111,9 @@ public class OrderReturnDishesView extends SmallForm {
 
             NotifyService.notifyReturnDishes(req.getDeskId());
         }
+
+        // 后厨打印
+        cartService.printKitchen(order, subOrder, list);
     }
 
     private ComboBox<String> buildReasonCombo(Consumer<String> onChange) {

@@ -321,7 +321,7 @@ public class CartService {
         printerImpl.submitTask(tickets, true);
     }
 
-    private void printKitchen(Order order, SubOrder subOrder, List<OrderDishes> orderDishes) throws Exception {
+    public void printKitchen(Order order, SubOrder subOrder, List<OrderDishes> orderDishes) {
         // 打印小票
         for (OrderDishes d : orderDishes) {
             Dishes dishes = dishesService.getById(d.getDishesId());

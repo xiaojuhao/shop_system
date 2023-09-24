@@ -3,6 +3,7 @@ package com.xjh.service.domain;
 import com.xjh.common.store.SequenceDatabase;
 import com.xjh.common.utils.DateBuilder;
 import com.xjh.common.utils.Logger;
+import com.xjh.dao.dataobject.SubOrder;
 import com.xjh.dao.mapper.SubOrderDAO;
 
 import javax.inject.Inject;
@@ -13,6 +14,11 @@ import java.time.LocalDateTime;
 public class SubOrderService {
     @Inject
     SubOrderDAO subOrderDAO;
+
+    public SubOrder findSubOrderBySubOrderId(Integer subOrderId){
+        return subOrderDAO.findBySubOrderId(subOrderId);
+    }
+
     @Deprecated
     public Integer createSubOrderId() {
         while (true) {

@@ -91,7 +91,9 @@ public class OrderDishesService {
             OrderDishes update = new OrderDishes();
             update.setOrderDishesId(orderDishes.getOrderDishesId());
             update.setOrderDishesSaletype(EnumOrderSaleType.RETURN.type);
+            orderDishes.setOrderDishesSaletype(EnumOrderSaleType.RETURN.type);
             update.setOrderDishesIfrefund(1);
+            orderDishes.setOrderDishesIfrefund(1);
             return orderDishesDAO.updateByPK(update);
         } catch (Exception ex) {
             ex.printStackTrace();
