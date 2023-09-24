@@ -59,6 +59,13 @@ public class CommonUtils {
         return coll.size();
     }
 
+    public static boolean strContains(String str, String sub) {
+        if (str == null || sub == null) {
+            return false;
+        }
+        return str.contains(sub);
+    }
+
     public static <T> HashSet<T> newHashset(T... ts) {
         if (ts == null) {
             return new HashSet<>();

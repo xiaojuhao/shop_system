@@ -26,6 +26,9 @@ import javafx.stage.StageStyle;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import static com.xjh.common.utils.CommonUtils.strContains;
+import static com.xjh.common.utils.Const.*;
+
 public class LoginController implements Initializable {
     @FXML
     private TextField accountField;
@@ -49,7 +52,18 @@ public class LoginController implements Initializable {
         // 调用登录功能
         Result<Account> accountCheck = accountService.checkPwd(account, password);
         if (accountCheck.isSuccess()) {
-            CurrentAccount.hold(CopyUtils.convert(accountCheck.getData(), AccountVO.class));
+            AccountVO accVO = CopyUtils.convert(accountCheck.getData(), AccountVO.class);
+            accVO.addRole(role_clerk);
+            if ("1".equals(accVO.getAccountUser()) // test
+                    || "root".equals(accVO.getAccountUser()) // root
+                    || strContains(accVO.getAccountNickName(), "管理员"))  // 管理员
+            {
+                accVO.addRole(role_su);
+            }
+            if (strContains(accVO.getAccountNickName(), "店长")) {
+                accVO.addRole(role_manager);
+            }
+            CurrentAccount.hold(accVO);
             // 创建主界面舞台
             Stage mainStage = MainStageHolder.get();
             //读入布局

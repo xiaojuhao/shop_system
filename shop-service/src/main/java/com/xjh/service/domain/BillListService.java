@@ -169,7 +169,6 @@ public class BillListService {
         List<OrderDishes> orderDishesList = orderDishesDAO.selectByOrderIds(orderIdList);
         List<OrderPay> orderPayList = orderPayDAO.selectByOrderIds(orderIdList);
 
-
         Predicate<SubOrder> isH5 = it -> EnumSubOrderType.of(it.getOrderType()) == EnumSubOrderType.H5;
 
         Map<Integer, List<SubOrder>> subOrderMap = CommonUtils.groupBy(subOrderList, SubOrder::getOrderId);
@@ -206,8 +205,6 @@ public class BillListService {
                     bo.totalUnpaidPrice += billView.orderNeedPay;
                     bo.totalUnpaidNums += 1;
                     break;
-                default:
-                    bo.customerNums += order.getOrderCustomerNums();
             }
 
             EnumOrderPeriodType periodType = EnumOrderPeriodType.check(order.getCreateTime());
@@ -227,23 +224,23 @@ public class BillListService {
                     bo.totalHadPaidPrice += billView.orderHadpaid;
             }
 
-            // 按渠道统计
-            CommonUtils.forEach(orderPayList, pay -> {
-                EnumPayMethod pm = EnumPayMethod.of(pay.getPaymentMethod());
-                // 支付渠道累计金额
-                ReflectionUtils.PropertyDescriptor totalPricePD = getSumTotalPricePD(BillListDO.class, pm);
-                if (totalPricePD != null) {
-                    double s = CommonUtils.parseDouble(totalPricePD.readValue(bo), 0D);
-                    totalPricePD.writeValue(bo, s + pay.getAmount());
-                }
-                // 支付渠道实际金额
-                ReflectionUtils.PropertyDescriptor actualPricePD = getSumActualPricePD(BillListDO.class, pm);
-                if (actualPricePD != null) {
-                    double s = CommonUtils.parseDouble(actualPricePD.readValue(bo), 0D);
-                    actualPricePD.writeValue(bo, s + pay.getActualAmount());
-                }
-            });
         }
+        // 按渠道统计
+        CommonUtils.forEach(orderPayList, pay -> {
+            EnumPayMethod pm = EnumPayMethod.of(pay.getPaymentMethod());
+            // 支付渠道累计金额
+            ReflectionUtils.PropertyDescriptor totalPricePD = getSumTotalPricePD(BillListDO.class, pm);
+            if (totalPricePD != null) {
+                double s = CommonUtils.parseDouble(totalPricePD.readValue(bo), 0D);
+                totalPricePD.writeValue(bo, s + pay.getAmount());
+            }
+            // 支付渠道实际金额
+            ReflectionUtils.PropertyDescriptor actualPricePD = getSumActualPricePD(BillListDO.class, pm);
+            if (actualPricePD != null) {
+                double s = CommonUtils.parseDouble(actualPricePD.readValue(bo), 0D);
+                actualPricePD.writeValue(bo, s + pay.getActualAmount());
+            }
+        });
     }
 
     public static ReflectionUtils.PropertyDescriptor getSumTotalPricePD(Class<?> clz, EnumPayMethod pm) {

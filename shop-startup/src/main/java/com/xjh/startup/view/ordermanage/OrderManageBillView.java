@@ -159,7 +159,7 @@ public class OrderManageBillView extends SimpleForm {
     public List<BillItem> buildStat3(BillListDO bo) {
         List<BillItem> list = new ArrayList<>();
         for (EnumPayMethod payMethod : EnumPayMethod.values()) {
-            Double totalPrice = -1D;
+            Double totalPrice = 0D;
             ReflectionUtils.PropertyDescriptor totalPricePD = getSumTotalPricePD(BillListDO.class, payMethod);
             if (totalPricePD != null) {
                 totalPrice = CommonUtils.parseDouble(totalPricePD.readValue(bo), 0D);
@@ -173,7 +173,7 @@ public class OrderManageBillView extends SimpleForm {
         List<BillItem> list = new ArrayList<>();
         for (EnumPayMethod payMethod : EnumPayMethod.values()) {
             if (payMethod.showActual) {
-                Double actualPrice = -1D;
+                Double actualPrice = -0D;
                 ReflectionUtils.PropertyDescriptor actualPricePD = getSumActualPricePD(BillListDO.class, payMethod);
                 if (actualPricePD != null) {
                     actualPrice = CommonUtils.parseDouble(actualPricePD.readValue(bo), 0D);
