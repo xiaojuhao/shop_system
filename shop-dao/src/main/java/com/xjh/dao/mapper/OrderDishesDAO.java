@@ -40,7 +40,7 @@ public class OrderDishesDAO {
             if (CommonUtils.isEmpty(orderIds)) {
                 return new ArrayList<>();
             }
-            String sql = "select * from order_pays where orderId in (" +
+            String sql = "select * from order_dishes_list where orderId in (" +
                     orderIds.stream().map(Object::toString)
                             .collect(Collectors.joining(",", "", ""))
                     + ")";
