@@ -27,8 +27,8 @@ import javafx.scene.text.FontWeight;
 
 import java.util.List;
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
-import static com.xjh.common.utils.TableViewUtils.rowIndex;
+import static com.xjh.service.store.TableViewUtils.newCol;
+import static com.xjh.service.store.TableViewUtils.rowIndex;
 
 public class OrderManageDetailShowView extends SimpleForm {
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);

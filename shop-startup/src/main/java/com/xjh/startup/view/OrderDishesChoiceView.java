@@ -21,6 +21,7 @@ import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.DishesTypeService;
 import com.xjh.service.domain.model.PlaceOrderFromCartReq;
 import com.xjh.service.domain.model.SendOrderRequest;
+import com.xjh.service.store.ImageHelper;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SimpleForm;
 import javafx.application.Platform;
@@ -56,7 +57,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.xjh.common.utils.CommonUtils.*;
-import static com.xjh.common.utils.ImageHelper.buildImageView;
+import static com.xjh.service.store.ImageHelper.buildImageView;
 import static com.xjh.common.utils.OrElse.orGet;
 import static com.xjh.startup.view.base.SimpleForm.*;
 

@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
+import static com.xjh.service.store.TableViewUtils.newCol;
 
 public class PrinterOrderDishesSettings extends SimpleForm implements Initializable {
     PrinterService printerService = GuiceContainer.getInstance(PrinterService.class);

@@ -4,7 +4,7 @@ package com.xjh.startup.view;
 import com.xjh.common.enumeration.EnumDishesStatus;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.ImageHelper;
+import com.xjh.service.store.ImageHelper;
 import com.xjh.common.utils.Result;
 import com.xjh.common.utils.cellvalue.*;
 import com.xjh.dao.dataobject.Dishes;
@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
+import static com.xjh.service.store.TableViewUtils.newCol;
 
 public class PackageDishesManageListView extends SimpleForm implements Initializable {
     static RichText IN_USE = RichText.create("已启用").with(Color.BLUE);

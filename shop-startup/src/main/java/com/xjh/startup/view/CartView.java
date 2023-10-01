@@ -35,7 +35,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.xjh.common.utils.CommonUtils.sizeOf;
-import static com.xjh.common.utils.TableViewUtils.newCol;
+import static com.xjh.service.store.TableViewUtils.newCol;
 import static com.xjh.service.domain.DishesTypeService.toDishesTypeName;
 import static java.lang.Math.max;
 

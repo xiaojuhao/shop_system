@@ -16,9 +16,9 @@ import static com.xjh.common.utils.CommonUtils.stringify;
 
 @Singleton
 public class ConfigService {
-    SysCfgDB sysCfgDB = SysCfgDB.inst();
+    static SysCfgDB sysCfgDB = SysCfgDB.inst();
 
-    public ConfigurationBO loadConfiguration() {
+    public static ConfigurationBO loadConfiguration() {
         Map<String, ReflectionUtils.PropertyDescriptor> pdMap = ReflectionUtils.resolvePD(ConfigurationBO.class);
         ConfigurationBO bo = new ConfigurationBO();
         for (CO co : loadSysCfg()) {
@@ -30,7 +30,7 @@ public class ConfigService {
         return bo;
     }
 
-    public List<CO> loadSysCfg() {
+    public static List<CO> loadSysCfg() {
         List<CO> coList = initCOList();
         for (CO co : coList) {
             String v = sysCfgDB.get(co.name, String.class);
@@ -49,6 +49,11 @@ public class ConfigService {
             if (co == null) {
                 continue;
             }
+            if (CommonUtils.isNotBlank(co.value)  //
+                    && co.value.contains("*")  //
+                    && co.value.contains("【敏感数据】")) {
+                continue;
+            }
             sysCfgDB.put(co.name, co.value);
         }
     }
@@ -60,7 +65,11 @@ public class ConfigService {
                 sb.append("\n\n");
             }
             sb.append("## ").append(co.remark).append("\n");
-            sb.append(co.name).append("=").append(co.value);
+            if (co.mask) {
+                sb.append(co.name).append("=").append(CommonUtils.maskStr(co.value) + "【敏感数据】");
+            }else {
+                sb.append(co.name).append("=").append(co.value);
+            }
         }
         return sb.toString();
     }
@@ -87,7 +96,7 @@ public class ConfigService {
         return coList;
     }
 
-    private List<CO> initCOList() {
+    private static List<CO> initCOList() {
         List<CO> coList = new ArrayList<>();
         ConfigurationBO cfginst = new ConfigurationBO();
         for (ReflectionUtils.PropertyDescriptor pd : ReflectionUtils.resolvePDList(ConfigurationBO.class)) {
@@ -103,6 +112,10 @@ public class ConfigService {
             if (CommonUtils.isBlank(co.remark)) {
                 co.remark = name + "注释";
             }
+            if (meta != null && meta.mask()) {
+                co.value = CommonUtils.maskStr(co.value) + "【敏感数据】";
+                co.mask = true;
+            }
             coList.add(co);
         }
         return coList;
@@ -113,5 +126,7 @@ public class ConfigService {
         String remark;
         String name;
         String value;
+
+        boolean mask = false;
     }
 }

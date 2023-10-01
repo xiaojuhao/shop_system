@@ -1,5 +1,6 @@
-package com.xjh.common.utils;
+package com.xjh.service.store;
 
+import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.cellvalue.*;
 import javafx.beans.Observable;
 import javafx.beans.property.Property;
@@ -23,7 +24,8 @@ import javafx.util.Callback;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static com.xjh.common.utils.ImageHelper.buildImageView;
+import static com.xjh.service.store.ImageHelper.buildImageView;
+
 
 public class TableViewUtils {
 

@@ -6,7 +6,7 @@ import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.enumeration.EnumDeskType;
 import com.xjh.common.enumeration.EnumOrderStatus;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.ImageHelper;
+import com.xjh.service.store.ImageHelper;
 import com.xjh.dao.dataobject.*;
 import com.xjh.dao.mapper.*;
 import com.xjh.service.domain.*;

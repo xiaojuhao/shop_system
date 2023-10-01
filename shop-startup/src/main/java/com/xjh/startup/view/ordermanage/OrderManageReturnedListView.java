@@ -26,7 +26,7 @@ import java.io.FileOutputStream;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
+import static com.xjh.service.store.TableViewUtils.newCol;
 
 public class OrderManageReturnedListView extends SimpleForm implements Initializable {
     ReturnReasonDAO returnReasonDAO = GuiceContainer.getInstance(ReturnReasonDAO.class);

@@ -58,7 +58,7 @@ import java.util.stream.Collectors;
 
 import static com.xjh.common.utils.CommonUtils.formatMoney;
 import static com.xjh.common.utils.CommonUtils.parseInt;
-import static com.xjh.common.utils.TableViewUtils.newCol;
+import static com.xjh.service.store.TableViewUtils.newCol;
 import static java.lang.Math.max;
 
 public class OrderDetailView extends VBox implements Initializable {

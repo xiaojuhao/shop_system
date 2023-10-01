@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
+import static com.xjh.service.store.TableViewUtils.newCol;
 
 public class PrinterManageListView extends MediumForm implements Initializable {
     PrinterService printerService = GuiceContainer.getInstance(PrinterService.class);

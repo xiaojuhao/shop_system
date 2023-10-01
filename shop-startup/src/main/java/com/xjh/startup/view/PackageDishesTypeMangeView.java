@@ -30,7 +30,7 @@ import lombok.Data;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
+import static com.xjh.service.store.TableViewUtils.newCol;
 
 public class PackageDishesTypeMangeView extends SimpleGridForm {
     DishesPackageService dishesPackageService = GuiceContainer.getInstance(DishesPackageService.class);

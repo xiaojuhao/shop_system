@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
+import static com.xjh.service.store.TableViewUtils.newCol;
 
 public class DishesAttributeManageView extends LargeForm implements Initializable {
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);

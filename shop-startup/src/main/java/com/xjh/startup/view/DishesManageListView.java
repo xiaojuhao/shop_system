@@ -16,6 +16,7 @@ import com.xjh.dao.mapper.DishesPriceDAO;
 import com.xjh.dao.query.DishesQuery;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.DishesTypeService;
+import com.xjh.service.store.ImageHelper;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.Initializable;
 import com.xjh.startup.view.base.ModelWindow;
@@ -46,8 +47,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
-import static com.xjh.common.utils.TableViewUtils.rowIndex;
+import static com.xjh.service.store.TableViewUtils.newCol;
+import static com.xjh.service.store.TableViewUtils.rowIndex;
 import static com.xjh.service.domain.DishesTypeService.toDishesTypeName;
 
 public class DishesManageListView extends SimpleForm implements Initializable {

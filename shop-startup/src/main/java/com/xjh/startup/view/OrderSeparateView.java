@@ -4,7 +4,7 @@ import com.xjh.common.enumeration.EnumDeskStatus;
 import com.xjh.common.model.DeskOrderParam;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.Result;
-import com.xjh.common.utils.TableViewUtils;
+import com.xjh.service.store.TableViewUtils;
 import com.xjh.common.utils.cellvalue.RichText;
 import com.xjh.dao.dataobject.Desk;
 import com.xjh.service.domain.DeskService;

@@ -11,4 +11,6 @@ public @interface FieldMeta {
     String remark();
 
     boolean readonly() default false;
+
+    boolean mask() default  false;
 }

@@ -19,6 +19,7 @@ import com.xjh.dao.mapper.DishesAttributeDAO;
 import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.dao.mapper.DishesPriceDAO;
 import com.xjh.dao.query.DishesQuery;
+import com.xjh.service.store.ImageHelper;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

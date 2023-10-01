@@ -1,9 +1,16 @@
-package com.xjh.common.utils;
+package com.xjh.service.store;
 
 import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSONArray;
+import com.aliyun.oss.OSSClient;
+import com.xjh.common.model.ConfigurationBO;
+import com.xjh.common.store.OssStore;
 import com.xjh.common.store.SysConfigUtils;
+import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.Logger;
 import com.xjh.common.valueobject.DishesImgVO;
+import com.xjh.service.domain.ConfigService;
+import com.xjh.service.printers.StringUtil;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -41,18 +48,26 @@ public class ImageHelper {
         return dir + "/images/";
     }
 
-    private static File getImageUrl(String url) {
+    private static File resolveImgUrl(String url) {
         if (CommonUtils.isBlank(url)) {
             return null;
         }
-        String path = getImageDir() + url.replaceAll("\\\\", "/");
+        url = url.replaceAll("\\\\", "/");
+        String path = getImageDir() + url;
         File file = new File(path);
         //Logger.info("图片路劲:" + file.exists() + ", " + path);
         if (!file.exists()) {
             Properties runtimeProp = SysConfigUtils.loadRuntimeProperties();
-            path = getImageDir(runtimeProp.getProperty("work_dir")) + url.replaceAll("\\\\", "/");
-            file = new File(path);
+            String path2 = getImageDir(runtimeProp.getProperty("work_dir")) + url;
+            file = new File(path2);
             //Logger.info("图片路劲(备份):" + file.exists() + "," + path);
+        }
+        if(!file.exists()){
+            ConfigurationBO cfg = ConfigService.loadConfiguration();
+            if(CommonUtils.isNotBlank(cfg.getOssAccessKeyId())){
+                OssStore ossStore = new OssStore(cfg.getOssEndpoint(), cfg.getOssAccessKeyId(), cfg.getOssAccessKeySecret());
+                ossStore.download("images/"+url, file);
+            }
         }
         return file;
     }
@@ -61,7 +76,7 @@ public class ImageHelper {
         if (CommonUtils.isBlank(imgUrl)) {
             return null;
         }
-        File imageFile = getImageUrl(imgUrl);
+        File imageFile = resolveImgUrl(imgUrl);
         if (imageFile == null || !imageFile.exists()) {
             return null;
         }

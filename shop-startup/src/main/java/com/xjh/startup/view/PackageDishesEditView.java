@@ -12,6 +12,7 @@ import com.xjh.service.domain.DishesAttributeService;
 import com.xjh.service.domain.DishesPackageService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.DishesTypeService;
+import com.xjh.service.store.ImageHelper;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.SimpleComboBox;
 import com.xjh.startup.view.base.SimpleGridForm;
@@ -35,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
+import static com.xjh.service.store.TableViewUtils.newCol;
 
 public class PackageDishesEditView extends SimpleGridForm {
     DishesPackageService dishesPackageService = GuiceContainer.getInstance(DishesPackageService.class);

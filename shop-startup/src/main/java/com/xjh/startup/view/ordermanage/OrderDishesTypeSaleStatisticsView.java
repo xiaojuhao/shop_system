@@ -37,8 +37,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
-import static com.xjh.common.utils.TableViewUtils.rowIndex;
+import static com.xjh.service.store.TableViewUtils.newCol;
+import static com.xjh.service.store.TableViewUtils.rowIndex;
 
 public class OrderDishesTypeSaleStatisticsView extends SimpleForm implements Initializable {
     AccountService accountService = GuiceContainer.getInstance(AccountService.class);

@@ -7,7 +7,7 @@ import com.xjh.common.enumeration.EnumDishesStatus;
 import com.xjh.common.model.IntStringPair;
 import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.ImageHelper;
+import com.xjh.service.store.ImageHelper;
 import com.xjh.common.utils.cellvalue.ImageSrc;
 import com.xjh.common.utils.cellvalue.Money;
 import com.xjh.common.utils.cellvalue.Operations;
@@ -41,7 +41,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
+import static com.xjh.service.store.TableViewUtils.newCol;
 
 public class PackageDishesAddView extends SimpleForm implements Initializable {
     static RichText STATUS_ON = RichText.create("上架").with(Color.BLUE);

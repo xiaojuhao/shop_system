@@ -26,7 +26,7 @@ import javafx.stage.Window;
 
 import java.util.List;
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
+import static com.xjh.service.store.TableViewUtils.newCol;
 
 public class DishesTypeManageListView extends SimpleForm implements Initializable {
     DishesTypeService dishesTypeService = GuiceContainer.getInstance(DishesTypeService.class);

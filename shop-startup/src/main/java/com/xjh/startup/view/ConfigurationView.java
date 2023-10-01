@@ -23,7 +23,7 @@ public class ConfigurationView extends MediumForm {
         TextArea ta = new TextArea();
         ta.setPrefWidth(width * 0.9);
         ta.setPrefHeight(height * 0.8);
-        ta.setText(toProp(configService.loadSysCfg()));
+        ta.setText(toProp(ConfigService.loadSysCfg()));
         this.getChildren().add(ta);
 
         Button button = new Button("保 存");

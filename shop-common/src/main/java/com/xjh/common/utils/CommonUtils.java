@@ -118,17 +118,19 @@ public class CommonUtils {
             return coll.stream().findFirst().orElse(null);
         }
     }
+
     public static <T> T lastOf(Collection<T> coll) {
         if (coll == null || coll.size() == 0) {
             return null;
         } else {
             T t = null;
-            for(T it : coll){
+            for (T it : coll) {
                 t = it;
             }
             return t;
         }
     }
+
     public static <T> Iterator<T> createIter(T[] arr) {
         int arrLen = arr.length;
         AtomicInteger index = new AtomicInteger(0);
@@ -177,14 +179,15 @@ public class CommonUtils {
         return new DecimalFormat(format).format(value);
     }
 
-    public static String formatScale(Double val, int scale){
-        if(val == null){
+    public static String formatScale(Double val, int scale) {
+        if (val == null) {
             return "0.00";
         }
         return scaleDecimal(BigDecimal.valueOf(val), scale);
     }
-    public static String scaleDecimal(BigDecimal bigDecimal, int scale){
-        if(bigDecimal == null){
+
+    public static String scaleDecimal(BigDecimal bigDecimal, int scale) {
+        if (bigDecimal == null) {
             return "0.00";
         }
         return bigDecimal.setScale(scale, RoundingMode.HALF_UP).toString();
@@ -537,19 +540,56 @@ public class CommonUtils {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
-    public static String maskPhone(String phoneNo) {
-        if (isBlank(phoneNo)) {
+    public static String maskStr(String str) {
+        if (isBlank(str)) {
             return null;
         }
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < phoneNo.length(); i++) {
-            if (i == 3 || i == 4 || i == 5 || i == 6) {
-                sb.append("*");
-            } else {
-                sb.append(phoneNo.charAt(i));
-            }
+        int len = length(str);
+        if (len == 1) {
+            return "*";
         }
-        return sb.toString();
+        if (len == 2) {
+            return str.charAt(0) + "*";
+        }
+        if (len == 3) {
+            return str.charAt(0) + "*" + str.charAt(2);
+        }
+        if (len == 4) {
+            return str.charAt(0) + "**" + str.charAt(3);
+        }
+        if (len == 5) {
+            return str.substring(0, 2) + "***" + str.charAt(4);
+        }
+        if (len == 6) {
+            return str.substring(0, 2) + "***" + str.charAt(5);
+        }
+        if(len > 6 && len < 11){
+            return maskStr2(str, 3, 2);
+        }
+        if(len >= 11 && len <= 16){
+            return maskStr2(str, 3, 4);
+        }
+        return maskStr2(str, 6, 4);
+    }
+
+    static String maskStr2(String str, int first, int tail) {
+        if (length(str) <= first) {
+            return loop("*", length(str));
+        }
+        if (length(str) < first + tail) {
+            return str.substring(0, first) + loop("*", tail);
+        }
+        return str.substring(0, first)  //
+                + loop("*", length(str) - first - tail) //
+                + str.substring(length(str) - tail);
+    }
+
+    static String loop(String str, int loops) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < loops; i++) {
+            builder.append(str);
+        }
+        return builder.toString();
     }
 
     public static String weekId(Date date) {
@@ -944,12 +984,12 @@ public class CommonUtils {
         }
     }
 
-    public static <T> T jsonToObj(String json, Class<T> clz){
-        if(isBlank(json)){
+    public static <T> T jsonToObj(String json, Class<T> clz) {
+        if (isBlank(json)) {
             return null;
         }
         String str = tryDecodeBase64(json);
-        if(isBlank(str)){
+        if (isBlank(str)) {
             return null;
         }
         return JSONObject.parseObject(str, clz);

@@ -14,6 +14,7 @@ import com.xjh.dao.dataobject.DishesType;
 import com.xjh.service.domain.DishesAttributeService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.DishesTypeService;
+import com.xjh.service.store.ImageHelper;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.view.base.ModelWindow;
 import com.xjh.startup.view.base.SimpleComboBox;
@@ -46,7 +47,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.xjh.common.utils.Const.KEEP_BASE64;
-import static com.xjh.common.utils.TableViewUtils.newCol;
+import static com.xjh.service.store.TableViewUtils.newCol;
 
 public class DishesEditView extends SimpleGridForm {
 

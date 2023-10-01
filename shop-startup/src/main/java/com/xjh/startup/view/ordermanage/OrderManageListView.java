@@ -46,8 +46,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.xjh.common.utils.TableViewUtils.newCol;
-import static com.xjh.common.utils.TableViewUtils.rowIndex;
+import static com.xjh.service.store.TableViewUtils.newCol;
+import static com.xjh.service.store.TableViewUtils.rowIndex;
 
 public class OrderManageListView extends SimpleForm implements Initializable {
     OrderService orderService = GuiceContainer.getInstance(OrderService.class);

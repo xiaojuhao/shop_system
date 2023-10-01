@@ -11,4 +11,12 @@ public class ConfigurationBO {
     String tickedUrl = "http://www.xiaojuhao.org/pay/";
     @FieldMeta(remark = "公众号地址")
     String publicAddress = "http://weixin.qq.com/r/GC7m-pzEj8Hwrdid93sK";
+
+    @FieldMeta(remark = "****** OSS服务器地址 ****** ")
+    String ossEndpoint = "";
+    @FieldMeta(remark = "****** OSS访问ID ****** ")
+    String ossAccessKeyId = "";
+    @FieldMeta(remark = "****** OSS访问秘钥 ****** ", mask = true)
+    String ossAccessKeySecret = "";
+
 }
