@@ -38,7 +38,7 @@ public class OssStore {
 
             // 上传文件。
             PutObjectResult result = ossClient.putObject(putObjectRequest);
-            System.out.println(JSONObject.toJSONString(result));
+            System.out.println("上传OSS文件： "+JSONObject.toJSONString(result));
         } catch (OSSException oe) {
             System.out.println("Caught an OSSException, which means your request made it to OSS, "
                     + "but was rejected with an error response for some reason.");
@@ -76,6 +76,7 @@ public class OssStore {
         GetObjectRequest getReq = new GetObjectRequest(bucketName, objectName);
         ossClient.getObject(getReq, to);
         ossClient.shutdown();
+        System.out.println("下载OSS文件: " + objectName);
     }
 
     public void listFiles(File f, List<File> files){
