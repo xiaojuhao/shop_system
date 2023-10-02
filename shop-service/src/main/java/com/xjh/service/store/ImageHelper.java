@@ -15,6 +15,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -41,49 +42,101 @@ public class ImageHelper {
     }
 
     public static String getImageDir() {
+        for (String dir : listImageDirs()) {
+            if (new File(dir).exists()) {
+                return dir;
+            }
+        }
         return getImageDir(workDir());
     }
 
     private static String getImageDir(String dir) {
+        if(dir.endsWith("/")){
+            return dir + "images/";
+        }
         return dir + "/images/";
     }
 
-    private static File resolveImgUrl(String url) {
+    public static boolean localExists(String url){
+        if (CommonUtils.isBlank(url)) {
+            return true;
+        }
+        url = url.replaceAll("\\\\", "/");
+        for (String dir : listImageDirs()) {
+            String path = dir + url;
+            File file = new File(path);
+            if (file.exists()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static File resolveImgUrl(String url) {
         if (CommonUtils.isBlank(url)) {
             return null;
         }
         url = url.replaceAll("\\\\", "/");
-        String path = getImageDir() + url;
-        File file = new File(path);
-        //Logger.info("图片路劲:" + file.exists() + ", " + path);
-        if (!file.exists()) {
-            Properties runtimeProp = SysConfigUtils.loadRuntimeProperties();
-            String path2 = getImageDir(runtimeProp.getProperty("work_dir")) + url;
-            file = new File(path2);
-            //Logger.info("图片路劲(备份):" + file.exists() + "," + path);
-        }
-        if(!file.exists()){
-            ConfigurationBO cfg = ConfigService.loadConfiguration();
-            if(CommonUtils.isNotBlank(cfg.getOssAccessKeyId())){
-                OssStore ossStore = new OssStore(cfg.getOssEndpoint(), cfg.getOssAccessKeyId(), cfg.getOssAccessKeySecret());
-                ossStore.download("images/"+url, file);
+        for (String dir : listImageDirs()) {
+            String path = dir + url;
+            File file = new File(path);
+            if (file.exists()) {
+                return file;
             }
         }
-        return file;
+
+        // 从OSS下载图片资源
+        ConfigurationBO cfg = ConfigService.loadConfiguration();
+        if (CommonUtils.isNotBlank(cfg.getOssAccessKeyId())) {
+            // 下载文件保存路径
+            String downloadDir = CommonUtils.firstOf(listImageDirs());
+            File downloadToFile = new File(downloadDir + url);
+            // 下载文件
+            OssStore ossStore = new OssStore(cfg.getOssEndpoint(), cfg.getOssAccessKeyId(), cfg.getOssAccessKeySecret());
+            if(ossStore.download("images/" + url, downloadToFile)) {
+                return downloadToFile;
+            }
+        }
+
+        URL logo = ImageHelper.class.getClassLoader().getResource("img/logo.png");
+
+        return new File(logo.getFile());
+    }
+
+    static List<String> listImageDirs() {
+        List<String> dirs = new ArrayList<>();
+        Properties runtimeProp = SysConfigUtils.loadRuntimeProperties();
+        String path2 = getImageDir(runtimeProp.getProperty("work_dir"));
+        if (CommonUtils.isNotBlank(path2)) {
+            dirs.add(normalizeDir(path2));
+        }
+
+        dirs.add(getImageDir(normalizeDir(workDir())));
+
+        return dirs;
+    }
+
+    static String normalizeDir(String dir) {
+        dir = dir.replaceAll("\\\\", "/");
+        if (!dir.endsWith("/")) {
+            dir += "/";
+        }
+        return dir;
     }
 
     public static ImageView buildImageView(String imgUrl) {
-        if (CommonUtils.isBlank(imgUrl)) {
-            return null;
-        }
-        File imageFile = resolveImgUrl(imgUrl);
-        if (imageFile == null || !imageFile.exists()) {
-            return null;
-        }
         try {
+            if (CommonUtils.isBlank(imgUrl)) {
+                return null;
+            }
+            File imageFile = resolveImgUrl(imgUrl);
+            if (imageFile == null || !imageFile.exists()) {
+                return null;
+            }
+
             return new ImageView(new Image("file:" + imageFile.getAbsolutePath()));
         } catch (Exception ex) {
-            Logger.info("解析图片错误: " + ex.getMessage() + ", " + imageFile.getAbsolutePath());
+            Logger.info("解析图片错误: " + ex.getMessage() + ", " + imgUrl);
             return null;
         }
     }

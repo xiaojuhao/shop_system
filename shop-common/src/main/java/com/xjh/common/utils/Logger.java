@@ -31,7 +31,7 @@ public class Logger {
         }
         try {
             System.out.println(msg);
-            homeLogger.append(msg);
+            homeLogger.append(msg).append("\n");
             homeLogger.flush();
         } catch (Exception ex) {
             ex.printStackTrace();

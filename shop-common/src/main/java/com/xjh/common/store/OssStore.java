@@ -7,6 +7,7 @@ import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
 import com.aliyun.oss.internal.OSSHeaders;
 import com.aliyun.oss.model.*;
+import com.xjh.common.utils.Logger;
 
 import java.io.File;
 import java.util.List;
@@ -65,10 +66,11 @@ public class OssStore {
         return exists;
     }
 
-    public void download(String objectName, File to){
+    public boolean download(String objectName, File to){
         OSS ossClient = new OSSClientBuilder().build(OSS_ENDPOINT, OSS_ACCCESS_KEY_ID, OSS_ACCESS_KEY_SECRET);
         if(!exists(objectName)){
-            return;
+            Logger.info("OSS中不存在资源: " + objectName);
+            return false;
         }
         if(!to.getParentFile().exists()){
             to.getParentFile().mkdirs();
@@ -76,7 +78,8 @@ public class OssStore {
         GetObjectRequest getReq = new GetObjectRequest(bucketName, objectName);
         ossClient.getObject(getReq, to);
         ossClient.shutdown();
-        System.out.println("下载OSS文件: " + objectName);
+        System.out.println("下载OSS文件: " + objectName + " >> " + to.getAbsolutePath());
+        return true;
     }
 
     public void listFiles(File f, List<File> files){

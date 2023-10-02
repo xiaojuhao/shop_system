@@ -4,6 +4,7 @@ import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.Safe;
 import com.xjh.common.utils.TimeRecord;
 import com.xjh.service.jobs.SchedJobService;
+import com.xjh.startup.foundation.InitializeSystem;
 import com.xjh.startup.foundation.constants.MainStageHolder;
 import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.foundation.ws.XjhWebSocketServer;
@@ -34,6 +35,8 @@ public class LoginApp extends Application {
         // 启动调度任务
         Safe.run(() -> GuiceContainer.getInstance(SchedJobService.class).startAllJobs());
         Logger.info("启动WebSocket服务器，cost " + timeRecord.getCostAndReset());
+
+        Safe.run(() -> GuiceContainer.getInstance(InitializeSystem.class).loadImagesAsync());
     }
 
     public static void main(String[] args) {
