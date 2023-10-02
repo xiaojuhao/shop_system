@@ -11,7 +11,6 @@ import static com.xjh.common.store.DirUtils.userHomeDir;
 import static com.xjh.common.store.DirUtils.workDir;
 
 public class Logger {
-    private static final AtomicLong counter = new AtomicLong();
     private static final AtomicBoolean exiting = new AtomicBoolean(false);
 
     public static void info(String msg) {
@@ -56,7 +55,6 @@ public class Logger {
             }
             log.append(msg).append("\r\n");
             workDirWriter.append(log);
-            counter.incrementAndGet();
             if (exiting.get()) {
                 doFlush(workDirWriter);
             }
@@ -119,10 +117,7 @@ public class Logger {
 
     private static void doFlush(FileWriter fileWriter) {
         try {
-            if (counter.get() > 0) {
-                counter.set(0);
-                fileWriter.flush();
-            }
+            fileWriter.flush();
         } catch (Exception ex) {
             ex.printStackTrace();
         }

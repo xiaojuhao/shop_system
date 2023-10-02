@@ -42,7 +42,7 @@ public class DirUtils {
         path = path.replace("target\\classes\\", "");
         path = path.replace("shop-common/", "");
         path = path.replace("shop-common\\", "");
-        Logger.logToHome("工作目录: " + path);
+        Logger.logToHome("DirUtil.workDir() >> " + path);
         workdirHolder.hold(path);
         return path;
     }
