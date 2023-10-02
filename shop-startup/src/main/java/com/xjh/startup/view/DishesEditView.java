@@ -2,8 +2,12 @@ package com.xjh.startup.view;
 
 import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
+import com.aliyuncs.utils.LogUtils;
 import com.google.common.collect.Lists;
+import com.sleepycat.je.utilint.LoggerUtils;
+import com.xjh.common.model.ConfigurationBO;
 import com.xjh.common.model.DishesAttributeBO;
+import com.xjh.common.store.OssStore;
 import com.xjh.common.utils.*;
 import com.xjh.common.utils.cellvalue.*;
 import com.xjh.common.valueobject.DishesAttributeVO;
@@ -11,6 +15,7 @@ import com.xjh.common.valueobject.DishesAttributeValueVO;
 import com.xjh.common.valueobject.DishesImgVO;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.dataobject.DishesType;
+import com.xjh.service.domain.ConfigService;
 import com.xjh.service.domain.DishesAttributeService;
 import com.xjh.service.domain.DishesService;
 import com.xjh.service.domain.DishesTypeService;
@@ -391,6 +396,16 @@ public class DishesEditView extends SimpleGridForm {
                 }));
                 imgItems.add(bo);
                 imgTV.refresh();
+
+                ConfigurationBO cfg = ConfigService.loadConfiguration();
+                if(CommonUtils.isNotBlank(cfg.getOssAccessKeyId())){
+                    new Thread(() -> {
+                        OssStore ossStore = new OssStore(cfg.getOssEndpoint(), cfg.getOssAccessKeyId(), cfg.getOssAccessKeySecret());
+                        ossStore.upload(toFile, "images/" + toUrl);
+                        Logger.info("上传OSS文件成功: " + "images/" + toUrl);
+                    }).start();
+                }
+
             } catch (Exception ex) {
                 ex.printStackTrace();
                 AlertBuilder.ERROR("上传文件失败:" + ex.getMessage());
