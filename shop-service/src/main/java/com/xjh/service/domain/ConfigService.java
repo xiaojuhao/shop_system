@@ -113,7 +113,6 @@ public class ConfigService {
                 co.remark = name + "注释";
             }
             if (meta != null && meta.mask() && CommonUtils.isNotBlank(co.value)) {
-                co.value = CommonUtils.maskStr(co.value) + "【敏感数据】";
                 co.mask = true;
             }
             coList.add(co);
