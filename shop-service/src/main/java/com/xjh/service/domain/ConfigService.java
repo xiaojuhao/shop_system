@@ -65,7 +65,7 @@ public class ConfigService {
                 sb.append("\n\n");
             }
             sb.append("## ").append(co.remark).append("\n");
-            if (co.mask) {
+            if (co.mask && CommonUtils.isNotBlank(co.value)) {
                 sb.append(co.name).append("=").append(CommonUtils.maskStr(co.value) + "【敏感数据】");
             }else {
                 sb.append(co.name).append("=").append(co.value);
@@ -112,7 +112,7 @@ public class ConfigService {
             if (CommonUtils.isBlank(co.remark)) {
                 co.remark = name + "注释";
             }
-            if (meta != null && meta.mask()) {
+            if (meta != null && meta.mask() && CommonUtils.isNotBlank(co.value)) {
                 co.value = CommonUtils.maskStr(co.value) + "【敏感数据】";
                 co.mask = true;
             }
