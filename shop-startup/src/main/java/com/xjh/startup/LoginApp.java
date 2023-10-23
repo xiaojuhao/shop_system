@@ -32,11 +32,6 @@ public class LoginApp extends Application {
             Logger.exiting();
             System.exit(0);
         });
-        // 启动调度任务
-        Safe.run(() -> GuiceContainer.getInstance(SchedJobService.class).startAllJobs());
-        Logger.info("启动WebSocket服务器，cost " + timeRecord.getCostAndReset());
-
-        Safe.run(() -> GuiceContainer.getInstance(InitializeSystem.class).loadImagesAsync());
     }
 
     public static void main(String[] args) {

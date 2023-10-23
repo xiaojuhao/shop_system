@@ -2,6 +2,7 @@ package com.xjh.startup.foundation.ioc;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.xjh.common.utils.AlertBuilder;
 import com.xjh.common.utils.Holder;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.TimeRecord;
@@ -37,6 +38,11 @@ public class GuiceContainer {
     }
 
     public static <T> T getInstance(Class<T> clz) {
-        return getInjector().getInstance(clz);
+        try {
+            return getInjector().getInstance(clz);
+        }catch (Exception | Error e){
+            AlertBuilder.ERROR("获取" + clz.getSimpleName()+"失败:" + e.getMessage());
+            return null;
+        }
     }
 }
