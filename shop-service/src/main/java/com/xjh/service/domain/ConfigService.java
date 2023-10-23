@@ -5,9 +5,12 @@ import com.xjh.common.anno.FieldMeta;
 import com.xjh.common.kvdb.impl.SysCfgDB;
 import com.xjh.common.model.ConfigurationBO;
 import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.utils.Holder;
 import com.xjh.common.utils.ReflectionUtils;
+import com.xjh.service.domain.model.StoreVO;
 import lombok.Data;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +19,15 @@ import static com.xjh.common.utils.CommonUtils.stringify;
 
 @Singleton
 public class ConfigService {
+    @Inject
+    StoreService storeService;
     static SysCfgDB sysCfgDB = SysCfgDB.inst();
+    static Holder<ConfigService> _this = new Holder<>();
+
+    public ConfigService(){
+        System.out.println("实例化 ConfigService Success !" );
+        _this.hold(this);
+    }
 
     public static ConfigurationBO loadConfiguration() {
         Map<String, ReflectionUtils.PropertyDescriptor> pdMap = ReflectionUtils.resolvePD(ConfigurationBO.class);
@@ -25,6 +36,12 @@ public class ConfigService {
             ReflectionUtils.PropertyDescriptor pd = pdMap.get(co.name);
             if (pd != null) {
                 pd.writeValue(bo, co.value);
+            }
+        }
+        if(_this != null) {
+            StoreVO store = _this.get().storeService.getStore().getData();
+            if(store != null){
+                bo.setStoreId(store.getStoreId()+"");
             }
         }
         return bo;
