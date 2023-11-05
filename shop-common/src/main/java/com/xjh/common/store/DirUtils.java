@@ -28,7 +28,7 @@ public class DirUtils {
         if (workdirHolder.get() != null) {
             return workdirHolder.get();
         }
-        String path = DirUtils.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        String path = new File("").getAbsolutePath();
         try {
             path = java.net.URLDecoder.decode(path, "UTF-8");
         } catch (Exception ex) {
