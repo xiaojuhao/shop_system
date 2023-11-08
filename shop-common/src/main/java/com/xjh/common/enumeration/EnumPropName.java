@@ -9,7 +9,9 @@ public enum  EnumPropName {
 
     DB_USERNAME("db_username"),
 
-    DB_PASSWORD("db_password")
+    DB_PASSWORD("db_password"),
+
+    FILE_PASSWORD("file_password")
     ;
     public String name;
     EnumPropName(String name){

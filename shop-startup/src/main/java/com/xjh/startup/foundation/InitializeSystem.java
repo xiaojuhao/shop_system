@@ -6,7 +6,6 @@ import com.xjh.common.valueobject.DishesImgVO;
 import com.xjh.dao.dataobject.Dishes;
 import com.xjh.dao.mapper.DishesDAO;
 import com.xjh.service.store.ImageHelper;
-import org.apache.poi.ss.formula.functions.T;
 
 import javax.inject.Inject;
 import java.util.List;

@@ -1,6 +1,5 @@
 package com.xjh.startup.view;
 
-import com.sun.scenario.animation.shared.TimerReceiver;
 import com.xjh.common.utils.*;
 import com.xjh.common.valueobject.AccountVO;
 import com.xjh.dao.dataobject.Account;
@@ -23,7 +22,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 

@@ -2,15 +2,12 @@ package com.xjh.service.store;
 
 import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSONArray;
-import com.aliyun.oss.OSSClient;
-import com.xjh.common.model.ConfigurationBO;
 import com.xjh.common.store.OssStore;
 import com.xjh.common.store.SysConfigUtils;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Logger;
 import com.xjh.common.valueobject.DishesImgVO;
 import com.xjh.service.domain.ConfigService;
-import com.xjh.service.printers.StringUtil;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -86,13 +83,12 @@ public class ImageHelper {
         }
 
         // 从OSS下载图片资源
-        ConfigurationBO cfg = ConfigService.loadConfiguration();
-        if (CommonUtils.isNotBlank(cfg.getOssAccessKeyId())) {
+        if (CommonUtils.isNotBlank(ConfigService.getOssAccessKeyId())) {
             // 下载文件保存路径
             String downloadDir = CommonUtils.firstOf(listImageDirs());
             File downloadToFile = new File(downloadDir + url);
             // 下载文件
-            OssStore ossStore = new OssStore(cfg.getOssEndpoint(), cfg.getOssAccessKeyId(), cfg.getOssAccessKeySecret());
+            OssStore ossStore = new OssStore(ConfigService.getOssEndpoint(), ConfigService.getOssAccessKeyId(), ConfigService.getOssAccessKeySecret());
             if(ossStore.download("images/" + url, downloadToFile)) {
                 return downloadToFile;
             }

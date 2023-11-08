@@ -1,148 +1,147 @@
 package com.xjh.service.domain;
 
 import com.google.inject.Singleton;
-import com.xjh.common.anno.FieldMeta;
+import com.xjh.common.enumeration.EnumPropName;
 import com.xjh.common.kvdb.impl.SysCfgDB;
-import com.xjh.common.model.ConfigurationBO;
-import com.xjh.common.utils.CommonUtils;
+import com.xjh.common.store.DirUtils;
+import com.xjh.common.store.SysConfigUtils;
 import com.xjh.common.utils.Holder;
-import com.xjh.common.utils.ReflectionUtils;
-import com.xjh.service.domain.model.StoreVO;
-import lombok.Data;
+import com.xjh.common.utils.Result;
+import com.xjh.service.domain.model.ConfigItem;
+import org.apache.poi.poifs.crypt.Decryptor;
+import org.apache.poi.poifs.crypt.EncryptionInfo;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.Map;
-
-import static com.xjh.common.utils.CommonUtils.stringify;
+import java.util.Properties;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Singleton
 public class ConfigService {
-    @Inject
-    StoreService storeService;
     static SysCfgDB sysCfgDB = SysCfgDB.inst();
-    static Holder<ConfigService> _this = new Holder<>();
 
-    public ConfigService(){
-        System.out.println("实例化 ConfigService Success !" );
-        _this.hold(this);
+    static Holder<Map<String, ConfigItem>> holder = new Holder<>();
+
+    public static File findConfigFile(){
+        File file = new File(DirUtils.workDir(), "config.xlsx");
+        if(file.exists()){
+            return file;
+        }
+        file = new File("c:/xjh", "config.xlsx");
+        if(file.exists()){
+            return file;
+        }
+        file = new File("d:/xjh", "config.xlsx");
+        if(file.exists()){
+            return file;
+        }
+        return null;
     }
 
-    public static ConfigurationBO loadConfiguration() {
-        Map<String, ReflectionUtils.PropertyDescriptor> pdMap = ReflectionUtils.resolvePD(ConfigurationBO.class);
-        ConfigurationBO bo = new ConfigurationBO();
-        for (CO co : loadSysCfg()) {
-            ReflectionUtils.PropertyDescriptor pd = pdMap.get(co.name);
-            if (pd != null) {
-                pd.writeValue(bo, co.value);
-            }
+    static String readCell(Cell cell){
+        if(cell == null){
+            return "";
         }
-        if(_this != null) {
-            StoreVO store = _this.get().storeService.getStore().getData();
-            if(store != null){
-                bo.setStoreId(store.getStoreId()+"");
-            }
+        if(cell.getCellTypeEnum() == CellType.NUMERIC){
+            return cell.getNumericCellValue()+"";
         }
-        return bo;
+        return cell.getStringCellValue();
     }
 
-    public static List<CO> loadSysCfg() {
-        List<CO> coList = initCOList();
-        for (CO co : coList) {
-            String v = sysCfgDB.get(co.name, String.class);
-            if (v != null && !v.trim().isEmpty()) {
-                co.value = v;
-            }
+    public static Map<String, ConfigItem> getConfigMap(){
+        startReadConfig();
+        if(holder.get() != null){
+            return holder.get();
         }
-        return coList;
+        return readConfig().getData();
     }
 
-    public void saveCOList(List<CO> list) {
-        if (list == null) {
-            return;
-        }
-        for (CO co : list) {
-            if (co == null) {
-                continue;
-            }
-            if (CommonUtils.isNotBlank(co.value)  //
-                    && co.value.contains("*")  //
-                    && co.value.contains("【敏感数据】")) {
-                continue;
-            }
-            sysCfgDB.put(co.name, co.value);
+    static AtomicBoolean started = new AtomicBoolean(false);
+    public static void startReadConfig(){
+        if(started.compareAndSet(false, true)){
+            Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+                Result<Map<String, ConfigItem>> rs = readConfig();
+                if(rs.isSuccess()){
+                    holder.hold(rs.getData());
+                }
+            }, 10, 10, TimeUnit.SECONDS);
         }
     }
 
-    public static String toProp(List<CO> list) {
-        StringBuilder sb = new StringBuilder();
-        for (CO co : list) {
-            if (sb.length() > 0) {
-                sb.append("\n\n");
+    public static Result<Map<String, ConfigItem>> readConfig() {
+        try{
+            Map<String, ConfigItem> configMap = new HashMap<>();
+            File file = findConfigFile();
+            if(file == null){
+                return Result.success(configMap);
             }
-            sb.append("## ").append(co.remark).append("\n");
-            if (co.mask && CommonUtils.isNotBlank(co.value)) {
-                sb.append(co.name).append("=").append(CommonUtils.maskStr(co.value) + "【敏感数据】");
-            }else {
-                sb.append(co.name).append("=").append(co.value);
+            Properties properties = SysConfigUtils.getDbConfig();
+            String filePassword = properties.getProperty(EnumPropName.FILE_PASSWORD.name);
+
+            InputStream is = Files.newInputStream(file.toPath());
+            POIFSFileSystem poifsFileSystem = new POIFSFileSystem(is);
+            EncryptionInfo encryptionInfo = new EncryptionInfo(poifsFileSystem);
+            Decryptor decryptor = Decryptor.getInstance(encryptionInfo);
+            decryptor.verifyPassword(filePassword);
+            Workbook wb = new XSSFWorkbook(decryptor.getDataStream(poifsFileSystem));
+            Sheet sheet = wb.getSheetAt(0);
+            int rows = sheet.getLastRowNum();
+            for(int i = 1; i < rows; i++){
+                Row row = sheet.getRow(i);
+                ConfigItem item = new ConfigItem();
+                item.setKey(readCell(row.getCell(0)));
+                item.setVal(readCell(row.getCell(1)));
+                item.setSensitive(readCell(row.getCell(2)));
+                item.setRemark(readCell(row.getCell(3)));
+                configMap.put(item.getKey(), item);
             }
+            is.close();
+            return Result.success(configMap);
+        }catch (Exception ex){
+            return Result.fail(ex.getMessage());
         }
-        return sb.toString();
     }
 
-    public static List<CO> toCOList(String text) {
-        List<CO> coList = new ArrayList<>();
-        String[] lines = text.split("\n");
-        for (String line : lines) {
-            if (line == null || line.trim().isEmpty()) {
-                continue;
-            }
-            if (line.trim().startsWith("#")) {
-                continue;
-            }
-            if (!line.contains("=")) {
-                continue;
-            }
-            int index = line.indexOf("=");
-            CO co = new CO();
-            co.name = line.substring(0, index);
-            co.value = line.substring(index + 1);
-            coList.add(co);
+    public static ConfigItem getConfig(String configKey){
+        Map<String, ConfigItem> config = getConfigMap();
+        if(config != null){
+            return config.get(configKey);
         }
-        return coList;
+        return null;
     }
 
-    private static List<CO> initCOList() {
-        List<CO> coList = new ArrayList<>();
-        ConfigurationBO cfginst = new ConfigurationBO();
-        for (ReflectionUtils.PropertyDescriptor pd : ReflectionUtils.resolvePDList(ConfigurationBO.class)) {
-            CO co = new CO();
-            String name = pd.getField().getName();
-            String value = stringify(pd.readValue(cfginst));
-            co.name = name;
-            co.value = value;
-            FieldMeta meta = pd.getField().getAnnotation(FieldMeta.class);
-            if (meta != null) {
-                co.remark = meta.remark();
-            }
-            if (CommonUtils.isBlank(co.remark)) {
-                co.remark = name + "注释";
-            }
-            if (meta != null && meta.mask() && CommonUtils.isNotBlank(co.value)) {
-                co.mask = true;
-            }
-            coList.add(co);
-        }
-        return coList;
+    public static String getOssAccessKeyId(){
+        ConfigItem ci = getConfig("ossAccessKeyId");
+        return ci != null ? ci.getVal() : "";
     }
 
-    @Data
-    public static class CO {
-        String remark;
-        String name;
-        String value;
 
-        boolean mask = false;
+    public static String getOssEndpoint(){
+        ConfigItem ci = getConfig("ossEndpoint");
+        return ci != null ? ci.getVal() : "";
     }
+
+    public static String getOssAccessKeySecret(){
+        ConfigItem ci = getConfig("ossAccessKeySecret");
+        return ci != null ? ci.getVal() : "";
+    }
+    public static String getTickedUrl(){
+        ConfigItem ci = getConfig("tickedUrl");
+        return ci != null ? ci.getVal() : "";
+    }
+
+    public static String getPublicAddress(){
+        ConfigItem ci = getConfig("publicAddress");
+        return ci != null ? ci.getVal() : "";
+    }
+
+
 }

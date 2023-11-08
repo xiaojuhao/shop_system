@@ -2,10 +2,7 @@ package com.xjh.startup.view;
 
 import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
-import com.aliyuncs.utils.LogUtils;
 import com.google.common.collect.Lists;
-import com.sleepycat.je.utilint.LoggerUtils;
-import com.xjh.common.model.ConfigurationBO;
 import com.xjh.common.model.DishesAttributeBO;
 import com.xjh.common.store.OssStore;
 import com.xjh.common.utils.*;
@@ -397,10 +394,9 @@ public class DishesEditView extends SimpleGridForm {
                 imgItems.add(bo);
                 imgTV.refresh();
 
-                ConfigurationBO cfg = ConfigService.loadConfiguration();
-                if(CommonUtils.isNotBlank(cfg.getOssAccessKeyId())){
+                if(CommonUtils.isNotBlank(ConfigService.getOssAccessKeyId())){
                     new Thread(() -> {
-                        OssStore ossStore = new OssStore(cfg.getOssEndpoint(), cfg.getOssAccessKeyId(), cfg.getOssAccessKeySecret());
+                        OssStore ossStore = new OssStore(ConfigService.getOssEndpoint(), ConfigService.getOssAccessKeyId(), ConfigService.getOssAccessKeySecret());
                         ossStore.upload(toFile, "images/" + toUrl);
                         Logger.info("上传OSS文件成功: " + "images/" + toUrl);
                     }).start();

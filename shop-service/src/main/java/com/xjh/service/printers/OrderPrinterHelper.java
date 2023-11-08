@@ -3,7 +3,6 @@ package com.xjh.service.printers;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.xjh.common.enumeration.*;
-import com.xjh.common.model.ConfigurationBO;
 import com.xjh.common.model.DeskOrderParam;
 import com.xjh.common.utils.*;
 import com.xjh.common.valueobject.OrderOverviewVO;
@@ -317,7 +316,6 @@ public class OrderPrinterHelper {
     }
 
     private List<JSONObject> qrCode(StoreVO store, Desk desk) {
-        ConfigurationBO cfg = configService.loadConfiguration();
         DeskKey deskKey = deskKeyDAO.getByDeskId(desk.getDeskId());
         String deskKeyString = deskKey != null ? deskKey.getDeskKey() : "";
         String deskCode = LocalDeskCode.getDeskCode(desk.getDeskName());
@@ -333,8 +331,8 @@ public class OrderPrinterHelper {
         jsonObject.put("QrWidth", 250);
         jsonObject.put("LeftPadding1", 30);
         jsonObject.put("LeftPadding2", 30);
-        jsonObject.put("Text1", cfg.getTickedUrl() + "?d=" + deskCode + "&s=" + store.getStoreId() + "&k=" + deskKeyString);
-        jsonObject.put("Text2", cfg.getPublicAddress());
+        jsonObject.put("Text1", ConfigService.getTickedUrl() + "?d=" + deskCode + "&s=" + store.getStoreId() + "&k=" + deskKeyString);
+        jsonObject.put("Text2", ConfigService.getPublicAddress());
         qrcode.add(jsonObject);
 
         jsonObject = new JSONObject();
@@ -408,7 +406,6 @@ public class OrderPrinterHelper {
     private JSONArray getOrderJsonArray80(SubOrder subOrder, Desk desk, List<OrderDishes> subOrderContainDishes) {
         StoreVO store = storeService.getStore().getData();
         Integer storeId = store.getStoreId();
-        ConfigurationBO cfg = configService.loadConfiguration();
         JSONArray jsonArray = new JSONArray();
 
         Order order = orderService.getOrder(subOrder.getOrderId());
@@ -719,8 +716,8 @@ public class OrderPrinterHelper {
         jsonObject.put("QrWidth", 250);
         jsonObject.put("LeftPadding1", 30);
         jsonObject.put("LeftPadding2", 30);
-        jsonObject.put("Text1", cfg.getTickedUrl()+"?d="+deskCode+"&s="+storeId+"&k="+deskKeyString);
-        jsonObject.put("Text2", cfg.getPublicAddress());
+        jsonObject.put("Text1", ConfigService.getTickedUrl()+"?d="+deskCode+"&s="+storeId+"&k="+deskKeyString);
+        jsonObject.put("Text2", ConfigService.getPublicAddress());
         jsonArray.add(jsonObject);
 
         jsonObject = new JSONObject();
@@ -963,7 +960,6 @@ public class OrderPrinterHelper {
     }
 
     public JSONArray buildCheckOutPrintData(Order order) {
-        ConfigurationBO cfg = configService.loadConfiguration();
         JSONArray jsonArray = new JSONArray();
         JSONObject jsonObject = new JSONObject();
 
@@ -2274,8 +2270,8 @@ public class OrderPrinterHelper {
         jsonObject.put("QrWidth", 250);
         jsonObject.put("LeftPadding1", 30);
         jsonObject.put("LeftPadding2", 30);
-        jsonObject.put("Text1", cfg.getTickedUrl() + "?d=" + deskCode + "&s=" + store.getStoreId() + "&k=" + deskKeyString);
-        jsonObject.put("Text2", cfg.getPublicAddress());
+        jsonObject.put("Text1", ConfigService.getTickedUrl() + "?d=" + deskCode + "&s=" + store.getStoreId() + "&k=" + deskKeyString);
+        jsonObject.put("Text2", ConfigService.getPublicAddress());
         jsonArray.add(jsonObject);
 
         jsonObject = new JSONObject();

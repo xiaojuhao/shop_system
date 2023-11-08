@@ -103,6 +103,14 @@ public class SysConfigView extends GridPane {
         this.add(new Label("DB密码："), 0, row);
         this.add(dbPwd, 1, row);
         collectData.add(() -> runtimeProp.setProperty(DB_PASSWORD.name, trim(dbPwd.getText())));
+
+        row++;
+        PasswordField filepwd = new PasswordField();
+        filepwd.setText(runtimeProp.getProperty(FILE_PASSWORD.name));
+        filepwd.setPrefWidth(450);
+        this.add(new Label("文件密码："), 0, row);
+        this.add(dbPwd, 1, row);
+        collectData.add(() -> runtimeProp.setProperty(FILE_PASSWORD.name, trim(filepwd.getText())));
         // save button
         row++;
         VBox saveRow = new VBox();

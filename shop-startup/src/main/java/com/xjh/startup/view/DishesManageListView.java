@@ -47,9 +47,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.xjh.service.domain.DishesTypeService.toDishesTypeName;
 import static com.xjh.service.store.TableViewUtils.newCol;
 import static com.xjh.service.store.TableViewUtils.rowIndex;
-import static com.xjh.service.domain.DishesTypeService.toDishesTypeName;
 
 public class DishesManageListView extends SimpleForm implements Initializable {
     DishesService dishesService = GuiceContainer.getInstance(DishesService.class);

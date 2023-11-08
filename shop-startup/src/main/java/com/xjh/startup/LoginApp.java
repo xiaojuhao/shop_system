@@ -1,12 +1,8 @@
 package com.xjh.startup;
 
 import com.xjh.common.utils.Logger;
-import com.xjh.common.utils.Safe;
 import com.xjh.common.utils.TimeRecord;
-import com.xjh.service.jobs.SchedJobService;
-import com.xjh.startup.foundation.InitializeSystem;
 import com.xjh.startup.foundation.constants.MainStageHolder;
-import com.xjh.startup.foundation.ioc.GuiceContainer;
 import com.xjh.startup.foundation.ws.XjhWebSocketServer;
 import com.xjh.startup.view.LoginView;
 import javafx.application.Application;

@@ -1,59 +1,23 @@
 package com.xjh.startup.another;
 
-import java.util.Arrays;
-
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
-
 import javafx.event.EventHandler;
-
-
 import javafx.geometry.Insets;
-
-
 import javafx.scene.Group;
-
-
 import javafx.scene.Scene;
-
-
-import javafx.scene.control.Label;
-
-
-import javafx.scene.control.SelectionMode;
-
-
-import javafx.scene.control.TableCell;
-
-
-import javafx.scene.control.TableColumn;
-
-
-import javafx.scene.control.TableView;
-
-
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-
-
 import javafx.scene.input.MouseDragEvent;
-
-
 import javafx.scene.input.MouseEvent;
-
-
 import javafx.scene.layout.VBox;
-
-
 import javafx.scene.text.Font;
-
-
 import javafx.stage.Stage;
-
-
 import javafx.util.Callback;
+
+import java.util.Arrays;
 
 
 public class DragSelectionTable extends Application {

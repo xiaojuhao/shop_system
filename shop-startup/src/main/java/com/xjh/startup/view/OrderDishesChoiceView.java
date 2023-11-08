@@ -57,8 +57,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.xjh.common.utils.CommonUtils.*;
-import static com.xjh.service.store.ImageHelper.buildImageView;
 import static com.xjh.common.utils.OrElse.orGet;
+import static com.xjh.service.store.ImageHelper.buildImageView;
 import static com.xjh.startup.view.base.SimpleForm.*;
 
 
