@@ -101,11 +101,13 @@ public abstract class AbstractBerkeleyKvDB<T> implements KvDB<T> {
             if (instHolder.get() != null) {
                 return instHolder.get();
             }
+            long startTime = System.currentTimeMillis();
             DatabaseConfig dbConfig = new DatabaseConfig();
             dbConfig.setTransactional(true);
             dbConfig.setAllowCreate(true);
             Database db = BerkeleyDBUtils.getEnv()
                     .openDatabase(null, getDbName(), dbConfig);
+            System.out.println("初始化BDB（" + getDbName() + "）, 耗时 " + (System.currentTimeMillis() - startTime) + "毫秒");
             return instHolder.hold(db);
         }
     }

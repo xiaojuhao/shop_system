@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Singleton
 public class ConfigService {
-    static SysCfgDB sysCfgDB = SysCfgDB.inst();
+    public static SysCfgDB sysCfgDB = SysCfgDB.inst();
 
     static Holder<Map<String, ConfigItem>> holder = new Holder<>();
 
@@ -83,17 +83,19 @@ public class ConfigService {
                 if(rs.isSuccess()){
                     holder.hold(rs.getData());
                 }
-            }, 10, 10, TimeUnit.SECONDS);
+            }, 10, 60, TimeUnit.SECONDS);
         }
     }
 
     public static boolean needReResolveConfig(){
         long startTime = System.currentTimeMillis();
         File file = findConfigFile();
+        System.out.println("搜索配置文件耗时: " + (System.currentTimeMillis() - startTime));
         if(file == null){
             return false;
         }
         String lastTime = sysCfgDB.get("file_resolve_time_" + file.getName(), String.class);
+        System.out.println("上次配置文件解析时间: " + lastTime + ", 耗时: " + (System.currentTimeMillis() - startTime));
         if(CommonUtils.isNotBlank(lastTime)){
             long ll = CommonUtils.parseLong(lastTime, 0L);
             System.out.println("检查配置文件更新, 耗时: " + (System.currentTimeMillis() - startTime) + "毫秒" );
@@ -130,6 +132,7 @@ public class ConfigService {
             sysCfgDB.put("file_resolve_time_" + file.getName(), file.lastModified()+"");
             return Result.success(configMap);
         }catch (Exception ex){
+            System.out.println("解析配置文件失败: " + ex.getMessage());
             return Result.fail(ex.getMessage());
         }
     }

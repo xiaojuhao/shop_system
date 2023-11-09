@@ -130,5 +130,14 @@ public class LoginController implements Initializable {
         wxImg.setImage(new Image("/img/weixin.png"));
         zfbImg.setImage(new Image("/img/zhifubao.png"));
         dingdingImg.setImage(new Image("/img/dingding.jpeg"));
+
+        new Thread(() -> {
+            try{
+                ConfigService.readConfig();
+            }catch (Exception ex){
+                //
+            }
+        }).start();
+
     }
 }
