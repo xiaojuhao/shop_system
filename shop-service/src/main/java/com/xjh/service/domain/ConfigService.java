@@ -1,13 +1,16 @@
 package com.xjh.service.domain;
 
 import com.google.inject.Singleton;
+import com.sun.scenario.animation.shared.TimerReceiver;
 import com.xjh.common.enumeration.EnumPropName;
 import com.xjh.common.kvdb.impl.SysCfgDB;
 import com.xjh.common.store.DirUtils;
 import com.xjh.common.store.SysConfigUtils;
+import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Holder;
 import com.xjh.common.utils.Result;
 import com.xjh.service.domain.model.ConfigItem;
+import com.xjh.service.printers.StringUtil;
 import org.apache.poi.poifs.crypt.Decryptor;
 import org.apache.poi.poifs.crypt.EncryptionInfo;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
@@ -76,6 +79,22 @@ public class ConfigService {
         }
     }
 
+    public static boolean needReResolveConfig(){
+        long startTime = System.currentTimeMillis();
+        File file = findConfigFile();
+        if(file == null){
+            return false;
+        }
+        String lastTime = sysCfgDB.get("file_resolve_time_" + file.getName(), String.class);
+        if(CommonUtils.isNotBlank(lastTime)){
+            long ll = CommonUtils.parseLong(lastTime, 0L);
+            System.out.println("检查配置文件更新, 耗时: " + (System.currentTimeMillis() - startTime) + "毫秒" );
+            return file.lastModified() > ll;
+        }
+        System.out.println("检查配置文件更新, 耗时: " + (System.currentTimeMillis() - startTime) + "毫秒" );
+        return true;
+    }
+
     public static Result<Map<String, ConfigItem>> readConfig() {
         try{
             Map<String, ConfigItem> configMap = new HashMap<>();
@@ -83,31 +102,43 @@ public class ConfigService {
             if(file == null){
                 return Result.success(configMap);
             }
+            long startTime = System.currentTimeMillis();
             Properties properties = SysConfigUtils.getDbConfig();
             String filePassword = properties.getProperty(EnumPropName.FILE_PASSWORD.name);
-
-            InputStream is = Files.newInputStream(file.toPath());
-            POIFSFileSystem poifsFileSystem = new POIFSFileSystem(is);
-            EncryptionInfo encryptionInfo = new EncryptionInfo(poifsFileSystem);
-            Decryptor decryptor = Decryptor.getInstance(encryptionInfo);
-            decryptor.verifyPassword(filePassword);
-            Workbook wb = new XSSFWorkbook(decryptor.getDataStream(poifsFileSystem));
-            Sheet sheet = wb.getSheetAt(0);
-            int rows = sheet.getLastRowNum();
-            for(int i = 1; i < rows; i++){
-                Row row = sheet.getRow(i);
-                ConfigItem item = new ConfigItem();
-                item.setKey(readCell(row.getCell(0)));
-                item.setVal(readCell(row.getCell(1)));
-                item.setSensitive(readCell(row.getCell(2)));
-                item.setRemark(readCell(row.getCell(3)));
-                configMap.put(item.getKey(), item);
+            if(CommonUtils.isNotBlank(filePassword)) {
+                InputStream is = Files.newInputStream(file.toPath());
+                POIFSFileSystem poifsFileSystem = new POIFSFileSystem(is);
+                EncryptionInfo encryptionInfo = new EncryptionInfo(poifsFileSystem);
+                Decryptor decryptor = Decryptor.getInstance(encryptionInfo);
+                decryptor.verifyPassword(filePassword);
+                Workbook wb = new XSSFWorkbook(decryptor.getDataStream(poifsFileSystem));
+                configMap = readConfigFromSheet(wb.getSheetAt(0));
+                is.close();
+            }else {
+                Workbook wb = new XSSFWorkbook(file);
+                configMap = readConfigFromSheet(wb.getSheetAt(0));
             }
-            is.close();
+            System.out.println("解析配置文件成功, 耗时: " + (System.currentTimeMillis() - startTime) + "毫秒");
+            sysCfgDB.put("file_resolve_time_" + file.getName(), file.lastModified()+"");
             return Result.success(configMap);
         }catch (Exception ex){
             return Result.fail(ex.getMessage());
         }
+    }
+
+    static Map<String, ConfigItem> readConfigFromSheet(Sheet sheet){
+        Map<String, ConfigItem> configMap = new HashMap<>();
+        int rows = sheet.getLastRowNum();
+        for(int i = 1; i <= rows; i++){
+            Row row = sheet.getRow(i);
+            ConfigItem item = new ConfigItem();
+            item.setKey(readCell(row.getCell(0)));
+            item.setVal(readCell(row.getCell(1)));
+            item.setSensitive(readCell(row.getCell(2)));
+            item.setRemark(readCell(row.getCell(3)));
+            configMap.put(item.getKey(), item);
+        }
+        return configMap;
     }
 
     public static ConfigItem getConfig(String configKey){
