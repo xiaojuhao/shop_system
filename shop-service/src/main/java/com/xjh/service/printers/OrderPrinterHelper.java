@@ -68,7 +68,7 @@ public class OrderPrinterHelper {
         array.add(simpleLineText("开台时间:" + DateBuilder.base(order.getCreateTime()).timeStr()));
         array.add(simpleLineText("桌台信息: 小句号料理-" + desk.getDeskName()));
         array.add(simpleLineText("用餐人数:" + order.getOrderCustomerNums()));
-        array.add(simpleLineText("点菜员:点菜员1"));
+        array.add(simpleLineText("点菜员: " + CurrentAccount.currentAccountName()));
         array.add(crlf()); // 换行
         // 订单菜品
         List<OrderDishes> orderDishesList = orderDishesService.selectByOrderId(param.getOrderId());
@@ -482,8 +482,7 @@ public class OrderPrinterHelper {
         jsonObject = new JSONObject();
         jsonObject.put("Name", "点菜员值");
         jsonObject.put("ComType", EnumComType.TEXT.type);
-        // jsonObject.put("SampleContent", subOrder.getSubOrderAccount().getAccountNickName());
-        jsonObject.put("SampleContent", CurrentAccount.currentAccountCode());
+        jsonObject.put("SampleContent", CurrentAccount.currentAccountName());
         jsonObject.put("Size", 1);
         jsonObject.put("FrontLen", 0);
         jsonObject.put("BehindLen", 0);
@@ -1091,8 +1090,7 @@ public class OrderPrinterHelper {
         jsonObject = new JSONObject();
         jsonObject.put("Name", "点菜员值");
         jsonObject.put("ComType", EnumComType.TEXT.type);
-        // jsonObject.put("SampleContent", order.getOrderAccount().getAccountNickName());
-        jsonObject.put("SampleContent", "点菜员哈哈");
+        jsonObject.put("SampleContent", CurrentAccount.currentAccountName());
         jsonObject.put("Size", 1);
         jsonObject.put("FrontLen", 0);
         jsonObject.put("BehindLen", 0);

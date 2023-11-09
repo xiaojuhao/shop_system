@@ -25,6 +25,14 @@ public class CurrentAccount {
         return get() != null ? get().getAccountUser() : "root";
     }
 
+
+    public static String currentAccountName() {
+        if(get() == null){
+            return "--";
+        }
+        return OrElse.orGet(get().getAccountNickName(), "--");
+    }
+
     public static boolean hasRole(String role) {
         return hasRoles(newHashset(role));
     }

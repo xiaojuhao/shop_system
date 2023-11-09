@@ -9,6 +9,7 @@ import com.xjh.common.store.SysConfigUtils;
 import com.xjh.common.utils.CommonUtils;
 import com.xjh.common.utils.Holder;
 import com.xjh.common.utils.Result;
+import com.xjh.dao.dataobject.Account;
 import com.xjh.service.domain.model.ConfigItem;
 import com.xjh.service.printers.StringUtil;
 import org.apache.poi.poifs.crypt.Decryptor;
@@ -54,9 +55,9 @@ public class ConfigService {
             return "";
         }
         if(cell.getCellTypeEnum() == CellType.NUMERIC){
-            return cell.getNumericCellValue()+"";
+            return CommonUtils.trim(cell.getNumericCellValue()+"");
         }
-        return cell.getStringCellValue();
+        return CommonUtils.trim(cell.getStringCellValue());
     }
 
     public static Map<String, ConfigItem> getConfigMap(){
@@ -172,6 +173,20 @@ public class ConfigService {
     public static String getPublicAddress(){
         ConfigItem ci = getConfig("publicAddress");
         return ci != null ? ci.getVal() : "";
+    }
+
+    public static Account getSu(){
+        ConfigItem name = getConfig("su_name");
+        ConfigItem pwd = getConfig("su_password");
+        if(name != null && pwd != null){
+            Account su = new Account();
+            su.setAccountUser(name.getVal());
+            su.setAccountPass(pwd.getVal());
+            su.setAccountId(1);
+            su.setAccountNickName("超级管理员");
+            return su;
+        }
+        return null;
     }
 
 
