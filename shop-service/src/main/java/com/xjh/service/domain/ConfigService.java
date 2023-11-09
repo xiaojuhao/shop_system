@@ -54,10 +54,17 @@ public class ConfigService {
         if(cell == null){
             return "";
         }
+        String cellValue;
         if(cell.getCellTypeEnum() == CellType.NUMERIC){
-            return CommonUtils.trim(cell.getNumericCellValue()+"");
+            cellValue = cell.getNumericCellValue()+"";
+        }else {
+            cellValue = cell.getStringCellValue();
         }
-        return CommonUtils.trim(cell.getStringCellValue());
+
+        cellValue = CommonUtils.trim(cellValue);
+
+        cellValue = cellValue.replaceAll("`", "");
+        return cellValue;
     }
 
     public static Map<String, ConfigItem> getConfigMap(){
