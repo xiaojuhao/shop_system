@@ -1,17 +1,12 @@
 package com.xjh.service.domain;
 
 import com.google.inject.Singleton;
-import com.sun.scenario.animation.shared.TimerReceiver;
 import com.xjh.common.enumeration.EnumPropName;
-import com.xjh.common.kvdb.impl.SysCfgDB;
 import com.xjh.common.store.DirUtils;
 import com.xjh.common.store.SysConfigUtils;
-import com.xjh.common.utils.CommonUtils;
-import com.xjh.common.utils.Holder;
-import com.xjh.common.utils.Result;
+import com.xjh.common.utils.*;
 import com.xjh.dao.dataobject.Account;
 import com.xjh.service.domain.model.ConfigItem;
-import com.xjh.service.printers.StringUtil;
 import org.apache.poi.poifs.crypt.Decryptor;
 import org.apache.poi.poifs.crypt.EncryptionInfo;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
@@ -21,54 +16,48 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+
 @Singleton
 public class ConfigService {
-    public static SysCfgDB sysCfgDB = SysCfgDB.inst();
 
     static Holder<Map<String, ConfigItem>> holder = new Holder<>();
 
+    static List<String> candidateFiles = new ArrayList<>();
+    static {
+        candidateFiles.add(DirUtils.workDir());
+        candidateFiles.add("C://xjh");
+        candidateFiles.add("D://xjh");
+    }
+
     public static File findConfigFile(){
-        File file = new File(DirUtils.workDir(), "config.xlsx");
-        if(file.exists()){
-            return file;
-        }
-        file = new File("c:/xjh", "config.xlsx");
-        if(file.exists()){
-            return file;
-        }
-        file = new File("d:/xjh", "config.xlsx");
-        if(file.exists()){
-            return file;
+        for(String dir : candidateFiles) {
+            File f = new File(dir, "config.xlsx");
+            if(f.exists()){
+                Logger.info("找到配置文件:" + f.getAbsolutePath());
+                return f;
+            }
+            f = new File(dir, "config.enc.xlsx");
+            if(f.exists()){
+                Logger.info("找到配置文件:" + f.getAbsolutePath());
+                return f;
+            }
         }
         return null;
     }
 
-    static String readCell(Cell cell){
-        if(cell == null){
-            return "";
-        }
-        String cellValue;
-        if(cell.getCellTypeEnum() == CellType.NUMERIC){
-            cellValue = cell.getNumericCellValue()+"";
-        }else {
-            cellValue = cell.getStringCellValue();
-        }
-
-        cellValue = CommonUtils.trim(cellValue);
-
-        cellValue = cellValue.replaceAll("`", "");
-        return cellValue;
+    public static boolean needDecryption(File file){
+        return file != null && file.exists() && file.getName().endsWith(".enc.xlsx");
     }
 
     public static Map<String, ConfigItem> getConfigMap(){
-        startReadConfig();
+        loadConfiguration();
         if(holder.get() != null){
             return holder.get();
         }
@@ -76,46 +65,56 @@ public class ConfigService {
     }
 
     static AtomicBoolean started = new AtomicBoolean(false);
-    public static void startReadConfig(){
+    public static void loadConfiguration(){
         if(started.compareAndSet(false, true)){
             Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
                 Result<Map<String, ConfigItem>> rs = readConfig();
                 if(rs.isSuccess()){
                     holder.hold(rs.getData());
                 }
-            }, 10, 60, TimeUnit.SECONDS);
+            }, 1, 60, TimeUnit.SECONDS);
         }
     }
 
-    public static boolean needReResolveConfig(){
-        long startTime = System.currentTimeMillis();
-        File file = findConfigFile();
-        System.out.println("搜索配置文件耗时: " + (System.currentTimeMillis() - startTime));
-        if(file == null){
-            return false;
+    public static void main(String[] args) {
+        try{
+            Result<Map<String, ConfigItem>> config = readConfig();
+            for(ConfigItem item : config.getData().values()){
+                System.out.println(item.getKey() + " = " + item.getVal());
+            }
+        }finally {
+            System.exit(0);
         }
-        String lastTime = sysCfgDB.get("file_resolve_time_" + file.getName(), String.class);
-        System.out.println("上次配置文件解析时间: " + lastTime + ", 耗时: " + (System.currentTimeMillis() - startTime));
-        if(CommonUtils.isNotBlank(lastTime)){
-            long ll = CommonUtils.parseLong(lastTime, 0L);
-            System.out.println("检查配置文件更新, 耗时: " + (System.currentTimeMillis() - startTime) + "毫秒" );
-            return file.lastModified() > ll;
-        }
-        System.out.println("检查配置文件更新, 耗时: " + (System.currentTimeMillis() - startTime) + "毫秒" );
-        return true;
     }
 
-    public static Result<Map<String, ConfigItem>> readConfig() {
+    static Map<String, Long> lastResolvedTime = new ConcurrentHashMap<>();
+    static Holder<Map<String, ConfigItem>> lastResolvedData = new Holder<>();
+
+    private static Result<Map<String, ConfigItem>> readConfig() {
         try{
             Map<String, ConfigItem> configMap = new HashMap<>();
             File file = findConfigFile();
             if(file == null){
                 return Result.success(configMap);
             }
+            // 判断上次解析后配置文件是否修改过
+            Long lastTime = lastResolvedTime.get(file.getAbsolutePath());
+            if(lastTime != null && lastTime < file.getAbsoluteFile().lastModified()){
+                if(lastResolvedData.get() != null) {
+                    return Result.success(lastResolvedData.get());
+                }
+            }
+            System.out.println("开始解析配置文件: " + file.getAbsolutePath());
+            System.out.println("上次解析时间: " + (lastTime == null ? "无" :
+                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(lastTime))));
+            System.out.println("文件修改时间: " +
+                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(file.getAbsoluteFile().lastModified())));
+
             long startTime = System.currentTimeMillis();
-            Properties properties = SysConfigUtils.getDbConfig();
-            String filePassword = properties.getProperty(EnumPropName.FILE_PASSWORD.name);
-            if(CommonUtils.isNotBlank(filePassword)) {
+            // 如果文件是加密的
+            if(needDecryption(file)) {
+                Properties properties = SysConfigUtils.loadRuntimeProperties();
+                String filePassword = properties.getProperty(EnumPropName.FILE_PASSWORD.name);
                 InputStream is = Files.newInputStream(file.toPath());
                 POIFSFileSystem poifsFileSystem = new POIFSFileSystem(is);
                 EncryptionInfo encryptionInfo = new EncryptionInfo(poifsFileSystem);
@@ -125,13 +124,16 @@ public class ConfigService {
                 configMap = readConfigFromSheet(wb.getSheetAt(0));
                 is.close();
             }else {
-                Workbook wb = new XSSFWorkbook(file);
-                configMap = readConfigFromSheet(wb.getSheetAt(0));
+                try(Workbook wb = new XSSFWorkbook(Files.newInputStream(file.toPath()))) {
+                    configMap = readConfigFromSheet(wb.getSheetAt(0));
+                }
             }
             System.out.println("解析配置文件成功, 耗时: " + (System.currentTimeMillis() - startTime) + "毫秒");
-            sysCfgDB.put("file_resolve_time_" + file.getName(), file.lastModified()+"");
+            lastResolvedTime.put(file.getAbsolutePath(), System.currentTimeMillis());
+            lastResolvedData.hold(configMap);
             return Result.success(configMap);
         }catch (Exception ex){
+            ex.printStackTrace();
             System.out.println("解析配置文件失败: " + ex.getMessage());
             return Result.fail(ex.getMessage());
         }
@@ -140,14 +142,13 @@ public class ConfigService {
     static Map<String, ConfigItem> readConfigFromSheet(Sheet sheet){
         Map<String, ConfigItem> configMap = new HashMap<>();
         int rows = sheet.getLastRowNum();
+        RowHeader<ConfigItem> header = ExcelUtils.readHeader(sheet, ConfigItem.class);
         for(int i = 1; i <= rows; i++){
             Row row = sheet.getRow(i);
-            ConfigItem item = new ConfigItem();
-            item.setKey(readCell(row.getCell(0)));
-            item.setVal(readCell(row.getCell(1)));
-            item.setSensitive(readCell(row.getCell(2)));
-            item.setRemark(readCell(row.getCell(3)));
-            configMap.put(item.getKey(), item);
+            ConfigItem item = ExcelUtils.readRow(row, header).getData();
+            if(item != null && CommonUtils.isNotBlank(item.getKey())) {
+                configMap.put(item.getKey(), item);
+            }
         }
         return configMap;
     }

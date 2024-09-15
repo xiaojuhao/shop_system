@@ -38,6 +38,17 @@ public class CommonUtils {
         return retList;
     }
 
+    public static boolean isPureDigit(String s) {
+        if (isBlank(s)) {
+            return false;
+        }
+        for (char c : s.toCharArray()) {
+            if (!Character.isDigit(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
     public static <V, R> List<R> collect(List<V> list, Function<V, R> mapper) {
         if (list == null || list.size() == 0) {
             return new ArrayList<>();

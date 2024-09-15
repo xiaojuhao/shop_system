@@ -2,6 +2,7 @@ package com.xjh.startup;
 
 import com.xjh.common.utils.Logger;
 import com.xjh.common.utils.TimeRecord;
+import com.xjh.service.domain.ConfigService;
 import com.xjh.startup.foundation.constants.MainStageHolder;
 import com.xjh.startup.foundation.ws.XjhWebSocketServer;
 import com.xjh.startup.view.LoginView;
@@ -15,6 +16,8 @@ public class LoginApp extends Application {
     public void start(Stage primaryStage) {
         // 主Stage
         MainStageHolder.hold(primaryStage);
+        // 加载配置文件
+        ConfigService.loadConfiguration();
 
         TimeRecord timeRecord = TimeRecord.start();
         primaryStage.setTitle("登录系统");
