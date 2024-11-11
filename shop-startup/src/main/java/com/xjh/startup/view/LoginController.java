@@ -4,8 +4,6 @@ import com.xjh.common.utils.*;
 import com.xjh.common.valueobject.AccountVO;
 import com.xjh.dao.dataobject.Account;
 import com.xjh.service.domain.AccountService;
-import com.xjh.service.domain.ConfigService;
-import com.xjh.service.domain.model.ConfigItem;
 import com.xjh.service.jobs.SchedJobService;
 import com.xjh.startup.foundation.InitializeSystem;
 import com.xjh.startup.foundation.constants.MainStageHolder;
@@ -24,7 +22,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -49,16 +46,6 @@ public class LoginController implements Initializable {
             return;
         }
         try {
-            if(ConfigService.needReResolveConfig()) {
-                File configFile = ConfigService.findConfigFile();
-                if (configFile != null) {
-                    Result<?> rs = ConfigService.readConfig();
-                    if (!rs.isSuccess()) {
-                        AlertBuilder.ERROR("提示", "读取" + configFile.getName() + "失败,请检查!");
-                        return;
-                    }
-                }
-            }
             AccountService accountService = GuiceContainer.getInstance(AccountService.class);
             String account = accountField.getText().trim();
             String password = passwordField.getText().trim();
@@ -66,9 +53,9 @@ public class LoginController implements Initializable {
             Result<Account> accountCheck = accountService.checkPwd(account, password);
             if (accountCheck.isSuccess()) {
                 AccountVO accVO = CopyUtils.convert(accountCheck.getData(), AccountVO.class);
+                assert accVO != null;
                 accVO.addRole(role_clerk);
-                if ("1".equals(accVO.getAccountUser()) // test
-                        || "root".equals(accVO.getAccountUser()) // root
+                if ("root".equals(accVO.getAccountUser()) // root
                         || strContains(accVO.getAccountNickName(), "管理员"))  // 管理员
                 {
                     accVO.addRole(role_su);
@@ -130,14 +117,6 @@ public class LoginController implements Initializable {
         wxImg.setImage(new Image("/img/weixin.png"));
         zfbImg.setImage(new Image("/img/zhifubao.png"));
         dingdingImg.setImage(new Image("/img/dingding.jpeg"));
-
-        new Thread(() -> {
-            try{
-                ConfigService.readConfig();
-            }catch (Exception ex){
-                //
-            }
-        }).start();
 
     }
 }
