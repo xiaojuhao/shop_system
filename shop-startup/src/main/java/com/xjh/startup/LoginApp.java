@@ -24,7 +24,7 @@ public class LoginApp extends Application {
         primaryStage.setMaximized(true);
         primaryStage.setScene(LoginView.getLoginView());
         primaryStage.show();
-        Logger.info("主页面渲染, cost " + timeRecord.getCostAndReset());
+        Logger.info("主页面渲染  , cost " + timeRecord.getCostAndReset());
         // 启动 webSocket服务器
         XjhWebSocketServer.startWS(8889);
         primaryStage.setOnCloseRequest(evt -> {
