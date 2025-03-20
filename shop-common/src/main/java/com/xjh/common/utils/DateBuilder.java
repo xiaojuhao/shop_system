@@ -37,6 +37,14 @@ public class DateBuilder {
         return builder;
     }
 
+    public static DateBuilder base22(Date date) {
+        DateBuilder builder = new DateBuilder();
+        if (date != null) {
+            builder.localDateTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+        return builder;
+    }
+
     public static DateBuilder base(LocalDate localDate) {
         DateBuilder builder = new DateBuilder();
         if (localDate != null) {
