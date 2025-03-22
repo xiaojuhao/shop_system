@@ -40,6 +40,7 @@ public class CopyUtils {
         if (from == null || to == null) {
             return Result.fail("拷贝错误");
         }
+
         Map<String, PropertyDescriptor> fromPds = ReflectionUtils.resolvePD(from.getClass());
         Map<String, PropertyDescriptor> toPds = ReflectionUtils.resolvePD(to.getClass());
         try {
